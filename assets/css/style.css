@@ -3912,6 +3912,7 @@ img {
 .footer-widget p {
     font-size: 14px;
     line-height: 1.9;
+    color: rgba(255,255,255,0.78);
     color: color-mix(in srgb, var(--text-on-footer, #fff) 78%, transparent);
 }
 
@@ -4002,6 +4003,7 @@ img {
 }
 
 .footer-links a {
+    color: rgba(255,255,255,0.74);
     color: color-mix(in srgb, var(--text-on-footer, #fff) 74%, transparent);
     font-size: 14px;
     display: inline-flex;
@@ -4044,6 +4046,7 @@ img {
 }
 
 .footer-notices a {
+    color: rgba(255,255,255,0.82);
     color: color-mix(in srgb, var(--text-on-footer, #fff) 82%, transparent);
     font-size: 14px;
     display: flex;
@@ -4058,6 +4061,7 @@ img {
 .footer-notices .notice-date {
     display: block;
     font-size: 12px;
+    color: rgba(255,255,255,0.58);
     color: color-mix(in srgb, var(--text-on-footer, #fff) 58%, transparent);
     margin-top: 5px;
 }
@@ -4074,6 +4078,7 @@ img {
     gap: 14px;
     margin-bottom: 16px;
     font-size: 14px;
+    color: rgba(255,255,255,0.84);
     color: color-mix(in srgb, var(--text-on-footer, #fff) 84%, transparent);
     transition: all 0.3s ease;
 }
@@ -4115,6 +4120,7 @@ img {
 .footer-bottom p {
     margin: 0;
     font-size: 13px;
+    color: rgba(255,255,255,0.68);
     color: color-mix(in srgb, var(--text-on-footer, #fff) 68%, transparent);
 }
 
