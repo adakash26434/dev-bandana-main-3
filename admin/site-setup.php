@@ -196,7 +196,7 @@ try {
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2"
                      >
-                    <span><i class="fas fa-users-cog me-2"></i>Admin खाताहरू</span>
+                    <span><i class="fas fa-users-gear me-2"></i>Admin खाताहरू</span>
                     <a href="manage-admins.php" class="btn btn-sm btn-light">
                         <i class="fas fa-arrow-right me-1"></i>Admin व्यवस्थापन खोल्नुहोस्
                     </a>
@@ -404,7 +404,7 @@ try {
                 <div class="list-group list-group-flush small">
                     <?php if ($isSuperAdmin): ?>
                     <a href="manage-admins.php" class="list-group-item list-group-item-action">
-                        <i class="fas fa-users-cog me-2 text-primary"></i>Admin User Management
+                        <i class="fas fa-users-gear me-2 text-primary"></i>Admin User Management
                     </a>
                     <?php endif; ?>
                     <a href="settings.php" class="list-group-item list-group-item-action">

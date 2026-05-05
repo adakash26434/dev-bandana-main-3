@@ -143,7 +143,7 @@ $_flash = getFlash();
 
 <?php
 $headerBtns = '<button class="btn btn-primary btn-sm" id="btnAddCmt"><i class="fas fa-plus me-1"></i>नयाँ थप्नुहोस्</button>';
-echo adminPageHeader('समिति/उपसमिति व्यवस्थापन', 'fa-users-cog', 'संचालक समिति र उपसमिति सदस्य व्यवस्थापन', $headerBtns);
+echo adminPageHeader('समिति/उपसमिति व्यवस्थापन', 'fa-users-gear', 'संचालक समिति र उपसमिति सदस्य व्यवस्थापन', $headerBtns);
 if ($_flash) echo adminAlert($_flash['type'] === 'success' ? 'success' : 'danger', $_flash['message']);
 ?>
 

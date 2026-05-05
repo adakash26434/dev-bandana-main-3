@@ -250,7 +250,7 @@ set_exception_handler(function (\Throwable $ex) {
 
     <!-- Admin CSS -->
     <link rel="stylesheet" href="assets/admin.css?v=9.7">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=4.1">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=4.8">
     <link rel="stylesheet" href="../assets/css/v9-mobile-fix.css?v=9.7">
     <link rel="stylesheet" href="../assets/css/site-banner-logo.css?v=1">
 
@@ -262,7 +262,7 @@ set_exception_handler(function (\Throwable $ex) {
         gap: 12px;
         padding: 10px 15px;
         margin: 2px 10px;
-        color: rgba(255,255,255,0.75);
+        color: #1f2937;
         font-size: 0.82rem;
         font-weight: 600;
         letter-spacing: 0.5px;
@@ -273,11 +273,11 @@ set_exception_handler(function (\Throwable $ex) {
         list-style: none;
     }
     .nav-group-header:hover {
-        background: rgba(255,255,255,0.1);
-        color: #fff;
+        background: #f3f4f6;
+        color: #111827;
     }
     .nav-group-header.open {
-        background: rgba(255,255,255,0.08);
+        background: var(--primary-color);
         color: #fff;
     }
     .nav-group-header .nav-group-icon {
@@ -292,13 +292,15 @@ set_exception_handler(function (\Throwable $ex) {
     .nav-group-header .nav-arrow {
         font-size: 0.65rem;
         transition: transform 0.25s ease;
-        opacity: 0.6;
+        opacity: 0.55;
+        color: #6b7280;
         order: 10;   /* सधैं सबैभन्दा दायाँ */
         flex-shrink: 0;
     }
     .nav-group-header.open .nav-arrow {
         transform: rotate(90deg);
         opacity: 1;
+        color: #fff;
     }
     /* ── Group Header Badge — reference image style ── */
     .nav-group-header .group-badge {
@@ -434,7 +436,7 @@ set_exception_handler(function (\Throwable $ex) {
           object-fit: contain !important;
           object-position: left center !important;
           border-radius: 6px !important;
-          background: rgba(255,255,255,0.08) !important;
+          background: #f3f4f6 !important;
           padding: 3px 5px !important;
           flex-shrink: 0 !important;
       }
@@ -442,7 +444,7 @@ set_exception_handler(function (\Throwable $ex) {
       .sidebar-brand.no-logo .sidebar-brand-text {
           font-size: 0.85rem;
           font-weight: 700;
-          color: #fff;
+          color: #1f2937;
           white-space: normal;
           word-break: break-word;
           overflow-wrap: break-word;
@@ -494,7 +496,7 @@ set_exception_handler(function (\Throwable $ex) {
                     <!-- ── Admin User Management — सबै admin ले देख्छन् ── -->
                     <li class="<?php echo $currentPage === 'manage-admins' ? 'active' : ''; ?>">
                         <a href="manage-admins.php">
-                            <span class="nav-icon-wrap"><i class="fas fa-users-cog"></i></span>
+                            <span class="nav-icon-wrap"><i class="fas fa-users-gear"></i></span>
                             <span>Admin व्यवस्थापन</span>
                             <?php if (!empty($_SESSION['is_superadmin'])): ?>
                             <span class="sa-mini-badge">SA</span>
@@ -1105,7 +1107,7 @@ set_exception_handler(function (\Throwable $ex) {
                                     <a href="change-password.php"><i class="fas fa-key"></i> पासवर्ड</a>
                                 <?php else: ?>
                                     <!-- Superadmin को लागि admin management link -->
-                                    <a href="manage-admins.php"><i class="fas fa-users-cog"></i> Admin व्यवस्थापन</a>
+                                    <a href="manage-admins.php"><i class="fas fa-users-gear"></i> Admin व्यवस्थापन</a>
                                 <?php endif; ?>
                                 <a href="logout.php"><i class="fas fa-sign-out-alt"></i> लगआउट</a>
                             </div>

@@ -382,6 +382,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof $ !== 'undefined' && $.fn.DataTable) {
         try {
             $('#noticesTable').DataTable({
+                autoWidth: false,
                 language: {
                     search    : 'खोज्नुहोस्:',
                     lengthMenu: '_MENU_ पङ्क्ति',

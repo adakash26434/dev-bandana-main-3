@@ -231,7 +231,8 @@ if ($result && !empty($result['ok'])) {
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=3">
-<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/eye-candy-verify-v7.css?v=9">
+<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=2">
+<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/eye-candy-verify-v7.css?v=10">
 <?php @require_once __DIR__ . '/assets/css/_color-vars.php'; ?>
 <style>
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
@@ -259,7 +260,7 @@ body {
 .page-back:hover { background: #f0fdf4; transform: translateX(-2px); }
 
 /* Outer wrap */
-.vp-outer { max-width: 660px; margin: 0 auto; }
+.vp-outer { max-width: 560px; margin: 0 auto; }
 
 /* Page header — logo centered above card */
 .vp-page-header {
@@ -342,7 +343,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 /* Form card — same language as program-attendance-verify */
 .verify-form-card {
     margin-top: 10px;
-    border-radius: 22px;
+    border-radius: 20px;
     overflow: hidden;
     background: #fff;
     box-shadow: 0 4px 6px rgba(0,0,0,.04), 0 24px 50px rgba(13,92,46,.12);
@@ -351,32 +352,32 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 .vp-card > .vp-result-ok + .verify-form-card { margin-top: 20px; }
 .verify-form-card__head {
     background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
-    padding: 26px 24px 22px;
+    padding: 20px 18px 18px;
     text-align: center;
     color: #fff;
 }
 .verify-form-card__head .vp-icon {
-    width: 64px; height: 64px; margin: 0 auto 14px;
+    width: 56px; height: 56px; margin: 0 auto 12px;
     border-radius: 50%;
     background: rgba(255,255,255,.18);
     box-shadow: 0 4px 16px rgba(0,0,0,.15);
-    font-size: 28px;
+    font-size: 24px;
 }
 .verify-form-card__head h1 {
     color: #fff !important;
-    font-size: 1.42rem !important;
+    font-size: 1.15rem !important;
     margin: 0 0 8px !important;
     letter-spacing: -.02em;
 }
 .verify-form-card__head .vp-sub {
     color: rgba(255,255,255,.88) !important;
-    font-size: .9rem !important;
+    font-size: .8rem !important;
     margin: 0 !important;
     line-height: 1.55 !important;
 }
 .verify-form-card__head .vp-sub b { color: #fff; font-weight: 700; }
-.verify-form-card__body { padding: 26px 24px 28px; }
-.verify-form-card__body .vp-field { margin-bottom: 18px; }
+.verify-form-card__body { padding: 18px 16px 20px; }
+.verify-form-card__body .vp-field { margin-bottom: 14px; }
 .verify-form-card__body .vp-field label {
     font-size: 11px;
     font-weight: 700;
@@ -384,19 +385,19 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     letter-spacing: .08em;
 }
 .verify-form-card__body .vp-field input {
-    padding: 13px 16px;
-    border-radius: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
     border: 1.5px solid #d1d5db;
-    font-size: 15px;
+    font-size: 14px;
 }
 .verify-form-card__body .vp-field input:focus {
     border-color: var(--primary-color,#1a8754);
     box-shadow: 0 0 0 3px rgba(26,135,84,.14);
 }
 .verify-form-card__body .vp-btn {
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 15px;
+    padding: 11px;
+    border-radius: 10px;
+    font-size: 14px;
     margin-top: 4px;
 }
 .vp-logo-hide { display: none !important; }
@@ -407,7 +408,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 }
 </style>
 </head>
-<body>
+<body class="auth-portal-page">
 <div class="vp-outer">
 
     <a href="<?php echo SITE_URL; ?>" class="page-back"><i class="fas fa-arrow-left"></i> मुख्य पृष्ठ</a>

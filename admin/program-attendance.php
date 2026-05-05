@@ -563,6 +563,26 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
 </div>
 <?php endif; ?>
 
+<ul class="nav nav-tabs admin-nav-tabs mb-3" id="paSectionTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="pa-tab-req" data-bs-toggle="tab" data-bs-target="#pa-pane-req" type="button" role="tab" aria-controls="pa-pane-req" aria-selected="true">
+      <i class="fas fa-hourglass-half me-2"></i>उपस्थिति अनुरोध
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="pa-tab-att" data-bs-toggle="tab" data-bs-target="#pa-pane-att" type="button" role="tab" aria-controls="pa-pane-att" aria-selected="false">
+      <i class="fas fa-list me-2"></i>उपस्थिति सूची
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="pa-tab-prereg" data-bs-toggle="tab" data-bs-target="#pa-pane-prereg" type="button" role="tab" aria-controls="pa-pane-prereg" aria-selected="false">
+      <i class="fas fa-user-plus me-2"></i>Pre-registration
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="paSectionTabsContent">
+  <div class="tab-pane fade show active" id="pa-pane-req" role="tabpanel" aria-labelledby="pa-tab-req">
 <div class="card admin-table-card mb-3 border-warning" style="border-width:2px;">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <h6 class="mb-0"><i class="fas fa-hourglass-half text-warning me-2"></i>उपस्थिति अनुरोध (QR / मोबाइल बिना)</h6>
@@ -616,7 +636,9 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
     </table>
   </div>
 </div>
+  </div>
 
+  <div class="tab-pane fade" id="pa-pane-att" role="tabpanel" aria-labelledby="pa-tab-att">
 <div class="card admin-table-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <h6 class="mb-0"><i class="fas fa-list me-2"></i>उपस्थिति सूची</h6>
@@ -660,7 +682,9 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
   </div>
   <?php endif; ?>
 </div>
+  </div>
 
+  <div class="tab-pane fade" id="pa-pane-prereg" role="tabpanel" aria-labelledby="pa-tab-prereg">
 <div class="card admin-table-card mt-3">
   <div class="card-header d-flex align-items-center justify-content-between">
     <h6 class="mb-0">Pre-registration सूची</h6>
@@ -769,6 +793,8 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
   </div>
 </div>
 <?php endif; ?>
+  </div>
+</div>
 
 <?php if (!empty($topProgramLabels) || !empty($trendLabels)): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

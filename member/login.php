@@ -311,6 +311,7 @@ if ($logoPath) {
 <title>Member Login — <?php echo htmlspecialchars($siteName); ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php memberHeadAssets(); ?>
+<link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>assets/css/auth-portals-unified.css?v=2">
 <link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>member/assets/member.css?v=10">
 <style>
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
@@ -340,16 +341,16 @@ body {
 .page-back:hover { background: #f0fdf4; transform: translateX(-2px); }
 
 .auth-card {
-    width: 100%; max-width: 400px;
+    width: 100%; max-width: 372px;
     margin-top: 0;
     background: #fff;
-    border-radius: 22px;
+    border-radius: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,.04), 0 22px 50px rgba(13,92,46,.11);
     border: 1px solid rgba(226,232,240,.9);
     overflow: hidden;
 }
 .card-header {
-    padding: 18px 22px 14px;
+    padding: 16px 18px 12px;
     text-align: center;
     border-bottom: 1px solid #f1f5f9;
     background: linear-gradient(180deg, rgba(240,253,244,.5) 0%, #fff 100%);
@@ -378,14 +379,14 @@ body {
     background:#f0fdf4; border:1px solid #bbf7d0;
     padding:4px 12px; border-radius:999px;
 }
-.card-body { padding: 18px 22px 20px; }
+.card-body { padding: 16px 18px 18px; }
 .card-title {
-    font-size: 1.15rem; font-weight: 800;
+    font-size: 1.02rem; font-weight: 800;
     color: var(--primary-dark,var(--primary-color,#1a8754));
     margin-bottom: 2px; line-height:1.2;
     letter-spacing: -.02em;
 }
-.card-sub { font-size:.8rem; color:#6b7280; margin-bottom:14px; line-height:1.45; }
+.card-sub { font-size:.76rem; color:#6b7280; margin-bottom:12px; line-height:1.45; }
 
 /* Tabs */
 .tabs { display:flex; gap:6px; margin-bottom:14px; background:#f1f5f9; border-radius:12px; padding:4px; }
@@ -403,9 +404,9 @@ body {
 .field { margin-bottom:11px; }
 .field label { display:block; font-size:.74rem; font-weight:600; color:#374151; margin-bottom:5px; }
 .field input, .field select {
-    width:100%; padding:10px 12px;
+    width:100%; padding:9px 11px;
     border:1.5px solid #e5e7eb; border-radius:10px;
-    font-size:.93rem; font-family:inherit;
+    font-size:.88rem; font-family:inherit;
     background:#fafbfc; color:#111827;
     transition:border-color .15s,box-shadow .15s;
 }
@@ -428,10 +429,10 @@ body {
 
 /* Button */
 .submit-btn {
-    width:100%; padding:11px 14px;
+    width:100%; padding:10px 14px;
     background:linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
     color:#fff; border:none; border-radius:10px;
-    font-size:.95rem; font-weight:700; font-family:inherit;
+    font-size:.9rem; font-weight:700; font-family:inherit;
     cursor:pointer; margin-top:8px;
     display:flex; align-items:center; justify-content:center; gap:8px;
     box-shadow:0 4px 14px rgba(26,135,84,.3);
@@ -479,15 +480,15 @@ body {
 @media (max-width:480px) {
     body { padding: 48px 12px 16px; justify-content: flex-start; }
     .auth-card { border-radius: 18px; }
-    .card-header { padding: 14px 16px 12px; }
-    .card-body { padding: 14px 16px 16px; }
+    .card-header { padding: 13px 14px 11px; }
+    .card-body { padding: 13px 14px 14px; }
 }
 @media (min-height:700px) {
     body { justify-content: center; padding-top: 56px; }
 }
 </style>
 </head>
-<body>
+<body class="auth-portal-page">
 
 <a href="<?php echo $siteUrl; ?>" class="page-back">
     <i class="fas fa-arrow-left"></i> गृहपृष्ठ

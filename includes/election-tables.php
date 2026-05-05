@@ -220,3 +220,130 @@ if (!function_exists('isElectionVotingOpen')) {
         }
     }
 }
+
+/**
+ * Designations master (positions) — admin use across staff/team/committees.
+ * This file is loaded by multiple admin pages, so helpers live here.
+ */
+if (!function_exists('ensureDesignationsTable')) {
+    function ensureDesignationsTable(?PDO $db = null): void
+    {
+        static $done = false;
+        if ($done) {
+            return;
+        }
+
+        if (!$db && function_exists('getDB')) {
+            try {
+                $db = getDB();
+            } catch (Throwable $e) {
+                return;
+            }
+        }
+
+        if (!$db instanceof PDO) {
+            return;
+        }
+
+        try {
+            $db->exec("CREATE TABLE IF NOT EXISTS designations (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title_np VARCHAR(160) NOT NULL,
+                title_en VARCHAR(160) NOT NULL DEFAULT '',
+                category VARCHAR(50) NOT NULL DEFAULT 'committee',
+                display_order INT NOT NULL DEFAULT 0,
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_desig_cat_ord (category, display_order, id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+            // Backward compatible: add missing columns if schema is older.
+            $cols = $db->query("SHOW COLUMNS FROM designations")->fetchAll(PDO::FETCH_COLUMN, 0) ?: [];
+            $colSet = array_flip($cols);
+
+            if (!isset($colSet['title_np'])) {
+                $db->exec("ALTER TABLE designations ADD COLUMN title_np VARCHAR(160) NOT NULL DEFAULT ''");
+            }
+            if (!isset($colSet['title_en'])) {
+                $db->exec("ALTER TABLE designations ADD COLUMN title_en VARCHAR(160) NOT NULL DEFAULT ''");
+            }
+            if (!isset($colSet['category'])) {
+                $db->exec("ALTER TABLE designations ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'committee'");
+            }
+            if (!isset($colSet['display_order'])) {
+                $db->exec("ALTER TABLE designations ADD COLUMN display_order INT NOT NULL DEFAULT 0");
+            }
+            if (!isset($colSet['is_active'])) {
+                $db->exec("ALTER TABLE designations ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1");
+            }
+            if (!isset($colSet['updated_at'])) {
+                $db->exec("ALTER TABLE designations ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP");
+            }
+
+            $done = true;
+        } catch (Throwable $e) {
+            // Best-effort: if schema creation fails, callers will just show empty dropdowns.
+        }
+    }
+}
+
+if (!function_exists('designationCategories')) {
+    function designationCategories(): array
+    {
+        // Keys must match what admin pages pass into fetchDesignations(...).
+        return [
+            'committee' => 'समिति',
+            'staff' => 'कर्मचारी',
+        ];
+    }
+}
+
+if (!function_exists('fetchDesignations')) {
+    function fetchDesignations(?PDO $db = null, array $categories = []): array
+    {
+        if (!($db instanceof PDO) && function_exists('getDB')) {
+            try {
+                $db = getDB();
+            } catch (Throwable $e) {
+                return [];
+            }
+        }
+
+        if (!($db instanceof PDO)) {
+            return [];
+        }
+
+        ensureDesignationsTable($db);
+
+        $cats = [];
+        foreach ($categories as $c) {
+            if (is_string($c) && trim($c) !== '') {
+                $cats[] = trim($c);
+            }
+        }
+
+        try {
+            if (empty($cats)) {
+                return $db->query(
+                    "SELECT id, title_np, title_en, category, display_order, is_active
+                     FROM designations
+                     WHERE is_active=1
+                     ORDER BY category, display_order, id"
+                )->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            }
+
+            $placeholders = implode(',', array_fill(0, count($cats), '?'));
+            $stmt = $db->prepare(
+                "SELECT id, title_np, title_en, category, display_order, is_active
+                 FROM designations
+                 WHERE is_active=1 AND category IN ($placeholders)
+                 ORDER BY category, display_order, id"
+            );
+            $stmt->execute($cats);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (Throwable $e) {
+            return [];
+        }
+    }
+}

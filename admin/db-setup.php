@@ -1158,7 +1158,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                             <i class="fas fa-code-branch me-2 text-warning"></i>Migration Runner
                         </a>
                         <a href="manage-admins.php" class="list-group-item list-group-item-action small py-2">
-                            <i class="fas fa-users-cog me-2 text-success"></i>Admin User व्यवस्थापन
+                            <i class="fas fa-users-gear me-2 text-success"></i>Admin User व्यवस्थापन
                         </a>
                         <a href="backup-restore.php" class="list-group-item list-group-item-action small py-2">
                             <i class="fas fa-shield-alt me-2 text-danger"></i>Backup / Restore

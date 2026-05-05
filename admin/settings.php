@@ -206,22 +206,33 @@ if (!in_array($panel, ['general', 'branding'], true)) {
     <ul class="nav admin-nav-tabs mb-4" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link <?php echo $panel === 'general' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#settings-general-tab" type="button" role="tab">
-                <i class="fas fa-list me-1"></i> सूची
+                <i class="fas fa-sliders me-1"></i> सामान्य सेटिङ्स
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link <?php echo $panel === 'branding' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#settings-branding-tab" type="button" role="tab">
-                <i class="fas fa-plus me-1"></i> नयाँ थप्नुहोस्
+                <i class="fas fa-image me-1"></i> ब्रान्डिङ / मिडिया
             </button>
         </li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade <?php echo $panel === 'general' ? 'show active' : ''; ?>" id="settings-general-tab" role="tabpanel">
+        <div class="alert alert-light border settings-tab-note mb-3">
+            <i class="fas fa-circle-info me-2 text-primary"></i>
+            वेबसाइटको नाम, SEO, सम्पर्क, social links, banking links, नेतृत्व र footer सम्बन्धी मुख्य सेटिङ्स यही tab मा छन्।
+        </div>
+        <div class="stg-subtabs mb-3" data-stg-panel="general">
+            <button type="button" class="stg-subtab-btn active" data-stg-group="identity"><i class="fas fa-globe me-1"></i> साइट / SEO</button>
+            <button type="button" class="stg-subtab-btn" data-stg-group="contact"><i class="fas fa-address-book me-1"></i> सम्पर्क / Maps</button>
+            <button type="button" class="stg-subtab-btn" data-stg-group="banking"><i class="fas fa-lock me-1"></i> Banking / Security</button>
+            <button type="button" class="stg-subtab-btn" data-stg-group="leadership"><i class="fas fa-users me-1"></i> नेतृत्व / Footer</button>
+            <button type="button" class="stg-subtab-btn" data-stg-group="all"><i class="fas fa-table-cells-large me-1"></i> सबै देखाउनुहोस्</button>
+        </div>
         <div class="row">
         <div class="col-lg-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-globe"></i> साइट जानकारी</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="identity" data-stg-order="1">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-globe"></i> साइट जानकारी</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -274,9 +285,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- SEO — प्रति डोमेन/सहकारी (Google, Facebook share) -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-search"></i> SEO (Google / सामाजिक साझेदारी)</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="identity" data-stg-order="2">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-search"></i> SEO (Google / सामाजिक साझेदारी)</h5>
                 </div>
                 <div class="card-body">
                     <p class="text-muted small mb-3">हरेक सहकारीको आफ्नै डोमेनमा यही थिम चलाउँदा यहाँ भएको विवरण प्रयोग हुन्छ। खाली छोड्नुभयो भने स्लोगन वा पृष्ठ–विशेष विवरण fallback हुन्छ।</p>
@@ -315,9 +326,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Contact Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-phone"></i> सम्पर्क जानकारी</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="1">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-phone"></i> सम्पर्क जानकारी</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -352,9 +363,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Social Media -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-share-alt"></i> सामाजिक सञ्जाल</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="2">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-share-alt"></i> सामाजिक सञ्जाल</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -400,9 +411,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Digital Banking -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-laptop"></i> डिजिटल बैंकिङ</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="banking" data-stg-order="1">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-laptop"></i> डिजिटल बैंकिङ</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -495,9 +506,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Leadership Section -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-user-tie"></i> नेतृत्व सन्देश</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="leadership" data-stg-order="1">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-user-tie"></i> नेतृत्व सन्देश</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -546,9 +557,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Footer -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-copyright"></i> फुटर</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="leadership" data-stg-order="2">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-copyright"></i> फुटर</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -560,9 +571,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Developer Info -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-code"></i> Developer जानकारी</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="leadership" data-stg-order="3">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-code"></i> Developer जानकारी</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -585,9 +596,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Google Map -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-map-marker-alt"></i> Google Map</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="4">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-map-marker-alt"></i> Google Map</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -601,9 +612,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Working Hours -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-clock"></i> कार्य समय</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="3">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-clock"></i> कार्य समय</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -620,7 +631,7 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card stg-save-card">
                 <div class="card-body">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-save"></i> सेटिङ्स सेभ गर्नुहोस्
@@ -632,13 +643,23 @@ if (!in_array($panel, ['general', 'branding'], true)) {
         </div>
 
         <div class="tab-pane fade <?php echo $panel === 'branding' ? 'show active' : ''; ?>" id="settings-branding-tab" role="tabpanel">
+        <div class="alert alert-light border settings-tab-note mb-3">
+            <i class="fas fa-circle-info me-2 text-primary"></i>
+            लोगो, header image, about image, theme colors र version जस्ता branding/media सम्बन्धी सेटिङ्स यही tab मा छन्।
+        </div>
+        <div class="stg-subtabs mb-3" data-stg-panel="branding">
+            <button type="button" class="stg-subtab-btn active" data-stg-group="media"><i class="fas fa-images me-1"></i> Logo / Media</button>
+            <button type="button" class="stg-subtab-btn" data-stg-group="colors"><i class="fas fa-palette me-1"></i> Theme Colors</button>
+            <button type="button" class="stg-subtab-btn" data-stg-group="version"><i class="fas fa-code-branch me-1"></i> Version</button>
+            <button type="button" class="stg-subtab-btn" data-stg-group="all"><i class="fas fa-table-cells-large me-1"></i> सबै देखाउनुहोस्</button>
+        </div>
         <div class="row">
         <div class="col-lg-12">
             <!-- Sidebar -->
             <!-- Logo -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-image"></i> लोगो</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="branding" data-stg-group="media" data-stg-order="1">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-image"></i> लोगो</h5>
                 </div>
                 <div class="card-body text-center">
                     <?php if (isset($settings['logo']) && $settings['logo']): ?>
@@ -652,9 +673,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Himal Background Photo -->
-            <div class="card mb-4" style="border-left:4px solid var(--primary-color);">
-                <div class="card-header" style="background:linear-gradient(90deg,#f0f9f2,#e8f5e9);">
-                    <h5 class="mb-0 text-success"><i class="fas fa-mountain me-2"></i>हेडर हिमाल फोटो</h5>
+            <div class="card mb-4 stg-section-card stg-accent-card stg-filter-card" data-stg-panel="branding" data-stg-group="media" data-stg-order="2">
+                <div class="card-header stg-section-header stg-soft-green-header">
+                    <h5 class="mb-0 stg-section-title"><i class="fas fa-mountain me-2"></i>हेडर हिमाल फोटो</h5>
                 </div>
                 <div class="card-body text-center">
                     <?php if (!empty($settings['himal_bg'])): ?>
@@ -681,9 +702,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- About Page Image -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-info-circle"></i> हाम्रो बारेमा पृष्ठको फोटो</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="branding" data-stg-group="media" data-stg-order="3">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-info-circle"></i> हाम्रो बारेमा पृष्ठको फोटो</h5>
                 </div>
                 <div class="card-body text-center">
                     <?php if (isset($settings['about_page_image']) && $settings['about_page_image']): ?>
@@ -697,9 +718,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Theme Color -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-palette"></i> Theme Color</h5>
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="branding" data-stg-group="colors" data-stg-order="1">
+                <div class="card-header stg-section-header">
+                    <h5 class="stg-section-title"><i class="fas fa-palette"></i> Theme Color</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -745,9 +766,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                  Admin ले website को version number अपडेट गर्न सक्छ।
                  यो version footer मा / system info मा देखाउन सकिन्छ।
                  =================================================== -->
-            <div class="card mb-4" id="version" style="border-left:4px solid var(--primary-light);">
-                <div class="card-header" style="background:linear-gradient(90deg,#f4fbf6,#e8f5e9);">
-                    <h5 class="mb-0 text-success"><i class="fas fa-code-branch me-2"></i>Website Version</h5>
+            <div class="card mb-4 stg-section-card stg-accent-card stg-filter-card" id="version" data-stg-panel="branding" data-stg-group="version" data-stg-order="1">
+                <div class="card-header stg-section-header stg-soft-green-header">
+                    <h5 class="mb-0 stg-section-title"><i class="fas fa-code-branch me-2"></i>Website Version</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -783,7 +804,7 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             </div>
 
             <!-- Save Button -->
-            <div class="card">
+            <div class="card stg-save-card">
                 <div class="card-body">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-save"></i> सेटिङ्स सेभ गर्नुहोस्
@@ -796,5 +817,44 @@ if (!in_array($panel, ['general', 'branding'], true)) {
     </div>
     </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.stg-subtabs[data-stg-panel]').forEach(function (bar) {
+        var panel = bar.getAttribute('data-stg-panel') || '';
+        var buttons = Array.prototype.slice.call(bar.querySelectorAll('.stg-subtab-btn[data-stg-group]'));
+        var cards = Array.prototype.slice.call(document.querySelectorAll('.stg-filter-card[data-stg-panel="' + panel + '"]'));
+        if (!panel || !buttons.length || !cards.length) return;
+
+        function setGroup(group) {
+            cards.sort(function (a, b) {
+                var ao = parseInt(a.getAttribute('data-stg-order') || '999', 10);
+                var bo = parseInt(b.getAttribute('data-stg-order') || '999', 10);
+                return ao - bo;
+            }).forEach(function (card) {
+                card.parentNode.appendChild(card);
+            });
+
+            buttons.forEach(function (btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-stg-group') === group);
+            });
+            cards.forEach(function (card) {
+                var cardGroup = card.getAttribute('data-stg-group') || 'all';
+                var show = (group === 'all' || cardGroup === group);
+                card.classList.toggle('d-none', !show);
+            });
+        }
+
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                setGroup(btn.getAttribute('data-stg-group') || 'all');
+            });
+        });
+
+        var defaultBtn = bar.querySelector('.stg-subtab-btn.active[data-stg-group]');
+        setGroup(defaultBtn ? defaultBtn.getAttribute('data-stg-group') : 'all');
+    });
+});
+</script>
 
 <?php require_once 'includes/admin-footer.php'; ?>
