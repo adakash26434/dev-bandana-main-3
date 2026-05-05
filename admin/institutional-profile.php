@@ -410,7 +410,7 @@ echo adminPageHeader(
       <h5><?php echo $formTitle; ?></h5>
     </div>
 
-    <form id="profileMainForm" method="POST" action="<?php echo $selfUrl; ? class="needs-validation" novalidate>">
+    <form id="profileMainForm" method="POST" action="<?php echo $selfUrl; ?>" class="needs-validation" novalidate>
       <input type="hidden" name="action" value="<?php echo $isEdit ? 'edit' : 'add'; ?>">
       <input type="hidden" name="id"     value="<?php echo $isEdit ? (int)$r['id'] : 0; ?>">
       <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">

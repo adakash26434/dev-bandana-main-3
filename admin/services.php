@@ -152,7 +152,7 @@ require_once 'includes/admin-ui.php';
                                 <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $s['display_order']; ?></span></td>
                                 <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-primary me-1 btn-edit-svc"
+                                    <button type="button" class="btn btn-sm btn-primary me-1 btn-edit-svc"
                                             data-id="<?php echo $s['id']; ?>"
                                             data-title="<?php echo htmlspecialchars($s['title_np'] ?: $s['title'], ENT_QUOTES); ?>"
                                             data-title-en="<?php echo htmlspecialchars($s['title_en'] ?? '', ENT_QUOTES); ?>"
@@ -167,7 +167,7 @@ require_once 'includes/admin-ui.php';
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $s['id']; ?>">
-                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -283,7 +283,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelectorAll('.btn-edit-svc').forEach(function(btn) {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             var d = this.dataset;
             document.getElementById('svcf_action').value  = 'edit';
             document.getElementById('svcf_id').value      = d.id;

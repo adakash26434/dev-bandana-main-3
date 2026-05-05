@@ -1032,7 +1032,9 @@ set_exception_handler(function (\Throwable $ex) {
                         ['label'=>'भेन्डर आवेदन',      'count'=>$adminAlertCounts['vendor'],            'href'=>'vendor-enlistment.php?status=pending','icon'=>'fa-store',               'color'=>'#0d6efd'],
                     ];
                     /* pending मात्र filter गर्ने — count > 0 भएका मात्र dropdown मा देखाउने */
-                    $activeNotifs = array_filter($notifItems, fn($i) => $i['count'] > 0);
+                    $activeNotifs = array_filter($notifItems, function ($i) {
+                        return ($i['count'] ?? 0) > 0;
+                    });
                     ?>
                     <div class="header-item notif-wrapper" style="position:relative;">
                         <!-- Bell button — सधैं देखिन्छ, count > 0 भए red badge -->
