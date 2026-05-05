@@ -894,3 +894,41 @@ form.kyc-form .row > [class*="col-"],
     letter-spacing: 0 !important;
     font-weight: 700 !important;
 }
+
+/* clearer table grid lines */
+.main-content .admin-table-card .table th,
+.main-content .admin-table-card .table td {
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.main-content .admin-table-card .table th:not(:last-child),
+.main-content .admin-table-card .table td:not(:last-child) {
+    border-right: 1px solid #f1f3f5 !important;
+}
+
+/* action button color tune: edit (blue), delete (red) */
+.main-content .admin-table-card td .btn-outline-primary,
+.main-content .admin-table-card td .btn-edit-svc {
+    background: #eef4ff !important;
+    border-color: #bfd3ff !important;
+    color: #1d4ed8 !important;
+}
+
+.main-content .admin-table-card td .btn-outline-primary:hover,
+.main-content .admin-table-card td .btn-edit-svc:hover {
+    background: #dbe8ff !important;
+    border-color: #9db8ff !important;
+    color: #1e40af !important;
+}
+
+.main-content .admin-table-card td .btn-outline-danger {
+    background: #fff1f2 !important;
+    border-color: #fecdd3 !important;
+    color: #be123c !important;
+}
+
+.main-content .admin-table-card td .btn-outline-danger:hover {
+    background: #ffe4e6 !important;
+    border-color: #fda4af !important;
+    color: #9f1239 !important;
+}
