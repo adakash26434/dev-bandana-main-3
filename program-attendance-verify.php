@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <i class="fas fa-user-plus"></i> Program Registration
             </a>
             <span class="pav-nav-pill att">
-                <i class="fas fa-user-check"></i> Attendance Verify (Staff)
+                <i class="fas fa-user-check"></i> Attendance Verify
             </span>
         </div>
 
