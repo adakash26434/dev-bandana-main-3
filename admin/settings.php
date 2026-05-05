@@ -5,6 +5,7 @@ require_once 'includes/admin-ui.php';
 
 $updateSuccess = false;
 $updateError = '';
+$canEditFooterDev = !empty($_SESSION['is_superadmin']);
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -33,6 +34,9 @@ checkCSRF();
         foreach ($textSettings as $key) {
             if (isset($_POST[$key])) {
                 if (in_array($key, ['twofa_admin_required','twofa_member_required'], true) && empty($_SESSION['is_superadmin'])) {
+                    continue;
+                }
+                if (in_array($key, ['footer_text', 'developer_name', 'developer_url'], true) && !$canEditFooterDev) {
                     continue;
                 }
                 $value = $_POST[$key];
@@ -562,33 +566,32 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <h5 class="stg-section-title"><i class="fas fa-copyright"></i> फुटर</h5>
                 </div>
                 <div class="card-body">
+                    <?php if (!$canEditFooterDev): ?>
+                    <div class="alert alert-warning py-2 mb-3">
+                        <i class="fas fa-lock me-1"></i> Copyright/Developed By सेटिङ्स Super Admin ले मात्र परिवर्तन गर्न मिल्छ।
+                    </div>
+                    <?php endif; ?>
                     <div class="mb-3">
                         <label class="form-label">Copyright Text</label>
                         <input type="text" name="footer_text" class="form-control"
-                               value="<?php echo $settings['footer_text'] ?? ''; ?>">
+                               value="<?php echo $settings['footer_text'] ?? ''; ?>"
+                               <?php echo $canEditFooterDev ? '' : 'readonly'; ?>>
                     </div>
-                </div>
-            </div>
-
-            <!-- Developer Info -->
-            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="leadership" data-stg-order="3">
-                <div class="card-header stg-section-header">
-                    <h5 class="stg-section-title"><i class="fas fa-code"></i> Developer जानकारी</h5>
-                </div>
-                <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Developer Name</label>
+                                <label class="form-label">Developed By (Name)</label>
                                 <input type="text" name="developer_name" class="form-control"
-                                       value="<?php echo $settings['developer_name'] ?? 'Tanka Adhikari'; ?>">
+                                       value="<?php echo $settings['developer_name'] ?? 'Tanka Adhikari'; ?>"
+                                       <?php echo $canEditFooterDev ? '' : 'readonly'; ?>>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Developer Website URL</label>
+                                <label class="form-label">Developed By URL</label>
                                 <input type="url" name="developer_url" class="form-control"
-                                       value="<?php echo $settings['developer_url'] ?? 'https://www.tankaadhikari.com.np/'; ?>">
+                                       value="<?php echo $settings['developer_url'] ?? 'https://www.tankaadhikari.com.np/'; ?>"
+                                       <?php echo $canEditFooterDev ? '' : 'readonly'; ?>>
                             </div>
                         </div>
                     </div>

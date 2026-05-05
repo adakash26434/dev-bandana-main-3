@@ -250,7 +250,7 @@ set_exception_handler(function (\Throwable $ex) {
 
     <!-- Admin CSS -->
     <link rel="stylesheet" href="assets/admin.css?v=9.7">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=4.8">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=5.0">
     <link rel="stylesheet" href="../assets/css/v9-mobile-fix.css?v=9.7">
     <link rel="stylesheet" href="../assets/css/site-banner-logo.css?v=1">
 
@@ -277,8 +277,8 @@ set_exception_handler(function (\Throwable $ex) {
         color: #111827;
     }
     .nav-group-header.open {
-        background: var(--primary-color);
-        color: #fff;
+        background: #ecfdf3;
+        color: #14532d;
     }
     .nav-group-header .nav-group-icon {
         width: 22px;
@@ -300,7 +300,7 @@ set_exception_handler(function (\Throwable $ex) {
     .nav-group-header.open .nav-arrow {
         transform: rotate(90deg);
         opacity: 1;
-        color: #fff;
+        color: #166534;
     }
     /* ── Group Header Badge — reference image style ── */
     .nav-group-header .group-badge {

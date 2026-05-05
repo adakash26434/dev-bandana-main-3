@@ -3144,18 +3144,18 @@ body.admin-page-db-setup .dbs-table-status-label {
 }
 
 .nav-group-header.open {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: #ecfdf3 !important;
+    color: #14532d !important;
 }
 
 .nav-group-header.open:hover {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: #dcfce7 !important;
+    color: #14532d !important;
 }
 
 .nav-group-header.open .nav-group-icon,
 .nav-group-header.open .nav-group-label {
-    color: #fff !important;
+    color: #14532d !important;
 }
 
 .nav-group-header .nav-group-icon {
@@ -3163,8 +3163,49 @@ body.admin-page-db-setup .dbs-table-status-label {
 }
 
 .nav-group-header.open .nav-group-icon {
-    color: #fff !important;
+    color: #14532d !important;
     opacity: 1 !important;
+}
+
+/* Final hard override: plain white sidebar + black text + green hover */
+.sidebar,
+aside.sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb !important;
+}
+
+.sidebar-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.sidebar-nav a,
+.sidebar-nav .nav-group-header,
+.sidebar-nav .nav-submenu > li > a {
+    color: #111827 !important;
+    background: transparent !important;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav .nav-group-header:hover,
+.sidebar-nav .nav-submenu > li > a:hover {
+    background: #ecfdf3 !important;
+    color: #166534 !important;
+}
+
+.sidebar-nav li.active > a,
+.sidebar-nav a.active,
+.sidebar-nav .nav-submenu li.active > a {
+    background: #dcfce7 !important;
+    color: #14532d !important;
+    border-left: 3px solid #16a34a !important;
+}
+
+.sidebar-nav li.active > a i,
+.sidebar-nav a.active i,
+.sidebar-nav li.active > a .nav-icon-wrap i,
+.sidebar-nav a.active .nav-icon-wrap i {
+    color: #166534 !important;
 }
 
 /* सूचना गिन्ने बैज — हल्का हरियो; रातो समूह बैज तलै छुट्टै */

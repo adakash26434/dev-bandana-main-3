@@ -393,6 +393,19 @@ body.auth-portal-page .tab-btn {
   justify-content: center !important;
 }
 
+/* Verify page: keep original strong header contrast */
+body.auth-portal-page .verify-form-card__head {
+  background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754)) !important;
+  color: #fff !important;
+  border-bottom-color: transparent !important;
+}
+
+body.auth-portal-page .verify-form-card__head h1,
+body.auth-portal-page .verify-form-card__head .vp-sub,
+body.auth-portal-page .verify-form-card__head .vp-sub b {
+  color: #fff !important;
+}
+
 @media (max-width: 900px) {
   body.auth-portal-page .split-wrap {
     width: 100%;
