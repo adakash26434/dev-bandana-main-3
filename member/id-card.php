@@ -555,12 +555,12 @@ if ($cardLogoRaw !== '') {
 .idcard-detail .dv.code { font-family:'Courier New',monospace; letter-spacing:.05em; font-weight:700; }
 
 .idcard-verify-help {
-  margin-top:18px; background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1px solid #bfdbfe;
+  margin-top:18px; background:#fef2f2; border:1px solid #fecaca;
   border-radius:10px; padding:14px; display:flex; gap:10px; align-items:flex-start;
 }
-.vh-icon { color:#1d4ed8; font-size:1.4rem; flex-shrink:0; }
-.vh-title { font-weight:700; font-size:.88rem; color:#1e3a8a; margin-bottom:4px; }
-.vh-text { font-size:.78rem; color:#1e40af; line-height:1.55; }
+.vh-icon { color:var(--secondary-color,#c0392b); font-size:1.4rem; flex-shrink:0; }
+.vh-title { font-weight:700; font-size:.88rem; color:var(--secondary-dark,#922b21); margin-bottom:4px; }
+.vh-text { font-size:.78rem; color:var(--secondary-dark,#922b21); line-height:1.55; }
 .vh-text b { font-family:'Courier New',monospace; background:#fff; padding:1px 6px; border-radius:4px; }
 
 @media (max-width:480px) {

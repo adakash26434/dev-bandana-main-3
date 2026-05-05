@@ -122,10 +122,10 @@ $greeting = $hour < 12 ? 'शुभ बिहान' : ($hour < 17 ? 'शुभ 
 /* सबै Quick Apply → /member/ भित्र (कल्याण = native welfare.php, बाँकी = apply-frame) */
 $quickActions = [
     ['href' => $siteUrl.'member/apply-frame.php?p=appointment', 'icon' => 'fa-calendar-check',     'color' => 'var(--primary-color)', 'label' => 'भेटघाट'],
-    ['href' => $siteUrl.'member/kyc.php',                        'icon' => 'fa-id-card',             'color' => '#1565c0', 'label' => 'KYC दर्ता'],
-    ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => '#6a1b9a', 'label' => 'ऋण आवेदन'],
+    ['href' => $siteUrl.'member/kyc.php',                        'icon' => 'fa-id-card',             'color' => 'var(--secondary-color,#c0392b)', 'label' => 'KYC दर्ता'],
+    ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark,#922b21)', 'label' => 'ऋण आवेदन'],
     ['href' => $siteUrl.'member/apply-frame.php?p=account',     'icon' => 'fa-university',          'color' => '#00695c', 'label' => 'खाता खोल्ने'],
-    ['href' => $siteUrl.'member/apply-frame.php?p=digital',     'icon' => 'fa-laptop',              'color' => '#1565c0', 'label' => 'डिजिटल सेवा'],
+    ['href' => $siteUrl.'member/apply-frame.php?p=digital',     'icon' => 'fa-laptop',              'color' => 'var(--secondary-color,#c0392b)', 'label' => 'डिजिटल सेवा'],
     ['href' => $siteUrl.'member/apply-frame.php?p=grievance',   'icon' => 'fa-comment-exclamation', 'color' => '#c62828', 'label' => 'गुनासो'],
     ['href' => $siteUrl.'member/welfare.php',                   'icon' => 'fa-heart',               'color' => '#e65100', 'label' => 'कल्याण'],
     ['href' => $siteUrl.'member/apply-frame.php?p=career',      'icon' => 'fa-briefcase',           'color' => '#37474f', 'label' => 'जागिर'],
@@ -166,8 +166,8 @@ require __DIR__ . '/includes/chrome.php';
             <div class="mem-stat-label">स्वीकृत</div>
         </div>
         <div class="mem-stat">
-            <div class="mem-stat-icon" style="color:#1565c0;">🔔</div>
-            <div class="mem-stat-num"  style="color:#1565c0;"><?php echo $unread; ?></div>
+            <div class="mem-stat-icon" style="color:var(--secondary-color,#c0392b);">🔔</div>
+            <div class="mem-stat-num"  style="color:var(--secondary-color,#c0392b);"><?php echo $unread; ?></div>
             <div class="mem-stat-label">नयाँ सूचना</div>
         </div>
         <div class="mem-stat">
@@ -210,8 +210,8 @@ require __DIR__ . '/includes/chrome.php';
                 if ($iosUrl) $digitalServices[] = ['icon'=>'fa-apple','iconLib'=>'fab','color'=>'#111827','bg'=>'#f3f4f6','label'=>'iOS App','href'=>$iosUrl,'desc'=>'App Store बाट डाउनलोड','target'=>'_blank'];
                 if ($andUrl) $digitalServices[] = ['icon'=>'fa-google-play','iconLib'=>'fab','color'=>'#16a34a','bg'=>'#f0fdf4','label'=>'Android App','href'=>$andUrl,'desc'=>'Play Store बाट डाउनलोड','target'=>'_blank'];
                 $digitalServices = array_merge($digitalServices, [
-                    ['icon'=>'fa-mobile-screen-button','color'=>'#1565c0','bg'=>'#eff6ff','label'=>'Mobile Banking',   'href'=>$siteUrl.'digital-services.php#mobile-banking','desc'=>'कुनै पनि समय बैंकिङ'],
-                    ['icon'=>'fa-qrcode',              'color'=>'#7c3aed','bg'=>'#f5f3ff','label'=>'QR Payment',       'href'=>$siteUrl.'digital-services.php#qr-payment',   'desc'=>'छिटो भुक्तानी'],
+                    ['icon'=>'fa-mobile-screen-button','color'=>'var(--secondary-color,#c0392b)','bg'=>'#fef2f2','label'=>'Mobile Banking',   'href'=>$siteUrl.'digital-services.php#mobile-banking','desc'=>'कुनै पनि समय बैंकिङ'],
+                    ['icon'=>'fa-qrcode',              'color'=>'var(--secondary-dark,#922b21)','bg'=>'#fef2f2','label'=>'QR Payment',       'href'=>$siteUrl.'digital-services.php#qr-payment',   'desc'=>'छिटो भुक्तानी'],
                     ['icon'=>'fa-file-invoice-dollar', 'color'=>'#059669','bg'=>'#ecfdf5','label'=>'Online Loan',       'href'=>$siteUrl.'member/apply-frame.php?p=loan',     'desc'=>'घरबाटै ऋण आवेदन'],
                     ['icon'=>'fa-piggy-bank',          'color'=>'#d97706','bg'=>'#fffbeb','label'=>'Online Bachat',     'href'=>$siteUrl.'digital-services.php#bachat',       'desc'=>'बचत खाता Online'],
                     ['icon'=>'fa-headset',             'color'=>'#c0392b','bg'=>'#fef2f2','label'=>'24/7 Support',      'href'=>$siteUrl.'digital-services.php#support',      'desc'=>'सहायता केन्द्र'],
@@ -298,7 +298,7 @@ require __DIR__ . '/includes/chrome.php';
                 <?php if (empty($notifs)): ?>
                 <div class="mem-empty"><span class="mem-empty-icon">🔔</span><div>कुनै सूचना छैन।</div></div>
                 <?php else:
-                    $iconMap = ['success'=>['fas fa-circle-check','#16a34a','#f0fdf4'],'error'=>['fas fa-circle-xmark','#dc2626','#fef2f2'],'warning'=>['fas fa-triangle-exclamation','#d97706','#fffbeb'],'info'=>['fas fa-circle-info','#1565c0','#eff6ff']];
+                    $iconMap = ['success'=>['fas fa-circle-check','#16a34a','#f0fdf4'],'error'=>['fas fa-circle-xmark','#dc2626','#fef2f2'],'warning'=>['fas fa-triangle-exclamation','#d97706','#fffbeb'],'info'=>['fas fa-circle-info','var(--secondary-color,#c0392b)','#fef2f2']];
                     foreach ($notifs as $n): $ic = $iconMap[$n['type']] ?? $iconMap['info'];
                 ?>
                 <div class="mem-notif-item <?php echo !$n['is_read'] ? 'unread' : ''; ?>" onclick="markRead(<?php echo $n['id']; ?>, this)" style="border-radius:8px;">

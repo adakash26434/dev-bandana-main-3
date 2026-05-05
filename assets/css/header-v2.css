@@ -193,7 +193,7 @@
 .pfl-lm-web    { background: #e8f5e9; color: #1a5f2a; }
 .pfl-lm-android{ background: #e8f5e9; color: #2e7d32; }
 .pfl-lm-ios    { background: #f3e5f5; color: #6a1b9a; }
-.pfl-lm-admin  { background: #e3f2fd; color: #1565c0; }
+.pfl-lm-admin  { background: #fef2f2; color: var(--secondary-color, #c0392b); }
 .pfl-lm-member { background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: var(--text-on-primary, #fff); }
 .pfl-lm-verify { background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark, var(--secondary-color))); color: var(--text-on-secondary, #fff); }
 
@@ -526,7 +526,7 @@ body.header-v2 .pfl-nav-area .nav-menu > li.active > a::after {
 
 /* Hover state — green gradient pill */
 body.header-v2 .pfl-nav-area .nav-menu > li > a:hover {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    background: var(--primary-color);
     color: var(--text-on-primary, #fff) !important;
     box-shadow: var(--shadow-primary, 0 3px 9px rgba(26,107,50,0.28));
     transform: translateY(-0.5px);
@@ -537,7 +537,7 @@ body.header-v2 .pfl-nav-area .nav-menu > li > a:hover::after {
 
 /* Active page — strong green gradient */
 body.header-v2 .pfl-nav-area .nav-menu > li.active > a {
-    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    background: var(--primary-dark);
     color: var(--text-on-primary, #fff) !important;
     box-shadow: var(--shadow-primary, 0 2px 7px rgba(20,82,38,0.32));
 }
@@ -572,7 +572,7 @@ body.header-v2 .pfl-nav-area .nav-menu .dropdown li:last-child a {
     border-bottom: none;
 }
 body.header-v2 .pfl-nav-area .nav-menu .dropdown li a:hover {
-    background: linear-gradient(to right, #edf7f0, #f5fbf7);
+    background: #edf7f0;
     color: var(--primary-dark);
     padding-left: 26px;
 }
@@ -712,7 +712,7 @@ body.dark-mode .pfl-nav-area {
 body.dark-mode.header-v2 .pfl-nav-area .nav-menu > li > a { color: #c8e6c9; }
 body.dark-mode.header-v2 .pfl-nav-area .nav-menu > li > a:hover,
 body.dark-mode.header-v2 .pfl-nav-area .nav-menu > li.active > a {
-    background: linear-gradient(135deg, #2d5a3d 0%, #3d7a53 100%);
+    background: #2d5a3d;
     color: #fff !important;
 }
 
@@ -963,11 +963,11 @@ body.dark-mode.header-v2 .pfl-nav-area .nav-menu > li > a {
     color: #c8e6c9 !important;
 }
 body.dark-mode.header-v2 .pfl-nav-area .nav-menu > li > a:hover {
-    background: linear-gradient(135deg, #2d5a3d 0%, #3d7a53 100%) !important;
+    background: #2d5a3d !important;
     color: #fff !important;
 }
 body.dark-mode.header-v2 .pfl-nav-area .nav-menu > li.active > a {
-    background: linear-gradient(135deg, #1a4a2e 0%, #2d7a45 100%) !important;
+    background: #1a4a2e !important;
     color: #fff !important;
 }
 

@@ -28,7 +28,7 @@
     --adm-success-bg: #f0fdf4;
     --adm-danger-bg:  #fef2f2;
     --adm-warn-bg:    #fffbeb;
-    --adm-info-bg:    #eff6ff;
+    --adm-info-bg:    #fef2f2;
 }
 
 html {
@@ -315,8 +315,8 @@ body {
 .alert-info {
     background: var(--adm-info-bg) !important;
     border-color: #bfdbfe !important;
-    border-left-color: #2563eb !important;
-    color: #1e3a8a !important;
+    border-left-color: var(--secondary-color,#c0392b) !important;
+    color: var(--secondary-dark,#922b21) !important;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -334,7 +334,7 @@ body {
 .badge-soft-success { background:#dcfce7; color:#15803d; }
 .badge-soft-danger  { background:#fee2e2; color:#dc2626; }
 .badge-soft-warning { background:#fef9c3; color:#a16207; }
-.badge-soft-info    { background:#dbeafe; color:#1d4ed8; }
+.badge-soft-info    { background:#fef2f2; color:var(--secondary-dark,#922b21); }
 .badge-soft-primary { background:#d1fae5; color:#065f46; }
 .badge-soft-muted   { background:#f3f4f6; color:#4b5563; }
 

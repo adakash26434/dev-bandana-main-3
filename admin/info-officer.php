@@ -102,12 +102,12 @@ if ($error) echo adminAlert('error', $error);
                         <?php if (!empty($currentOfficer['photo'])): ?>
                             <img src="<?php echo htmlspecialchars('../' . $currentOfficer['photo']); ?>"
                                  class="rounded-circle mb-3 border border-3"
-                                 style="width:100px;height:100px;object-fit:cover;border-color:#0ea5e9!important;"
+                                 style="width:100px;height:100px;object-fit:cover;border-color:var(--secondary-color,#c0392b)!important;"
                                  alt="Photo">
                         <?php else: ?>
                             <div class="rounded-circle mb-3 d-inline-flex align-items-center justify-content-center border border-3"
-                                 style="width:100px;height:100px;background:#e0f2fe;border-color:#0ea5e9!important;">
-                                <i class="fas fa-user-shield fa-2x" style="color:#0ea5e9;"></i>
+                                 style="width:100px;height:100px;background:#fef2f2;border-color:var(--secondary-color,#c0392b)!important;">
+                                <i class="fas fa-user-shield fa-2x" style="color:var(--secondary-color,#c0392b);"></i>
                             </div>
                         <?php endif; ?>
                         <h5 class="fw-bold mb-1"><?php echo htmlspecialchars($currentOfficer['name']); ?></h5>

@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $claimTypes = [
     'maternity' => ['np' => 'सुत्केरी सुविधा',  'en' => 'Maternity', 'icon' => 'fa-baby',         'color' => '#e91e63'],
     'death'     => ['np' => 'मृत्यु सुविधा',    'en' => 'Death',     'icon' => 'fa-heart-broken',  'color' => '#607d8b'],
-    'insurance' => ['np' => 'बीमा दाबी',         'en' => 'Insurance', 'icon' => 'fa-shield-halved', 'color' => '#7c3aed'],
+    'insurance' => ['np' => 'बीमा दाबी',         'en' => 'Insurance', 'icon' => 'fa-shield-halved', 'color' => 'var(--secondary-color,#c0392b)'],
     'medical'   => ['np' => 'उपचार खर्च',        'en' => 'Medical',   'icon' => 'fa-hospital',      'color' => '#4caf50'],
     'accident'  => ['np' => 'दुर्घटना सुविधा',  'en' => 'Accident',  'icon' => 'fa-triangle-exclamation', 'color' => '#f97316'],
     'other'     => ['np' => 'अन्य सुविधा',       'en' => 'Other',     'icon' => 'fa-gift',          'color' => '#ff9800'],
@@ -422,7 +422,7 @@ if ($flash = getFlash()):
         <div class="sm-lbl">स्वीकृत</div>
     </a>
     <a href="?status=paid" class="stat-mini <?php echo $filterStatus==='paid'?'active-filter':''; ?>">
-        <div class="sm-icon" style="background:linear-gradient(135deg,#7c3aed20,#7c3aed10);"><i class="fas fa-rupee-sign" style="color:#7c3aed;"></i></div>
+        <div class="sm-icon" style="background:#fef2f2;"><i class="fas fa-rupee-sign" style="color:var(--secondary-color,#c0392b);"></i></div>
         <div class="sm-val"><?php echo $statusCounts['paid'] ?? 0; ?></div>
         <div class="sm-lbl">भुक्तान</div>
     </a>

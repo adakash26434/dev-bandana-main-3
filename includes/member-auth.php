@@ -892,7 +892,7 @@ function getMemberApplications($email, $phone, $limit = 50) {
     $queries = [
         ['table' => 'appointments',        'service' => 'भेटघाट',         'icon' => 'fa-calendar-check',    'color' => 'var(--primary-color)',
          'fields' => 'id, name as full_name, phone, email, preferred_date as app_date, purpose as detail, status, tracking_id, created_at, branch'],
-        ['table' => 'kyc_applications',    'service' => 'KYC दर्ता',      'icon' => 'fa-id-card',            'color' => '#1565c0',
+        ['table' => 'kyc_applications',    'service' => 'KYC दर्ता',      'icon' => 'fa-id-card',            'color' => 'var(--secondary-color,#c0392b)',
          'fields' => 'id, full_name, mobile as phone, email, NULL as app_date, account_type as detail, status, tracking_id, created_at, branch'],
         ['table' => 'loan_applications',   'service' => 'ऋण आवेदन',      'icon' => 'fa-hand-holding-usd',   'color' => '#6a1b9a',
          'fields' => 'id, full_name, mobile as phone, email, NULL as app_date, loan_type as detail, status, tracking_id, created_at, NULL as branch'],
@@ -933,7 +933,7 @@ function getMemberApplications($email, $phone, $limit = 50) {
 function memberStatusBadge($status) {
     $map = [
         'pending'      => ['bg' => '#fff8e1', 'color' => '#f59e0b', 'text' => 'विचाराधीन',   'dot' => '#f59e0b'],
-        'under_review' => ['bg' => '#e3f2fd', 'color' => '#1565c0', 'text' => 'समीक्षामा',    'dot' => '#1565c0'],
+        'under_review' => ['bg' => '#fef2f2', 'color' => 'var(--secondary-color,#c0392b)', 'text' => 'समीक्षामा',    'dot' => 'var(--secondary-color,#c0392b)'],
         'approved'     => ['bg' => '#e8f5e9', 'color' => '#2e7d32', 'text' => 'स्वीकृत',      'dot' => '#2e7d32'],
         'rejected'     => ['bg' => '#ffebee', 'color' => '#c62828', 'text' => 'अस्वीकृत',    'dot' => '#c62828'],
         'completed'    => ['bg' => '#e8f5e9', 'color' => 'var(--primary-color)', 'text' => 'सम्पन्न',      'dot' => 'var(--primary-color)'],

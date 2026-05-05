@@ -320,7 +320,7 @@ var appSum  = appData.reduce((a,b)=>a+b,0);
 if(appSum > 0) new Chart('chartAppTypes', {type:'doughnut', data:{
     labels: <?= $j(array_keys($appTypes)) ?>,
     datasets:[{data: appData,
-        backgroundColor:['#1a5f2a','#1565c0','#7c3aed','#d97706','#dc2626','#0f766e','#374151'],
+        backgroundColor:['#1a5f2a','var(--secondary-color,#c0392b)','var(--secondary-dark,#922b21)','#d97706','#dc2626','#0f766e','#374151'],
         borderWidth:2, borderColor:'#fff'}]
 }, options:{plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:8}}}, cutout:'65%'}});
 
@@ -337,7 +337,7 @@ var kycData   = <?= $j(array_values($kycStatus)) ?>;
 if(kycLabels.length > 0) new Chart('chartKyc', {type:'doughnut', data:{
     labels: kycLabels,
     datasets:[{data: kycData,
-        backgroundColor:['#d97706','#1565c0','#16a34a','#dc2626','#9ca3af'],
+        backgroundColor:['#d97706','var(--secondary-color,#c0392b)','#16a34a','#dc2626','#9ca3af'],
         borderWidth:2, borderColor:'#fff'}]
 }, options:{plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:6}}}, cutout:'60%'}});
 
@@ -357,7 +357,7 @@ var wlData   = <?= $j(array_values($welfarTypes)) ?>;
 new Chart('chartWelfare', {type:'pie', data:{
     labels: wlLabels,
     datasets:[{data: wlData,
-        backgroundColor:['#dc2626','#d97706','#1565c0','#7c3aed','#16a34a'],
+        backgroundColor:['#dc2626','#d97706','var(--secondary-color,#c0392b)','var(--secondary-dark,#922b21)','#16a34a'],
         borderWidth:2, borderColor:'#fff'}]
 }, options:{plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:6}}}}});
 <?php endif; ?>

@@ -1841,7 +1841,7 @@ img {
 }
 
 .loan-rates .rates-header-modern {
-    background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+    background: linear-gradient(135deg, var(--secondary-dark, #922b21) 0%, var(--secondary-color, #c0392b) 100%);
 }
 
 .rates-icon {
@@ -1941,9 +1941,9 @@ img {
 }
 
 .rate-value.loan {
-    background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+    background: linear-gradient(135deg, var(--secondary-dark, #922b21) 0%, var(--secondary-color, #c0392b) 100%);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(21,101,192,0.28);
+    box-shadow: 0 4px 12px rgba(192,57,43,0.28);
 }
 
 .rate-empty {
@@ -9256,8 +9256,8 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .leadership-profile-card.info-officer .profile-position {
-    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-    color: #1565c0;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    color: var(--secondary-color, #c0392b);
 }
 
 .leadership-profile-card.grievance-officer .profile-position {

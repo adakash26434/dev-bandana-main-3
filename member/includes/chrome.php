@@ -187,7 +187,7 @@ $_hasIdCard = true;
                         'success'=>['fas fa-circle-check','#16a34a','#f0fdf4'],
                         'error'  =>['fas fa-circle-xmark','#dc2626','#fef2f2'],
                         'warning'=>['fas fa-triangle-exclamation','#d97706','#fffbeb'],
-                        'info'   =>['fas fa-circle-info','#1565c0','#eff6ff'],
+                        'info'   =>['fas fa-circle-info','var(--secondary-color,#c0392b)','#fef2f2'],
                     ];
                     foreach ($_bellNotifs as $_n):
                         $_ic = $_iconMap[$_n['type']] ?? $_iconMap['info'];

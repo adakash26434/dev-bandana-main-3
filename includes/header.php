@@ -27,9 +27,12 @@ $instagramUrl = getSetting('instagram_url', '');
 $logo = trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')));
 $primaryColor = getSetting('primary_color', 'var(--primary-color)');
 $secondaryColor = getSetting('secondary_color', getSetting('topbar_color', '#c0392b'));
-$headerColor  = getSetting('header_color', getSetting('topbar_color', $secondaryColor));
-$footerColor  = getSetting('footer_color', 'var(--primary-color)');
-$topbarColor  = getSetting('topbar_color', $headerColor);
+/* Public portal strict 2-color scheme:
+   Primary = brand green, Secondary = utility/accent.
+   header/topbar use Secondary; footer uses Primary. */
+$headerColor  = $secondaryColor;
+$footerColor  = $primaryColor;
+$topbarColor  = $secondaryColor;
 $mobileAppPhoto = getSetting('mobile_app_photo', 'assets/images/mobile-app.png');
 $himalBg = getSetting('himal_bg', '');
 
@@ -248,7 +251,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=3">
     <?php @require_once __DIR__ . '/../assets/css/_color-vars.php'; ?>
     <!-- Header v2 — Pokhara Finance Style (Testing) -->
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/header-v2.css?v=22">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/header-v2.css?v=23">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/v9-mobile-fix.css?v=9.8">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/site-banner-logo.css?v=3">
 

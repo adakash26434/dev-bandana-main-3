@@ -119,7 +119,13 @@ $siteName  = getSetting('site_name', 'सहकारी');
 $pageTitle = 'सेवा अनुरोध — ' . $siteName;
 $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">';
 
-$statusColors = ['pending'=>'#d97706','confirmed'=>'#1565c0','completed'=>'#16a34a','cancelled'=>'#dc2626','processing'=>'#7c3aed'];
+$statusColors = [
+    'pending' => 'var(--secondary-color,#c0392b)',
+    'confirmed' => 'var(--secondary-color,#c0392b)',
+    'completed' => 'var(--primary-color,#1a8754)',
+    'cancelled' => '#dc2626',
+    'processing' => 'var(--secondary-dark,#922b21)'
+];
 
 $extraHead = <<<HTML
 <style>
@@ -152,7 +158,7 @@ HTML;
   <?php if ($successMsg): ?>
   <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;color:#166534;font-size:.9rem;margin-bottom:16px;">
     <i class="fas fa-circle-check" style="margin-right:8px;"></i><?= $successMsg ?>
-    <div style="margin-top:10px;"><a href="tracker.php" style="color:#16a34a;font-weight:700;">Tracker मा हेर्नुहोस् →</a></div>
+    <div style="margin-top:10px;"><a href="tracker.php" style="color:var(--primary-color,#1a8754);font-weight:700;">Tracker मा हेर्नुहोस् →</a></div>
   </div>
   <?php endif; ?>
   <?php if ($errorMsg): ?>

@@ -12,8 +12,7 @@
   <a href="<?php echo SITE_URL; ?>member/welfare.php"><i class="fas fa-heart-pulse"></i><span>कल्याण</span></a>
   <a href="<?php echo SITE_URL; ?>member/scan.php" class="mp-nav-scan" aria-label="कार्यक्रम QR स्क्यान"><i class="fas fa-qrcode"></i><span>स्क्यान</span></a>
   <a href="<?php echo SITE_URL; ?>member/attend.php"><i class="fas fa-calendar-check"></i><span>उपस्थिति</span></a>
-  <a href="<?php echo SITE_URL; ?>member/service-request.php"><i class="fas fa-concierge-bell"></i><span>सेवा</span></a>
-  <a href="<?php echo SITE_URL; ?>member/certificate.php"><i class="fas fa-certificate"></i><span>प्रमाणपत्र</span></a>
+  <a href="<?php echo SITE_URL; ?>member/profile.php"><i class="fas fa-user-circle"></i><span>प्रोफाइल</span></a>
 </nav>
 
 <style>

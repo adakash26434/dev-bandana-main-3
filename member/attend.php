@@ -63,8 +63,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
                     }
                 }
             } catch (Throwable $e) {
-                $checkInErr = 'Check-in गर्न समस्या भयो।';
-                error_log('[attend checkin] ' . $e->getMessage());
+                $sqlState = ($e instanceof PDOException) ? (string)$e->getCode() : '';
+                if ($sqlState === '23000' || str_contains($e->getMessage(), 'Duplicate') || str_contains($e->getMessage(), 'uniq_member_program')) {
+                    $checkInErr = 'तपाईं यो कार्यक्रममा पहिल्यै check-in हुनुभएको छ।';
+                } else {
+                    $checkInErr = 'Check-in गर्न समस्या भयो।';
+                    error_log('[attend checkin] ' . $e->getMessage());
+                }
             }
         }
     }
@@ -134,6 +139,48 @@ if ($qrProgramRow) {
     }
 }
 
+/* QR scan बाट आएको auto check-in (scan.php -> attend.php?qr_token=...&auto=1) */
+if ($qrProgramRow && ($_GET['auto'] ?? '') === '1' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    try {
+        $qpid = (int)$qrProgramRow['id'];
+        $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
+        $dup->execute([$memberId, $qpid]);
+        if ($dup->fetchColumn()) {
+            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" मा तपाईंको उपस्थिति पहिल्यै दर्ता छ।';
+        } else {
+            $ins = $db->prepare("INSERT INTO member_program_attendance
+                (member_id, member_card_no, program_id, program_title, source, verified_by_ip)
+                VALUES (?,?,?,?,?,?)");
+            $ins->execute([
+                $memberId,
+                $memCard,
+                $qpid,
+                (string)$qrProgramRow['title'],
+                'member_qr_scan_auto',
+                $_SERVER['REMOTE_ADDR'] ?? ''
+            ]);
+            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" मा उपस्थिति स्वतः दर्ता भयो!';
+            $qrAlreadyAttended = true;
+            // local list पनि update (same request मा badge/count सही देखियोस्)
+            array_unshift($myAttendance, [
+                'program_id' => $qpid,
+                'program_title' => (string)$qrProgramRow['title'],
+                'attended_at' => date('Y-m-d H:i:s'),
+                'location' => $qrProgramRow['location'] ?? '',
+            ]);
+        }
+    } catch (Throwable $e) {
+        $sqlState = ($e instanceof PDOException) ? (string)$e->getCode() : '';
+        if ($sqlState === '23000' || str_contains($e->getMessage(), 'Duplicate') || str_contains($e->getMessage(), 'uniq_member_program')) {
+            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" मा तपाईंको उपस्थिति पहिल्यै दर्ता छ।';
+            $qrAlreadyAttended = true;
+        } else {
+            $checkInErr = 'QR check-in स्वतः दर्ता गर्न समस्या भयो।';
+            error_log('[attend auto qr checkin] ' . $e->getMessage());
+        }
+    }
+}
+
 /* My pre-registrations */
 $myPreregs = [];
 try {
@@ -182,7 +229,7 @@ HTML;
 <?php require __DIR__ . '/includes/chrome.php'; ?>
 
 <main class="mp-main">
-<div class="mp-container">
+<div class="mp-container mp-container-medium">
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
     <h1 style="font-size:1.25rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0;">
@@ -259,7 +306,7 @@ HTML;
           <div style="font-size:.7rem;color:#9ca3af;">उपस्थित कार्यक्रम</div>
         </div>
         <div style="text-align:center;">
-          <div style="font-size:1.3rem;font-weight:800;color:#1565c0;"><?= count($myPreregs) ?></div>
+          <div style="font-size:1.3rem;font-weight:800;color:var(--secondary-color,#c0392b);"><?= count($myPreregs) ?></div>
           <div style="font-size:.7rem;color:#9ca3af;">Pre-reg</div>
         </div>
         <div style="text-align:center;">
@@ -332,12 +379,12 @@ HTML;
             <?php elseif ($prog['pre_registration_open'] && !$isPrereg): ?>
             <form method="POST" style="display:inline;">
               <?= $csrfField ?><input type="hidden" name="action" value="prereg"><input type="hidden" name="program_id" value="<?= $progId ?>">
-              <button type="submit" style="padding:7px 16px;background:#1565c0;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;">
+              <button type="submit" style="padding:7px 16px;background:var(--secondary-color,#c0392b);color:var(--text-on-secondary,#fff);border:none;border-radius:8px;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;">
                 <i class="fas fa-clipboard-check" style="margin-right:4px;"></i>Pre-register
               </button>
             </form>
             <?php elseif ($isPrereg): ?>
-            <span style="font-size:.78rem;color:#1565c0;font-weight:600;"><i class="fas fa-bookmark" style="margin-right:4px;"></i>Pre-registered</span>
+            <span style="font-size:.78rem;color:var(--secondary-color,#c0392b);font-weight:600;"><i class="fas fa-bookmark" style="margin-right:4px;"></i>Pre-registered</span>
             <?php endif; ?>
           </div>
           <?php endif; ?>
@@ -376,7 +423,7 @@ HTML;
   <div class="tab-pane" id="tab-prereg">
     <?php foreach ($myPreregs as $pr): ?>
     <div class="prog-card" style="display:flex;gap:12px;align-items:center;">
-      <div style="width:40px;height:40px;border-radius:50%;background:#1565c0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;flex-shrink:0;">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--secondary-color,#c0392b);display:flex;align-items:center;justify-content:center;color:var(--text-on-secondary,#fff);font-size:.9rem;flex-shrink:0;">
         <i class="fas fa-bookmark"></i>
       </div>
       <div style="flex:1;min-width:0;">
@@ -386,7 +433,7 @@ HTML;
           <?php if ($pr['location']): ?><span style="margin-left:8px;"><i class="fas fa-location-dot" style="margin-right:3px;"></i><?= htmlspecialchars($pr['location']) ?></span><?php endif; ?>
         </div>
       </div>
-      <span style="font-size:.75rem;font-weight:700;color:#1565c0;background:#eff6ff;padding:4px 10px;border-radius:20px;">Pre-reg</span>
+      <span style="font-size:.75rem;font-weight:700;color:var(--secondary-color,#c0392b);background:#fef2f2;padding:4px 10px;border-radius:20px;">Pre-reg</span>
     </div>
     <?php endforeach; ?>
   </div>

@@ -35,6 +35,25 @@
     padding: 24px 16px 60px;
 }
 
+/* Shared centered content wrappers for member pages */
+.mp-main {
+    width: 100%;
+}
+
+.mp-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.mp-container-narrow {
+    max-width: 560px;
+}
+
+.mp-container-medium {
+    max-width: 900px;
+}
+
 /* ─────────────────────────────────────────
    v10.7 Typography Consistency (Member)
    Member portal का headings सबै page मा एकरूप बनाउन

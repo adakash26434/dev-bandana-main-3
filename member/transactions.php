@@ -75,9 +75,9 @@ $pageTitle = isEnglish() ? 'Transaction History' : 'कारोबार वि
       <div style="font-size:1.1rem;font-weight:700;color:#dc2626;"><?php echo formatNepaliCurrency((float)$totalDebit); ?></div>
       <div style="font-size:12px;color:#b91c1c;margin-top:4px;"><i class="fas fa-arrow-up me-1"></i>झिकेको</div>
     </div>
-    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px;text-align:center;">
-      <div style="font-size:1.1rem;font-weight:700;color:#2563eb;"><?php echo formatNepaliCurrency((float)$totalCredit - (float)$totalDebit); ?></div>
-      <div style="font-size:12px;color:#1d4ed8;margin-top:4px;"><i class="fas fa-wallet me-1"></i>ब्यालेन्स</div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;text-align:center;">
+      <div style="font-size:1.1rem;font-weight:700;color:var(--secondary-color,#c0392b);"><?php echo formatNepaliCurrency((float)$totalCredit - (float)$totalDebit); ?></div>
+      <div style="font-size:12px;color:var(--secondary-dark,#922b21);margin-top:4px;"><i class="fas fa-wallet me-1"></i>ब्यालेन्स</div>
     </div>
     <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:16px;text-align:center;">
       <div style="font-size:1.1rem;font-weight:700;color:#374151;"><?php echo toNepaliNumeral($totalCount); ?></div>

@@ -104,7 +104,7 @@ function adminBadge(string $color, string $text, bool $dark = false): string {
         'success'   => 'background:#dcfce7;color:#166534;',
         'danger'    => 'background:#fee2e2;color:#991b1b;',
         'warning'   => 'background:#fef9c3;color:#713f12;',
-        'info'      => 'background:#dbeafe;color:#1e40af;',
+        'info'      => 'background:#fef2f2;color:var(--secondary-dark,#922b21);',
         'primary'   => 'background:#dcfce7;color:#166534;',
         'secondary' => 'background:#f3f4f6;color:#4b5563;',
         'dark'      => 'background:#1f2937;color:#fff;',
@@ -148,7 +148,7 @@ function adminStatusBadge(string $status): string {
         'pending'    => ['bg' => '#fef9c3', 'color' => '#713f12', 'icon' => 'fa-clock',       'label' => 'प्रतीक्षारत'],
         'approved'   => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle-check', 'label' => 'स्वीकृत'],
         'rejected'   => ['bg' => '#fee2e2', 'color' => '#991b1b', 'icon' => 'fa-circle-xmark', 'label' => 'अस्वीकृत'],
-        'processing' => ['bg' => '#dbeafe', 'color' => '#1e40af', 'icon' => 'fa-spinner',      'label' => 'प्रक्रियामा'],
+        'processing' => ['bg' => '#fef2f2', 'color' => 'var(--secondary-dark,#922b21)', 'icon' => 'fa-spinner',      'label' => 'प्रक्रियामा'],
         'resolved'   => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-check',        'label' => 'समाधान'],
         'closed'     => ['bg' => '#f3f4f6', 'color' => '#4b5563', 'icon' => 'fa-xmark',        'label' => 'बन्द'],
         'active'     => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle',       'label' => 'Active'],
@@ -169,9 +169,9 @@ function adminStatusBadge(string $status): string {
    ────────────────────────────────────────────────────────────── */
 function adminStatLink(string $url, string $color, string $label, $count, bool $dark = false): string {
     $softBg  = ['success' => '#dcfce7', 'danger' => '#fee2e2', 'warning' => '#fef9c3',
-                 'info' => '#dbeafe', 'primary' => '#dcfce7', 'secondary' => '#f3f4f6'];
+                 'info' => '#fef2f2', 'primary' => '#dcfce7', 'secondary' => '#f3f4f6'];
     $softClr = ['success' => '#166534', 'danger' => '#991b1b', 'warning' => '#713f12',
-                 'info' => '#1e40af', 'primary' => '#166534', 'secondary' => '#374151'];
+                 'info' => 'var(--secondary-dark,#922b21)', 'primary' => '#166534', 'secondary' => '#374151'];
     $bg  = $softBg[$color]  ?? '#f3f4f6';
     $clr = $softClr[$color] ?? '#374151';
     return '<a href="' . htmlspecialchars($url) . '" class="text-decoration-none" style="'
@@ -305,7 +305,7 @@ function adminSectionCard(string $title, string $icon, string $color, string $bo
     $bgs = [
         'primary'   => 'background:linear-gradient(135deg,rgba(26,95,42,0.06),rgba(40,167,69,0.04));border-left:3px solid var(--primary-color);',
         'success'   => 'background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;',
-        'info'      => 'background:rgba(59,130,246,0.05);border-left:3px solid #3b82f6;',
+        'info'      => 'background:#fef2f2;border-left:3px solid var(--secondary-color,#c0392b);',
         'warning'   => 'background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;',
         'danger'    => 'background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;',
         'secondary' => 'background:rgba(107,114,128,0.05);border-left:3px solid #9ca3af;',
@@ -393,7 +393,7 @@ function adminQuickStat(string $label, int|string $value, string $icon = 'fa-cir
         'primary' => 'background:#d1fae5;color:#065f46;',
         'danger'  => 'background:#fee2e2;color:#dc2626;',
         'warning' => 'background:#fef9c3;color:#a16207;',
-        'info'    => 'background:#dbeafe;color:#1d4ed8;',
+        'info'    => 'background:#fef2f2;color:var(--secondary-dark,#922b21);',
     ];
     $style = $colors[$color] ?? $colors['primary'];
     return '<span style="display:inline-flex;align-items:center;gap:6px;'

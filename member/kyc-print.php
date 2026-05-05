@@ -75,8 +75,8 @@ if (!$kycRow) {
         .hdr .sub { font-size: 12px; color: #475569; margin-top: 4px; }
         .meta { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin: 10px 0; font-size: 12px; }
         .meta div { background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 8px; border-radius: 6px; }
-        .sec { margin-top: 10px; border: 1px solid #dbeafe; border-radius: 8px; overflow: hidden; }
-        .sec h3 { margin: 0; font-size: 14px; padding: 7px 10px; background: #eff6ff; color: #1e3a8a; }
+        .sec { margin-top: 10px; border: 1px solid #fecaca; border-radius: 8px; overflow: hidden; }
+        .sec h3 { margin: 0; font-size: 14px; padding: 7px 10px; background: #fef2f2; color: var(--secondary-dark,#922b21); }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         td, th { border-bottom: 1px solid #e5e7eb; padding: 6px 8px; vertical-align: top; }
         th { width: 32%; text-align: left; color: #475569; background: #f8fafc; }

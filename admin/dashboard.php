@@ -85,7 +85,7 @@ $sadasyaBadge = $stats['requests'] + $stats['pwResets'];
       $welfareRecent=$pdo->query("SELECT id, member_name AS claimant_name, claim_type, status, claim_amount, created_at FROM member_welfare_claims ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
   } catch (Throwable $e) { error_log("[dashboard welfare] ".$e->getMessage()); }
   $welfareBadge=$welfarePending+$welfareReview;
-  $welfareClaimTypes=['maternity'=>['np'=>'सुत्केरी सुविधा','icon'=>'fa-baby','color'=>'#e91e63','bg'=>'#fce4ec'],'death'=>['np'=>'मृत्यु सुविधा','icon'=>'fa-heart-broken','color'=>'#607d8b','bg'=>'#eceff1'],'insurance'=>['np'=>'बीमा दाबी','icon'=>'fa-shield-halved','color'=>'#7c3aed','bg'=>'#ede9fe'],'medical'=>['np'=>'उपचार खर्च','icon'=>'fa-hospital','color'=>'#059669','bg'=>'#d1fae5'],'accident'=>['np'=>'दुर्घटना सुविधा','icon'=>'fa-triangle-exclamation','color'=>'#f97316','bg'=>'#ffedd5'],'other'=>['np'=>'अन्य सुविधा','icon'=>'fa-gift','color'=>'#d97706','bg'=>'#fef3c7']];
+  $welfareClaimTypes=['maternity'=>['np'=>'सुत्केरी सुविधा','icon'=>'fa-baby','color'=>'#e91e63','bg'=>'#fce4ec'],'death'=>['np'=>'मृत्यु सुविधा','icon'=>'fa-heart-broken','color'=>'#607d8b','bg'=>'#eceff1'],'insurance'=>['np'=>'बीमा दाबी','icon'=>'fa-shield-halved','color'=>'var(--secondary-color,#c0392b)','bg'=>'#fef2f2'],'medical'=>['np'=>'उपचार खर्च','icon'=>'fa-hospital','color'=>'#059669','bg'=>'#d1fae5'],'accident'=>['np'=>'दुर्घटना सुविधा','icon'=>'fa-triangle-exclamation','color'=>'#f97316','bg'=>'#ffedd5'],'other'=>['np'=>'अन्य सुविधा','icon'=>'fa-gift','color'=>'#d97706','bg'=>'#fef3c7']];
 
 /* Recent activity */
 $log = [];
@@ -127,8 +127,8 @@ try {
            font-size:1.4rem;color:#fff;flex-shrink:0;
            background:linear-gradient(135deg,var(--primary-color),var(--primary-light));}
   .ds-icon.warn{background:linear-gradient(135deg,#d97706,#f59e0b);}
-  .ds-icon.info{background:linear-gradient(135deg,#1e40af,#3b82f6);}
-  .ds-icon.alt{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+  .ds-icon.info{background:linear-gradient(135deg,var(--secondary-dark,#922b21),var(--secondary-color,#c0392b));}
+  .ds-icon.alt{background:linear-gradient(135deg,var(--secondary-color,#c0392b),#d45d50);}
   .ds-icon.danger{background:linear-gradient(135deg,#b91c1c,#ef4444);}
   .ds-val{font-size:1.7rem;font-weight:700;line-height:1;color:#111827;}
   .ds-lbl{font-size:.82rem;color:#6b7280;margin-top:4px;}
@@ -168,7 +168,7 @@ try {
     .wf-type-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
     .wf-type-name{flex-grow:1;font-size:.88rem;font-weight:600;color:#111827;}
     .wf-badge{border-radius:999px;font-size:.72rem;font-weight:700;padding:2px 8px;display:inline-block;text-decoration:none;}
-    .wf-badge.pending{background:#fef9c3;color:#854d0e;}.wf-badge.review{background:#dbeafe;color:#1e40af;}.wf-badge.approved{background:#dcfce7;color:#166534;}
+    .wf-badge.pending{background:#fef9c3;color:#854d0e;}.wf-badge.review{background:#fef2f2;color:var(--secondary-dark,#922b21);}.wf-badge.approved{background:#dcfce7;color:#166534;}
     .wf-summary-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
     .wf-stat-chip{flex:1;min-width:90px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;text-align:center;text-decoration:none;color:inherit;}
     .wf-stat-chip .val{font-size:1.4rem;font-weight:700;line-height:1;}.wf-stat-chip .lbl{font-size:.72rem;color:#6b7280;margin-top:2px;}

@@ -23,7 +23,7 @@ $cvv  = mb_substr(trim((string)($_POST['cvv'] ?? '')), 0, 32, 'UTF-8');
 
 $programs = [];
 try {
-    $programs = $pdo->query("SELECT id, title, event_date, event_time, location
+    $programs = $pdo->query("SELECT id, title, event_date, event_time, location, qr_token
                              FROM upcoming_programs
                              WHERE is_active=1
                              ORDER BY COALESCE(event_date, '9999-12-31') ASC, id DESC")->fetchAll() ?: [];
@@ -107,6 +107,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .pav-field-input[name="cvv"]{font-family:'Courier New',monospace;letter-spacing:.35em;text-align:center;font-weight:700;font-size:16px;}
 .pav-field-input[name="code"]{font-family:'Courier New',monospace;letter-spacing:.1em;text-transform:uppercase;font-weight:700;}
 
+/* Compact selected-program QR preview */
+.pav-program-qr{
+  display:none;
+  margin-top:10px;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  padding:10px 12px;
+}
+.pav-program-qr.is-visible{display:flex;align-items:center;gap:12px;}
+.pav-program-qr-img{
+  width:72px;
+  height:72px;
+  border-radius:8px;
+  background:#fff;
+  border:1px solid #dbe3ee;
+  object-fit:contain;
+  flex-shrink:0;
+}
+.pav-program-qr-meta{min-width:0;}
+.pav-program-qr-title{font-size:.79rem;font-weight:700;color:#334155;line-height:1.35;}
+.pav-program-qr-link{
+  display:inline-block;
+  margin-top:4px;
+  font-size:.73rem;
+  color:#166534;
+  font-weight:700;
+  text-decoration:none;
+}
+.pav-program-qr-empty{
+  font-size:.74rem;
+  color:#64748b;
+  margin-top:6px;
+}
+
 /* Submit button */
 .pav-btn{width:100%;min-height:44px;padding:11px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 16px rgba(26,135,84,.32);transition:all .15s;letter-spacing:.02em;}
 .pav-btn:hover{filter:brightness(1.07);transform:translateY(-1px);box-shadow:0 8px 22px rgba(26,135,84,.38);}
@@ -179,9 +214,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="pav-field">
                         <label><i class="fas fa-calendar-check me-1"></i><?php echo isEnglish() ? 'Select Program' : 'कार्यक्रम छान्नुहोस्'; ?></label>
-                        <select name="program_id" class="pav-field-input" required>
+                        <select name="program_id" class="pav-field-input" id="pavProgramSelect" required>
                             <option value=""><?php echo isEnglish() ? '— Choose a program —' : '— कार्यक्रम छान्नुहोस् —'; ?></option>
                             <?php foreach ($programs as $pg): ?>
+                                <?php
+                                    $qrToken = trim((string)($pg['qr_token'] ?? ''));
+                                    $memberAttendUrl = $qrToken !== '' ? (rtrim(SITE_URL, '/') . '/member/attend.php?qr_token=' . rawurlencode($qrToken)) : '';
+                                ?>
                                 <option value="<?php echo (int)$pg['id']; ?>" <?php echo $programId === (int)$pg['id'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($pg['title']); ?>
                                     <?php if (!empty($pg['event_date'])): ?> · <?php echo htmlspecialchars($pg['event_date']); ?><?php endif; ?>
@@ -189,6 +228,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <div id="pavProgramQr" class="pav-program-qr" aria-live="polite"></div>
+                        <div id="pavProgramQrEmpty" class="pav-program-qr-empty">
+                            <?php echo isEnglish() ? 'Selected program QR दिखाउन, त्यो कार्यक्रममा QR token generate भएको हुनुपर्छ।' : 'कार्यक्रम select गरेपछि QR देखाउन, त्यो कार्यक्रममा QR token generate भएको हुनुपर्छ।'; ?>
+                        </div>
                     </div>
 
                     <div class="row g-3">
@@ -266,6 +309,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </section>
 <script>
 (function(){
+    var programQrMap = <?php
+        $qrMap = [];
+        foreach ($programs as $pg) {
+            $id = (int)($pg['id'] ?? 0);
+            if ($id <= 0) continue;
+            $token = trim((string)($pg['qr_token'] ?? ''));
+            if ($token === '') continue;
+            $qrMap[$id] = rtrim(SITE_URL, '/') . '/member/attend.php?qr_token=' . rawurlencode($token);
+        }
+        echo json_encode($qrMap, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    ?> || {};
+    var programSel = document.getElementById('pavProgramSelect');
+    var programQrBox = document.getElementById('pavProgramQr');
+    var programQrEmpty = document.getElementById('pavProgramQrEmpty');
+    function updateProgramQr() {
+        if (!programSel || !programQrBox) return;
+        var pid = (programSel.value || '').trim();
+        var url = (pid && programQrMap[pid]) ? programQrMap[pid] : '';
+        if (!url) {
+            programQrBox.classList.remove('is-visible');
+            programQrBox.innerHTML = '';
+            if (programQrEmpty) programQrEmpty.style.display = '';
+            return;
+        }
+        var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=144x144&margin=4&data=' + encodeURIComponent(url);
+        programQrBox.innerHTML =
+            '<img class="pav-program-qr-img" src="' + qrSrc + '" alt="Program QR">' +
+            '<div class="pav-program-qr-meta">' +
+            '<div class="pav-program-qr-title"><?php echo isEnglish() ? 'Selected program QR' : 'छानिएको कार्यक्रमको QR'; ?></div>' +
+            '<a class="pav-program-qr-link" target="_blank" rel="noopener" href="' + url + '"><i class="fas fa-up-right-from-square me-1"></i><?php echo isEnglish() ? 'Open attendance link' : 'Attendance link खोल्नुहोस्'; ?></a>' +
+            '</div>';
+        programQrBox.classList.add('is-visible');
+        if (programQrEmpty) programQrEmpty.style.display = 'none';
+    }
+    if (programSel) {
+        programSel.addEventListener('change', updateProgramQr);
+        updateProgramQr();
+    }
+
     var code = document.querySelector('.pav-card-body input[name="code"]');
     var cvv  = document.querySelector('.pav-card-body input[name="cvv"]');
     if (code) code.addEventListener('input', function(e){

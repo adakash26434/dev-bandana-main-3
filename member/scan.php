@@ -19,7 +19,7 @@ $base      = rtrim(SITE_URL, '/') . '/';
 
 $extraHead = <<<'HTML'
 <style>
-.scan-wrap { max-width: 520px; margin: 0 auto; }
+.scan-wrap { margin: 0 auto; }
 .scan-hero {
   background: linear-gradient(135deg,#ecfdf5,#d1fae5);
   border: 1px solid #6ee7b7;
@@ -72,7 +72,7 @@ require __DIR__ . '/includes/chrome.php';
 ?>
 
 <main class="mp-main">
-<div class="mp-container scan-wrap">
+<div class="mp-container mp-container-narrow scan-wrap">
   <h1 style="font-size:1.2rem;font-weight:800;color:var(--primary-color,#1a8754);margin:0 0 10px;">
     <i class="fas fa-qrcode" style="margin-right:8px;"></i>कार्यक्रम QR स्क्यान
   </h1>
@@ -130,7 +130,7 @@ require __DIR__ . '/includes/chrome.php';
   }
 
   function goAttendance(token) {
-    window.location.href = base + 'member/attend.php?qr_token=' + encodeURIComponent(token);
+    window.location.href = base + 'member/attend.php?qr_token=' + encodeURIComponent(token) + '&auto=1';
   }
 
   function onScanSuccess(decodedText) {

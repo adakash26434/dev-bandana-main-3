@@ -46,6 +46,15 @@ if ($cycle) {
 }
 
 $votingOpen = $cycle ? isElectionVotingOpen($cycle) : false;
+$voteEnded = false;
+if ($cycle && !empty($cycle['vote_end_at'])) {
+    try {
+        $tz = new DateTimeZone('Asia/Kathmandu');
+        $voteEnded = (new DateTime('now', $tz)) > (new DateTime((string)$cycle['vote_end_at'], $tz));
+    } catch (Throwable $e) {
+        $voteEnded = false;
+    }
+}
 
 /* Submit handle */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submit_vote' && $cycle) {
@@ -101,6 +110,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
     }
 }
 
+/* Recompute after submit handling so UI reflects latest state immediately */
+$canVoteNow = (bool)($cycle && !$alreadyVoted && $votingOpen);
+$resultsVisible = (bool)($cycle && (!empty($cycle['results_finalized']) || $voteEnded));
+
 /* डाटा लोड — समिति-wise grouping */
 $positions = []; $candByPos = []; $samitiGroups = [];
 if ($cycle) {
@@ -148,7 +161,8 @@ require __DIR__ . '/includes/chrome.php';
 .tally-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-top:6px;}
 .tally-bar > div{height:100%;background:linear-gradient(90deg,var(--primary-color),var(--primary-light));}
 </style>
-<main class="container py-4" style="max-width:1100px;">
+<main class="mp-main py-4">
+<div class="mp-container mp-container-medium">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h1 class="h4 mb-0"><i class="fas fa-check-to-slot me-2"></i>मतदान</h1>
         <?php if ($cycle): ?><span class="badge bg-light text-dark border">कुल मतदाता: <?php echo $totalVoters; ?></span><?php endif; ?>
@@ -179,13 +193,29 @@ require __DIR__ . '/includes/chrome.php';
                         <span class="badge bg-secondary">मतदान बन्द</span>
                     <?php endif; ?>
                 </div>
+                <?php if (!$alreadyVoted && !empty($cycle['vote_start_at']) && !empty($cycle['vote_end_at'])): ?>
+                    <div class="small mt-2 text-muted" id="voteCountdown"
+                         data-start="<?php echo htmlspecialchars((string)$cycle['vote_start_at'], ENT_QUOTES, 'UTF-8'); ?>"
+                         data-end="<?php echo htmlspecialchars((string)$cycle['vote_end_at'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <i class="fas fa-hourglass-half me-1"></i> समय गणना हुँदैछ...
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
-        <?php if (!$alreadyVoted && $votingOpen && !empty($positions)): ?>
+        <?php if (!empty($positions)): ?>
         <form method="post" id="voteForm" novalidate>
             <?php echo csrfField(); ?>
             <input type="hidden" name="action" value="submit_vote">
+            <?php if (!$canVoteNow): ?>
+                <div class="alert alert-light border mb-3">
+                    <?php if ($alreadyVoted): ?>
+                        <i class="fas fa-check-circle text-success me-1"></i> तपाईंले मतदान गरिसक्नुभएको छ। उम्मेदवार सूची हेर्न सक्नुहुन्छ।
+                    <?php else: ?>
+                        <i class="fas fa-clock text-warning me-1"></i> मतदान अहिले खुला छैन। मतदान समय खुल्दा मात्र मत दिन मिल्छ।
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
             <?php
             $samitiKeys = array_keys($samitiGroups);
             $firstKey = $samitiKeys[0] ?? 0;
@@ -217,7 +247,7 @@ require __DIR__ . '/includes/chrome.php';
                                     <?php foreach ($list as $cd): $cnt = $tally[(int)$cd['id']] ?? 0; $maxT = max(1, !empty($tally) ? max($tally) : 1); ?>
                                         <div class="col-md-4 col-sm-6">
                                             <label class="vote-card card h-100 p-2 mb-0">
-                                                <input type="<?php echo $maxV > 1 ? 'checkbox' : 'radio'; ?>" name="picks[<?php echo (int)$pos['id']; ?>]<?php echo $maxV > 1 ? '[]' : ''; ?>" value="<?php echo (int)$cd['id']; ?>" class="form-check-input mb-2 vote-input">
+                                                <input type="<?php echo $maxV > 1 ? 'checkbox' : 'radio'; ?>" name="picks[<?php echo (int)$pos['id']; ?>]<?php echo $maxV > 1 ? '[]' : ''; ?>" value="<?php echo (int)$cd['id']; ?>" class="form-check-input mb-2 vote-input" <?php echo $canVoteNow ? '' : 'disabled'; ?>>
                                                 <?php if (!empty($cd['photo'])): ?>
                                                     <img src="<?php echo SITE_URL . htmlspecialchars(ltrim((string)$cd['photo'], '/')); ?>" class="vote-photo" alt="">
                                                 <?php else: ?>
@@ -230,9 +260,11 @@ require __DIR__ . '/includes/chrome.php';
                                                 <?php if (!empty($cd['bio_np'])): ?>
                                                     <div class="small text-muted mt-1"><?php echo nl2br(htmlspecialchars(mb_substr($cd['bio_np'], 0, 120))); ?><?php echo mb_strlen($cd['bio_np']) > 120 ? '…' : ''; ?></div>
                                                 <?php endif; ?>
+                                                <?php if ($resultsVisible): ?>
                                                 <div class="small text-muted mt-2">हालसम्म मत: <strong><?php echo $cnt; ?></strong>
                                                     <div class="tally-bar"><div style="width:<?php echo round($cnt/$maxT*100); ?>%"></div></div>
                                                 </div>
+                                                <?php endif; ?>
                                             </label>
                                         </div>
                                     <?php endforeach; ?>
@@ -245,9 +277,11 @@ require __DIR__ . '/includes/chrome.php';
             <?php endforeach; ?>
             </div>
 
-            <div class="d-flex justify-content-end gap-2 mb-5">
-                <button type="button" class="btn btn-primary btn-lg" id="reviewBtn"><i class="fas fa-eye me-1"></i>समीक्षा र पुष्टि</button>
-            </div>
+            <?php if ($canVoteNow): ?>
+                <div class="d-flex justify-content-end gap-2 mb-5">
+                    <button type="button" class="btn btn-primary btn-lg" id="reviewBtn"><i class="fas fa-eye me-1"></i>समीक्षा र पुष्टि</button>
+                </div>
+            <?php endif; ?>
 
             <!-- Confirmation Modal -->
             <div class="modal fade" id="confirmModal" tabindex="-1">
@@ -265,6 +299,7 @@ require __DIR__ . '/includes/chrome.php';
             </div>
         </form>
 
+        <?php if ($canVoteNow): ?>
         <script>
         (function(){
             var picks = {};
@@ -299,8 +334,9 @@ require __DIR__ . '/includes/chrome.php';
             });
         })();
         </script>
+        <?php endif; ?>
 
-        <?php else: ?>
+        <?php if ($resultsVisible): ?>
             <h2 class="h6 mb-3"><i class="fas fa-chart-bar me-2"></i>हालको परिणाम (live)</h2>
             <?php foreach ($positions as $pos): $list = $candByPos[(int)$pos['id']] ?? [];
                   usort($list, fn($a,$b) => ($tally[(int)$b['id']]??0) - ($tally[(int)$a['id']]??0));
@@ -324,7 +360,69 @@ require __DIR__ . '/includes/chrome.php';
                     </div>
                 </div>
             <?php endforeach; ?>
+        <?php elseif ($cycle): ?>
+            <div class="alert alert-secondary mt-3">
+                <i class="fas fa-hourglass-half me-1"></i> परिणाम मतदान अवधि सकिएपछि (वा Admin ले finalize गरेपछि) देखाइनेछ।
+            </div>
+        <?php endif; ?>
+        <?php else: ?>
+            <div class="alert alert-info">यस निर्वाचनका लागि उम्मेदवार/पदहरू अझै प्रकाशित गरिएको छैन।</div>
         <?php endif; ?>
     <?php endif; ?>
+</div>
 </main>
+<script>
+(function () {
+    var el = document.getElementById('voteCountdown');
+    if (!el) return;
+    var startRaw = el.getAttribute('data-start') || '';
+    var endRaw = el.getAttribute('data-end') || '';
+    if (!startRaw || !endRaw) return;
+
+    // Parse "YYYY-MM-DD HH:MM:SS" into local Date.
+    function parseDbDateTime(s) {
+        var m = String(s).trim().match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
+        if (!m) return null;
+        return new Date(
+            Number(m[1]),
+            Number(m[2]) - 1,
+            Number(m[3]),
+            Number(m[4]),
+            Number(m[5]),
+            Number(m[6] || 0)
+        );
+    }
+    var start = parseDbDateTime(startRaw);
+    var end = parseDbDateTime(endRaw);
+    if (!start || !end) return;
+
+    function fmt(ms) {
+        if (ms < 0) ms = 0;
+        var sec = Math.floor(ms / 1000);
+        var d = Math.floor(sec / 86400); sec %= 86400;
+        var h = Math.floor(sec / 3600); sec %= 3600;
+        var m = Math.floor(sec / 60); var s = sec % 60;
+        var parts = [];
+        if (d) parts.push(d + ' दिन');
+        if (h || d) parts.push(h + ' घण्टा');
+        if (m || h || d) parts.push(m + ' मिनेट');
+        parts.push(s + ' सेकेन्ड');
+        return parts.join(' ');
+    }
+
+    function tick() {
+        var now = new Date();
+        if (now < start) {
+            el.innerHTML = '<i class="fas fa-hourglass-start me-1"></i> मतदान सुरु हुन बाँकी: <strong>' + fmt(start - now) + '</strong>';
+        } else if (now <= end) {
+            el.innerHTML = '<i class="fas fa-hourglass-half me-1"></i> मतदान बन्द हुन बाँकी: <strong>' + fmt(end - now) + '</strong>';
+        } else {
+            el.innerHTML = '<i class="fas fa-hourglass-end me-1"></i> मतदान समय समाप्त भयो।';
+            clearInterval(timer);
+        }
+    }
+    tick();
+    var timer = setInterval(tick, 1000);
+})();
+</script>
 <?php require __DIR__ . '/includes/chrome-foot.php'; ?>

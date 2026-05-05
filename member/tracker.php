@@ -162,23 +162,23 @@ require __DIR__ . '/includes/chrome.php';
             $hasAttach = !empty($viewApp['admin_attachment']);
             if ($hasReply || $hasAttach):
             ?>
-            <div style="margin:14px 0 6px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1.5px solid #10b981;border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:#065f46;font-size:.92rem;margin-bottom:8px;">
+            <div style="margin:14px 0 6px;background:#f0fdf4;border:1.5px solid var(--primary-light,#2e8b4a);border-radius:12px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--primary-dark,#144a21);font-size:.92rem;margin-bottom:8px;">
                     <i class="fas fa-comment-dots"></i> Admin बाट प्रतिक्रिया
                     <?php if (!empty($viewApp['resolved_at'])): ?>
-                    <span style="margin-left:auto;font-size:.7rem;font-weight:600;color:#047857;background:#fff;padding:2px 8px;border-radius:999px;">
+                    <span style="margin-left:auto;font-size:.7rem;font-weight:600;color:var(--primary-dark,#144a21);background:#fff;padding:2px 8px;border-radius:999px;">
                         <?php echo formatNepaliDate($viewApp['resolved_at'], true); ?>
                     </span>
                     <?php endif; ?>
                 </div>
                 <?php if ($hasReply): ?>
-                <div style="white-space:pre-wrap;font-size:.88rem;color:#064e3b;line-height:1.6;">
+                <div style="white-space:pre-wrap;font-size:.88rem;color:var(--primary-dark,#144a21);line-height:1.6;">
                     <?php echo nl2br(htmlspecialchars($viewApp['admin_response'])); ?>
                 </div>
                 <?php endif; ?>
                 <?php if ($hasAttach): ?>
                 <div style="margin-top:10px;">
-                    <a href="<?php echo htmlspecialchars($siteUrl . ltrim($viewApp['admin_attachment'],'/')); ?>" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#065f46;border:1px solid #10b981;padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:700;text-decoration:none;">
+                    <a href="<?php echo htmlspecialchars($siteUrl . ltrim($viewApp['admin_attachment'],'/')); ?>" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--primary-dark,#144a21);border:1px solid var(--primary-light,#2e8b4a);padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:700;text-decoration:none;">
                         <i class="fas fa-paperclip"></i> संलग्न फाइल हेर्नुहोस्
                     </a>
                 </div>

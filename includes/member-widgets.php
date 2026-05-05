@@ -114,7 +114,7 @@ function memberTransactionHistory(string $email, string $phone, int $limit = 50)
             foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) {
                 $out[] = ['type'=>'kyc','tracking_id'=>$r['tracking_id'],'title'=>'KYC आवेदन',
                           'amount'=>null,'status'=>$r['status'],'date'=>$r['created_at'],
-                          'color'=>'#1565c0','icon'=>'fa-id-card'];
+                          'color'=>'var(--secondary-color,#c0392b)','icon'=>'fa-id-card'];
             }
         } catch (\Throwable $e) {}
 

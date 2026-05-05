@@ -46,7 +46,7 @@ echo adminPageHeader('Quick Start Guide','fa-book-open',
 .hg-step{background:#f8fafc;border-left:4px solid var(--primary-color,#1a5f2a);padding:13px 17px;border-radius:0 10px 10px 0;margin:9px 0;font-size:.9rem;}
 .hg-step b,.hg-step strong{color:var(--primary-color,#1a5f2a);}
 .hg-warn{background:#fef3c7;border-left:4px solid #f59e0b;padding:13px 17px;border-radius:0 10px 10px 0;margin:9px 0;color:#78350f;font-size:.9rem;}
-.hg-info{background:#dbeafe;border-left:4px solid #3b82f6;padding:13px 17px;border-radius:0 10px 10px 0;margin:9px 0;color:#1e3a8a;font-size:.9rem;}
+.hg-info{background:#fef2f2;border-left:4px solid var(--secondary-color,#c0392b);padding:13px 17px;border-radius:0 10px 10px 0;margin:9px 0;color:var(--secondary-dark,#922b21);font-size:.9rem;}
 .hg-success{background:#dcfce7;border-left:4px solid #16a34a;padding:13px 17px;border-radius:0 10px 10px 0;margin:9px 0;color:#14532d;font-size:.9rem;}
 .hg-danger{background:#fee2e2;border-left:4px solid #ef4444;padding:13px 17px;border-radius:0 10px 10px 0;margin:9px 0;color:#7f1d1d;font-size:.9rem;}
 
@@ -63,7 +63,7 @@ echo adminPageHeader('Quick Start Guide','fa-book-open',
 
 /* ─── Kbd + code ─── */
 .kbd{background:#1f2937;color:#f9fafb;padding:2px 8px;border-radius:4px;font-family:'Courier New',monospace;font-size:.8rem;}
-code{background:#f1f5f9;color:#1e40af;padding:1px 6px;border-radius:4px;font-size:.82rem;}
+code{background:#fef2f2;color:var(--secondary-dark,#922b21);padding:1px 6px;border-radius:4px;font-size:.82rem;}
 
 /* ─── FAQ accordion ─── */
 .hg-faq details{background:#f8fafc;border-radius:8px;padding:12px 16px;margin:8px 0;border:1px solid #e5e7eb;}
@@ -77,7 +77,7 @@ code{background:#f1f5f9;color:#1e40af;padding:1px 6px;border-radius:4px;font-siz
 /* ─── Badge ─── */
 .hg-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700;}
 .hg-badge-green{background:#dcfce7;color:#14532d;}
-.hg-badge-blue{background:#dbeafe;color:#1e3a8a;}
+.hg-badge-blue{background:#fef2f2;color:var(--secondary-dark,#922b21);}
 .hg-badge-yellow{background:#fef3c7;color:#78350f;}
 .hg-badge-red{background:#fee2e2;color:#7f1d1d;}
 

@@ -668,7 +668,7 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
     font-size: .9rem;
 }
 .portal-rating-strong {
-    color: #7c3aed;
+    color: var(--secondary-color,#c0392b);
     font-weight: 700;
 }
 .portal-rating-sub { font-size: .67rem; }
@@ -710,9 +710,9 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
     display: inline-block;
     padding: 3px 8px;
     border-radius: 999px;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #dbeafe;
+    background: #fef2f2;
+    color: var(--secondary-dark,#922b21);
+    border: 1px solid #fecaca;
     font-size: 0.74rem;
     font-weight: 600;
 }

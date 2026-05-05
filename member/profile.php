@@ -354,7 +354,7 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
                 </div>
                 <div class="mem-card-body">
                     <?php if (!$hasPwd): ?>
-                    <div class="mem-alert" style="background:#eff6ff;border-left:3px solid #3b82f6;color:#1e40af;font-size:0.8rem;padding:9px 12px;margin-bottom:12px;">
+                    <div class="mem-alert" style="background:#fef2f2;border-left:3px solid var(--secondary-color,#c0392b);color:var(--secondary-dark,#922b21);font-size:0.8rem;padding:9px 12px;margin-bottom:12px;">
                         <i class="fas fa-info-circle me-1"></i>
                         तपाईंको account OAuth (Google/Facebook) बाट बनेको छ। तल नयाँ पासवर्ड सेट गर्नुहोस् — त्यसपछि इमेल + पासवर्डले पनि लगिन गर्न सक्नुहुनेछ।
                     </div>
@@ -398,7 +398,7 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
                             $methods = [];
                             if ($mem['password_hash']) $methods[] = '<span style="background:#f0fdf4;color:var(--primary-color);padding:2px 7px;border-radius:8px;font-size:0.72rem;font-weight:700;">Email</span>';
                             if ($mem['google_id']) $methods[] = '<span style="background:#fef2f2;color:#ea4335;padding:2px 7px;border-radius:8px;font-size:0.72rem;font-weight:700;"><i class="fab fa-google me-1"></i>Google</span>';
-                            if ($mem['facebook_id']) $methods[] = '<span style="background:#eff6ff;color:#1877f2;padding:2px 7px;border-radius:8px;font-size:0.72rem;font-weight:700;"><i class="fab fa-facebook-f me-1"></i>Facebook</span>';
+                            if ($mem['facebook_id']) $methods[] = '<span style="background:#fef2f2;color:var(--secondary-color,#c0392b);padding:2px 7px;border-radius:8px;font-size:0.72rem;font-weight:700;"><i class="fab fa-facebook-f me-1"></i>Facebook</span>';
                             echo implode(' ', $methods) ?: '—';
                             ?>
                         </td></tr>
@@ -581,7 +581,7 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
                             <div style="border:1px solid #e5e7eb;border-radius:10px;padding:8px;background:#f9fafb;">
                                 <div style="font-size:0.75rem;font-weight:600;color:#374151;margin-bottom:6px;"><?php echo htmlspecialchars($label); ?></div>
                                 <?php if ($docShowImg && $docImgUrl !== ''): ?>
-                                    <img src="<?php echo htmlspecialchars($docImgUrl); ?>" alt="<?php echo htmlspecialchars($label); ?>" style="width:100%;height:74px;object-fit:cover;border-radius:8px;border:1px solid #dbeafe;background:#fff;">
+                                    <img src="<?php echo htmlspecialchars($docImgUrl); ?>" alt="<?php echo htmlspecialchars($label); ?>" style="width:100%;height:74px;object-fit:cover;border-radius:8px;border:1px solid #fecaca;background:#fff;">
                                 <?php else: ?>
                                     <div style="height:74px;border:1px dashed #d1d5db;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;color:#9ca3af;background:#fff;text-align:center;padding:6px;"><?php echo $srcRaw !== '' ? 'फाइल भेटिएन / URL मिलेन' : 'अपलोड छैन'; ?></div>
                                 <?php endif; ?>
@@ -637,7 +637,7 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
                             <button type="submit" class="mem-submit-btn" style="margin-top:4px;"><i class="fas fa-upload me-2"></i>हराइरहेको KYC कागजात अपडेट</button>
                         </form>
                         <?php else: ?>
-                        <div class="mem-alert" style="margin-top:8px;background:#eff6ff;border-left:3px solid #2563eb;color:#1e3a8a;font-size:0.8rem;padding:9px 12px;">
+                        <div class="mem-alert" style="margin-top:8px;background:#fef2f2;border-left:3px solid var(--secondary-color,#c0392b);color:var(--secondary-dark,#922b21);font-size:0.8rem;padding:9px 12px;">
                             <i class="fas fa-database me-1"></i>
                             सबै KYM data single-source रूपमा सुरक्षित छ। थप field/नयाँ आवेदनको लागि
                             <a href="<?php echo htmlspecialchars($kycEditUrl); ?>" style="margin-left:6px;font-weight:700;">KYM फर्म खोल्नुहोस्</a>।

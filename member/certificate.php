@@ -111,7 +111,7 @@ $extraHead = <<<HTML
 .cert-qr img { display:block; }
 .cert-sign-line { border-top:1.5px solid #374151; margin-top:40px; padding-top:5px; font-size:.75rem; color:#6b7280; text-align:center; min-width:100px; }
 .cert-watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-30deg); font-size:5rem; font-weight:900; color:rgba(26,95,42,.04); pointer-events:none; white-space:nowrap; z-index:0; }
-.cert-ribbon { position:absolute; top:16px; right:-20px; background:#d97706; color:#fff; font-size:.65rem; font-weight:700; padding:4px 28px; transform:rotate(35deg); letter-spacing:.08em; }
+.cert-ribbon { position:absolute; top:16px; right:-20px; background:var(--secondary-color,#c0392b); color:var(--text-on-secondary,#fff); font-size:.65rem; font-weight:700; padding:4px 28px; transform:rotate(35deg); letter-spacing:.08em; }
 </style>
 HTML;
 ?>
@@ -136,7 +136,7 @@ HTML;
   </div>
 
   <?php if (!$fullName || !$sadasyata): ?>
-  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:16px;font-size:.88rem;color:#92400e;margin-bottom:16px;display:flex;gap:8px;align-items:center;" class="cert-noprint">
+  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;font-size:.88rem;color:var(--secondary-dark,#922b21);margin-bottom:16px;display:flex;gap:8px;align-items:center;" class="cert-noprint">
     <i class="fas fa-triangle-exclamation"></i>
     <div>तपाईंको KYC अनुमोदन भएको छैन। KYC approve भएपछि मात्र पूर्ण प्रमाणपत्र उपलब्ध हुनेछ।</div>
   </div>

@@ -153,10 +153,10 @@ $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars
 
 $statusLabels = [
     'pending'      => ['label' => 'पर्खाइमा',   'color' => '#d97706', 'bg' => '#fffbeb', 'icon' => 'fa-clock'],
-    'under_review' => ['label' => 'समीक्षामा',  'color' => '#1565c0', 'bg' => '#eff6ff', 'icon' => 'fa-magnifying-glass'],
+    'under_review' => ['label' => 'समीक्षामा',  'color' => 'var(--secondary-color,#c0392b)', 'bg' => '#fef2f2', 'icon' => 'fa-magnifying-glass'],
     'approved'     => ['label' => 'स्वीकृत',    'color' => '#16a34a', 'bg' => '#f0fdf4', 'icon' => 'fa-circle-check'],
     'rejected'     => ['label' => 'अस्वीकृत',   'color' => '#dc2626', 'bg' => '#fef2f2', 'icon' => 'fa-circle-xmark'],
-    'paid'         => ['label' => 'भुक्तानी भयो','color' => '#7c3aed','bg' => '#faf5ff', 'icon' => 'fa-money-bill'],
+    'paid'         => ['label' => 'भुक्तानी भयो','color' => 'var(--secondary-dark,#922b21)','bg' => '#fef2f2', 'icon' => 'fa-money-bill'],
     'completed'    => ['label' => 'सम्पन्न',     'color' => '#0f766e', 'bg' => '#f0fdfa', 'icon' => 'fa-flag-checkered'],
 ];
 $extraHead = <<<HTML
@@ -175,13 +175,13 @@ $extraHead = <<<HTML
 .wf-tdot  { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;
             font-size:.7rem; border:2px solid #e5e7eb; background:#f9fafb; color:#9ca3af; }
 .wf-tdot.done   { background:var(--primary-color,#1a8754); border-color:var(--primary-color,#1a8754); color:#fff; }
-.wf-tdot.active { background:#1565c0; border-color:#1565c0; color:#fff; }
+.wf-tdot.active { background:var(--secondary-color,#c0392b); border-color:var(--secondary-color,#c0392b); color:#fff; }
 .wf-tdot.reject { background:#dc2626; border-color:#dc2626; color:#fff; }
 .wf-tline { flex:1; height:2px; background:#e5e7eb; min-width:16px; }
 .wf-tline.done { background:var(--primary-color,#1a8754); }
 .wf-tlabel { font-size:.65rem; color:#9ca3af; text-align:center; }
 .wf-tlabel.done   { color:var(--primary-color,#1a8754); font-weight:600; }
-.wf-tlabel.active { color:#1565c0; font-weight:700; }
+.wf-tlabel.active { color:var(--secondary-color,#c0392b); font-weight:700; }
 .form-group { margin-bottom:14px; }
 .form-group label { display:block; font-size:.82rem; font-weight:600; color:#374151; margin-bottom:5px; }
 .form-control { width:100%; padding:10px 14px; min-height:44px; border:1.5px solid #d1d5db; border-radius:10px;
@@ -320,7 +320,7 @@ HTML;
 
   <!-- Tab: New Claim Form -->
   <div class="wf-pane <?= $activeTab==='new'?'active':'' ?>" id="pane-new">
-    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:.83rem;color:#1e40af;margin-bottom:18px;display:flex;gap:8px;align-items:center;">
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:.83rem;color:var(--secondary-dark,#922b21);margin-bottom:18px;display:flex;gap:8px;align-items:center;">
       <i class="fas fa-circle-info" style="flex-shrink:0;"></i>
       <div>तपाईंको नाम, फोन र ठेगाना <strong>profile बाट auto-fill</strong> भएको छ। केवल दाबीको विवरण भर्नुहोस्।</div>
     </div>
@@ -391,8 +391,8 @@ HTML;
 
       <!-- Medical/Accident-specific fields -->
       <div class="type-fields" id="tf-medical">
-        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:14px;">
-          <div style="font-size:.8rem;font-weight:700;color:#1565c0;margin-bottom:10px;"><i class="fas fa-stethoscope" style="margin-right:5px;"></i>उपचार विवरण</div>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin-bottom:14px;">
+          <div style="font-size:.8rem;font-weight:700;color:var(--secondary-color,#c0392b);margin-bottom:10px;"><i class="fas fa-stethoscope" style="margin-right:5px;"></i>उपचार विवरण</div>
           <div class="form-row cols2">
             <div class="form-group" style="margin-bottom:0;"><label>रोग / चोट विवरण</label><input name="disease_illness" type="text" class="form-control" placeholder="संक्षिप्त विवरण"></div>
             <div class="form-group" style="margin-bottom:0;"><label>उपचार मिति</label><input name="treatment_date" type="text" class="form-control" placeholder="YYYY-MM-DD"></div>
@@ -403,8 +403,8 @@ HTML;
 
       <!-- Insurance-specific fields -->
       <div class="type-fields" id="tf-insurance">
-        <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;padding:12px;margin-bottom:14px;">
-          <div style="font-size:.8rem;font-weight:700;color:#7c3aed;margin-bottom:10px;"><i class="fas fa-shield-halved" style="margin-right:5px;"></i>बीमा विवरण</div>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin-bottom:14px;">
+          <div style="font-size:.8rem;font-weight:700;color:var(--secondary-dark,#922b21);margin-bottom:10px;"><i class="fas fa-shield-halved" style="margin-right:5px;"></i>बीमा विवरण</div>
           <div class="form-row cols2">
             <div class="form-group" style="margin-bottom:0;">
               <label>बीमा पोलिसी नम्बर</label>

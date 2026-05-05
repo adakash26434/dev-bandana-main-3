@@ -817,7 +817,7 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
   if (tctx && trendLabels.length) {
     new Chart(tctx, {
       type: 'line',
-      data: { labels: trendLabels, datasets: [{ label:'Daily', data: trendData, borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,0.12)', fill:true, tension:0.3 }] },
+      data: { labels: trendLabels, datasets: [{ label:'Daily', data: trendData, borderColor:'var(--secondary-color,#c0392b)', backgroundColor:'rgba(192,57,43,0.12)', fill:true, tension:0.3 }] },
       options: { responsive:true, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, ticks:{precision:0}} } }
     });
   }

@@ -40,7 +40,7 @@
     --color-success:    #28a745;
     --color-warning:    #ffc107;
     --color-danger:     #dc3545;
-    --color-info:       #1565c0;
+    --color-info:       var(--secondary-color);
 
     /* Shadows */
     --shadow-primary:   0 4px 20px rgba(26,95,42,.16);
