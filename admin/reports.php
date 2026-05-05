@@ -178,7 +178,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                         </div>
 
                         <!-- Month selection (for monthly reports) -->
-                        <div class="mb-3" id="monthField" style="display: <?php echo ($editReport['report_type'] ?? '') === 'monthly' ? 'block' : 'none'; ?>;">
+                        <div class="mb-3 <?php echo ($editReport['report_type'] ?? '') === 'monthly' ? '' : 'd-none'; ?>" id="monthField">
                             <label class="form-label">महिना *</label>
                             <select name="report_month" class="form-select">
                                 <option value="">-- महिना छान्नुहोस् --</option>
@@ -191,7 +191,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                         </div>
 
                         <!-- Quarter selection (for quarterly reports) -->
-                        <div class="mb-3" id="quarterField" style="display: <?php echo ($editReport['report_type'] ?? '') === 'quarterly' ? 'block' : 'none'; ?>;">
+                        <div class="mb-3 <?php echo ($editReport['report_type'] ?? '') === 'quarterly' ? '' : 'd-none'; ?>" id="quarterField">
                             <label class="form-label">त्रैमास *</label>
                             <select name="report_quarter" class="form-select">
                                 <option value="">-- त्रैमास छान्नुहोस् --</option>
@@ -317,7 +317,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                                         <a href="?edit=<?php echo $report['id']; ?>" class="btn btn-sm btn-primary" title="सम्पादन">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं निश्चित हुनुहुन्छ?')">
+                                        <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं निश्चित हुनुहुन्छ?')">
                                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
     <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?php echo $report['id']; ?>">
@@ -348,8 +348,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function toggleFields() {
         const type = reportType.value;
-        monthField.style.display = type === 'monthly' ? 'block' : 'none';
-        quarterField.style.display = type === 'quarterly' ? 'block' : 'none';
+        monthField.classList.toggle('d-none', type !== 'monthly');
+        quarterField.classList.toggle('d-none', type !== 'quarterly');
     }
 
     reportType.addEventListener('change', toggleFields);

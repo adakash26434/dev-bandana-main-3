@@ -110,10 +110,10 @@ $users = filter_out_file_managed_superadmin_rows($users);
 ?>
 
 <div class="admin-content">
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <div class="page-header stf-page-head">
         <div>
-            <h1 style="margin:0;color:var(--primary-color);">👥 कर्मचारी व्यवस्थापन</h1>
-            <p style="color:var(--text-muted);margin:6px 0 0;">Admin र Staff users — role hierarchy</p>
+            <h1 class="stf-title">👥 कर्मचारी व्यवस्थापन</h1>
+            <p class="stf-subtitle">Admin र Staff users — role hierarchy</p>
         </div>
         <button class="btn-coop" onclick="document.getElementById('addStaffModal').style.display='flex'">
             <i class="fas fa-user-plus"></i> नयाँ User थप्नुहोस्
@@ -126,12 +126,12 @@ $users = filter_out_file_managed_superadmin_rows($users);
         <div class="alert alert-<?= $f['type']==='error'?'danger':'success' ?>"><?= e($f['message']) ?></div>
     <?php endif; ?>
 
-    <div class="card-coop" style="padding:0;overflow:hidden;">
-        <table class="table table-hover mb-0" style="font-family:var(--font-primary);">
-            <thead style="background:var(--bg-soft);">
+    <div class="card-coop stf-card-table-wrap">
+        <table class="table table-hover mb-0 stf-table">
+            <thead class="stf-soft-head">
                 <tr>
                     <th>नाम</th><th>Username</th><th>Email</th>
-                    <th>पद</th><th>भूमिका</th><th>Status</th><th>Last Login</th><th style="text-align:right;">कार्य</th>
+                    <th>पद</th><th>भूमिका</th><th>Status</th><th>Last Login</th><th class="stf-align-right">कार्य</th>
                 </tr>
             </thead>
             <tbody>
@@ -148,15 +148,15 @@ $users = filter_out_file_managed_superadmin_rows($users);
                     <td><span class="badge bg-<?= $badge ?>"><?= e($u['role']) ?></span></td>
                     <td>
                         <?php if ($u['is_active']): ?>
-                            <span style="color:var(--color-success);">● सक्रिय</span>
+                            <span class="stf-status-dot stf-status-active">● सक्रिय</span>
                         <?php else: ?>
-                            <span style="color:var(--color-danger);">● निष्क्रिय</span>
+                            <span class="stf-status-dot stf-status-inactive">● निष्क्रिय</span>
                         <?php endif; ?>
                     </td>
                     <td><small><?= e($u['last_login'] ?? 'कहिल्यै लग-इन भएको छैन') ?></small></td>
-                    <td style="text-align:right;">
+                    <td class="stf-align-right">
                         <?php if ($u['id'] !== $me): ?>
-                        <form method="post" style="display:inline;">
+                        <form method="post" class="stf-inline-form">
                             <?= csrfField() ?>
                             <input type="hidden" name="action" value="toggle">
                             <input type="hidden" name="id" value="<?= (int)$u['id'] ?>">
@@ -170,7 +170,7 @@ $users = filter_out_file_managed_superadmin_rows($users);
                             <i class="fas fa-key"></i>
                         </button>
                         <?php if (is_superadmin()): ?>
-                            <form method="post" style="display:inline;"
+                            <form method="post" class="stf-inline-form"
                                   onsubmit="return confirm('पक्का delete गर्ने?');">
                                 <?= csrfField() ?>
                                 <input type="hidden" name="action" value="delete">
@@ -181,7 +181,7 @@ $users = filter_out_file_managed_superadmin_rows($users);
                             </form>
                         <?php endif; ?>
                         <?php else: ?>
-                            <small style="color:var(--text-muted);">(आफैँ)</small>
+                            <small class="stf-self-note">(आफैँ)</small>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -191,9 +191,9 @@ $users = filter_out_file_managed_superadmin_rows($users);
     </div>
 
     <!-- Permission Matrix -->
-    <div class="card-coop" style="margin-top:24px;">
-        <h3 style="color:var(--primary-color);margin-top:0;">🔐 भूमिका अनुसार अनुमतिहरू</h3>
-        <table class="table table-hover table-sm" style="margin:0;">
+    <div class="card-coop stf-mt24">
+        <h3 class="stf-section-title">🔐 भूमिका अनुसार अनुमतिहरू</h3>
+        <table class="table table-hover table-sm stf-table-no-margin">
             <thead>
                 <tr><th>क्षमता</th><th>Superadmin</th><th>Admin</th><th>Staff</th></tr>
             </thead>
@@ -211,14 +211,13 @@ $users = filter_out_file_managed_superadmin_rows($users);
 </div>
 
 <!-- Add User Modal -->
-<div id="addStaffModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
-     z-index:9999;align-items:center;justify-content:center;">
-    <div class="card-coop" style="max-width:480px;width:92%;">
-        <h3 style="color:var(--primary-color);margin-top:0;">नयाँ User थप्नुहोस्</h3>
+<div id="addStaffModal" class="stf-modal-backdrop">
+    <div class="card-coop stf-modal-card stf-modal-card-lg">
+        <h3 class="stf-section-title">नयाँ User थप्नुहोस्</h3>
         <form method="post" class="needs-validation" novalidate>
             <?= csrfField() ?>
             <input type="hidden" name="action" value="create">
-            <div style="display:grid;gap:12px;">
+            <div class="stf-grid-gap">
                 <input class="field-coop" name="name"     placeholder="पूरा नाम" required>
                 <input class="field-coop" name="username" placeholder="Username" required>
                 <input class="field-coop" name="email"    type="email" placeholder="Email">
@@ -229,7 +228,7 @@ $users = filter_out_file_managed_superadmin_rows($users);
                         <option value="<?= e($__d['title_np']) ?>"><?= e($__d['title_np']) ?><?php if($__d['title_en']): ?> — <?= e($__d['title_en']) ?><?php endif; ?></option>
                     <?php endforeach; ?>
                 </select>
-                <small style="color:var(--text-muted);">पद यहाँ नभए <a href="designations.php" target="_blank">पद मास्टर</a> मा थप्नुहोस्।</small>
+                <small class="stf-muted-note">पद यहाँ नभए <a href="designations.php" target="_blank">पद मास्टर</a> मा थप्नुहोस्।</small>
                 <select class="field-coop" name="role">
                     <option value="staff">Staff (सीमित अधिकार)</option>
                     <?php if (is_superadmin()): ?>
@@ -238,7 +237,7 @@ $users = filter_out_file_managed_superadmin_rows($users);
                     <?php endif; ?>
                 </select>
             </div>
-            <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+            <div class="stf-actions-row stf-actions-row-lg">
                 <button type="button" class="btn-coop btn-outline"
                         onclick="document.getElementById('addStaffModal').style.display='none'">रद्द</button>
                 <button type="submit" class="btn-coop">थप्नुहोस्</button>
@@ -248,10 +247,9 @@ $users = filter_out_file_managed_superadmin_rows($users);
 </div>
 
 <!-- Reset Password Modal -->
-<div id="resetPwModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
-     z-index:9999;align-items:center;justify-content:center;">
-    <div class="card-coop" style="max-width:420px;width:92%;">
-        <h3 style="color:var(--primary-color);margin-top:0;">Password Reset</h3>
+<div id="resetPwModal" class="stf-modal-backdrop">
+    <div class="card-coop stf-modal-card stf-modal-card-sm">
+        <h3 class="stf-section-title">Password Reset</h3>
         <p>User: <strong id="resetPwUser"></strong></p>
         <form method="post" class="needs-validation" novalidate>
             <?= csrfField() ?>
@@ -259,7 +257,7 @@ $users = filter_out_file_managed_superadmin_rows($users);
             <input type="hidden" name="id" id="resetPwId">
             <input class="field-coop" type="password" name="new_password"
                    placeholder="नयाँ password (कम्तीमा 6 अक्षर)" required minlength="6">
-            <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+            <div class="stf-actions-row stf-actions-row-sm">
                 <button type="button" class="btn-coop btn-outline"
                         onclick="document.getElementById('resetPwModal').style.display='none'">रद्द</button>
                 <button type="submit" class="btn-coop">Reset</button>

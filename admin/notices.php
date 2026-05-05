@@ -122,7 +122,7 @@ $flash = getFlash();
 
     <!-- ══ TAB 1: सूची ══ -->
     <div class="tab-pane fade show active" id="tab-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+        <div class="card admin-table-card svc-flat-top-card">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <form method="POST">
@@ -201,7 +201,7 @@ $flash = getFlash();
                                         data-attachment="<?php echo htmlspecialchars($item['attachment'] ?? '', ENT_QUOTES); ?>">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('यो सूचना मेटाउने हो?')">
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('यो सूचना मेटाउने हो?')">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo (int)$item['id']; ?>">
                                         <?php echo csrfField(); ?>
@@ -222,8 +222,8 @@ $flash = getFlash();
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="tab-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card svc-flat-top-card">
+            <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
                 <h5 class="mb-0 fw-bold" id="noticeFormTitle">
                     <i class="fas fa-plus-circle me-2"></i>नयाँ सूचना थप्नुहोस्
                 </h5>
@@ -261,7 +261,7 @@ $flash = getFlash();
                                     <input type="text" name="notice_date" id="ntf_date"
                                            class="form-control admin-fancy-input nepali-datepicker"
                                            placeholder="YYYY-MM-DD" autocomplete="off">
-                                    <span class="input-group-text bg-success text-white ndp-trigger" style="cursor:pointer;">
+                                    <span class="input-group-text bg-success text-white ndp-trigger ntf-cursor-pointer">
                                         <i class="fas fa-calendar-alt"></i>
                                     </span>
                                 </div>
@@ -273,7 +273,7 @@ $flash = getFlash();
                                     <small class="text-muted fw-normal" id="ntf_att_note"></small>
                                 </label>
                                 <input type="file" name="attachment" class="form-control admin-fancy-input" accept=".pdf,.jpg,.jpeg,.png">
-                                <div id="ntf_att_link" class="mt-1" style="display:none;">
+                                <div id="ntf_att_link" class="mt-1 d-none">
                                     <small class="text-muted">हालको फाइल:
                                         <a id="ntf_att_href" href="#" target="_blank" class="text-success fw-semibold">
                                             <i class="fas fa-external-link-alt me-1"></i>हेर्नुहोस्
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('ntf_date').value    = '';
         document.getElementById('ntf_active').checked= true;
         document.getElementById('ntf_popup').checked = false;
-        document.getElementById('ntf_att_link').style.display = 'none';
+        document.getElementById('ntf_att_link').classList.add('d-none');
         document.getElementById('ntf_att_note').textContent   = '';
         document.getElementById('ntf_submit').innerHTML = '<i class="fas fa-plus-circle me-2"></i>थप्नुहोस्';
         document.getElementById('noticeFormTitle').innerHTML  = '<i class="fas fa-plus-circle me-2"></i>नयाँ सूचना थप्नुहोस्';
@@ -363,11 +363,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('ntf_popup').checked = d.popup  === '1';
 
             if (d.attachment) {
-                document.getElementById('ntf_att_link').style.display = 'block';
+                document.getElementById('ntf_att_link').classList.remove('d-none');
                 document.getElementById('ntf_att_href').href = '../' + d.attachment;
                 document.getElementById('ntf_att_note').textContent = ' — नयाँ फाइल नचुने भने पुरानै रहन्छ';
             } else {
-                document.getElementById('ntf_att_link').style.display = 'none';
+                document.getElementById('ntf_att_link').classList.add('d-none');
                 document.getElementById('ntf_att_note').textContent   = '';
             }
             document.getElementById('ntf_submit').innerHTML = '<i class="fas fa-save me-2"></i>अपडेट गर्नुहोस्';

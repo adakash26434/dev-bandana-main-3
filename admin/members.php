@@ -140,17 +140,17 @@ try {
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-4">
                 <?php if ($viewMember['avatar_url']): ?>
-                <img src="<?php echo htmlspecialchars($viewMember['avatar_url']); ?>" class="rounded-circle mb-3" style="width:80px;height:80px;object-fit:cover;border:3px solid var(--primary-color);">
+                <img src="<?php echo htmlspecialchars($viewMember['avatar_url']); ?>" class="rounded-circle mb-3 mem-avatar-lg">
                 <?php else: ?>
-                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;font-weight:700;">
+                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-3 mem-avatar-fallback-lg">
                     <?php echo mb_substr($viewMember['name'],0,1); ?>
                 </div>
                 <?php endif; ?>
                 <h5 class="fw-bold mb-1"><?php echo htmlspecialchars($viewMember['name']); ?></h5>
                 <div class="text-muted small"><?php echo htmlspecialchars($viewMember['member_card_no'] ?? ''); ?></div>
                 <div class="mt-2">
-                    <?php if ($viewMember['google_id']): ?><span class="badge" style="background:#ea4335;"><i class="fab fa-google me-1"></i>Google</span><?php endif; ?>
-                    <?php if ($viewMember['facebook_id']): ?><span class="badge" style="background:#1877f2;"><i class="fab fa-facebook me-1"></i>Facebook</span><?php endif; ?>
+                    <?php if ($viewMember['google_id']): ?><span class="badge mem-badge-google"><i class="fab fa-google me-1"></i>Google</span><?php endif; ?>
+                    <?php if ($viewMember['facebook_id']): ?><span class="badge mem-badge-facebook"><i class="fab fa-facebook me-1"></i>Facebook</span><?php endif; ?>
                     <?php if ($viewMember['password_hash']): ?><span class="badge bg-success">Email</span><?php endif; ?>
                 </div>
             </div>
@@ -196,7 +196,7 @@ try {
 
             <?php /* ── Issue #3: CVV / Verification Code admin panel ── */ ?>
             <?php if ($viewCard && (!empty($viewCard['cvv']) || !empty($viewCard['verification_code']))): ?>
-            <div class="card-body border-top" style="background:linear-gradient(135deg,#fefce8,#fef9c3);">
+            <div class="card-body border-top mem-card-secret">
                 <div class="fw-bold small text-warning-emphasis mb-2">
                     <i class="fas fa-shield-halved"></i> ID Card गोप्य विवरण
                 </div>
@@ -210,9 +210,9 @@ try {
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="text-muted small">CVV</span>
-                    <code class="small text-danger fw-bold" style="letter-spacing:.2em;"><?php echo htmlspecialchars($viewCard['cvv'] ?? '—'); ?></code>
+                    <code class="small text-danger fw-bold mem-cvv-code"><?php echo htmlspecialchars($viewCard['cvv'] ?? '—'); ?></code>
                 </div>
-                <div class="small text-muted mt-2" style="font-size:.7rem;">
+                <div class="small text-muted mt-2 mem-help-xs">
                     ⚠ यो जानकारी members लाई मात्र देखिनुपर्छ — admin reference मात्र हो।
                 </div>
             </div>
@@ -294,7 +294,7 @@ try {
                             <tbody>
                             <?php foreach ($viewApps as $app): ?>
                             <tr>
-                                <td><span class="badge" style="background:<?php echo $app['service_color']; ?>;">
+                                <td><span class="badge mem-service-badge" data-service-color="<?php echo htmlspecialchars($app['service_color'] ?? '#16a34a', ENT_QUOTES, 'UTF-8'); ?>">
                                     <i class="fas <?php echo $app['service_icon']; ?> me-1"></i><?php echo $app['service_name']; ?>
                                 </span></td>
                                 <td class="small"><?php echo htmlspecialchars(mb_strimwidth($app['detail']??'', 0, 35, '…')); ?></td>
@@ -317,15 +317,15 @@ try {
                     $icMap = ['success'=>'bg-success','error'=>'bg-danger','warning'=>'bg-warning','info'=>'bg-primary'];
                     foreach ($viewNotifs as $n): ?>
                     <div class="d-flex align-items-start gap-2 mb-3 pb-3 border-bottom">
-                        <span class="badge rounded-pill <?php echo $icMap[$n['type']] ?? 'bg-secondary'; ?>" style="font-size:.7rem;padding:5px 7px;">
+                        <span class="badge rounded-pill <?php echo $icMap[$n['type']] ?? 'bg-secondary'; ?> mem-notif-pill">
                             <i class="fas fa-bell"></i>
                         </span>
                         <div class="flex-grow-1">
                             <div class="fw-bold small"><?php echo htmlspecialchars($n['title']); ?>
-                                <?php if (!$n['is_read']): ?><span class="badge bg-warning text-dark ms-1" style="font-size:.55rem;">Unread</span><?php endif; ?>
+                                <?php if (!$n['is_read']): ?><span class="badge bg-warning text-dark ms-1 mem-unread-pill">Unread</span><?php endif; ?>
                             </div>
-                            <div class="text-muted" style="font-size:.78rem;"><?php echo nl2br(htmlspecialchars($n['message'] ?? '')); ?></div>
-                            <div class="text-muted" style="font-size:.68rem;"><?php echo formatNepaliDate($n['created_at'], true); ?></div>
+                            <div class="text-muted mem-notif-message"><?php echo nl2br(htmlspecialchars($n['message'] ?? '')); ?></div>
+                            <div class="text-muted mem-notif-time"><?php echo formatNepaliDate($n['created_at'], true); ?></div>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -391,13 +391,13 @@ try {
     <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
         <h5 class="mb-0 fw-bold text-success"><i class="fas fa-users me-2"></i>Member Portal सदस्यहरू</h5>
         <form class="d-flex gap-2" method="GET">
-            <select name="kyc" class="form-select form-select-sm" style="min-width:150px;">
+            <select name="kyc" class="form-select form-select-sm mem-filter-kyc">
                 <option value="all" <?php echo $kycFilter==='all' ? 'selected' : ''; ?>>KYC: सबै</option>
                 <option value="linked" <?php echo $kycFilter==='linked' ? 'selected' : ''; ?>>KYC Linked</option>
                 <option value="unlinked" <?php echo $kycFilter==='unlinked' ? 'selected' : ''; ?>>KYC Unlinked</option>
             </select>
-            <input type="text" name="search" class="form-control form-control-sm" placeholder="नाम / इमेल / फोन खोज्नुहोस्…"
-                   value="<?php echo htmlspecialchars($search); ?>" style="min-width:220px;">
+            <input type="text" name="search" class="form-control form-control-sm mem-filter-search" placeholder="नाम / इमेल / फोन खोज्नुहोस्…"
+                   value="<?php echo htmlspecialchars($search); ?>">
             <button class="btn btn-success btn-sm"><i class="fas fa-search"></i></button>
             <?php if ($search || $kycFilter !== 'all'): ?><a href="members.php" class="btn btn-outline-secondary btn-sm">Clear</a><?php endif; ?>
         </form>
@@ -423,20 +423,20 @@ try {
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <?php if ($m['avatar_url']): ?>
-                            <img src="<?php echo htmlspecialchars($m['avatar_url']); ?>" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;">
+                            <img src="<?php echo htmlspecialchars($m['avatar_url']); ?>" class="rounded-circle mem-avatar-sm">
                             <?php else: ?>
-                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:.9rem;">
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold mem-avatar-fallback-sm">
                                 <?php echo mb_substr($m['name'],0,1); ?>
                             </div>
                             <?php endif; ?>
                             <div>
                                 <div class="fw-bold small"><?php echo htmlspecialchars($m['name']); ?></div>
-                                <div class="text-muted" style="font-size:.7rem;"><?php echo htmlspecialchars($m['email'] ?? '—'); ?></div>
-                                <div style="margin-top:2px;">
+                                <div class="text-muted mem-email-xs"><?php echo htmlspecialchars($m['email'] ?? '—'); ?></div>
+                                <div class="mem-kyc-wrap">
                                     <?php if (!empty($m['kyc_application_id'])): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:.58rem;">KYC Linked</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle mem-kyc-pill">KYC Linked</span>
                                     <?php else: ?>
-                                        <span class="badge bg-light text-muted border" style="font-size:.58rem;">KYC Unlinked</span>
+                                        <span class="badge bg-light text-muted border mem-kyc-pill">KYC Unlinked</span>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -446,9 +446,9 @@ try {
                     <td class="small"><?php echo htmlspecialchars($m['phone'] ?? '—'); ?></td>
                     <td><code class="small"><?php echo htmlspecialchars($m['member_card_no'] ?? ''); ?></code></td>
                     <td>
-                        <?php if ($m['google_id']): ?><span class="badge" style="background:#ea4335;font-size:.65rem;"><i class="fab fa-google me-1"></i>G</span><?php endif; ?>
-                        <?php if ($m['facebook_id']): ?><span class="badge" style="background:#1877f2;font-size:.65rem;"><i class="fab fa-facebook me-1"></i>FB</span><?php endif; ?>
-                        <?php if ($m['password_hash']): ?><span class="badge bg-success" style="font-size:.65rem;">Email</span><?php endif; ?>
+                        <?php if ($m['google_id']): ?><span class="badge mem-badge-google mem-login-pill"><i class="fab fa-google me-1"></i>G</span><?php endif; ?>
+                        <?php if ($m['facebook_id']): ?><span class="badge mem-badge-facebook mem-login-pill"><i class="fab fa-facebook me-1"></i>FB</span><?php endif; ?>
+                        <?php if ($m['password_hash']): ?><span class="badge bg-success mem-login-pill">Email</span><?php endif; ?>
                     </td>
                     <td class="small text-muted"><?php echo formatNepaliDate($m['created_at']); ?></td>
                     <td>
@@ -461,7 +461,7 @@ try {
                         $asLabel = ['pending'=>'⏳ Pending','approved'=>'✅ Approved','rejected'=>'❌ Rejected','renewal_pending'=>'🔄 Renewal'];
                         $bClass  = $asBadge[$as] ?? 'bg-secondary';
                         $bLabel  = $asLabel[$as] ?? $as;
-                        echo "<br><span class='badge $bClass' style='font-size:.6rem;margin-top:2px;'>$bLabel</span>";
+                        echo "<br><span class='badge $bClass mem-status-pill'>$bLabel</span>";
                         ?>
                     </td>
                     <td>
@@ -499,5 +499,14 @@ try {
 
 <?php endif; ?>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.mem-service-badge[data-service-color]').forEach(function (el) {
+        var c = (el.getAttribute('data-service-color') || '').trim();
+        if (c) el.style.backgroundColor = c;
+    });
+});
+</script>
 
 <?php require_once 'includes/admin-footer.php'; ?>

@@ -173,15 +173,15 @@ if ($_flash) echo adminAlert($_flash['type'] === 'success' ? 'success' : 'danger
      TAB: समिति प्रकार
 ══════════════════════════════ -->
 <?php if ($activeTab === 'types'): ?>
-<div class="card admin-table-card" style="border-top-left-radius:0!important;">
-    <div class="card-header d-flex align-items-center justify-content-between" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+<div class="card admin-table-card cmt-flat-top-card">
+    <div class="card-header d-flex align-items-center justify-content-between cmt-header-green">
         <h5 class="mb-0 fw-bold"><i class="fas fa-layer-group me-2"></i>समिति प्रकारहरू</h5>
         <button class="btn btn-outline-light btn-sm" id="btnAddType"><i class="fas fa-plus me-1"></i>नयाँ प्रकार</button>
     </div>
 
             <!-- खोज बक्स -->
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3">
-                <div class="input-group input-group-sm" style="max-width:300px">
+                <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -229,7 +229,7 @@ if ($_flash) echo adminAlert($_flash['type'] === 'success' ? 'success' : 'danger
                                     data-show-nav="<?php echo $showNav; ?>">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <form method="POST" style="display:inline" onsubmit="return confirm('यो समिति प्रकार मेटाउने?')">
+                            <form method="POST" class="svc-inline-form" onsubmit="return confirm('यो समिति प्रकार मेटाउने?')">
     <?php echo csrfField(); ?>
                                 <input type="hidden" name="action" value="delete_type">
                                 <input type="hidden" name="delete_id" value="<?php echo $t['id']; ?>">
@@ -245,8 +245,8 @@ if ($_flash) echo adminAlert($_flash['type'] === 'success' ? 'success' : 'danger
 </div>
 
 <!-- Add/Edit Form Panel -->
-<div id="typFormPanel" class="card mt-4 d-none" style="border-top:3px solid var(--primary-light);">
-    <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+<div id="typFormPanel" class="card mt-4 d-none cmt-top-border-green">
+    <div class="card-header d-flex justify-content-between align-items-center cmt-header-green">
         <h5 class="mb-0 fw-bold" id="typFormTitle"><i class="fas fa-plus-circle me-2"></i>नयाँ समिति प्रकार</h5>
         <button type="button" class="btn btn-light btn-sm" id="btnCancelType"><i class="fas fa-times me-1"></i>रद्द</button>
     </div>
@@ -348,15 +348,15 @@ document.addEventListener('DOMContentLoaded', function() {
      TAB: कार्यकाल
 ══════════════════════════════ -->
 <?php if ($activeTab === 'tenures'): ?>
-<div class="card admin-table-card" style="border-top-left-radius:0!important;">
-    <div class="card-header d-flex align-items-center justify-content-between" style="background:linear-gradient(135deg,#0c4da2,#1a73e8);color:#fff;">
+<div class="card admin-table-card cmt-flat-top-card">
+    <div class="card-header d-flex align-items-center justify-content-between cmt-header-blue">
         <h5 class="mb-0 fw-bold"><i class="fas fa-calendar-alt me-2"></i>कार्यकालहरू</h5>
         <button class="btn btn-outline-light btn-sm" id="btnAddTenure"><i class="fas fa-plus me-1"></i>नयाँ कार्यकाल</button>
     </div>
 
             <!-- खोज बक्स -->
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3">
-                <div class="input-group input-group-sm" style="max-width:300px">
+                <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     data-active="<?php echo $tn['is_active']; ?>">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <form method="POST" style="display:inline" onsubmit="return confirm('यो कार्यकाल मेटाउने?')">
+                            <form method="POST" class="svc-inline-form" onsubmit="return confirm('यो कार्यकाल मेटाउने?')">
     <?php echo csrfField(); ?>
                                 <input type="hidden" name="action" value="delete_tenure">
                                 <input type="hidden" name="delete_id" value="<?php echo $tn['id']; ?>">
@@ -419,8 +419,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Tenure Add/Edit Form Panel -->
-<div id="tenFormPanel" class="card mt-4 d-none" style="border-top:3px solid #1a73e8;">
-    <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,#0c4da2,#1a73e8);color:#fff;">
+<div id="tenFormPanel" class="card mt-4 d-none cmt-top-border-blue">
+    <div class="card-header d-flex justify-content-between align-items-center cmt-header-blue">
         <h5 class="mb-0 fw-bold" id="tenFormTitle"><i class="fas fa-plus-circle me-2"></i>नयाँ कार्यकाल</h5>
         <button type="button" class="btn btn-light btn-sm" id="btnCancelTenure"><i class="fas fa-times me-1"></i>रद्द</button>
     </div>
@@ -528,15 +528,15 @@ document.addEventListener('DOMContentLoaded', function() {
      TAB: सदस्य
 ══════════════════════════════ -->
 <?php if ($activeTab === 'members'): ?>
-<div class="card admin-table-card" style="border-top-left-radius:0!important;">
-    <div class="card-header d-flex align-items-center justify-content-between" style="background:linear-gradient(135deg,#1565c0,#0288d1);color:#fff;">
+<div class="card admin-table-card cmt-flat-top-card">
+    <div class="card-header d-flex align-items-center justify-content-between cmt-header-cyan">
         <h5 class="mb-0 fw-bold"><i class="fas fa-user-friends me-2"></i>समिति सदस्यहरू</h5>
         <button class="btn btn-outline-light btn-sm" id="btnAddMember"><i class="fas fa-plus me-1"></i>नयाँ सदस्य</button>
     </div>
 
             <!-- खोज बक्स -->
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3">
-                <div class="input-group input-group-sm" style="max-width:300px">
+                <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -562,9 +562,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td class="ps-3">
                             <?php if ($m['photo']): ?>
                             <img src="../<?php echo htmlspecialchars($m['photo']); ?>"
-                                 style="width:48px;height:48px;object-fit:cover;border-radius:50%;border:2px solid #dee2e6;">
+                                 class="cmt-mem-avatar">
                             <?php else: ?>
-                            <div style="width:48px;height:48px;background:#e9ecef;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                            <div class="cmt-mem-avatar-fallback">
                                 <i class="fas fa-user text-secondary"></i>
                             </div>
                             <?php endif; ?>
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     title="सम्पादन">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <form method="POST" style="display:inline" onsubmit="return confirm('यो सदस्य मेटाउने?')">
+                            <form method="POST" class="svc-inline-form" onsubmit="return confirm('यो सदस्य मेटाउने?')">
     <?php echo csrfField(); ?>
                                 <input type="hidden" name="action" value="delete_member">
                                 <input type="hidden" name="delete_id" value="<?php echo $m['id']; ?>">
@@ -604,8 +604,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Member Add/Edit Form Panel -->
-<div id="memFormPanel" class="card mt-4 d-none" style="border-top:3px solid #0288d1;">
-    <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,#1565c0,#0288d1);color:#fff;">
+<div id="memFormPanel" class="card mt-4 d-none cmt-top-border-cyan">
+    <div class="card-header d-flex justify-content-between align-items-center cmt-header-cyan">
         <h5 class="mb-0 fw-bold" id="memFormTitle"><i class="fas fa-plus-circle me-2"></i>नयाँ समिति सदस्य</h5>
         <button type="button" class="btn btn-light btn-sm" id="btnCancelMember"><i class="fas fa-times me-1"></i>रद्द</button>
     </div>
@@ -743,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('mem_existing_photo').value   = m.photo || '';
             document.getElementById('mem_photo_note').textContent = m.photo ? ' — नयाँ नचुने भने पुरानै रहन्छ' : '';
             document.getElementById('mem_photo_prev').innerHTML   = m.photo
-                ? '<img src="../' + m.photo + '" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #0288d1;">'
+                ? '<img src="../' + m.photo + '" class="cmt-preview-img cmt-preview-img-cyan">'
                 : '';
             document.getElementById('mem_submit').innerHTML = '<i class="fas fa-save me-2"></i>अपडेट गर्नुहोस्';
             document.getElementById('memFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>सदस्य सम्पादन';
@@ -756,7 +756,7 @@ function previewMemPhoto(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
         reader.onload = function(e) {
-            prev.innerHTML = '<img src="' + e.target.result + '" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--primary-light);">';
+            prev.innerHTML = '<img src="' + e.target.result + '" class="cmt-preview-img cmt-preview-img-green">';
         };
         reader.readAsDataURL(input.files[0]);
     }

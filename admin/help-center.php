@@ -386,11 +386,11 @@ if ($action === 'add' || $action === 'edit') {
         <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th style="width:60px">क्रम</th>
+                        <th class="hc-col-order">क्रम</th>
                         <th>प्रश्न</th>
                         <th>वर्ग</th>
                         <th>स्थिति</th>
-                        <th style="width:120px">कार्य</th>
+                        <th class="hc-col-actions">कार्य</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -423,7 +423,7 @@ if ($action === 'add' || $action === 'edit') {
                                class="btn btn-sm btn-primary" title="सम्पादन">
                                     <i class="fas fa-edit"></i>
                             </a>
-                            <form method="POST" style="display:inline;"
+                            <form method="POST" class="svc-inline-form"
                                   onsubmit="return confirm('के तपाईं यो प्रश्न मेटाउन निश्चित हुनुहुन्छ?');">
                                 <?php echo csrfField(); ?>
                                 <input type="hidden" name="action" value="delete">

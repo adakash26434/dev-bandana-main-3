@@ -159,7 +159,7 @@ if ($viewApt):
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-calendar-check me-2"></i>भेटघाट विवरण
-            <code style="font-size:0.83rem;background:rgba(255,255,255,0.15);padding:2px 10px;border-radius:6px;margin-left:8px;">
+            <code class="apt-track-chip">
                 APT-<?php echo str_pad($viewApt['id'], 6, '0', STR_PAD_LEFT); ?>
             </code>
             <span class="badge bg-<?php echo $sc; ?> ms-1"><?php echo $sl; ?></span>
@@ -210,7 +210,7 @@ if ($viewApt):
                 <?php if (!empty($viewApt['message'])): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-comment-dots"></i>सदस्यको सन्देश</div>
-                    <div class="p-3" style="white-space:pre-wrap;font-size:0.9rem;color:#374151;">
+                    <div class="p-3 apt-text-block">
                         <?php echo nl2br(htmlspecialchars($viewApt['message'])); ?>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ if ($viewApt):
                 <?php if (!empty($viewApt['remarks'])): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-reply"></i>Admin टिप्पणी (Member ले Tracker मा देख्छ)</div>
-                    <div class="p-3" style="white-space:pre-wrap;font-size:0.9rem;color:#374151;background:#f0fff4;">
+                    <div class="p-3 apt-text-block apt-text-block-success">
                         <?php echo nl2br(htmlspecialchars($viewApt['remarks'])); ?>
                     </div>
                 </div>
@@ -393,7 +393,7 @@ if ($viewApt):
 </div>
 
 <!-- ── Table ── -->
-<div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+<div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
         <h6><i class="fas fa-calendar-check me-2 text-primary"></i>भेटघाट सूची</h6>
         <span class="result-count-badge"><?php echo $total; ?> भेटघाट</span>
@@ -420,7 +420,7 @@ if ($viewApt):
                 $aptTrackId = $apt['tracking_id'] ?: 'APT-' . str_pad($apt['id'], 6, '0', STR_PAD_LEFT);
             ?>
             <tr>
-                <td><code class="text-primary small" style="letter-spacing:0.4px;"><?php echo htmlspecialchars($aptTrackId); ?></code></td>
+                <td><code class="text-primary small apt-track-code"><?php echo htmlspecialchars($aptTrackId); ?></code></td>
                 <td>
                     <div class="cell-main"><?php echo htmlspecialchars($apt['name'] ?? '—'); ?></div>
                     <?php if (!empty($apt['member_id'])): ?><div class="cell-sub">ID: <?php echo htmlspecialchars($apt['member_id']); ?></div><?php endif; ?>

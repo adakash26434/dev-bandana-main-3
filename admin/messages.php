@@ -82,13 +82,13 @@ if ($action === 'view' && isset($_GET['id'])) {
             <!-- सम्पर्क जानकारी -->
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <div class="p-3 rounded-3" style="background:linear-gradient(135deg,#f0f7f2,#e8f5e9);border-left:4px solid var(--primary-light);">
+                    <div class="p-3 rounded-3 msg-info-card msg-info-sender">
                         <div class="text-muted small mb-1"><i class="fas fa-user me-1"></i>प्रेषक</div>
                         <div class="fw-bold"><?php echo htmlspecialchars($message['name']); ?></div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 rounded-3" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-left:4px solid #3b82f6;">
+                    <div class="p-3 rounded-3 msg-info-card msg-info-email">
                         <div class="text-muted small mb-1"><i class="fas fa-envelope me-1"></i>इमेल</div>
                         <div class="fw-bold">
                             <a href="mailto:<?php echo htmlspecialchars($message['email']); ?>" class="text-primary text-decoration-none">
@@ -99,7 +99,7 @@ if ($action === 'view' && isset($_GET['id'])) {
                 </div>
                 <?php if (!empty($message['phone'])): ?>
                 <div class="col-md-4">
-                    <div class="p-3 rounded-3" style="background:linear-gradient(135deg,#fff7ed,#fed7aa);border-left:4px solid #f97316;">
+                    <div class="p-3 rounded-3 msg-info-card msg-info-phone">
                         <div class="text-muted small mb-1"><i class="fas fa-phone me-1"></i>फोन</div>
                         <div class="fw-bold">
                             <a href="tel:<?php echo htmlspecialchars($message['phone']); ?>" class="text-dark text-decoration-none">
@@ -112,16 +112,16 @@ if ($action === 'view' && isset($_GET['id'])) {
             </div>
 
             <?php if (!empty($message['subject'])): ?>
-            <div class="mb-3 p-3 rounded-3" style="background:#f8f9fa;border-left:4px solid var(--primary-color);">
+            <div class="mb-3 p-3 rounded-3 msg-subject-box">
                 <strong class="text-success"><i class="fas fa-tag me-2"></i>विषय:</strong>
                 <?php echo htmlspecialchars($message['subject']); ?>
             </div>
             <?php endif; ?>
 
             <!-- सन्देश body -->
-            <div class="p-4 rounded-3 mb-4" style="background:linear-gradient(135deg,#f8fdf9,#eef7f0);border:1px solid rgba(26,95,42,0.1);">
+            <div class="p-4 rounded-3 mb-4 msg-body-wrap">
                 <h6 class="text-success fw-bold mb-3"><i class="fas fa-comment me-2"></i>सन्देश:</h6>
-                <p class="mb-0" style="line-height:1.9;font-size:1rem;color:#333;">
+                <p class="mb-0 msg-body-text">
                     <?php echo nl2br(htmlspecialchars($message['message'])); ?>
                 </p>
             </div>
@@ -264,13 +264,13 @@ if ($action === 'view' && isset($_GET['id'])) {
                             <td class="ps-3 text-muted"><?php echo $i + 1; ?></td>
                             <td>
                                 <?php if (!$msg['is_read']): ?>
-                                <span class="badge bg-danger me-1" style="font-size:0.65rem;">नयाँ</span>
+                                <span class="badge bg-danger me-1 msg-badge-xxs">नयाँ</span>
                                 <?php endif; ?>
                                 <?php echo htmlspecialchars($msg['name']); ?>
                             </td>
                             <td class="text-muted small"><?php echo htmlspecialchars($msg['email']); ?></td>
                             <td>
-                                <span class="text-truncate d-block" style="max-width:260px;">
+                                <span class="text-truncate d-block msg-text-clamp">
                                     <?php echo htmlspecialchars(mb_substr($msg['subject'] ?? $msg['message'] ?? '', 0, 55)); ?>
                                 </span>
                             </td>

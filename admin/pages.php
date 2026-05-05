@@ -540,7 +540,7 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
 
             <!-- खोज बक्स -->
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3">
-                <div class="input-group input-group-sm" style="max-width:300px">
+                <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="पृष्ठ खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -604,7 +604,7 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <?php $isProtectedPolicy = in_array(($pg['slug'] ?? ''), ['privacy-policy','terms-of-service','cookie-policy'], true); ?>
-                                <form method="POST" style="display:inline" onsubmit="return confirm('यो पृष्ठ मेटाउने हो?')">
+                                <form method="POST" class="svc-inline-form" onsubmit="return confirm('यो पृष्ठ मेटाउने हो?')">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?php echo (int)$pg['id']; ?>">
                                     <?php echo csrfField(); ?>

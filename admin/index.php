@@ -445,6 +445,24 @@ $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . l
             border-radius: 9px; font-size: .76rem; color: #15803d;
             display: flex; align-items: center; gap: 8px;
         }
+        .alert-info-soft {
+            background: #ecfeff;
+            border-color: #a5f3fc;
+            color: #155e75;
+        }
+        .field-compact {
+            font-size: .82rem;
+        }
+        .link-primary-strong {
+            color: var(--primary-color,#1a8754);
+            font-weight: 600;
+        }
+        .security-note-warning {
+            background: #fff7ed;
+            border-color: #fed7aa;
+            color: #9a3412;
+            margin-top: 14px;
+        }
         @media (max-width:480px) {
             .auth-card { border-radius: 16px; }
             .card-header { padding: 24px 20px 18px; }
@@ -487,7 +505,7 @@ $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . l
             <?php echo csrfField(); ?>
             <input type="hidden" name="do_admin_2fa" value="1">
             <?php if (($admin2faPending['mode'] ?? '') === 'setup'): ?>
-                <div class="alert-error" style="background:#ecfeff;border-color:#a5f3fc;color:#155e75;">
+                <div class="alert-error alert-info-soft">
                     <i class="fas fa-qrcode"></i> Google Authenticator setup आवश्यक छ।
                 </div>
                 <div class="field">
@@ -498,8 +516,8 @@ $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . l
                     </div>
                 </div>
                 <?php if ($admin2faSetupUri !== ''): ?>
-                <div class="field" style="font-size:.82rem;">
-                    <a href="https://chart.googleapis.com/chart?chs=220x220&cht=qr&chl=<?php echo urlencode($admin2faSetupUri); ?>" target="_blank" rel="noopener" style="color:var(--primary-color,#1a8754);font-weight:600;">QR खोल्नुहोस् (scan गर्न)</a>
+                <div class="field field-compact">
+                    <a href="https://chart.googleapis.com/chart?chs=220x220&cht=qr&chl=<?php echo urlencode($admin2faSetupUri); ?>" target="_blank" rel="noopener" class="link-primary-strong">QR खोल्नुहोस् (scan गर्न)</a>
                 </div>
                 <?php endif; ?>
             <?php endif; ?>
@@ -514,7 +532,7 @@ $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . l
                 <i class="fas fa-shield-check"></i> 2FA Verify
             </button>
             <?php if (!empty($_SESSION['admin_2fa_backup_plain']) && is_array($_SESSION['admin_2fa_backup_plain'])): ?>
-                <div class="security-note" style="background:#fff7ed;border-color:#fed7aa;color:#9a3412;margin-top:14px;">
+                <div class="security-note security-note-warning">
                     <i class="fas fa-triangle-exclamation"></i>
                     Backup codes: <code><?php echo htmlspecialchars(implode(' , ', $_SESSION['admin_2fa_backup_plain']), ENT_QUOTES, 'UTF-8'); ?></code>
                 </div>

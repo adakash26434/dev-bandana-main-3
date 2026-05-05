@@ -101,11 +101,11 @@ catch (Exception $e) { $news = []; }
 
     <!-- ══ TAB 1: सूची ══ -->
     <div class="tab-pane fade show active" id="news-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+        <div class="card admin-table-card svc-flat-top-card">
 
             <!-- खोज बक्स — client-side filter -->
-            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3" style="flex-wrap:wrap">
-                <div class="input-group input-group-sm" style="max-width:300px">
+            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 svc-search-wrap">
+                <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="नाम, विवरण अनुसार खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -143,9 +143,9 @@ catch (Exception $e) { $news = []; }
                                 <td class="text-center"><input type="checkbox" class="news-select" name="selected_ids[]" value="<?php echo (int)$n['id']; ?>"></td>
                                 <td class="ps-3">
                                     <?php if ($n['image']): ?>
-                                    <img src="../<?php echo htmlspecialchars($n['image']); ?>" style="width:55px;height:55px;object-fit:cover;border-radius:10px;border:2px solid #e0f0e8;">
+                                    <img src="../<?php echo htmlspecialchars($n['image']); ?>" class="news-thumb-img">
                                     <?php else: ?>
-                                    <div style="width:55px;height:55px;background:linear-gradient(135deg,rgba(26,95,42,.1),rgba(40,167,69,.15));border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-newspaper text-success"></i></div>
+                                    <div class="news-thumb-placeholder"><i class="fas fa-newspaper text-success"></i></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -170,7 +170,7 @@ catch (Exception $e) { $news = []; }
                                             title="सम्पादन">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो समाचार मेटाउन निश्चित हुनुहुन्छ?')">
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो समाचार मेटाउन निश्चित हुनुहुन्छ?')">
     <?php echo csrfField(); ?>
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $n['id']; ?>">
@@ -189,8 +189,8 @@ catch (Exception $e) { $news = []; }
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="news-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card svc-flat-top-card">
+            <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
                 <h5 class="mb-0 fw-bold" id="newsFormTitle">
                     <i class="fas fa-plus-circle me-2"></i>नयाँ समाचार थप्नुहोस्
                 </h5>
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             var prev = document.getElementById('nf_img_preview');
             prev.innerHTML = d.image
-                ? '<img src="../' + d.image + '" style="max-height:80px;border-radius:8px;border:2px solid #e0f0e8;">'
+                ? '<img src="../' + d.image + '" class="news-preview-img">'
                 : '';
             document.getElementById('nf_img_note').textContent = d.image
                 ? ' — नयाँ फोटो नचुने भने पुरानै रहन्छ'

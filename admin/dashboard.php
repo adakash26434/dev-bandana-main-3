@@ -183,7 +183,7 @@ try {
 </style>
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-  <h1 style="font-size:1.3rem;margin:0;color:var(--primary-color);font-weight:700;">
+  <h1 class="dash-title-main">
     <i class="fas fa-gauge"></i> Office Dashboard
   </h1>
   <div class="d-flex gap-2 flex-wrap">
@@ -258,7 +258,7 @@ try {
     </div>
     <div class="col-12 col-sm-6 col-lg-3">
       <a href="program-attendance.php" class="ds-card">
-        <div class="ds-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-clipboard-check"></i></div>
+        <div class="ds-icon dash-icon-purple"><i class="fas fa-clipboard-check"></i></div>
         <div>
           <div class="ds-val"><?= $stats['programAttend'] ?></div>
           <div class="ds-lbl">Program Attendance</div>
@@ -285,20 +285,20 @@ try {
   <div class="ds-section">
     <h2><i class="fas fa-clock-rotate-left"></i> हालैको गतिविधि</h2>
     <?php if (empty($log)): ?>
-      <div class="text-center py-4" style="color:#6b7280;">
-        <div style="font-size:2rem;margin-bottom:6px;"><i class="fas fa-inbox"></i></div>
+      <div class="text-center py-4 dash-muted-block">
+        <div class="dash-empty-icon-lg"><i class="fas fa-inbox"></i></div>
         <div>हाल कुनै गतिविधि छैन।</div>
       </div>
     <?php else: ?>
       <div class="list-group list-group-flush">
         <?php foreach ($log as $l): ?>
           <div class="list-group-item d-flex align-items-center gap-3 px-0">
-            <div style="width:34px;height:34px;border-radius:50%;background:#dcfce7;color:#166534;display:grid;place-items:center;flex-shrink:0;">
+            <div class="dash-log-icon">
               <i class="fas fa-check"></i>
             </div>
             <div class="flex-grow-1">
-              <div style="font-weight:600;font-size:.9rem;"><?= htmlspecialchars($l['action'] ?? '') ?></div>
-              <div style="font-size:.75rem;color:#6b7280;">
+              <div class="dash-log-title"><?= htmlspecialchars($l['action'] ?? '') ?></div>
+              <div class="dash-log-time">
                 <?= !empty($l['created_at']) ? date('Y-m-d H:i', strtotime($l['created_at'])) : '' ?>
               </div>
             </div>
@@ -311,9 +311,9 @@ try {
 
 <!-- ===== TAB 2: SMART CREDENTIAL MANAGER ===== -->
 <div class="ds-pane" id="pane-creds">
-  <div class="ds-section" style="margin-top:0;">
+  <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 style="margin:0;"><i class="fas fa-key"></i> Smart Credential Manager</h2>
+      <h2 class="dash-section-title"><i class="fas fa-key"></i> Smart Credential Manager</h2>
       <a href="credentials.php" class="btn btn-success btn-sm">
         <i class="fas fa-arrow-up-right-from-square"></i> पूरै पेज खोल्नुहोस्
       </a>
@@ -322,8 +322,8 @@ try {
     <?php if ($credsError): ?>
       <div class="alert alert-warning mb-3"><i class="fas fa-triangle-exclamation"></i> <?= $credsError ?></div>
     <?php elseif (empty($creds)): ?>
-      <div class="text-center py-5" style="color:#6b7280;">
-        <div style="font-size:2.4rem;margin-bottom:8px;"><i class="fas fa-key"></i></div>
+      <div class="text-center py-5 dash-muted-block">
+        <div class="dash-empty-icon-xl"><i class="fas fa-key"></i></div>
         <div>अहिलेसम्म कुनै credential save गरिएको छैन।</div>
         <a href="credentials.php" class="btn btn-success btn-sm mt-3">
           <i class="fas fa-plus"></i> नयाँ Credential थप्नुहोस्
@@ -341,14 +341,14 @@ try {
                   <i class="fas fa-globe"></i>
                 <?php endif; ?>
               </div>
-              <div style="flex-grow:1;min-width:0;">
+              <div class="dash-flex-grow">
                 <div class="cred-name text-truncate" title="<?= htmlspecialchars($c['site_name']) ?>">
                   <?= htmlspecialchars($c['site_name']) ?>
                 </div>
                 <div class="cred-cat"><?= htmlspecialchars($c['category'] ?: 'general') ?></div>
               </div>
             </div>
-            <div style="font-size:.8rem;color:#6b7280;" class="text-truncate">
+            <div class="text-truncate dash-meta-sm">
               <i class="fas fa-user"></i> <?= htmlspecialchars($c['username']) ?>
             </div>
             <div class="cred-actions">
@@ -368,9 +368,9 @@ try {
 
 <!-- ===== TAB 3: सदस्य अनुरोध ===== -->
 <div class="ds-pane" id="pane-requests">
-  <div class="ds-section" style="margin-top:0;">
+  <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 style="margin:0;"><i class="fas fa-user-clock"></i> सदस्य अनुरोध</h2>
+      <h2 class="dash-section-title"><i class="fas fa-user-clock"></i> सदस्य अनुरोध</h2>
       <a href="member-online-portal.php?status=pending" class="btn btn-warning btn-sm">
         <i class="fas fa-list"></i> सबै हेर्नुहोस्
       </a>
@@ -391,12 +391,12 @@ try {
       </div>
     </div>
 
-    <h2 style="font-size:.95rem;color:var(--primary-color);margin:18px 0 8px;">
+    <h2 class="dash-subtitle-row">
       <i class="fas fa-clock"></i> हालैका दर्ता अनुरोधहरू
     </h2>
     <?php if (empty($pendingMembers)): ?>
-      <div class="text-center py-4" style="color:#6b7280;">
-        <div style="font-size:2rem;margin-bottom:6px;"><i class="fas fa-circle-check"></i></div>
+      <div class="text-center py-4 dash-muted-block">
+        <div class="dash-empty-icon-lg"><i class="fas fa-circle-check"></i></div>
         <div>कुनै पेन्डिङ अनुरोध छैन।</div>
       </div>
     <?php else: ?>
@@ -428,23 +428,23 @@ try {
 
 <!-- ===== TAB: कल्याण दाबी (pane-welfare — URL #welfare) ===== -->
 <div class="ds-pane" id="pane-welfare">
-  <div class="ds-section" style="margin-top:0;">
+  <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 style="margin:0;"><i class="fas fa-hand-holding-heart" style="color:#e91e63;"></i> कल्याण दाबी व्यवस्थापन</h2>
+      <h2 class="dash-section-title"><i class="fas fa-hand-holding-heart dash-heart-icon"></i> कल्याण दाबी व्यवस्थापन</h2>
       <a href="welfare-claims.php" class="btn btn-sm btn-outline-success"><i class="fas fa-arrow-up-right-from-square"></i> सबै दाबी</a>
     </div>
     <div class="wf-summary-bar">
-      <a href="welfare-claims.php?status=pending" class="wf-stat-chip"><div class="val" style="color:#d97706;"><?= $welfarePending ?></div><div class="lbl">पेन्डिङ</div></a>
-      <a href="welfare-claims.php?status=under_review" class="wf-stat-chip"><div class="val" style="color:#1e40af;"><?= $welfareReview ?></div><div class="lbl">समीक्षाधीन</div></a>
-      <a href="welfare-claims.php?status=approved" class="wf-stat-chip"><div class="val" style="color:#166534;"><?= $welfareApproved ?></div><div class="lbl">स्वीकृत</div></a>
+      <a href="welfare-claims.php?status=pending" class="wf-stat-chip"><div class="val dash-val-pending"><?= $welfarePending ?></div><div class="lbl">पेन्डिङ</div></a>
+      <a href="welfare-claims.php?status=under_review" class="wf-stat-chip"><div class="val dash-val-review"><?= $welfareReview ?></div><div class="lbl">समीक्षाधीन</div></a>
+      <a href="welfare-claims.php?status=approved" class="wf-stat-chip"><div class="val dash-val-approved"><?= $welfareApproved ?></div><div class="lbl">स्वीकृत</div></a>
     </div>
     <?php if (empty($welfareByType)): ?>
-      <div class="text-center py-3" style="color:#9ca3af;font-size:.85rem;">कुनै दाबी छैन।</div>
+      <div class="text-center py-3 dash-empty-note">कुनै दाबी छैन।</div>
     <?php else: ?>
       <?php foreach ($welfareByType as $wt): $tk = $wt['claim_type']; $tm = $welfareClaimTypes[$tk] ?? ['np' => $tk, 'icon' => 'fa-circle', 'color' => '#6b7280', 'bg' => '#f3f4f6']; ?>
         <div class="wf-type-row">
-          <div class="wf-type-icon" style="background:<?= $tm['bg'] ?>;color:<?= $tm['color'] ?>;"><i class="fas <?= $tm['icon'] ?>"></i></div>
-          <div class="wf-type-name"><?= htmlspecialchars($tm['np']) ?><div style="font-size:.7rem;font-weight:400;color:#6b7280;"><?= (int)($wt['total'] ?? 0) ?> दाबी</div></div>
+          <div class="wf-type-icon dash-wf-type-icon" data-bg="<?= htmlspecialchars($tm['bg'] ?? '#f3f4f6', ENT_QUOTES, 'UTF-8') ?>" data-color="<?= htmlspecialchars($tm['color'] ?? '#6b7280', ENT_QUOTES, 'UTF-8') ?>"><i class="fas <?= $tm['icon'] ?>"></i></div>
+          <div class="wf-type-name"><?= htmlspecialchars($tm['np']) ?><div class="dash-type-total"><?= (int)($wt['total'] ?? 0) ?> दाबी</div></div>
           <div class="d-flex gap-1 flex-wrap">
             <?php if ((int)($wt['pending_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=pending" class="wf-badge pending"><?= (int)$wt['pending_count'] ?> पेन्डिङ</a><?php endif; ?>
             <?php if ((int)($wt['review_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=under_review" class="wf-badge review"><?= (int)$wt['review_count'] ?> समीक्षा</a><?php endif; ?>
@@ -454,9 +454,9 @@ try {
       <?php endforeach; ?>
     <?php endif; ?>
 
-    <h3 style="font-size:.95rem;color:var(--primary-color);margin:22px 0 10px;"><i class="fas fa-list"></i> पछिल्ला दाबीहरू</h3>
+    <h3 class="dash-subtitle-row dash-subtitle-lg"><i class="fas fa-list"></i> पछिल्ला दाबीहरू</h3>
     <?php if (empty($welfareRecent)): ?>
-      <div class="text-center py-3" style="color:#6b7280;font-size:.88rem;">अहिलेसम्म कुनै दाबी रेकर्ड छैन।</div>
+      <div class="text-center py-3 dash-empty-note-lg">अहिलेसम्म कुनै दाबी रेकर्ड छैन।</div>
     <?php else: ?>
       <div class="table-responsive border rounded">
         <table class="table table-sm table-hover mb-0 align-middle">
@@ -481,9 +481,9 @@ try {
 
 <!-- ===== TAB: कार्यक्रम उपस्थिति ===== -->
 <div class="ds-pane" id="pane-programs">
-  <div class="ds-section" style="margin-top:0;">
+  <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 style="margin:0;"><i class="fas fa-clipboard-check"></i> कार्यक्रम उपस्थिति</h2>
+      <h2 class="dash-section-title"><i class="fas fa-clipboard-check"></i> कार्यक्रम उपस्थिति</h2>
       <div class="d-flex flex-wrap gap-2">
         <a href="program-attendance.php" class="btn btn-success btn-sm"><i class="fas fa-table"></i> पूरै रिपोर्ट</a>
         <a href="programs.php" class="btn btn-outline-success btn-sm"><i class="fas fa-calendar-plus"></i> कार्यक्रम व्यवस्थापन</a>
@@ -493,7 +493,7 @@ try {
     <div class="row g-3 mb-4">
       <div class="col-6 col-md-4">
         <a href="program-attendance.php" class="ds-card">
-          <div class="ds-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-user-check"></i></div>
+          <div class="ds-icon dash-icon-purple"><i class="fas fa-user-check"></i></div>
           <div><div class="ds-val"><?= (int)$stats['programAttend'] ?></div><div class="ds-lbl">कुल उपस्थिति रेकर्ड</div></div>
         </a>
       </div>
@@ -512,9 +512,9 @@ try {
     </div>
     <div class="row g-3">
       <div class="col-lg-6">
-        <h3 style="font-size:.95rem;color:var(--primary-color);margin:0 0 10px;"><i class="fas fa-chart-bar"></i> बढी उपस्थिति भएका कार्यक्रम</h3>
+        <h3 class="dash-subtitle-row dash-subtitle-tight"><i class="fas fa-chart-bar"></i> बढी उपस्थिति भएका कार्यक्रम</h3>
         <?php if (empty($dashAttendTopPrograms)): ?>
-          <div class="text-center py-4" style="color:#6b7280;font-size:.9rem;">अहिलेसम्म कुनै उपस्थिति रेकर्ड छैन।</div>
+          <div class="text-center py-4 dash-empty-note-md">अहिलेसम्म कुनै उपस्थिति रेकर्ड छैन।</div>
         <?php else: ?>
           <div class="list-group list-group-flush border rounded overflow-hidden">
             <?php foreach ($dashAttendTopPrograms as $tp): ?>
@@ -527,15 +527,15 @@ try {
         <?php endif; ?>
       </div>
       <div class="col-lg-6">
-        <h3 style="font-size:.95rem;color:var(--primary-color);margin:0 0 10px;"><i class="fas fa-clock"></i> पछिल्लो उपस्थिति</h3>
+        <h3 class="dash-subtitle-row dash-subtitle-tight"><i class="fas fa-clock"></i> पछिल्लो उपस्थिति</h3>
         <?php if (empty($dashAttendRecent)): ?>
-          <div class="text-center py-4" style="color:#6b7280;font-size:.9rem;">डाटा छैन।</div>
+          <div class="text-center py-4 dash-empty-note-md">डाटा छैन।</div>
         <?php else: ?>
           <div class="list-group list-group-flush border rounded overflow-hidden">
             <?php foreach ($dashAttendRecent as $ar): ?>
               <div class="list-group-item py-2 px-3">
-                <div style="font-weight:600;font-size:.88rem;" class="text-truncate"><?= htmlspecialchars((string)($ar['program_title'] ?? '')) ?></div>
-                <div style="font-size:.75rem;color:#6b7280;">
+                <div class="text-truncate dash-program-title"><?= htmlspecialchars((string)($ar['program_title'] ?? '')) ?></div>
+                <div class="dash-program-meta">
                   <?= htmlspecialchars(trim((string)($ar['member_name'] ?? '') ?: ((string)($ar['member_card_no'] ?? '') ?: '—'))) ?>
                   &nbsp;·&nbsp;
                   <?= !empty($ar['attended_at']) ? htmlspecialchars(date('Y-m-d H:i', strtotime((string)$ar['attended_at']))) : '' ?>
@@ -568,6 +568,16 @@ try {
                   : (tabIds.includes(fromLS) ? fromLS : 'office');
   if (initial !== 'office') activate(initial);
 })();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.dash-wf-type-icon[data-bg][data-color]').forEach(function (el) {
+    var bg = (el.getAttribute('data-bg') || '').trim();
+    var color = (el.getAttribute('data-color') || '').trim();
+    if (bg) el.style.backgroundColor = bg;
+    if (color) el.style.color = color;
+  });
+});
 </script>
 
 <?php require_once 'includes/admin-footer.php'; ?>

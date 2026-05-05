@@ -253,7 +253,7 @@ function approvalBadge($status) {
         'rejected' => ['bg-danger',             '❌ अस्वीकृत'],
     ];
     [$cls, $lbl] = $map[$status] ?? ['bg-secondary', ucfirst($status)];
-    return "<span class='badge $cls' style='font-size:.7rem;'>$lbl</span>";
+    return "<span class='badge $cls portal-badge-xs'>$lbl</span>";
 }
 function memberProgramStars(int $attended, int $eligible): string {
     $star = 1;
@@ -281,7 +281,7 @@ function memberProgramStars(int $attended, int $eligible): string {
         <i class="fas fa-globe me-2"></i>Member Online Portal
     </h4>
     <?php if ($stats['pending'] > 0): ?>
-    <span class="badge bg-danger" style="font-size:.85rem;padding:6px 12px;animation:badge-pulse 2s ease-in-out infinite;">
+    <span class="badge bg-danger portal-pending-pulse-badge">
         <?php echo $stats['pending']; ?> अनुमोदन प्रतीक्षामा
     </span>
     <?php endif; ?>
@@ -297,10 +297,10 @@ function memberProgramStars(int $attended, int $eligible): string {
         ['icon'=>'fa-ban','color'=>'#6b7280','bg'=>'#f9fafb','val'=>$stats['inactive'],  'label'=>'निष्क्रिय'],
     ]; foreach ($statItems as $s): ?>
     <div class="col-6 col-md-2">
-        <a href="<?php echo $s['link'] ?? '#'; ?>" style="text-decoration:none;">
-        <div class="card border-0 shadow-sm text-center py-3 stat-uniform-card" style="background:<?php echo $s['bg']; ?>;">
-            <i class="fas <?php echo $s['icon']; ?> fa-xl mb-2" style="color:<?php echo $s['color']; ?>;"></i>
-            <div class="stat-value" style="color:<?php echo $s['color']; ?>;"><?php echo $s['val']; ?></div>
+        <a href="<?php echo $s['link'] ?? '#'; ?>" class="portal-stat-link">
+        <div class="card border-0 shadow-sm text-center py-3 stat-uniform-card portal-stat-card" data-bg="<?php echo htmlspecialchars((string)$s['bg'], ENT_QUOTES, 'UTF-8'); ?>">
+            <i class="fas <?php echo $s['icon']; ?> fa-xl mb-2 portal-stat-color" data-color="<?php echo htmlspecialchars((string)$s['color'], ENT_QUOTES, 'UTF-8'); ?>"></i>
+            <div class="stat-value portal-stat-color" data-color="<?php echo htmlspecialchars((string)$s['color'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo $s['val']; ?></div>
             <div class="stat-label"><?php echo $s['label']; ?></div>
         </div>
         </a>
@@ -347,9 +347,9 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-4">
                 <?php if ($vmPhoto): ?>
-                <img src="<?php echo htmlspecialchars($vmPhotoSrc); ?>" class="rounded-circle mb-3" style="width:80px;height:80px;object-fit:cover;border:3px solid var(--primary-color);">
+                <img src="<?php echo htmlspecialchars($vmPhotoSrc); ?>" class="rounded-circle mb-3 portal-avatar-lg">
                 <?php else: ?>
-                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;font-weight:700;"><?php echo mb_substr($vmName,0,1); ?></div>
+                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-3 portal-avatar-fallback-lg"><?php echo mb_substr($vmName,0,1); ?></div>
                 <?php endif; ?>
                 <h5 class="fw-bold mb-1"><?php echo htmlspecialchars($vmName); ?></h5>
                 <div class="mb-2"><?php echo approvalBadge($viewMember['approval_status'] ?? 'pending'); ?></div>
@@ -363,7 +363,7 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
                 <li class="list-group-item d-flex justify-content-between"><span class="text-muted fw-bold">दर्ता मिति</span><span><?php echo formatNepaliDate($viewMember['created_at']); ?></span></li>
                 <li class="list-group-item d-flex justify-content-between">
                     <span class="text-muted fw-bold">Program Rating</span>
-                    <span style="color:#7c3aed;font-weight:700;">
+                    <span class="portal-rating-strong">
                         <?php $vmAtt=(int)($memberProgramCounts[(int)$viewMember['id']] ?? 0); echo memberProgramStars($vmAtt, (int)$activeProgramTotal); ?>
                         (<?php echo $vmAtt; ?>/<?php echo max(1,(int)$activeProgramTotal); ?>)
                     </span>
@@ -379,7 +379,7 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
                 <?php endif; ?>
             </ul>
             <?php if ($viewCard && (!empty($viewCard['cvv']) || !empty($viewCard['verification_code']))): ?>
-            <div class="card-body border-top" style="background:linear-gradient(135deg,#fefce8,#fef9c3);">
+            <div class="card-body border-top portal-card-security-wrap">
                 <div class="fw-bold small text-warning-emphasis mb-2">
                     <i class="fas fa-shield-halved"></i> ID Card विवरण (Admin)
                 </div>
@@ -393,7 +393,7 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="text-muted fw-bold small">CVV</span>
-                    <code class="small text-danger fw-bold" style="letter-spacing:.2em;"><?php echo htmlspecialchars($viewCard['cvv'] ?? '—'); ?></code>
+                    <code class="small text-danger fw-bold portal-cvv-code"><?php echo htmlspecialchars($viewCard['cvv'] ?? '—'); ?></code>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-1">
                     <span class="text-muted fw-bold small">Security Fail Count</span>
@@ -522,7 +522,7 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
                     <div id="adminPartnerHint" class="small text-muted mt-2">संस्था चयन गरेपछि history table देखिन्छ।</div>
                 </div>
                 <div class="table-responsive portal-partner-table-wrap">
-                    <table class="table table-sm table-hover align-middle mb-0 portal-partner-table" id="adminPartnerHistoryTable" style="display:none;">
+                    <table class="table table-sm table-hover align-middle mb-0 portal-partner-table d-none" id="adminPartnerHistoryTable">
                         <thead class="table-light">
                             <tr><th>संस्था</th><th>लिएको सेवा</th><th>सेवा अवस्था</th><th>विवरण</th><th>मिति</th></tr>
                         </thead>
@@ -608,7 +608,7 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
             r.style.display = ok ? '' : 'none';
             if (ok) shown++;
         });
-        table.style.display = (v !== '' && shown > 0) ? '' : 'none';
+        table.classList.toggle('d-none', !(v !== '' && shown > 0));
         if (countBadge) {
             countBadge.textContent = v === ''
                 ? ('कुल ' + rows.length + ' रेकर्ड')
@@ -622,9 +622,63 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
     sel.addEventListener('change', applyAdminPartnerFilter);
     applyAdminPartnerFilter();
 })();
+
+(function(){
+    document.querySelectorAll('.portal-stat-card[data-bg]').forEach(function(card){
+        var bg = (card.getAttribute('data-bg') || '').trim();
+        if (bg) card.style.background = bg;
+    });
+    document.querySelectorAll('.portal-stat-color[data-color]').forEach(function(el){
+        var c = (el.getAttribute('data-color') || '').trim();
+        if (c) el.style.color = c;
+    });
+})();
 </script>
 
 <style>
+.portal-badge-xs { font-size: .7rem; }
+.portal-badge-xxs { font-size: .58rem; }
+.portal-badge-mini { font-size: .65rem; }
+.portal-pending-pulse-badge {
+    font-size: .85rem;
+    padding: 6px 12px;
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+.portal-stat-link { text-decoration: none; }
+.portal-avatar-lg {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+.portal-avatar-fallback-lg {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+    font-weight: 700;
+}
+.portal-avatar-sm {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+.portal-avatar-fallback-sm {
+    width: 32px;
+    height: 32px;
+    font-size: .9rem;
+}
+.portal-rating-strong {
+    color: #7c3aed;
+    font-weight: 700;
+}
+.portal-rating-sub { font-size: .67rem; }
+.portal-card-security-wrap {
+    background: linear-gradient(135deg,#fefce8,#fef9c3);
+}
+.portal-cvv-code { letter-spacing: .2em; }
+.portal-search-input { min-width: 220px; }
+.portal-status-select { width: auto; }
+.portal-email-xs { font-size: .7rem; }
 .portal-member-meta-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -796,8 +850,8 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
         <form class="d-flex gap-2 flex-wrap align-items-center" method="GET">
             <input type="hidden" name="tab" value="members">
             <input type="text" name="search" class="form-control form-control-sm" placeholder="नाम / इमेल / फोन / सदस्यता नं खोज्नुहोस्…"
-                   value="<?php echo htmlspecialchars($search); ?>" style="min-width:220px;">
-            <select name="status" class="form-select form-select-sm" style="width:auto;">
+                   value="<?php echo htmlspecialchars($search); ?>" class="portal-search-input">
+            <select name="status" class="form-select form-select-sm portal-status-select">
                 <option value="">सबै अवस्था</option>
                 <option value="pending"  <?php echo $filterStatus==='pending'  ? 'selected' : ''; ?>>⏳ प्रतीक्षामा</option>
                 <option value="approved" <?php echo $filterStatus==='approved' ? 'selected' : ''; ?>>✅ स्वीकृत</option>
@@ -848,34 +902,34 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <?php if ($mDisplayAvatar): ?>
-                            <img src="<?php echo htmlspecialchars($mDisplayAvatar); ?>" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;">
+                            <img src="<?php echo htmlspecialchars($mDisplayAvatar); ?>" class="rounded-circle portal-avatar-sm">
                             <?php else: ?>
-                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:.9rem;"><?php echo mb_substr((string)$mDisplayName,0,1); ?></div>
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold portal-avatar-fallback-sm"><?php echo mb_substr((string)$mDisplayName,0,1); ?></div>
                             <?php endif; ?>
                             <div>
                                 <div class="fw-bold small"><?php echo htmlspecialchars($mDisplayName); ?></div>
-                                <span class="badge <?php echo $m['is_active'] ? 'bg-success' : 'bg-secondary'; ?>" style="font-size:.58rem;"><?php echo $m['is_active'] ? 'Active' : 'Inactive'; ?></span>
+                                <span class="badge <?php echo $m['is_active'] ? 'bg-success' : 'bg-secondary'; ?> portal-badge-xxs"><?php echo $m['is_active'] ? 'Active' : 'Inactive'; ?></span>
                             </div>
                         </div>
                     </td>
                     <td class="small"><code><?php echo htmlspecialchars($m['sadasyata_number'] ?? '—'); ?></code></td>
                     <td class="small">
                         <div><?php echo htmlspecialchars($mDisplayPhone ?? '—'); ?></div>
-                        <div class="text-muted" style="font-size:.7rem;"><?php echo htmlspecialchars($mDisplayEmail ?? ''); ?></div>
+                        <div class="text-muted portal-email-xs"><?php echo htmlspecialchars($mDisplayEmail ?? ''); ?></div>
                     </td>
                     <td class="small text-muted"><?php echo !empty($m['approved_at']) ? formatNepaliDate($m['approved_at']) : '—'; ?></td>
                     <td class="small text-muted"><?php echo !empty($m['card_expires_at']) ? formatNepaliDate($m['card_expires_at']) : '—'; ?></td>
                     <td class="small text-muted"><?php echo formatNepaliDate($m['created_at']); ?></td>
                     <td><?php echo approvalBadge($m['approval_status'] ?? 'pending'); ?></td>
-                    <td class="small" style="color:#7c3aed;font-weight:700;">
+                    <td class="small portal-rating-strong">
                         <?php $mAtt=(int)($memberProgramCounts[(int)$m['id']] ?? 0); echo memberProgramStars($mAtt, (int)$activeProgramTotal); ?>
-                        <div class="text-muted" style="font-size:.67rem;"><?php echo $mAtt; ?>/<?php echo max(1,(int)$activeProgramTotal); ?></div>
+                        <div class="text-muted portal-rating-sub"><?php echo $mAtt; ?>/<?php echo max(1,(int)$activeProgramTotal); ?></div>
                     </td>
                     <td class="small">
                         <?php if ($m['id_card_generated']): ?>
-                        <span class="badge bg-success" style="font-size:.65rem;"><i class="fas fa-check me-1"></i>Generate भयो</span>
+                        <span class="badge bg-success portal-badge-mini"><i class="fas fa-check me-1"></i>Generate भयो</span>
                         <?php else: ?>
-                        <span class="badge bg-light text-muted border" style="font-size:.65rem;">Generate नभएको</span>
+                        <span class="badge bg-light text-muted border portal-badge-mini">Generate नभएको</span>
                         <?php endif; ?>
                     </td>
                     <td>

@@ -400,7 +400,7 @@ if ($viewApp):
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-user-check me-2"></i>KYC आवेदन विवरण
-            <code style="font-size:0.83rem;background:rgba(255,255,255,0.15);padding:2px 10px;border-radius:6px;margin-left:8px;">
+            <code class="apt-track-chip">
                 <?php echo htmlspecialchars($trackId); ?>
             </code>
         </h5>
@@ -416,8 +416,7 @@ if ($viewApp):
                 <?php if (!empty($viewApp['photo'])): ?>
                 <div class="text-center mb-3">
                     <img src="../<?php echo htmlspecialchars($viewApp['photo']); ?>"
-                         alt="फोटो" class="img-thumbnail"
-                         style="max-height:160px;border-radius:8px;">
+                         alt="फोटो" class="img-thumbnail kyc-photo-main">
                 </div>
                 <?php endif; ?>
 
@@ -502,9 +501,9 @@ if ($viewApp):
                         <tr><th>डिजिटल ID कार्ड</th>
                             <td>
                                 <?php if (!empty($viewApp['want_id_card'])): ?>
-                                    <span class="badge" style="background:var(--primary-color);font-size:.8rem;"><i class="fas fa-id-card me-1"></i>अनुरोध गरिएको — स्वीकृतिमा स्वतः तयार हुनेछ</span>
+                                    <span class="badge kyc-id-requested"><i class="fas fa-id-card me-1"></i>अनुरोध गरिएको — स्वीकृतिमा स्वतः तयार हुनेछ</span>
                                 <?php else: ?>
-                                    <span class="text-muted" style="font-size:.85rem;">अनुरोध गरिएको छैन</span>
+                                    <span class="text-muted kyc-id-not-requested">अनुरोध गरिएको छैन</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -522,7 +521,7 @@ if ($viewApp):
                         <div class="col-6 text-center">
                             <a href="../<?php echo htmlspecialchars($viewApp['citizenship_front']); ?>" target="_blank">
                                 <img src="../<?php echo htmlspecialchars($viewApp['citizenship_front']); ?>"
-                                     class="img-thumbnail mb-1" style="height:110px;object-fit:cover;width:100%;" alt="नागरिकता अगाडि">
+                                     class="img-thumbnail mb-1 kyc-doc-thumb" alt="नागरिकता अगाडि">
                                 <div class="small text-muted fw-semibold">अगाडि</div>
                             </a>
                         </div>
@@ -531,7 +530,7 @@ if ($viewApp):
                         <div class="col-6 text-center">
                             <a href="../<?php echo htmlspecialchars($viewApp['citizenship_back']); ?>" target="_blank">
                                 <img src="../<?php echo htmlspecialchars($viewApp['citizenship_back']); ?>"
-                                     class="img-thumbnail mb-1" style="height:110px;object-fit:cover;width:100%;" alt="नागरिकता पछाडि">
+                                     class="img-thumbnail mb-1 kyc-doc-thumb" alt="नागरिकता पछाडि">
                                 <div class="small text-muted fw-semibold">पछाडि</div>
                             </a>
                         </div>
@@ -540,7 +539,7 @@ if ($viewApp):
                         <div class="col-6 text-center">
                             <a href="../<?php echo htmlspecialchars($viewApp['national_id_card']); ?>" target="_blank">
                                 <img src="../<?php echo htmlspecialchars($viewApp['national_id_card']); ?>"
-                                     class="img-thumbnail mb-1" style="height:110px;object-fit:cover;width:100%;" alt="National ID Card">
+                                     class="img-thumbnail mb-1 kyc-doc-thumb" alt="National ID Card">
                                 <div class="small text-muted fw-semibold">National ID</div>
                             </a>
                         </div>
@@ -575,9 +574,9 @@ if ($viewApp):
                             <table class="table table-sm adm-detail-table align-middle mb-0">
                                 <thead>
                                     <tr>
-                                        <th style="width:28%;">सम्बन्ध</th>
+                                        <th class="kyc-col-relation">सम्बन्ध</th>
                                         <th>नाम</th>
-                                        <th style="width:24%;">फोन</th>
+                                        <th class="kyc-col-phone">फोन</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -712,7 +711,7 @@ if ($viewApp):
                 <?php if (!empty($viewApp['remarks'])): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-sticky-note"></i>Admin टिप्पणी (Member ले Tracker मा देख्छ)</div>
-                    <div class="p-3" style="white-space:pre-wrap;font-size:0.9rem;color:#374151;background:#f0fff4;">
+                    <div class="p-3 apt-text-block apt-text-block-success">
                         <?php echo nl2br(htmlspecialchars($viewApp['remarks'])); ?>
                     </div>
                 </div>
@@ -920,14 +919,14 @@ if ($viewApp):
         <div class="sm-lbl">अस्वीकृत</div>
     </a>
     <a href="?status=incomplete" class="stat-mini <?php echo $status_filter==='incomplete'?'active-filter':''; ?>">
-        <div class="sm-icon" style="background:#e5e7eb;color:#334155;"><i class="fas fa-file-circle-exclamation"></i></div>
+        <div class="sm-icon kyc-sm-icon-muted"><i class="fas fa-file-circle-exclamation"></i></div>
         <div class="sm-val"><?php echo $incompleteCount; ?></div>
         <div class="sm-lbl">अपूर्ण</div>
     </a>
 </div>
 
 <!-- ── Bulk Import (Excel CSV) ── -->
-<div class="card border-0 shadow-sm mb-3 no-print" style="border-radius:10px;">
+<div class="card border-0 shadow-sm mb-3 no-print kyc-rounded-card">
     <div class="card-body py-3">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
             <h6 class="mb-0"><i class="fas fa-file-import me-2 text-primary"></i>KYC Bulk Import (Excel/CSV)</h6>
@@ -982,7 +981,7 @@ if ($viewApp):
 </div>
 
 <!-- ── KYC Table ── -->
-<div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+<div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
         <h6><i class="fas fa-user-check me-2 text-primary"></i>KYC आवेदन सूची</h6>
         <span class="result-count-badge"><?php echo $total; ?> आवेदन</span>
@@ -991,7 +990,7 @@ if ($viewApp):
         <table class="table-hover table app-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th style="width:200px;">आवेदक</th>
+                    <th class="acc-col-applicant">आवेदक</th>
                     <th>Member ID</th>
                     <th>सम्पर्क</th>
                     <th>नागरिकता</th>
@@ -1013,7 +1012,7 @@ if ($viewApp):
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <?php if (!empty($app['photo'])): ?>
-                        <img src="../<?php echo htmlspecialchars($app['photo']); ?>" style="width:36px;height:36px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.15);" alt="">
+                        <img src="../<?php echo htmlspecialchars($app['photo']); ?>" class="kyc-list-avatar" alt="">
                         <?php else: ?>
                         <div class="av-letter av-kyc"><?php echo $initLetter; ?></div>
                         <?php endif; ?>
@@ -1080,7 +1079,7 @@ if ($viewApp):
             <?php endfor; ?>
             <a href="?<?php echo http_build_query(array_merge($qs,['page'=>min($totalPages,$page+1)])); ?>" class="<?php echo $page>=$totalPages?'disabled':''; ?>"><i class="fas fa-angle-right"></i></a>
             <a href="?<?php echo http_build_query(array_merge($qs,['page'=>$totalPages])); ?>" class="<?php echo $page==$totalPages?'disabled':''; ?>"><i class="fas fa-angle-double-right"></i></a>
-            <span style="font-size:0.78rem;color:#6b7280;margin-left:8px;"><?php echo $page; ?>/<?php echo $totalPages; ?> · <?php echo $total; ?> रेकर्ड</span>
+            <span class="acc-page-meta"><?php echo $page; ?>/<?php echo $totalPages; ?> · <?php echo $total; ?> रेकर्ड</span>
         </div>
     </div>
     <?php endif; ?>

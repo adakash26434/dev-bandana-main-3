@@ -328,7 +328,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
     </form>
 </div>
 
-<div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+<div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
         <h6><i class="fas fa-mobile-alt me-2 text-primary"></i>डिजिटल सेवा अनुरोध सूची</h6>
         <span class="result-count-badge"><?php echo count($requests); ?> रेकर्ड</span>

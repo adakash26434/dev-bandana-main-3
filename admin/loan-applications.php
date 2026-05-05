@@ -154,7 +154,7 @@ if ($viewApp):
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-hand-holding-usd me-2"></i>ऋण आवेदन विवरण
-            <code style="font-size:0.83rem;background:rgba(255,255,255,0.15);padding:2px 10px;border-radius:6px;margin-left:8px;">
+            <code class="apt-track-chip">
                 <?php echo htmlspecialchars($trackId); ?>
             </code>
         </h5>
@@ -261,7 +261,7 @@ if ($viewApp):
                 <?php if (!empty($viewApp['remarks'])): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-sticky-note"></i>Admin टिप्पणी (Member ले Tracker मा देख्छ)</div>
-                    <div class="p-3" style="white-space:pre-wrap;font-size:0.9rem;color:#374151;background:#f0fff4;">
+                    <div class="p-3 apt-text-block apt-text-block-success">
                         <?php echo nl2br(htmlspecialchars($viewApp['remarks'])); ?>
                     </div>
                 </div>
@@ -385,9 +385,9 @@ if ($viewApp):
         <div class="sm-val"><?php echo $rejectedCount; ?></div>
         <div class="sm-lbl">अस्वीकृत</div>
     </a>
-    <div class="stat-mini" style="cursor:default;">
+    <div class="stat-mini loan-stat-static">
         <div class="sm-icon ic-amount"><i class="fas fa-rupee-sign"></i></div>
-        <div class="sm-val" style="font-size:1.1rem;"><?php echo number_format((float)$totalAmount/100000,2); ?>L</div>
+        <div class="sm-val loan-stat-amount"><?php echo number_format((float)$totalAmount/100000,2); ?>L</div>
         <div class="sm-lbl">पेन्डिङ रकम</div>
     </div>
 </div>
@@ -428,7 +428,7 @@ if ($viewApp):
 </div>
 
 <!-- ── Application Table ── -->
-<div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+<div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
         <h6><i class="fas fa-hand-holding-usd me-2 text-success"></i>ऋण आवेदन सूची</h6>
         <span class="result-count-badge"><?php echo $total; ?> आवेदन<?php echo $search ? ' — "'.htmlspecialchars($search).'" खोज' : ''; ?></span>
@@ -437,7 +437,7 @@ if ($viewApp):
         <table class="table-hover table app-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th style="width:200px;">आवेदक</th>
+                    <th class="acc-col-applicant">आवेदक</th>
                     <th>सम्पर्क</th>
                     <th>ऋण विवरण</th>
                     <th>रकम</th>
@@ -531,7 +531,7 @@ if ($viewApp):
             <?php endif; endfor; ?>
             <a href="<?php echo $nextPage ? '?'.http_build_query(array_merge($qs,['page'=>$nextPage])) : '#'; ?>" class="<?php echo !$nextPage?'disabled':''; ?>"><i class="fas fa-angle-right"></i></a>
             <a href="?<?php echo http_build_query(array_merge($qs,['page'=>$totalPages])); ?>" class="<?php echo $page==$totalPages?'disabled':''; ?>" title="अन्तिम"><i class="fas fa-angle-double-right"></i></a>
-            <span style="font-size:0.78rem;color:#6b7280;margin-left:8px;"><?php echo $page; ?>/<?php echo $totalPages; ?> पेज · <?php echo $total; ?> रेकर्ड</span>
+            <span class="acc-page-meta"><?php echo $page; ?>/<?php echo $totalPages; ?> पेज · <?php echo $total; ?> रेकर्ड</span>
         </div>
     </div>
     <?php endif; ?>

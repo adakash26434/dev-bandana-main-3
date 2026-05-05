@@ -91,11 +91,11 @@ require_once 'includes/admin-ui.php';
 
     <!-- ══ TAB 1: सूची ══ -->
     <div class="tab-pane fade show active" id="link-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+        <div class="card admin-table-card svc-flat-top-card">
 
             <!-- खोज बक्स — client-side filter -->
-            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3" style="flex-wrap:wrap">
-                <div class="input-group input-group-sm" style="max-width:300px">
+            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 svc-search-wrap">
+                <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="नाम, विवरण अनुसार खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -124,12 +124,12 @@ require_once 'includes/admin-ui.php';
                             <?php endif; ?>
                             <?php foreach ($links as $l): ?>
                             <tr>
-                                <td class="ps-3"><i class="<?php echo htmlspecialchars($l['icon']); ?> fa-lg" style="color:var(--primary-color);"></i></td>
+                                <td class="ps-3"><i class="<?php echo htmlspecialchars($l['icon']); ?> fa-lg svc-icon-mark"></i></td>
                                 <td>
                                     <div class="fw-semibold"><?php echo htmlspecialchars($l['title_np'] ?: $l['title']); ?></div>
                                     <small class="text-muted"><?php echo htmlspecialchars($l['title']); ?></small>
                                 </td>
-                                <td><a href="<?php echo htmlspecialchars($l['url']); ?>" target="_blank" class="text-truncate d-inline-block" style="max-width:200px;"><?php echo htmlspecialchars($l['url']); ?></a></td>
+                                <td><a href="<?php echo htmlspecialchars($l['url']); ?>" target="_blank" class="text-truncate d-inline-block ul-link-clamp"><?php echo htmlspecialchars($l['url']); ?></a></td>
                                 <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $l['display_order']; ?></span></td>
                                 <td class="text-center"><span class="badge bg-<?php echo $l['is_popup'] ? 'warning text-dark' : 'secondary'; ?>"><?php echo $l['is_popup'] ? 'पप-अप' : 'नयाँ ट्याब'; ?></span></td>
                                 <td class="text-center"><span class="badge bg-<?php echo $l['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $l['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
@@ -147,7 +147,7 @@ require_once 'includes/admin-ui.php';
                                             title="सम्पादन">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो लिंक मेटाउन निश्चित हुनुहुन्छ?')">
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो लिंक मेटाउन निश्चित हुनुहुन्छ?')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $l['id']; ?>">
@@ -165,8 +165,8 @@ require_once 'includes/admin-ui.php';
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="link-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card svc-flat-top-card">
+            <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
                 <h5 class="mb-0 fw-bold" id="linkFormTitle">
                     <i class="fas fa-plus-circle me-2"></i>नयाँ लिंक थप्नुहोस्
                 </h5>

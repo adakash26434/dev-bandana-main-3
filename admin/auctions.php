@@ -457,7 +457,7 @@ $_f = getFlash(); if ($_f) echo adminAlert($_f['type'], $_f['message']);
         <div class="sm-lbl">जारी</div>
     </a>
     <a href="?status=completed" class="stat-mini <?php echo $filterStatus==='completed'?'active-filter':''; ?>">
-        <div class="sm-icon" style="background:linear-gradient(135deg,#6f42c1,#9b6fe0);"><i class="fas fa-check-double" style="color:#fff;"></i></div>
+        <div class="sm-icon auc-icon-completed-bg"><i class="fas fa-check-double auc-icon-completed-fg"></i></div>
         <div class="sm-val"><?php echo $counts['completed']; ?></div>
         <div class="sm-lbl">सम्पन्न</div>
     </a>
@@ -536,7 +536,7 @@ $_f = getFlash(); if ($_f) echo adminAlert($_f['type'], $_f['message']);
                         <td>
                             <span class="font-monospace text-primary small"><?php echo htmlspecialchars($auc['tracking_number'] ?? '—'); ?></span>
                             <?php if (!$auc['is_active']): ?>
-                            <br><span class="badge bg-secondary" style="font-size:.6rem">निष्क्रिय</span>
+                            <br><span class="badge bg-secondary auc-badge-xxs">निष्क्रिय</span>
                             <?php endif; ?>
                             <?php if (!empty($auc['document'])): ?>
                             <br><a href="<?php echo SITE_URL . htmlspecialchars($auc['document']); ?>" target="_blank"
@@ -552,7 +552,7 @@ $_f = getFlash(); if ($_f) echo adminAlert($_f['type'], $_f['message']);
                             <?php endif; ?>
                             <?php if (!empty($auc['google_map_link'])): ?>
                             <br><a href="<?php echo htmlspecialchars($auc['google_map_link']); ?>" target="_blank"
-                               class="badge bg-danger text-decoration-none mt-1" style="font-size:.7rem">
+                               class="badge bg-danger text-decoration-none mt-1 auc-badge-xs">
                                 <i class="fab fa-google me-1"></i>Map
                             </a>
                             <?php endif; ?>

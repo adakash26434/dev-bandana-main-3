@@ -165,11 +165,11 @@ try {
 
     <!-- ══ TAB 1: सूची ══ -->
     <div class="tab-pane fade show active" id="team-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+        <div class="card admin-table-card svc-flat-top-card">
 
             <!-- खोज बक्स — client-side filter -->
-            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3" style="flex-wrap:wrap">
-                <div class="input-group input-group-sm" style="max-width:300px">
+            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 svc-search-wrap">
+                <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="नाम, विवरण अनुसार खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -201,9 +201,9 @@ try {
                             <tr>
                                 <td class="ps-3">
                                     <?php if (!empty($m['photo'])): ?>
-                                    <img src="<?php echo SITE_URL . htmlspecialchars($m['photo']); ?>" style="width:50px;height:50px;object-fit:cover;border-radius:50%;border:2px solid #e0f0e8;">
+                                    <img src="<?php echo SITE_URL . htmlspecialchars($m['photo']); ?>" class="tm-avatar-photo">
                                     <?php else: ?>
-                                    <div style="width:50px;height:50px;background:linear-gradient(135deg,rgba(26,95,42,.15),rgba(40,167,69,.2));border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user text-success"></i></div>
+                                    <div class="tm-avatar-fallback"><i class="fas fa-user text-success"></i></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -219,7 +219,8 @@ try {
                                     <?php if (!empty($m['email'])): ?><small><i class="fas fa-envelope me-1 text-success"></i><?php echo htmlspecialchars($m['email']); ?></small><?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge" style="background:<?php echo ($catColors[$m['category']] ?? '#6c757d') . '20'; ?>;color:<?php echo $catColors[$m['category']] ?? '#6c757d'; ?>;border:1px solid currentColor;padding:5px 10px;">
+                                    <span class="badge tm-cat-badge"
+                                          data-badge-color="<?php echo htmlspecialchars($catColors[$m['category']] ?? '#6c757d', ENT_QUOTES); ?>">
                                         <?php echo $cats[$m['category']] ?? $m['category']; ?>
                                     </span>
                                 </td>
@@ -228,11 +229,11 @@ try {
                                     <?php if ($m['is_grievance_officer']): ?><span class="badge bg-danger-subtle text-danger border d-block">गुनासो अधिकारी</span><?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <form method="POST" style="display:inline">
+                                    <form method="POST" class="svc-inline-form">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="toggle">
                                         <input type="hidden" name="id" value="<?php echo $m['id']; ?>">
-                                        <button class="badge bg-<?php echo $m['is_active'] ? 'success' : 'secondary'; ?> border-0" style="cursor:pointer;">
+                                        <button class="badge bg-<?php echo $m['is_active'] ? 'success' : 'secondary'; ?> border-0 tm-status-toggle-btn">
                                             <?php echo $m['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?>
                                         </button>
                                     </form>
@@ -243,7 +244,7 @@ try {
                                             title="सम्पादन">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो सदस्य मेटाउन निश्चित हुनुहुन्छ?')">
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो सदस्य मेटाउन निश्चित हुनुहुन्छ?')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $m['id']; ?>">
@@ -261,8 +262,8 @@ try {
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="team-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card svc-flat-top-card">
+            <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
                 <h5 class="mb-0 fw-bold" id="teamFormTitle">
                     <i class="fas fa-plus-circle me-2"></i>नयाँ सदस्य थप्नुहोस्
                 </h5>
@@ -337,7 +338,7 @@ try {
                                 <input class="form-check-input" type="checkbox" name="is_grievance_officer" id="tmf_is_griev" value="1">
                                 <label class="form-check-label fw-semibold" for="tmf_is_griev">गुनासो अधिकारी</label>
                             </div>
-                            <p class="small text-muted mb-0 mt-2" style="font-size:.72rem;line-height:1.35;">
+                            <p class="small text-muted mb-0 mt-2 tm-note-xs">
                                 <i class="fas fa-link me-1 opacity-75"></i>छुट्टै पृष्ठबाट पनि तोक्न मिल्छ —
                                 <a href="info-officer.php" class="link-primary">RTI</a>,
                                 <a href="grievance-officer.php" class="link-primary">गुनासो</a>।
@@ -444,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             var prev = document.getElementById('tmf_photo_prev');
             prev.innerHTML = m.photo
-                ? '<img src="<?php echo SITE_URL; ?>' + m.photo + '" style="width:70px;height:70px;object-fit:cover;border-radius:50%;border:2px solid #e0f0e8;">'
+                ? '<img src="<?php echo SITE_URL; ?>' + m.photo + '" class="tm-photo-preview">'
                 : '';
             document.getElementById('tmf_photo_note').textContent = m.photo ? ' — नयाँ फोटो नचुने भने पुरानै रहन्छ' : '';
             document.getElementById('tmf_submit').innerHTML = '<i class="fas fa-save me-2"></i>अपडेट गर्नुहोस्';
@@ -452,6 +453,14 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('teamFormTabLabel').textContent = 'सम्पादन';
             switchToForm();
         });
+    });
+
+    document.querySelectorAll('.tm-cat-badge[data-badge-color]').forEach(function (el) {
+        var c = (el.getAttribute('data-badge-color') || '').trim();
+        if (!c) return;
+        el.style.background = c + '20';
+        el.style.color = c;
+        el.style.border = '1px solid currentColor';
     });
 });
 </script>

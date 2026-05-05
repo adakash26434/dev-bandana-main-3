@@ -102,16 +102,16 @@ $filtered = $typeFilter
 
     <!-- ══ TAB 1: सूची ══ -->
     <div class="tab-pane fade show active" id="pf-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+        <div class="card admin-table-card svc-flat-top-card">
 
             <!-- Filter bar -->
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 flex-wrap">
-                <div class="input-group input-group-sm" style="max-width:280px">
+                <div class="input-group input-group-sm pf-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search"
                            placeholder="संस्था, स्थान, विवरण खोज्नुहोस्..." autocomplete="off">
                 </div>
-                <select class="form-select form-select-sm" style="max-width:200px" id="pfTypeFilter">
+                <select class="form-select form-select-sm pf-type-filter" id="pfTypeFilter">
                     <option value="">— सुविधा प्रकार —</option>
                     <?php foreach ($types as $t): ?>
                     <option value="<?php echo htmlspecialchars($t); ?>" <?php echo $typeFilter===$t?'selected':''; ?>>
@@ -154,19 +154,19 @@ $filtered = $typeFilter
                                     <div class="fw-semibold text-dark"><?php echo htmlspecialchars($f['partner_name']); ?></div>
                                 </td>
                                 <td>
-                                    <span class="text-muted"><i class="fas fa-location-dot me-1 text-success" style="font-size:.75rem;"></i>
+                                    <span class="text-muted"><i class="fas fa-location-dot me-1 text-success pf-location-icon"></i>
                                     <?php echo htmlspecialchars($f['location'] ?: '—'); ?></span>
                                 </td>
                                 <td>
                                     <?php if ($f['facility_type']): ?>
-                                    <span class="badge" style="background:#e8f5e9;color:var(--primary-color);font-weight:600;font-size:.78rem;">
+                                    <span class="badge pf-type-badge">
                                         <?php echo htmlspecialchars($f['facility_type']); ?>
                                     </span>
                                     <?php else: echo '—'; endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <?php if ($f['discount_percent'] > 0): ?>
-                                    <span class="badge bg-warning text-dark fw-bold" style="font-size:.85rem;">
+                                    <span class="badge bg-warning text-dark fw-bold pf-discount-badge">
                                         <?php echo number_format($f['discount_percent'], 0); ?>%
                                     </span>
                                     <?php else: echo '<span class="text-muted">—</span>'; endif; ?>
@@ -190,7 +190,7 @@ $filtered = $typeFilter
                                             title="सम्पादन">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline"
+                                    <form method="POST" class="svc-inline-form"
                                           onsubmit="return confirm('के तपाईं यो सुविधा मेटाउन निश्चित हुनुहुन्छ?')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
@@ -211,9 +211,8 @@ $filtered = $typeFilter
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="pf-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center"
-                 style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card svc-flat-top-card">
+            <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
                 <h5 class="mb-0 fw-bold" id="pfFormTitle">
                     <i class="fas fa-plus-circle me-2"></i>नयाँ साझेदार सुविधा थप्नुहोस्
                 </h5>

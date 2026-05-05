@@ -199,8 +199,8 @@ $j = fn($v) => json_encode($v, JSON_UNESCAPED_UNICODE);
             <div class="d-flex justify-content-between small text-muted mb-1">
               <span>KYC Approval Rate</span><span><?= $kycRate ?>%</span>
             </div>
-            <div class="progress" style="height:8px;">
-              <div class="progress-bar bg-success" style="width:<?= $kycRate ?>%"></div>
+            <div class="progress anl-progress-md">
+              <div class="progress-bar bg-success anl-progress-bar" data-width="<?= (float)$kycRate ?>"></div>
             </div>
           </div>
         </div>
@@ -258,7 +258,7 @@ $j = fn($v) => json_encode($v, JSON_UNESCAPED_UNICODE);
           <h6 class="mb-0 fw-bold"><i class="fas fa-table text-secondary me-2"></i>Quick Summary</h6>
         </div>
         <div class="card-body p-0">
-          <table class="table table-sm table-hover mb-0" style="font-size:.88rem;">
+          <table class="table table-sm table-hover mb-0 anl-table-compact">
             <thead class="table-light"><tr><th>मेट्रिक</th><th class="text-end">संख्या</th><th class="text-end">%</th></tr></thead>
             <tbody>
               <?php
@@ -279,10 +279,10 @@ $j = fn($v) => json_encode($v, JSON_UNESCAPED_UNICODE);
                 <td class="text-end fw-bold"><?= number_format($num) ?></td>
                 <td class="text-end">
                   <div class="d-flex align-items-center justify-content-end gap-2">
-                    <div class="progress flex-grow-1" style="height:6px;min-width:60px;">
-                      <div class="progress-bar bg-success" style="width:<?= min(100,$pct) ?>%"></div>
+                    <div class="progress flex-grow-1 anl-progress-sm">
+                      <div class="progress-bar bg-success anl-progress-bar" data-width="<?= (float)min(100,$pct) ?>"></div>
                     </div>
-                    <span style="min-width:36px;"><?= $pct ?>%</span>
+                    <span class="anl-pct-label"><?= $pct ?>%</span>
                   </div>
                 </td>
               </tr>
@@ -371,5 +371,13 @@ if(msKeys.length > 0) new Chart('chartMemStatus', {type:'doughnut', data:{
         backgroundColor:['#16a34a','#d97706','#dc2626','#9ca3af'],
         borderWidth:2, borderColor:'#fff'}]
 }, options:{plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:6}}}, cutout:'55%'}});
+
+document.querySelectorAll('.anl-progress-bar[data-width]').forEach(function (el) {
+    var w = parseFloat(el.getAttribute('data-width') || '0');
+    if (!isFinite(w)) w = 0;
+    if (w < 0) w = 0;
+    if (w > 100) w = 100;
+    el.style.width = w + '%';
+});
 </script>
 <?php require_once 'includes/admin-footer.php'; ?>

@@ -153,7 +153,7 @@ if ($viewApp):
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-user-plus me-2"></i>खाता आवेदन विवरण
-            <code style="font-size:0.83rem;background:rgba(255,255,255,0.15);padding:2px 10px;border-radius:6px;margin-left:8px;">
+            <code class="apt-track-chip">
                 <?php echo htmlspecialchars($trackId); ?>
             </code>
         </h5>
@@ -256,7 +256,7 @@ if ($viewApp):
                     <div class="col-6 col-md-3 text-center">
                         <a href="<?php echo htmlspecialchars(SITE_URL . $viewApp[$col]); ?>" target="_blank">
                             <img src="<?php echo htmlspecialchars(SITE_URL . $viewApp[$col]); ?>"
-                                 class="img-thumbnail mb-1" style="height:100px;object-fit:cover;width:100%;" alt="<?php echo $label; ?>">
+                                 class="img-thumbnail mb-1 acc-doc-thumb" alt="<?php echo $label; ?>">
                             <div class="small text-muted"><?php echo $label; ?></div>
                         </a>
                     </div>
@@ -282,7 +282,7 @@ if ($viewApp):
                 <?php if (!empty($viewApp['remarks'])): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-sticky-note"></i>Admin टिप्पणी (Member ले Tracker मा देख्छ)</div>
-                    <div class="p-3" style="white-space:pre-wrap;font-size:0.9rem;color:#374151;background:#f0fff4;">
+                    <div class="p-3 apt-text-block apt-text-block-success">
                         <?php echo nl2br(htmlspecialchars($viewApp['remarks'])); ?>
                     </div>
                 </div>
@@ -429,16 +429,16 @@ if ($viewApp):
 </div>
 
 <!-- ── Account Table ── -->
-<div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+<div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
-        <h6><i class="fas fa-user-plus me-2 text-purple" style="color:#7c3aed;"></i>खाता आवेदन सूची</h6>
+        <h6><i class="fas fa-user-plus me-2 text-purple acc-title-icon"></i>खाता आवेदन सूची</h6>
         <span class="result-count-badge"><?php echo $totalCount; ?> आवेदन</span>
     </div>
     <div class="table-responsive">
         <table class="table-hover table app-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th style="width:200px;">आवेदक</th>
+                    <th class="acc-col-applicant">आवेदक</th>
                     <th>खाता प्रकार</th>
                     <th>सम्पर्क</th>
                     <th>नागरिकता</th>
@@ -515,7 +515,7 @@ if ($viewApp):
             <?php endfor; ?>
             <a href="?<?php echo http_build_query(array_merge($qs2,['page'=>min($totalPages,$page+1)])); ?>" class="<?php echo $page>=$totalPages?'disabled':''; ?>"><i class="fas fa-angle-right"></i></a>
             <a href="?<?php echo http_build_query(array_merge($qs2,['page'=>$totalPages])); ?>" class="<?php echo $page==$totalPages?'disabled':''; ?>"><i class="fas fa-angle-double-right"></i></a>
-            <span style="font-size:0.78rem;color:#6b7280;margin-left:8px;"><?php echo $page; ?>/<?php echo $totalPages; ?> · <?php echo $totalCount; ?> रेकर्ड</span>
+            <span class="acc-page-meta"><?php echo $page; ?>/<?php echo $totalPages; ?> · <?php echo $totalCount; ?> रेकर्ड</span>
         </div>
     </div>
     <?php endif; ?>

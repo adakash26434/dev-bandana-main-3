@@ -174,7 +174,7 @@ if (isset($_GET['view'])) {
             <div class="sm-lbl">छनोट</div>
         </a>
         <a href="?status=interviewed" class="stat-mini <?php echo $statusFilter==='interviewed'?'active-filter':''; ?>">
-            <div class="sm-icon" style="background:linear-gradient(135deg,#64748b20,#64748b10);"><i class="fas fa-comments" style="color:#64748b;"></i></div>
+            <div class="sm-icon job-icon-interview-bg"><i class="fas fa-comments job-icon-interview-fg"></i></div>
             <div class="sm-val"><?php echo $stats['interviewed'] ?? 0; ?></div>
             <div class="sm-lbl">अन्तर्वार्ता</div>
         </a>
@@ -411,7 +411,7 @@ if (isset($_GET['view'])) {
         </form>
     </div>
     <!-- ── Applications List ── -->
-    <div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+    <div class="card border-0 shadow-sm app-rounded-card">
         <div class="tbl-header-bar no-print">
             <h6><i class="fas fa-briefcase me-2 text-primary"></i>रोजगार आवेदन सूची</h6>
             <span class="result-count-badge"><?php echo count($applications); ?> आवेदन</span>
@@ -475,7 +475,7 @@ if (isset($_GET['view'])) {
                                         <a href="?view=<?php echo $app['id']; ?><?php echo $careerId ? '&career_id=' . $careerId : ''; ?>" class="btn btn-sm btn-info" title="हेर्नुहोस्">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं पक्का हुनुहुन्छ?')">
+                                        <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं पक्का हुनुहुन्छ?')">
     <?php echo csrfField(); ?>
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?php echo $app['id']; ?>">
