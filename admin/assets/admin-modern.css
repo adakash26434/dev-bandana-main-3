@@ -2850,3 +2850,75 @@ body.admin-page-db-setup .dbs-table-status-item {
 body.admin-page-db-setup .dbs-table-status-label {
     max-width: 120px;
 }
+
+/* Vendor enlistment (vendor-enlistment.php) */
+.ven-desc-box {
+    min-height: 80px;
+    font-size: 0.9rem;
+}
+
+.ven-title-icon {
+    color: #0f766e;
+}
+
+.ven-search-group {
+    max-width: 220px;
+}
+
+.ven-col-company {
+    width: 210px;
+}
+
+/* Grievance officer assignment (grievance-officer.php) */
+.gof-card-header {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #fff;
+}
+
+.gof-avatar-photo {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-color: #8b5cf6 !important;
+}
+
+.gof-avatar-fallback {
+    width: 100px;
+    height: 100px;
+    background: #ede9fe;
+    border-color: #8b5cf6 !important;
+}
+
+.gof-accent-icon,
+.gof-position-accent {
+    color: #8b5cf6;
+}
+
+.gof-badge-violet {
+    background: #8b5cf6;
+    color: #fff;
+}
+
+.gof-empty-state-icon {
+    opacity: 0.3;
+}
+
+.gof-row-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 6px;
+}
+
+.gof-btn-violet {
+    background: #8b5cf6;
+    color: #fff;
+    border-color: #8b5cf6;
+}
+
+.gof-btn-violet:hover {
+    background: #7c3aed;
+    color: #fff;
+    border-color: #7c3aed;
+}

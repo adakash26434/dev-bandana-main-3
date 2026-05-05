@@ -74,27 +74,25 @@ if ($error) echo adminAlert('error', $error);
         <!-- हालको गुनासो अधिकारी -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;">
+                <div class="card-header gof-card-header">
                     <h5 class="mb-0"><i class="fas fa-id-badge me-2"></i>हालको गुनासो अधिकारी</h5>
                 </div>
                 <div class="card-body text-center py-4">
                     <?php if ($currentOfficer): ?>
                         <?php if (!empty($currentOfficer['photo'])): ?>
                             <img src="<?php echo htmlspecialchars('../' . $currentOfficer['photo']); ?>"
-                                 class="rounded-circle mb-3 border border-3"
-                                 style="width:100px;height:100px;object-fit:cover;border-color:#8b5cf6!important;"
+                                 class="rounded-circle mb-3 border border-3 gof-avatar-photo"
                                  alt="Photo">
                         <?php else: ?>
-                            <div class="rounded-circle mb-3 d-inline-flex align-items-center justify-content-center border border-3"
-                                 style="width:100px;height:100px;background:#ede9fe;border-color:#8b5cf6!important;">
-                                <i class="fas fa-user-tie fa-2x" style="color:#8b5cf6;"></i>
+                            <div class="rounded-circle mb-3 d-inline-flex align-items-center justify-content-center border border-3 gof-avatar-fallback">
+                                <i class="fas fa-user-tie fa-2x gof-accent-icon"></i>
                             </div>
                         <?php endif; ?>
                         <h5 class="fw-bold mb-1"><?php echo htmlspecialchars($currentOfficer['name']); ?></h5>
                         <?php if (!empty($currentOfficer['name_en'])): ?>
                             <p class="text-muted small mb-2"><?php echo htmlspecialchars($currentOfficer['name_en']); ?></p>
                         <?php endif; ?>
-                        <p class="fw-semibold mb-2" style="color:#8b5cf6;">
+                        <p class="fw-semibold mb-2 gof-position-accent">
                             <?php echo htmlspecialchars($currentOfficer['position_np'] ?: $currentOfficer['position']); ?>
                         </p>
                         <?php if (!empty($currentOfficer['phone'])): ?>
@@ -103,12 +101,12 @@ if ($error) echo adminAlert('error', $error);
                         <?php if (!empty($currentOfficer['email'])): ?>
                             <p class="text-muted small mb-0"><i class="fas fa-envelope me-1"></i><?php echo htmlspecialchars($currentOfficer['email']); ?></p>
                         <?php endif; ?>
-                        <span class="badge mt-3" style="background:#8b5cf6;">
+                        <span class="badge mt-3 gof-badge-violet">
                             <i class="fas fa-check-circle me-1"></i>गुनासो अधिकारी
                         </span>
                     <?php else: ?>
                         <div class="text-muted py-4">
-                            <i class="fas fa-user-slash fa-3x mb-3 d-block" style="opacity:.3;"></i>
+                            <i class="fas fa-user-slash fa-3x mb-3 d-block gof-empty-state-icon"></i>
                             <p>कुनै गुनासो अधिकारी तोकिएको छैन।</p>
                             <p class="small">तलबाट टिम सदस्य चयन गर्नुहोस्।</p>
                         </div>
@@ -146,7 +144,7 @@ if ($error) echo adminAlert('error', $error);
                                     <td>
                                         <?php if (!empty($m['photo'])): ?>
                                             <img src="<?php echo htmlspecialchars('../' . $m['photo']); ?>"
-                                                 style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:6px;" alt="">
+                                                 class="gof-row-avatar" alt="">
                                         <?php endif; ?>
                                         <strong><?php echo htmlspecialchars($m['name']); ?></strong>
                                         <?php if (!empty($m['name_en'])): ?>
@@ -157,17 +155,17 @@ if ($error) echo adminAlert('error', $error);
                                     <td class="small"><?php echo htmlspecialchars($m['phone'] ?? '—'); ?></td>
                                     <td>
                                         <?php if (!$currentOfficer || $currentOfficer['id'] != $m['id']): ?>
-                                        <form method="POST" style="display:inline;">
+                                        <form method="POST" class="svc-inline-form">
                                             <?php echo csrfField(); ?>
                                             <input type="hidden" name="member_id" value="<?php echo $m['id']; ?>">
                                             <button type="submit" name="set_officer" value="1"
-                                                    class="btn btn-sm" style="background:#8b5cf6;color:#fff;"
+                                                    class="btn btn-sm gof-btn-violet"
                                                     onclick="return confirm('<?php echo htmlspecialchars($m['name']); ?> लाई गुनासो अधिकारी बनाउने?')">
                                                 <i class="fas fa-user-check me-1"></i>तोक्नुहोस्
                                             </button>
                                         </form>
                                         <?php else: ?>
-                                            <span class="badge" style="background:#8b5cf6;">हालको अधिकारी</span>
+                                            <span class="badge gof-badge-violet">हालको अधिकारी</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

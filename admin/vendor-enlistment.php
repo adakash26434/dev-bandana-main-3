@@ -153,7 +153,7 @@ $businessLabels = [
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-muted small">विवरण</label>
-                    <div class="p-3 bg-light rounded" style="min-height:80px;font-size:0.9rem;">
+                    <div class="p-3 bg-light rounded ven-desc-box">
                         <?php echo nl2br(htmlspecialchars($detail['description'] ?? '—')); ?>
                     </div>
                 </div>
@@ -233,12 +233,12 @@ $businessLabels = [
 </div>
 
 <!-- ── Vendor Table ── -->
-<div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+<div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
-        <h6><i class="fas fa-store me-2" style="color:#0f766e;"></i>भेन्डर सूची — <?php echo $tab==='all'?'सबै':(ucfirst($tab)); ?></h6>
+        <h6><i class="fas fa-store me-2 ven-title-icon"></i>भेन्डर सूची — <?php echo $tab==='all'?'सबै':(ucfirst($tab)); ?></h6>
         <div class="d-flex gap-2 align-items-center">
             <div class="admin-search-wrap d-flex align-items-center gap-2">
-                <div class="input-group input-group-sm" style="max-width:220px">
+                <div class="input-group input-group-sm ven-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -251,7 +251,7 @@ $businessLabels = [
         <table class="table-hover table app-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th style="width:210px;">कम्पनी / फर्म</th>
+                    <th class="ven-col-company">कम्पनी / फर्म</th>
                     <th>मालिक</th>
                     <th>सम्पर्क</th>
                     <th>व्यवसाय प्रकार</th>
