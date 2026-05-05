@@ -521,3 +521,214 @@ hr { border-color: var(--adm-border) !important; opacity: 1 !important; }
 @media (min-width: 992px) {
     .admin-topbar-brand { display: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════
+   21. CLEAN FORM MODE (v1.1)
+   Reduce clutter and improve readability across admin forms.
+   ═══════════════════════════════════════════════════ */
+
+.main-content {
+    background: #f6f8f7 !important;
+}
+
+.content-area,
+.admin-content,
+.container-fluid {
+    max-width: 100% !important;
+}
+
+.card,
+.admin-table-card,
+.admin-form-page .card,
+.tab-content > .tab-pane > .card {
+    border-radius: 10px !important;
+    border: 1px solid #dfe5e1 !important;
+    box-shadow: none !important;
+}
+
+.card-header,
+.gradient-card-header,
+.tab-content .card > .card-header {
+    background: #f8faf9 !important;
+    color: #1f2937 !important;
+    border-bottom: 1px solid #e3e8e5 !important;
+}
+
+.card-header[style*="linear-gradient"],
+.card-header[style*="var(--primary-color)"] {
+    background: #f8faf9 !important;
+    color: #1f2937 !important;
+}
+
+.table-col-header,
+.table thead,
+.table thead th {
+    background: #f4f7f5 !important;
+    color: #1f2937 !important;
+    border-color: #dfe5e1 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-size: 0.84rem !important;
+}
+
+.nav-tabs,
+.admin-nav-tabs {
+    border-bottom: none !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+    flex-wrap: wrap !important;
+}
+
+.nav-tabs .nav-link,
+.admin-nav-tabs .nav-link {
+    border: 1px solid #d7dfda !important;
+    border-radius: 8px !important;
+    margin-bottom: 0 !important;
+    padding: 9px 14px !important;
+    background: #ffffff !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+}
+
+.nav-tabs .nav-link:hover,
+.admin-nav-tabs .nav-link:hover {
+    background: #f3f7f4 !important;
+    border-color: #bfcac2 !important;
+    color: #14532d !important;
+}
+
+.nav-tabs .nav-link.active,
+.admin-nav-tabs .nav-link.active {
+    background: #eaf6ef !important;
+    border-color: #7ab88f !important;
+    color: #14532d !important;
+    box-shadow: none !important;
+}
+
+.form-label {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: #253238 !important;
+}
+
+.form-control,
+.form-select,
+textarea.form-control {
+    min-height: 46px !important;
+    font-size: 0.96rem !important;
+    padding: 11px 13px !important;
+    border: 1px solid #cfd8d3 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+textarea.form-control {
+    min-height: 120px !important;
+    line-height: 1.45 !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+    border-color: #2f8f55 !important;
+    box-shadow: 0 0 0 2px rgba(47, 143, 85, 0.12) !important;
+}
+
+.row.g-2 > [class*="col-"],
+.row.g-3 > [class*="col-"],
+.row.g-4 > [class*="col-"] {
+    margin-bottom: 2px !important;
+}
+
+.card-body {
+    padding: 18px !important;
+}
+
+.btn {
+    border-radius: 8px !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.btn-primary,
+.btn-success {
+    background: #1f7a46 !important;
+    border-color: #1f7a46 !important;
+}
+
+.btn-primary:hover,
+.btn-success:hover {
+    background: #176238 !important;
+    border-color: #176238 !important;
+}
+
+.btn-outline-danger {
+    border-color: #f1b3b3 !important;
+    color: #b42323 !important;
+}
+
+.d-flex.gap-3,
+.d-flex.gap-2 {
+    flex-wrap: wrap !important;
+}
+
+/* Shared helper classes from admin-ui.php */
+.admin-page-subtitle-text {
+    font-style: normal !important;
+    font-size: 0.86rem !important;
+    color: #5b6770 !important;
+}
+
+.admin-page-header-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    margin-right: 10px;
+    background: #e9f3ed;
+    color: #1f7a46;
+    border: 1px solid #cfe3d6;
+}
+
+.admin-icon-btn {
+    min-width: 34px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.admin-action-group .btn {
+    min-height: 32px !important;
+}
+
+/* Uniform form wrappers used by many pages */
+.admin-form-page .card,
+.admin-section-card,
+.admin-table-card {
+    overflow: hidden !important;
+}
+
+.admin-form-page .card .card-header h4,
+.admin-form-page .card .card-header h5,
+.admin-form-page .card .card-header h6,
+.admin-section-card .card-header h6,
+.admin-table-card .card-header h5 {
+    font-size: 0.93rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+}
+
+/* Consistent table paddings and row height in all admin list pages */
+.admin-table-card .table td,
+.admin-table-card .table th,
+.card .table td,
+.card .table th {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}

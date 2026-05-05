@@ -38,18 +38,12 @@ if (!defined('IS_ADMIN_PAGE')) { http_response_code(403); exit('Access denied.')
 function adminPageHeader(string $title, string $icon = 'fa-cog', string $subtitle = '', string $rightHtml = '', string $color = 'primary'): string {
     /* subtitle — italic muted text */
     $sub = $subtitle
-        ? '<small class="text-muted d-block mt-1" style="font-size:0.78rem;font-style:italic;">'
+        ? '<small class="text-muted d-block mt-1 admin-page-subtitle-text">'
           . htmlspecialchars($subtitle) . '</small>'
         : '';
 
     /* icon background circle */
-    $iconHtml = '<span style="'
-        . 'display:inline-flex;align-items:center;justify-content:center;'
-        . 'width:34px;height:34px;border-radius:8px;'
-        . 'background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));'
-        . 'color:#fff;font-size:0.9rem;flex-shrink:0;margin-right:10px;'
-        . 'box-shadow:0 2px 8px rgba(26,95,42,0.25);'
-        . '"><i class="fas ' . $icon . '"></i></span>';
+    $iconHtml = '<span class="admin-page-header-icon"><i class="fas ' . $icon . '"></i></span>';
 
     /* Title topbar मा पहिले नै देखिन्छ — यहाँ subtitle + icon मात्र राख्ने */
     $subBlock = $sub
@@ -195,11 +189,6 @@ function adminStatLink(string $url, string $color, string $label, $count, bool $
    ────────────────────────────────────────────────────────────── */
 function adminAddBtn(string $label, string $href = '#', string $icon = 'fa-plus', string $onclick = ''): string {
     $onclickAttr = $onclick ? ' onclick="' . htmlspecialchars($onclick, ENT_QUOTES) . '"' : '';
-    $style = 'background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));'
-           . 'border:none;box-shadow:0 3px 12px rgba(26,95,42,0.25);'
-           . 'border-radius:10px;padding:9px 18px;font-weight:600;font-size:0.875rem;'
-           . 'display:inline-flex;align-items:center;gap:7px;color:#fff;'
-           . 'text-decoration:none;transition:all 0.15s;cursor:pointer;';
     if ($href !== '#') {
         return '<a href="' . htmlspecialchars($href) . '" class="btn btn-primary"' . $onclickAttr . '>'
              . '<i class="fas ' . $icon . '"></i>' . htmlspecialchars($label) . '</a>';
@@ -216,12 +205,12 @@ function adminToggleBtn(int $recordId, $isActive, string $csrfToken, string $ext
     if ($isActive) {
         $btn = '<button type="submit" class="btn btn-sm btn-success" '
              . 'title="Active छ — थिच्दा Hidden हुन्छ" '
-             . 'style="height:28px;min-width:70px;font-size:0.7rem;padding:0 9px;border-radius:6px;">'
+             . 'style="min-width:82px;">'
              . '<i class="fas fa-eye fa-fw"></i> Active</button>';
     } else {
         $btn = '<button type="submit" class="btn btn-sm btn-outline-secondary" '
              . 'title="Hidden छ — थिच्दा Active हुन्छ" '
-             . 'style="height:28px;min-width:70px;font-size:0.7rem;padding:0 9px;border-radius:6px;">'
+             . 'style="min-width:82px;">'
              . '<i class="fas fa-eye-slash fa-fw"></i> Hidden</button>';
     }
     return '<form method="POST" class="d-inline">'
@@ -242,9 +231,8 @@ function adminDeleteBtn(int $recordId, string $csrfToken, string $confirmMsg = '
          . '<input type="hidden" name="id" value="' . $recordId . '">'
          . '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrfToken) . '">'
          . $extraFields
-         . '<button type="submit" class="btn btn-sm btn-outline-danger" title="हटाउनुहोस्" '
-         . 'style="height:28px;width:28px;padding:0;border-radius:6px;border-width:1.5px;">'
-         . '<i class="fas fa-trash-can" style="font-size:0.72rem;"></i></button></form>';
+         . '<button type="submit" class="btn btn-sm btn-outline-danger admin-icon-btn" title="हटाउनुहोस्">'
+         . '<i class="fas fa-trash-can"></i></button></form>';
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -252,17 +240,14 @@ function adminDeleteBtn(int $recordId, string $csrfToken, string $confirmMsg = '
    Compact icon+text edit button
    ────────────────────────────────────────────────────────────── */
 function adminEditBtn(string $onclick = '', string $href = '#'): string {
-    $style = 'height:28px;min-width:30px;padding:0 8px;border-radius:6px;'
-           . 'border-width:1.5px;font-size:0.72rem;display:inline-flex;'
-           . 'align-items:center;gap:3px;';
     if ($onclick) {
         return '<button type="button" class="btn btn-sm btn-outline-primary" '
              . 'onclick="' . htmlspecialchars($onclick, ENT_QUOTES) . '" '
-             . 'title="सम्पादन" style="' . $style . '">'
+             . 'title="सम्पादन" style="min-width:34px;">'
              . '<i class="fas fa-pen fa-fw"></i></button>';
     }
     return '<a href="' . htmlspecialchars($href) . '" class="btn btn-sm btn-outline-primary" '
-         . 'title="सम्पादन" style="' . $style . '">'
+         . 'title="सम्पादन" style="min-width:34px;">'
          . '<i class="fas fa-pen fa-fw"></i></a>';
 }
 
@@ -272,11 +257,8 @@ function adminEditBtn(string $onclick = '', string $href = '#'): string {
    ────────────────────────────────────────────────────────────── */
 function adminViewBtn(string $href, string $label = ''): string {
     $txt   = $label ? ' ' . htmlspecialchars($label) : '';
-    $style = 'height:28px;min-width:30px;padding:0 8px;border-radius:6px;'
-           . 'border-width:1.5px;font-size:0.72rem;display:inline-flex;'
-           . 'align-items:center;gap:3px;';
     return '<a href="' . htmlspecialchars($href) . '" class="btn btn-sm btn-outline-info" '
-         . 'title="हेर्नुहोस्" style="' . $style . '">'
+         . 'title="हेर्नुहोस्" style="min-width:34px;">'
          . '<i class="fas fa-eye fa-fw"></i>' . $txt . '</a>';
 }
 
@@ -297,7 +279,7 @@ function adminActionBtns(
     string $extraDelete   = '',
     string $confirmMsg    = 'यो record हटाउने? यो कार्य फिर्ता हुँदैन।'
 ): string {
-    $out = '<div class="d-flex align-items-center" style="gap:4px;flex-wrap:nowrap;">';
+    $out = '<div class="d-flex align-items-center admin-action-group" style="gap:6px;flex-wrap:wrap;">';
     $out .= adminEditBtn($editOnclick, $editHref);
     if ($showToggle) $out .= adminToggleBtn($recordId, $isActive, $csrfToken, $extraToggle);
     if ($showDelete) $out .= adminDeleteBtn($recordId, $csrfToken, $confirmMsg, $extraDelete);
@@ -310,8 +292,7 @@ function adminActionBtns(
    Back to list button
    ────────────────────────────────────────────────────────────── */
 function adminBackBtn(string $href, string $label = 'सूचीमा फर्किनुहोस्'): string {
-    return '<a href="' . htmlspecialchars($href) . '" class="btn btn-outline-secondary btn-sm" '
-         . 'style="border-radius:8px;padding:7px 14px;font-size:0.82rem;font-weight:500;">'
+    return '<a href="' . htmlspecialchars($href) . '" class="btn btn-outline-secondary btn-sm">'
          . '<i class="fas fa-arrow-left me-1"></i>' . htmlspecialchars($label) . '</a>';
 }
 
@@ -331,9 +312,9 @@ function adminSectionCard(string $title, string $icon, string $color, string $bo
     ];
     $headerStyle = $bgs[$color] ?? $bgs['primary'];
 
-    return '<div class="card mb-3 admin-section-card" style="border:1px solid rgba(0,0,0,0.06);border-radius:12px;overflow:hidden;">'
+    return '<div class="card mb-3 admin-section-card">'
          . '<div class="card-header py-2 px-3" style="' . $headerStyle . '">'
-         . '<h6 class="mb-0 text-' . $color . '" style="font-size:0.85rem;font-weight:700;">'
+         . '<h6 class="mb-0 text-' . $color . '">'
          . '<i class="fas ' . $icon . ' me-2"></i>' . htmlspecialchars($title) . '</h6></div>'
          . '<div class="card-body p-3">' . $body . '</div></div>';
 }
@@ -350,13 +331,13 @@ function adminTableCard(string $tableHtml, bool $noPad = true, string $headerTit
     if ($headerTitle) {
         $iconHtml = $headerIcon ? '<i class="fas ' . $headerIcon . ' me-2"></i>' : '';
         $rightHtml = $headerRight ? '<div>' . $headerRight . '</div>' : '';
-        $headerHtml = '<div class="gradient-card-header d-flex align-items-center justify-content-between">'
-                    . '<h5 class="mb-0" style="font-size:0.95rem;font-weight:700;">'
+        $headerHtml = '<div class="card-header d-flex align-items-center justify-content-between">'
+                    . '<h5 class="mb-0">'
                     . $iconHtml . htmlspecialchars($headerTitle) . '</h5>'
                     . $rightHtml . '</div>';
     }
 
-    return '<div class="card shadow-sm admin-table-card">'
+    return '<div class="card admin-table-card">'
          . $headerHtml
          . '<div class="' . $bodyClass . '"><div class="table-responsive">'
          . $tableHtml . '</div></div></div>';
