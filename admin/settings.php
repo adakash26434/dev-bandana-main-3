@@ -269,22 +269,6 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                                placeholder="Short tagline for English UI / SEO fallback">
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">हिरो शीर्षक</label>
-                        <input type="text" name="hero_title" class="form-control"
-                               value="<?php echo $settings['hero_title'] ?? ''; ?>">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">हिरो उप-शीर्षक</label>
-                        <input type="text" name="hero_subtitle" class="form-control"
-                               value="<?php echo $settings['hero_subtitle'] ?? ''; ?>">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">संक्षिप्त परिचय</label>
-                        <textarea name="about_short" class="form-control" rows="3"><?php echo $settings['about_short'] ?? ''; ?></textarea>
-                    </div>
                 </div>
             </div>
 
@@ -294,6 +278,39 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <h5 class="stg-section-title"><i class="fas fa-search"></i> SEO (Google / सामाजिक साझेदारी)</h5>
                 </div>
                 <div class="card-body">
+                    <h6 class="text-success fw-bold mb-3"><i class="fas fa-globe me-2"></i>साइट जानकारी</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Website Name</label>
+                                <input type="text" name="site_name" class="form-control"
+                                       value="<?php echo $settings['site_name'] ?? ''; ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Website Name (EN)</label>
+                                <input type="text" name="site_name_en" class="form-control"
+                                       value="<?php echo $settings['site_name_en'] ?? ''; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Slogan</label>
+                        <input type="text" name="site_slogan" class="form-control"
+                               value="<?php echo htmlspecialchars($settings['site_slogan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Slogan (EN)</label>
+                        <input type="text" name="site_slogan_en" class="form-control"
+                               value="<?php echo htmlspecialchars($settings['site_slogan_en'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">संक्षिप्त परिचय</label>
+                        <textarea name="about_short" class="form-control" rows="3"><?php echo $settings['about_short'] ?? ''; ?></textarea>
+                    </div>
+
+                    <hr>
                     <p class="text-muted small mb-3">हरेक सहकारीको आफ्नै डोमेनमा यही थिम चलाउँदा यहाँ भएको विवरण प्रयोग हुन्छ। खाली छोड्नुभयो भने स्लोगन वा पृष्ठ–विशेष विवरण fallback हुन्छ।</p>
                     <div class="mb-3">
                         <label class="form-label">मेटा विवरण (नेपाली) — &lt;meta name=&quot;description&quot;&gt;</label>
@@ -830,14 +847,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!panel || !buttons.length || !cards.length) return;
 
         function setGroup(group) {
-            cards.sort(function (a, b) {
-                var ao = parseInt(a.getAttribute('data-stg-order') || '999', 10);
-                var bo = parseInt(b.getAttribute('data-stg-order') || '999', 10);
-                return ao - bo;
-            }).forEach(function (card) {
-                card.parentNode.appendChild(card);
-            });
-
             buttons.forEach(function (btn) {
                 btn.classList.toggle('active', btn.getAttribute('data-stg-group') === group);
             });
