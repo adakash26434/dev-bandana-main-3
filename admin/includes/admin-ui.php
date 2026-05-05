@@ -1,0 +1,420 @@
+<?php
+/**
+ * admin/includes/admin-ui.php
+ * ══════════════════════════════════════════════════════════════
+ * Universal Admin UI Helper Functions — v2.0
+ * Enhanced: better badges, buttons, headers, empty state, etc.
+ *
+ * USAGE (admin-header.php pachi include garnus):
+ *   require_once 'includes/admin-ui.php';
+ *
+ * AVAILABLE FUNCTIONS:
+ *   adminPageHeader()       — page title + subtitle + right buttons
+ *   adminAlert()            — success/error/warning/info alerts
+ *   adminEmptyRow()         — empty state for table tbody
+ *   adminBadge()            — soft pill badges
+ *   adminActiveBadge()      — active/hidden badge with dot
+ *   adminStatusBadge()      — pending/approved/rejected status
+ *   adminStatLink()         — clickable stat badge in header
+ *   adminAddBtn()           — "+ Add" button
+ *   adminToggleBtn()        — active/inactive toggle form
+ *   adminDeleteBtn()        — delete confirm form
+ *   adminEditBtn()          — edit button (modal or page link)
+ *   adminViewBtn()          — view detail button
+ *   adminActionBtns()       — grouped edit+toggle+delete buttons
+ *   adminSectionCard()      — grouped form section with header
+ *   adminTableCard()        — standard table wrapper card
+ *   adminBackBtn()          — back to list button
+ *   adminFiscalYearSelect() — BS fiscal year <select>
+ * ══════════════════════════════════════════════════════════════
+ */
+if (!defined('IS_ADMIN_PAGE')) { http_response_code(403); exit('Access denied.'); }
+
+/* ──────────────────────────────────────────────────────────────
+   adminPageHeader
+   Page header: left = icon + title + subtitle, right = buttons
+   CSS Enhancement Layer ले gradient + left-border थप्छ
+   ────────────────────────────────────────────────────────────── */
+function adminPageHeader(string $title, string $icon = 'fa-cog', string $subtitle = '', string $rightHtml = '', string $color = 'primary'): string {
+    /* subtitle — italic muted text */
+    $sub = $subtitle
+        ? '<small class="text-muted d-block mt-1" style="font-size:0.78rem;font-style:italic;">'
+          . htmlspecialchars($subtitle) . '</small>'
+        : '';
+
+    /* icon background circle */
+    $iconHtml = '<span style="'
+        . 'display:inline-flex;align-items:center;justify-content:center;'
+        . 'width:34px;height:34px;border-radius:8px;'
+        . 'background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));'
+        . 'color:#fff;font-size:0.9rem;flex-shrink:0;margin-right:10px;'
+        . 'box-shadow:0 2px 8px rgba(26,95,42,0.25);'
+        . '"><i class="fas ' . $icon . '"></i></span>';
+
+    /* Title topbar मा पहिले नै देखिन्छ — यहाँ subtitle + icon मात्र राख्ने */
+    $subBlock = $sub
+        ? '<div class="d-flex align-items-center">' . $iconHtml . $sub . '</div>'
+        : '';
+
+    /* Subtitle र right content दुवै छैन भने पूरै block नदेखाउने */
+    if (!$subBlock && !$rightHtml) return '';
+
+    return '<div class="admin-page-header mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">'
+         . $subBlock
+         . '<div class="d-flex gap-2 flex-wrap align-items-center">' . $rightHtml . '</div>'
+         . '</div>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminAlert
+   Bootstrap alert box — modern border-left style
+   ────────────────────────────────────────────────────────────── */
+function adminAlert(string $type, string $msg, bool $dismiss = true): string {
+    if (empty(trim($msg))) return '';
+    $icons = [
+        'success' => 'fa-circle-check',
+        'danger'  => 'fa-circle-xmark',
+        'warning' => 'fa-triangle-exclamation',
+        'info'    => 'fa-circle-info'
+    ];
+    $icon     = $icons[$type] ?? 'fa-circle-info';
+    $closeBtn = $dismiss
+        ? '<button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="बन्द"></button>'
+        : '';
+    return '<div class="alert alert-' . $type . ' alert-dismissible fade show" role="alert">'
+         . '<i class="fas ' . $icon . ' fa-fw flex-shrink-0"></i>'
+         . '<span>' . htmlspecialchars($msg) . '</span>'
+         . $closeBtn . '</div>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminEmptyRow
+   Beautiful empty state <tr> for table tbody
+   ────────────────────────────────────────────────────────────── */
+function adminEmptyRow(int $colspan = 6, string $msg = 'कुनै डाटा उपलब्ध छैन।', string $sub = 'माथिको बटनबाट नयाँ थप्नुहोस्।'): string {
+    return '<tr><td colspan="' . $colspan . '" class="text-center admin-empty-state">'
+         . '<i class="fas fa-inbox" style="font-size:2.2rem;"></i>'
+         . '<div style="font-size:0.9rem;font-weight:600;color:#6b7280;margin-top:8px;">'
+         . htmlspecialchars($msg) . '</div>'
+         . '<p>' . htmlspecialchars($sub) . '</p>'
+         . '</td></tr>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminBadge
+   Soft pill badge — consistent color system
+   ────────────────────────────────────────────────────────────── */
+function adminBadge(string $color, string $text, bool $dark = false): string {
+    /* Map Bootstrap color names → soft pill styles */
+    $softStyles = [
+        'success'   => 'background:#dcfce7;color:#166534;',
+        'danger'    => 'background:#fee2e2;color:#991b1b;',
+        'warning'   => 'background:#fef9c3;color:#713f12;',
+        'info'      => 'background:#dbeafe;color:#1e40af;',
+        'primary'   => 'background:#dcfce7;color:#166534;',
+        'secondary' => 'background:#f3f4f6;color:#4b5563;',
+        'dark'      => 'background:#1f2937;color:#fff;',
+        'light'     => 'background:#f9fafb;color:#374151;border:1px solid #e5e7eb;',
+    ];
+    $style = $softStyles[$color] ?? ('background:#f3f4f6;color:#374151;');
+    return '<span class="badge" style="'
+         . 'border-radius:20px;padding:4px 10px;font-weight:600;font-size:0.72rem;'
+         . $style . '">'
+         . htmlspecialchars($text) . '</span>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminActiveBadge
+   Active/Hidden badge with dot indicator
+   ────────────────────────────────────────────────────────────── */
+function adminActiveBadge($isActive): string {
+    if ($isActive) {
+        return '<span class="badge" style="'
+             . 'background:#dcfce7;color:#166534;border-radius:20px;'
+             . 'padding:4px 10px;font-weight:600;font-size:0.72rem;'
+             . 'display:inline-flex;align-items:center;gap:5px;">'
+             . '<span style="width:6px;height:6px;border-radius:50%;background:#22c55e;'
+             . 'box-shadow:0 0 0 2px rgba(34,197,94,0.25);flex-shrink:0;"></span>'
+             . 'Active</span>';
+    }
+    return '<span class="badge" style="'
+         . 'background:#f3f4f6;color:#6b7280;border-radius:20px;'
+         . 'padding:4px 10px;font-weight:600;font-size:0.72rem;'
+         . 'display:inline-flex;align-items:center;gap:5px;">'
+         . '<span style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;"></span>'
+         . 'Hidden</span>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminStatusBadge
+   Pending / Approved / Rejected / Processing status
+   ────────────────────────────────────────────────────────────── */
+function adminStatusBadge(string $status): string {
+    $map = [
+        'pending'    => ['bg' => '#fef9c3', 'color' => '#713f12', 'icon' => 'fa-clock',       'label' => 'प्रतीक्षारत'],
+        'approved'   => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle-check', 'label' => 'स्वीकृत'],
+        'rejected'   => ['bg' => '#fee2e2', 'color' => '#991b1b', 'icon' => 'fa-circle-xmark', 'label' => 'अस्वीकृत'],
+        'processing' => ['bg' => '#dbeafe', 'color' => '#1e40af', 'icon' => 'fa-spinner',      'label' => 'प्रक्रियामा'],
+        'resolved'   => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-check',        'label' => 'समाधान'],
+        'closed'     => ['bg' => '#f3f4f6', 'color' => '#4b5563', 'icon' => 'fa-xmark',        'label' => 'बन्द'],
+        'active'     => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle',       'label' => 'Active'],
+        'inactive'   => ['bg' => '#f3f4f6', 'color' => '#6b7280', 'icon' => 'fa-circle',       'label' => 'Inactive'],
+    ];
+    $s = $map[strtolower($status)] ?? ['bg' => '#f3f4f6', 'color' => '#374151', 'icon' => 'fa-circle', 'label' => $status];
+    return '<span class="badge" style="'
+         . 'background:' . $s['bg'] . ';color:' . $s['color'] . ';'
+         . 'border-radius:20px;padding:4px 10px;font-weight:600;font-size:0.72rem;'
+         . 'display:inline-flex;align-items:center;gap:4px;">'
+         . '<i class="fas ' . $s['icon'] . ' fa-fw" style="font-size:0.65rem;"></i>'
+         . htmlspecialchars($s['label']) . '</span>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminStatLink
+   Clickable stat/count badge (for page header rightHtml)
+   ────────────────────────────────────────────────────────────── */
+function adminStatLink(string $url, string $color, string $label, $count, bool $dark = false): string {
+    $softBg  = ['success' => '#dcfce7', 'danger' => '#fee2e2', 'warning' => '#fef9c3',
+                 'info' => '#dbeafe', 'primary' => '#dcfce7', 'secondary' => '#f3f4f6'];
+    $softClr = ['success' => '#166534', 'danger' => '#991b1b', 'warning' => '#713f12',
+                 'info' => '#1e40af', 'primary' => '#166534', 'secondary' => '#374151'];
+    $bg  = $softBg[$color]  ?? '#f3f4f6';
+    $clr = $softClr[$color] ?? '#374151';
+    return '<a href="' . htmlspecialchars($url) . '" class="text-decoration-none" style="'
+         . 'display:inline-flex;align-items:center;gap:5px;'
+         . 'background:' . $bg . ';color:' . $clr . ';'
+         . 'border-radius:20px;padding:6px 14px;font-size:0.82rem;font-weight:600;'
+         . 'border:1px solid rgba(0,0,0,0.06);'
+         . 'transition:all 0.15s;box-shadow:0 1px 4px rgba(0,0,0,0.05);'
+         . '">' . htmlspecialchars($label) . ': <strong>' . (int)$count . '</strong></a>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminAddBtn
+   Primary "+ Add" button with gradient
+   ────────────────────────────────────────────────────────────── */
+function adminAddBtn(string $label, string $href = '#', string $icon = 'fa-plus', string $onclick = ''): string {
+    $onclickAttr = $onclick ? ' onclick="' . htmlspecialchars($onclick, ENT_QUOTES) . '"' : '';
+    $style = 'background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));'
+           . 'border:none;box-shadow:0 3px 12px rgba(26,95,42,0.25);'
+           . 'border-radius:10px;padding:9px 18px;font-weight:600;font-size:0.875rem;'
+           . 'display:inline-flex;align-items:center;gap:7px;color:#fff;'
+           . 'text-decoration:none;transition:all 0.15s;cursor:pointer;';
+    if ($href !== '#') {
+        return '<a href="' . htmlspecialchars($href) . '" class="btn btn-primary"' . $onclickAttr . '>'
+             . '<i class="fas ' . $icon . '"></i>' . htmlspecialchars($label) . '</a>';
+    }
+    return '<button type="button" class="btn btn-primary"' . $onclickAttr . '>'
+         . '<i class="fas ' . $icon . '"></i>' . htmlspecialchars($label) . '</button>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminToggleBtn
+   Active/Inactive compact toggle button
+   ────────────────────────────────────────────────────────────── */
+function adminToggleBtn(int $recordId, $isActive, string $csrfToken, string $extraFields = ''): string {
+    if ($isActive) {
+        $btn = '<button type="submit" class="btn btn-sm btn-success" '
+             . 'title="Active छ — थिच्दा Hidden हुन्छ" '
+             . 'style="height:28px;min-width:70px;font-size:0.7rem;padding:0 9px;border-radius:6px;">'
+             . '<i class="fas fa-eye fa-fw"></i> Active</button>';
+    } else {
+        $btn = '<button type="submit" class="btn btn-sm btn-outline-secondary" '
+             . 'title="Hidden छ — थिच्दा Active हुन्छ" '
+             . 'style="height:28px;min-width:70px;font-size:0.7rem;padding:0 9px;border-radius:6px;">'
+             . '<i class="fas fa-eye-slash fa-fw"></i> Hidden</button>';
+    }
+    return '<form method="POST" class="d-inline">'
+         . '<input type="hidden" name="action" value="toggle">'
+         . '<input type="hidden" name="id" value="' . $recordId . '">'
+         . '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrfToken) . '">'
+         . $extraFields . $btn . '</form>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminDeleteBtn
+   Compact icon-only delete button with confirm
+   ────────────────────────────────────────────────────────────── */
+function adminDeleteBtn(int $recordId, string $csrfToken, string $confirmMsg = 'यो record हटाउने? यो कार्य फिर्ता हुँदैन।', string $extraFields = ''): string {
+    $safeMsg = addslashes($confirmMsg);
+    return '<form method="POST" class="d-inline" onsubmit="return confirm(\'' . $safeMsg . '\')">'
+         . '<input type="hidden" name="action" value="delete">'
+         . '<input type="hidden" name="id" value="' . $recordId . '">'
+         . '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrfToken) . '">'
+         . $extraFields
+         . '<button type="submit" class="btn btn-sm btn-outline-danger" title="हटाउनुहोस्" '
+         . 'style="height:28px;width:28px;padding:0;border-radius:6px;border-width:1.5px;">'
+         . '<i class="fas fa-trash-can" style="font-size:0.72rem;"></i></button></form>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminEditBtn
+   Compact icon+text edit button
+   ────────────────────────────────────────────────────────────── */
+function adminEditBtn(string $onclick = '', string $href = '#'): string {
+    $style = 'height:28px;min-width:30px;padding:0 8px;border-radius:6px;'
+           . 'border-width:1.5px;font-size:0.72rem;display:inline-flex;'
+           . 'align-items:center;gap:3px;';
+    if ($onclick) {
+        return '<button type="button" class="btn btn-sm btn-outline-primary" '
+             . 'onclick="' . htmlspecialchars($onclick, ENT_QUOTES) . '" '
+             . 'title="सम्पादन" style="' . $style . '">'
+             . '<i class="fas fa-pen fa-fw"></i></button>';
+    }
+    return '<a href="' . htmlspecialchars($href) . '" class="btn btn-sm btn-outline-primary" '
+         . 'title="सम्पादन" style="' . $style . '">'
+         . '<i class="fas fa-pen fa-fw"></i></a>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminViewBtn
+   View detail button
+   ────────────────────────────────────────────────────────────── */
+function adminViewBtn(string $href, string $label = ''): string {
+    $txt   = $label ? ' ' . htmlspecialchars($label) : '';
+    $style = 'height:28px;min-width:30px;padding:0 8px;border-radius:6px;'
+           . 'border-width:1.5px;font-size:0.72rem;display:inline-flex;'
+           . 'align-items:center;gap:3px;';
+    return '<a href="' . htmlspecialchars($href) . '" class="btn btn-sm btn-outline-info" '
+         . 'title="हेर्नुहोस्" style="' . $style . '">'
+         . '<i class="fas fa-eye fa-fw"></i>' . $txt . '</a>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminActionBtns
+   Compact grouped action buttons (edit + toggle + delete)
+   Usage: echo adminActionBtns($id, $isActive, $csrfToken, editOnclick: 'openEdit(3)');
+   ────────────────────────────────────────────────────────────── */
+function adminActionBtns(
+    int    $recordId,
+           $isActive,
+    string $csrfToken,
+    string $editOnclick   = '',
+    string $editHref      = '#',
+    bool   $showToggle    = true,
+    bool   $showDelete    = true,
+    string $extraToggle   = '',
+    string $extraDelete   = '',
+    string $confirmMsg    = 'यो record हटाउने? यो कार्य फिर्ता हुँदैन।'
+): string {
+    $out = '<div class="d-flex align-items-center" style="gap:4px;flex-wrap:nowrap;">';
+    $out .= adminEditBtn($editOnclick, $editHref);
+    if ($showToggle) $out .= adminToggleBtn($recordId, $isActive, $csrfToken, $extraToggle);
+    if ($showDelete) $out .= adminDeleteBtn($recordId, $csrfToken, $confirmMsg, $extraDelete);
+    $out .= '</div>';
+    return $out;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminBackBtn
+   Back to list button
+   ────────────────────────────────────────────────────────────── */
+function adminBackBtn(string $href, string $label = 'सूचीमा फर्किनुहोस्'): string {
+    return '<a href="' . htmlspecialchars($href) . '" class="btn btn-outline-secondary btn-sm" '
+         . 'style="border-radius:8px;padding:7px 14px;font-size:0.82rem;font-weight:500;">'
+         . '<i class="fas fa-arrow-left me-1"></i>' . htmlspecialchars($label) . '</a>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminSectionCard
+   Grouped form section card with colored left-border header
+   ────────────────────────────────────────────────────────────── */
+function adminSectionCard(string $title, string $icon, string $color, string $body): string {
+    /* Map colors to soft bg / accent */
+    $bgs = [
+        'primary'   => 'background:linear-gradient(135deg,rgba(26,95,42,0.06),rgba(40,167,69,0.04));border-left:3px solid var(--primary-color);',
+        'success'   => 'background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;',
+        'info'      => 'background:rgba(59,130,246,0.05);border-left:3px solid #3b82f6;',
+        'warning'   => 'background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;',
+        'danger'    => 'background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;',
+        'secondary' => 'background:rgba(107,114,128,0.05);border-left:3px solid #9ca3af;',
+    ];
+    $headerStyle = $bgs[$color] ?? $bgs['primary'];
+
+    return '<div class="card mb-3 admin-section-card" style="border:1px solid rgba(0,0,0,0.06);border-radius:12px;overflow:hidden;">'
+         . '<div class="card-header py-2 px-3" style="' . $headerStyle . '">'
+         . '<h6 class="mb-0 text-' . $color . '" style="font-size:0.85rem;font-weight:700;">'
+         . '<i class="fas ' . $icon . ' me-2"></i>' . htmlspecialchars($title) . '</h6></div>'
+         . '<div class="card-body p-3">' . $body . '</div></div>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminTableCard
+   Standard card wrapper for table — optional gradient header
+   ────────────────────────────────────────────────────────────── */
+function adminTableCard(string $tableHtml, bool $noPad = true, string $headerTitle = '', string $headerIcon = '', string $headerRight = ''): string {
+    $bodyClass = $noPad ? 'card-body p-0' : 'card-body';
+
+    /* Optional gradient header */
+    $headerHtml = '';
+    if ($headerTitle) {
+        $iconHtml = $headerIcon ? '<i class="fas ' . $headerIcon . ' me-2"></i>' : '';
+        $rightHtml = $headerRight ? '<div>' . $headerRight . '</div>' : '';
+        $headerHtml = '<div class="gradient-card-header d-flex align-items-center justify-content-between">'
+                    . '<h5 class="mb-0" style="font-size:0.95rem;font-weight:700;">'
+                    . $iconHtml . htmlspecialchars($headerTitle) . '</h5>'
+                    . $rightHtml . '</div>';
+    }
+
+    return '<div class="card shadow-sm admin-table-card">'
+         . $headerHtml
+         . '<div class="' . $bodyClass . '"><div class="table-responsive">'
+         . $tableHtml . '</div></div></div>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminFiscalYearSelect
+   Nepali fiscal year <select> dropdown (2070/71 - 2095/96)
+   ────────────────────────────────────────────────────────────── */
+function adminFiscalYearSelect(string $name, string $selected = '', bool $required = false, string $id = '', string $cssClass = 'form-select'): string {
+    $req   = $required ? ' required' : '';
+    $idAt  = $id ? ' id="' . htmlspecialchars($id) . '"' : '';
+    $opts  = '<option value="">-- आर्थिक वर्ष छान्नुहोस् --</option>';
+    for ($yr = 2095; $yr >= 2070; $yr--) {
+        $next = $yr + 1;
+        $val  = $yr . '/' . sprintf('%02d', $next % 100);
+        $sel  = ($val === $selected) ? ' selected' : '';
+        $opts .= '<option value="' . $val . '"' . $sel . '>' . $val . '</option>';
+    }
+    return '<select name="' . htmlspecialchars($name) . '"' . $idAt
+         . ' class="' . $cssClass . '"' . $req . '>' . $opts . '</select>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminHelpTip
+   Non-developer को लागि simple guidance box
+   Usage: echo adminHelpTip('यो पृष्ठबाट संस्थाका सूचनाहरू थप्न सकिन्छ।', ['सूचना थप्न: "+ नयाँ सूचना" बटन थिच्नुस्।']);
+   ────────────────────────────────────────────────────────────── */
+function adminHelpTip(string $mainText, array $steps = [], string $icon = 'fa-circle-info'): string {
+    $stepsHtml = '';
+    if ($steps) {
+        $stepsHtml = '<ul style="margin:6px 0 0 0;padding-left:18px;">';
+        foreach ($steps as $s) {
+            $stepsHtml .= '<li>' . htmlspecialchars($s) . '</li>';
+        }
+        $stepsHtml .= '</ul>';
+    }
+    return '<div class="admin-help-tip mb-3">'
+         . '<span class="help-icon"><i class="fas ' . htmlspecialchars($icon) . '"></i></span>'
+         . '<div><span>' . htmlspecialchars($mainText) . '</span>' . $stepsHtml . '</div>'
+         . '</div>';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   adminQuickStat
+   Simple stat pill for dashboard/header areas
+   ────────────────────────────────────────────────────────────── */
+function adminQuickStat(string $label, int|string $value, string $icon = 'fa-circle', string $color = 'primary'): string {
+    $colors = [
+        'primary' => 'background:#d1fae5;color:#065f46;',
+        'danger'  => 'background:#fee2e2;color:#dc2626;',
+        'warning' => 'background:#fef9c3;color:#a16207;',
+        'info'    => 'background:#dbeafe;color:#1d4ed8;',
+    ];
+    $style = $colors[$color] ?? $colors['primary'];
+    return '<span style="display:inline-flex;align-items:center;gap:6px;'
+         . $style . 'padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;">'
+         . '<i class="fas ' . htmlspecialchars($icon) . '" style="font-size:.7rem;"></i>'
+         . htmlspecialchars((string)$value) . ' ' . htmlspecialchars($label) . '</span>';
+}
+

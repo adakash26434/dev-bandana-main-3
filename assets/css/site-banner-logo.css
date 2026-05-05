@@ -1,0 +1,216 @@
+/**
+ * Site-wide banner logo caps — same idea as verify `.v7v-brand--banner`
+ * (object-fit: contain, width:auto, bounded max height/width).
+ * Load after header-v2 / v9-mobile-fix / member.css so overrides win.
+ */
+:root {
+  --site-logo-banner-max-h: 58px;
+  --site-logo-banner-max-h-mobile: 50px;
+  --site-logo-banner-max-h-xs: 44px;
+  --site-logo-banner-max-w: min(420px, calc(100vw - 120px));
+  --site-logo-banner-max-w-tight: min(380px, calc(100vw - 84px));
+  --site-logo-split-max-h: 56px;
+  --site-logo-split-max-w: min(280px, 88vw);
+  --site-logo-admin-sidebar-max-h: 44px;
+  --site-logo-admin-sidebar-max-w: min(200px, 82%);
+  --site-logo-admin-topbar-max-h: 40px;
+  --site-logo-admin-topbar-max-w: min(210px, 42vw);
+  --site-logo-verify-banner-max-h: 72px;
+}
+
+/* ── Public header (desktop + overrides mobile fixed heights) ── */
+body.header-v2 .pfl-brand-content.has-logo .pfl-brand-logo {
+  width: auto !important;
+  max-width: var(--site-logo-banner-max-w) !important;
+  height: auto !important;
+  max-height: var(--site-logo-banner-max-h) !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: auto;
+}
+
+@media (max-width: 991px) {
+  body.header-v2 .pfl-brand-content.has-logo .pfl-brand-logo {
+    max-height: var(--site-logo-banner-max-h-mobile) !important;
+    max-width: var(--site-logo-banner-max-w-tight) !important;
+  }
+}
+
+/* header-v2.css sets .pfl-brand-logo { max-height: 36px } at 767px — keep banner readable */
+@media (max-width: 767px) {
+  body.header-v2 .pfl-brand-content.has-logo .pfl-brand-logo {
+    max-height: var(--site-logo-banner-max-h-mobile) !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 575px) {
+  body.header-v2 .pfl-brand-content.has-logo .pfl-brand-logo {
+    max-height: var(--site-logo-banner-max-h-xs) !important;
+  }
+}
+
+/* v9-mobile-fix uses fixed height — restore banner behaviour */
+@media (max-width: 991px) {
+  body.header-v2 .pfl-brand-area .pfl-brand-content.has-logo .pfl-brand-logo {
+    height: auto !important;
+  }
+}
+
+/* ── Member portal topbar ── */
+.mem-topbar-brand.has-logo img {
+  height: auto !important;
+  width: auto !important;
+  max-height: var(--site-logo-banner-max-h) !important;
+  max-width: min(220px, 55vw) !important;
+  object-fit: contain !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  padding: 4px 8px !important;
+}
+
+/* ── Auth split panels (member + admin login) ── */
+.split-left .sl-top.has-logo .sl-logo {
+  min-height: 0 !important;
+  align-items: center !important;
+}
+
+.split-left .sl-top.has-logo .sl-logo img {
+  height: auto !important;
+  max-height: var(--site-logo-split-max-h) !important;
+  max-width: var(--site-logo-split-max-w) !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+/* ── Admin: sidebar + top header ── */
+.sidebar-brand.has-logo .sidebar-brand-logo {
+  height: auto !important;
+  max-height: var(--site-logo-admin-sidebar-max-h) !important;
+  max-width: var(--site-logo-admin-sidebar-max-w) !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+.admin-topbar-brand.has-logo img {
+  height: auto !important;
+  max-height: var(--site-logo-admin-topbar-max-h) !important;
+  max-width: var(--site-logo-admin-topbar-max-w) !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+@media (max-width: 575px) {
+  .sidebar-brand.has-logo .sidebar-brand-logo {
+    max-height: 42px !important;
+  }
+}
+
+/* ── Public footer stacked logo (banner, not tiny square) ── */
+.footer-logo.footer-logo-stacked.has-logo img {
+  max-width: min(280px, 100%) !important;
+  max-height: 56px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* ── Verify hero (keep readable; aligns tokens with other banners) ── */
+.v7v-brand--banner .v7v-brand-logo img {
+  max-height: var(--site-logo-verify-banner-max-h) !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     DEVANAGARI TEXT OVERFLOW FIX — v9.8
+     Prevents Nepali labels from being clipped or overwriting adjacent cells.
+     Applies to ALL admin detail view tables using adm-detail-table.
+     ════════════════════════════════════════════════════════════════ */
+
+  /* 1. Detail table label column (th) — Devanagari text needs room */
+  .adm-detail-table th {
+    width: 38% !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+  .adm-detail-table td {
+    width: 62% !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* 2. Admin sidebar logo — prevent banner image from overflowing header */
+  .sidebar-brand.has-logo .sidebar-brand-logo {
+    display: block !important;
+    height: auto !important;
+    width: auto !important;
+    max-height: 48px !important;
+    max-width: min(182px, 76%) !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+    border-radius: 6px !important;
+    background: rgba(255,255,255,0.07) !important;
+    padding: 3px 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 3. Admin topbar brand logo */
+  .admin-topbar-brand.has-logo img {
+    height: auto !important;
+    max-height: 38px !important;
+    max-width: min(200px, 40vw) !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+
+  /* 4. Sidebar-header: compact padding — overrides admin.css padding: 18px 18px 16px !important */
+  .sidebar-header {
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+  /* The <a class="logo sidebar-brand"> element itself controls the spacing */
+  .sidebar-header .logo,
+  .sidebar-brand.has-logo,
+  .sidebar-brand.no-logo {
+    padding: 8px 14px !important;
+    gap: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+  }
+  .sidebar-brand {
+    display: flex !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* 5. Mobile: Ensure Devanagari admin labels wrap correctly */
+  @media (max-width: 768px) {
+    .adm-detail-table th,
+    .adm-detail-table td {
+      display: block !important;
+      width: 100% !important;
+      border-right: none !important;
+    }
+    .adm-detail-table th {
+      padding-bottom: 2px !important;
+      border-bottom: none !important;
+      font-size: 0.7rem !important;
+    }
+    .adm-detail-table td {
+      padding-top: 2px !important;
+      padding-left: 14px !important;
+      border-bottom: 1px solid #e5e7eb !important;
+    }
+  }
+  

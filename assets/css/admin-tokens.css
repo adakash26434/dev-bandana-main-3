@@ -1,0 +1,60 @@
+/**
+ * 🎨 Admin Panel — Dynamic Color Override
+ * ─────────────────────────────────────────────────────────────
+ * `admin/assets/admin.css` पछि load हुन्छ। ती सबै hardcoded
+ * #1a5f2a (154 places) लाई CSS variables बाट override गर्छ।
+ *
+ * Admin → Settings → Primary Color बदले admin sidebar/buttons
+ * पनि auto-update हुन्छ।
+ */
+
+/* Sidebar — तपाईंको actual class names */
+.sidebar, .sidebar-header,
+.sidebar-nav .nav-group-header.open,
+.sidebar-nav li.active > a {
+    background: var(--primary-color) !important;
+}
+.sidebar-nav li > a:hover { background: var(--primary-dark) !important; }
+.sidebar-user-strip { background: var(--primary-dark) !important; }
+
+/* Active group highlight */
+.nav-group-header.open .nav-group-icon,
+.nav-group-header.open .nav-group-label { color: #fff !important; }
+
+/* Buttons (admin) */
+.btn-admin-primary, .admin-btn-primary,
+.btn-primary, .admin-card-header,
+.admin-stat-card.primary, .quick-action-btn.primary {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #fff !important;
+}
+.btn-admin-primary:hover, .btn-primary:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+/* Text accents */
+.admin-text-primary, .text-primary,
+.admin-stat-value, .admin-section-title,
+.admin-pill.active { color: var(--primary-color) !important; }
+
+/* Form focus */
+.admin-form-control:focus,
+.admin-fancy-input:focus,
+.form-control:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(26,95,42,.12) !important;
+}
+
+/* Badges & pills */
+.group-badge, .nav-badge, .admin-badge-primary {
+    background: var(--secondary-color) !important; color: #fff !important;
+}
+
+/* Font unify */
+.admin-body, .sidebar, .sidebar-nav, .admin-content,
+.admin-card, .admin-form-control, .admin-fancy-input,
+.admin-btn, .admin-table, .admin-topbar {
+    font-family: var(--font-primary, 'Mukta', 'Noto Sans Devanagari', sans-serif) !important;
+}

@@ -1,0 +1,604 @@
+/**
+ * UNIVERSAL CSS — Aakash Cooperative Website
+ * =============================================
+ * यो file सबै पृष्ठहरूमा load हुन्छ।
+ * Font, colour, form, card, button — सबै consistent बनाउनको लागि।
+ *
+ * Rules:
+ *  - CSS variable प्रयोग गर्नुहोस्, hardcode नगर्नुस्
+ *  - !important कम प्रयोग गर्नुहोस्
+ *  - नयाँ utility class थप्दा यहीँ थप्नुहोस् (WYSIWYG: .coop-prose)
+ */
+
+/* ============================================================
+   1. NEPALI FONT — Noto Sans Devanagari + Mukta
+   ============================================================ */
+
+/* Mukta already loaded via header.php — Noto Sans adds better
+   Devanagari coverage for conjuncts and rare characters */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap');
+
+/* Universal font stack: Mukta → Noto Sans Devanagari → fallback */
+:root {
+    --font-primary: 'Mukta', 'Noto Sans Devanagari', 'Segoe UI', sans-serif;
+    --font-nepali:  'Noto Sans Devanagari', 'Mukta', sans-serif;
+
+    /* Spacing scale */
+    --space-xs:  4px;
+    --space-sm:  8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 40px;
+    --space-2xl:64px;
+
+    /* Border radius scale */
+    --radius-sm:  6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    /* Shadow scale */
+    --shadow-sm: 0 1px 4px rgba(0,0,0,.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+    --shadow-xl: 0 16px 48px rgba(0,0,0,.14);
+
+    /* Typography scale */
+    --text-xs:  .75rem;
+    --text-sm:  .875rem;
+    --text-base:1rem;
+    --text-lg:  1.125rem;
+    --text-xl:  1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+}
+
+/* Base font */
+body {
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--text-color, #333);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* Headings — consistent scale */
+h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700; line-height: 1.25; }
+h2 { font-size: clamp(1.35rem, 3vw, 1.9rem); font-weight: 700; line-height: 1.3;  }
+h3 { font-size: clamp(1.15rem, 2.5vw, 1.5rem); font-weight: 600; line-height: 1.35; }
+h4 { font-size: clamp(1.05rem, 2vw, 1.25rem); font-weight: 600; line-height: 1.4;  }
+h5 { font-size: 1.05rem; font-weight: 600; }
+h6 { font-size: .95rem;  font-weight: 600; }
+
+
+/* ============================================================
+   2. PAGE BANNER — uniform style
+   ============================================================ */
+.page-banner {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    padding: 24px 0 28px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+.page-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+/* Gold shimmer accent line at the bottom of every page banner */
+.page-banner::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right,
+        transparent 0%,
+        #c8860a 15%,
+        #f5c518 40%,
+        #ffd700 50%,
+        #f5c518 60%,
+        #c8860a 85%,
+        transparent 100%
+    );
+}
+.page-banner .container { position: relative; z-index: 1; }
+.page-banner h1 {
+    color: #fff;
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+    letter-spacing: 0.01em;
+}
+.page-banner p {
+    color: rgba(255,255,255,.8);
+    margin-bottom: 0;
+    font-size: var(--text-base);
+}
+
+/* Breadcrumb inside page-banner */
+.page-banner .breadcrumb {
+    margin-bottom: 0;
+    background: transparent;
+    padding: 0;
+    justify-content: center;
+}
+.page-banner .breadcrumb-item {
+    font-size: 12.5px;
+}
+.page-banner .breadcrumb-item a {
+    color: rgba(255,255,255,.8);
+    text-decoration: none;
+    transition: color .2s;
+}
+.page-banner .breadcrumb-item a:hover { color: #fff; }
+.page-banner .breadcrumb-item.active { color: rgba(255,255,255,.95); }
+.page-banner .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,.45); }
+
+
+/* ============================================================
+   2b. COOP-PROSE — सबैतिर उस्तै WYSIWYG / लामो पाठ
+   about.php, page.php, अन्य: class="coop-prose" wrapper मा राख्नुहोस्
+   ============================================================ */
+.coop-prose {
+    max-width: 42rem;
+    margin-inline: auto;
+    font-size: 1.0625rem;
+    line-height: 1.92;
+    letter-spacing: 0.01em;
+    color: #3d3d3d;
+    text-align: start;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: manual;
+}
+
+@media (min-width: 576px) {
+    .coop-prose {
+        text-align: justify;
+        text-justify: inter-word;
+    }
+}
+
+@media (max-width: 575px) {
+    .coop-prose {
+        max-width: 100%;
+        font-size: 1rem;
+        line-height: 1.88;
+    }
+}
+
+.coop-prose p {
+    margin-bottom: 1.05em;
+}
+
+.coop-prose p:last-child {
+    margin-bottom: 0;
+}
+
+.coop-prose h1,
+.coop-prose h2,
+.coop-prose h3,
+.coop-prose h4,
+.coop-prose h5,
+.coop-prose h6 {
+    margin-top: 1.1em;
+    margin-bottom: 0.5em;
+    color: var(--primary-color);
+    text-align: start;
+    text-wrap: balance;
+}
+
+.coop-prose h1:first-child,
+.coop-prose h2:first-child,
+.coop-prose h3:first-child,
+.coop-prose h4:first-child {
+    margin-top: 0;
+}
+
+.coop-prose ul,
+.coop-prose ol {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+    text-align: start;
+}
+
+.coop-prose li {
+    margin-bottom: 0.35em;
+    line-height: 1.75;
+}
+
+.coop-prose strong,
+.coop-prose b {
+    font-weight: 700;
+    color: #2a2a2a;
+}
+
+.coop-prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md, 10px);
+    margin: 0.75rem 0;
+}
+
+.coop-prose table {
+    max-width: 100%;
+    display: block;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.coop-prose blockquote {
+    background: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    border-radius: 0 var(--radius-md, 10px) var(--radius-md, 10px) 0;
+    font-style: italic;
+    text-align: start;
+}
+
+/* Full-width column मा prose — max-width नलागोस् (optional utility) */
+.coop-prose.coop-prose--full {
+    max-width: none;
+    margin-inline: 0;
+}
+
+
+/* ============================================================
+   3. SECTION HEADER — uniform style
+   ============================================================ */
+.section-header {
+    margin-bottom: 2rem;
+}
+.section-header h2,
+.section-header h3 {
+    font-weight: 700;
+    color: var(--primary-dark);
+    position: relative;
+    margin-bottom: .5rem;
+}
+/* h2/h3::after — disabled: section-divider div नै divider बनाउँछ
+   यो pseudo-element राख्दा duplicate lines देखिन्थे */
+.section-header h2::after,
+.section-header h3::after {
+    display: none;
+}
+.section-header p {
+    color: var(--text-light, #666);
+    font-size: var(--text-base);
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   4. CARDS — uniform shadow, border-radius, hover
+   ============================================================ */
+.card {
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .25s, transform .25s;
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    padding: .9rem 1.25rem;
+    font-weight: 600;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+}
+.card-footer {
+    background: #f8f9fa;
+    border-top: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+}
+
+/* Clickable card variant */
+.card-clickable {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.card-clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* ============================================================
+   5. BUTTONS — consistent style
+   ============================================================ */
+.btn {
+    font-family: var(--font-primary);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    padding: .45rem 1.1rem;
+    font-size: var(--text-sm);
+    transition: all .2s ease;
+    letter-spacing: .01em;
+}
+.btn-lg { padding: .65rem 1.6rem; font-size: var(--text-base); }
+.btn-sm { padding: .28rem .75rem; font-size: var(--text-xs); }
+
+.btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(26,95,42,.3);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+}
+.btn-warning  { border-radius: var(--radius-md); }
+.btn-danger   { border-radius: var(--radius-md); }
+.btn-success  { border-radius: var(--radius-md); }
+.btn-info     { border-radius: var(--radius-md); }
+
+
+/* ============================================================
+   6. FORMS — universal consistent styling
+   ============================================================ */
+.form-label {
+    font-weight: 500;
+    font-size: var(--text-sm);
+    color: #444;
+    margin-bottom: .35rem;
+}
+.form-label .text-danger { font-size: .7em; }
+
+.form-control,
+.form-select {
+    font-family: var(--font-primary);
+    font-size: var(--text-base, .95rem);
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-height: 44px;
+    color: #333;
+    background-color: #fff;
+    transition: border-color .2s, box-shadow .2s;
+    line-height: 1.4;
+}
+
+.form-control-sm,
+.form-select-sm {
+    min-height: 34px;
+    padding: .32rem .62rem;
+    line-height: 1.25;
+}
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26,95,42,.12);
+    outline: none;
+}
+.form-control::placeholder { color: #aab; font-size: var(--text-sm); }
+.form-control.is-invalid { border-color: var(--danger, #dc3545); }
+.form-control.is-valid   { border-color: var(--success, #28a745); }
+
+/* Textarea */
+textarea.form-control { min-height: 100px; resize: vertical; }
+
+/* Input group */
+.input-group .form-control:focus { z-index: 3; }
+.input-group-text {
+    background: #f5f7fa;
+    border: 1.5px solid #d1d5db;
+    color: #666;
+    font-size: var(--text-sm);
+    min-height: 44px;
+    padding: 10px 14px;
+}
+
+/* Form check — radio + checkbox */
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.form-check-input:focus { box-shadow: 0 0 0 3px rgba(26,95,42,.12); }
+
+/* Form section card (common pattern) */
+.form-card {
+    background: #fff;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+}
+.form-card-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--primary-dark);
+    padding-bottom: .6rem;
+    border-bottom: 2px solid #f0f8f2;
+    margin-bottom: 1.2rem;
+}
+.form-card-title i {
+    color: var(--primary-color);
+    margin-right: .4rem;
+}
+
+
+/* ============================================================
+   7. TABLE — uniform style
+   ============================================================ */
+.table {
+    font-size: var(--text-sm);
+    color: #333;
+}
+.table th {
+    background: #f5f7fa;
+    font-weight: 600;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #555;
+    border-bottom: 2px solid var(--border-color, #e0e0e0);
+    padding: .7rem .9rem;
+    white-space: nowrap;
+}
+.table td {
+    padding: .65rem .9rem;
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(26,95,42,.025);
+}
+.table-hover > tbody > tr:hover > * {
+    background-color: rgba(26,95,42,.05);
+}
+
+
+/* ============================================================
+   8. BADGES & STATUS CHIPS
+   ============================================================ */
+.badge {
+    font-family: var(--font-primary);
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    padding: .28em .65em;
+    font-size: .72em;
+    letter-spacing: .02em;
+}
+
+/* Status badges — reusable */
+.badge-pending  { background: #fff3cd; color: #856404; border: 1px solid #ffe69c; }
+.badge-approved { background: #d1e7dd; color: #155724; border: 1px solid #badbcc; }
+.badge-rejected { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+.badge-review   { background: #cff4fc; color: #055160; border: 1px solid #b6effb; }
+
+
+/* ============================================================
+   9. ALERTS — uniform
+   ============================================================ */
+.alert {
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    font-size: var(--text-sm);
+    padding: .85rem 1rem;
+}
+.alert-success { border-color: #badbcc; }
+.alert-danger  { border-color: #f5c2c7; }
+.alert-warning { border-color: #ffecb5; }
+.alert-info    { border-color: #b6effb; }
+
+
+/* ============================================================
+   10. UTILITY HELPERS
+   ============================================================ */
+
+/* Consistent section spacing */
+.section-py  { padding-top: var(--space-2xl);  padding-bottom: var(--space-2xl); }
+.section-py-sm{ padding-top: var(--space-xl); padding-bottom: var(--space-xl); }
+
+/* Text helpers */
+.text-primary-dark { color: var(--primary-dark) !important; }
+.text-primary-light{ color: var(--primary-light, #28a745) !important; }
+.text-nepali { font-family: var(--font-nepali) !important; }
+
+/* Divider with icon */
+.divider-icon {
+    display: flex; align-items: center; gap: .75rem;
+    color: #ccc; font-size: .8rem; margin: 1.2rem 0;
+}
+.divider-icon::before, .divider-icon::after {
+    content: ''; flex: 1; height: 1px; background: #e5e7eb;
+}
+
+/* Required asterisk */
+.req { color: var(--danger, #dc3545); font-size: .75em; }
+
+/* Loading spinner overlay */
+.loading-overlay {
+    position: fixed; inset: 0; background: rgba(255,255,255,.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; flex-direction: column; gap: 12px;
+}
+.loading-overlay .spinner-border { color: var(--primary-color); width: 2.5rem; height: 2.5rem; }
+
+/* Consistent empty-state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #aaa;
+}
+.empty-state i { font-size: 3rem; opacity: .35; display: block; margin-bottom: .75rem; }
+.empty-state p { font-size: var(--text-sm); margin-bottom: 1rem; }
+
+
+/* ============================================================
+   11. DARK MODE supplement
+   ============================================================ */
+body.dark-mode .form-card           { background: #1e2535; border-color: #2c3651; }
+body.dark-mode .form-card-title     { color: #90caa0; border-color: #2c3651; }
+body.dark-mode .form-control,
+body.dark-mode .form-select         { background: #252d3d; border-color: #3a4a60; color: #e0e0e0; }
+body.dark-mode .form-control::placeholder { color: #666; }
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus   { border-color: var(--primary-light, #28a745); }
+body.dark-mode .table th            { background: #1a2030; color: #aab; }
+body.dark-mode .table td            { border-color: #252d3d; color: #d0d0d0; }
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: rgba(255,255,255,.03); }
+body.dark-mode .input-group-text    { background: #252d3d; border-color: #3a4a60; color: #999; }
+body.dark-mode .card                { background: #1e2535; border-color: #2c3651; }
+body.dark-mode .card-header,
+body.dark-mode .card-footer         { background: #1a2030; border-color: #2c3651; color: #ccc; }
+body.dark-mode .section-header h2,
+body.dark-mode .section-header h3   { color: #90caa0; }
+body.dark-mode .section-header p    { color: #999; }
+
+
+/* ============================================================
+   12. PRINT — clean print layout
+   ============================================================ */
+@media print {
+    .page-banner, header, footer, .whatsapp-float,
+    .scroll-to-top, nav, .alert-dismissible .btn-close { display: none !important; }
+    body { font-size: 12pt; color: #000; }
+    .card { box-shadow: none; border: 1px solid #ccc; }
+    a { color: #000; text-decoration: none; }
+}
+
+/* ============================================================
+   13. RESPONSIVE improvements
+   ============================================================ */
+@media (max-width: 767px) {
+    .page-banner { padding: 18px 0 22px; }
+    .page-banner h1 { font-size: 1.25rem; }
+    .section-header h2 { font-size: 1.35rem; }
+    .form-card { padding: 1.1rem; }
+    .btn-lg { padding: .55rem 1.2rem; font-size: var(--text-sm); }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+}
+@media (max-width: 575px) {
+    .page-banner { padding: 14px 0 18px; }
+    .section-py { padding-top: 2rem; padding-bottom: 2rem; }
+}

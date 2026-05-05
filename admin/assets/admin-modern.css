@@ -1,0 +1,523 @@
+/**
+ * admin-modern.css — Modern Design Overlay v1.0
+ * ================================================
+ * Bootstrap 5 + admin.css माथि load हुन्छ।
+ * पुरानो styles override गर्छ — admin.css नछुईकन।
+ *
+ * ─── Non-developer को लागि सरल guide ───────────────
+ *  रंग बदल्न: design-tokens.css मा --primary-color बदल्नुहोस्
+ *  Layout: admin/assets/admin.css मा --sidebar-width बदल्नुहोस्
+ * ────────────────────────────────────────────────────
+ */
+
+/* ═══════════════════════════════════════════════════
+   1. ROOT OVERRIDES — Modern spacing & radius
+   ═══════════════════════════════════════════════════ */
+:root {
+    --adm-radius:     12px;
+    --adm-radius-sm:  8px;
+    --adm-radius-lg:  16px;
+    --adm-shadow-xs:  0 1px 3px rgba(0,0,0,.06);
+    --adm-shadow-sm:  0 2px 8px rgba(0,0,0,.08);
+    --adm-shadow-md:  0 4px 16px rgba(0,0,0,.10);
+    --adm-border:     #e5e7eb;
+    --adm-bg:         #f5f7f5;
+    --adm-surface:    #ffffff;
+    --adm-text:       #1a2e1f;
+    --adm-muted:      #6b7280;
+    --adm-success-bg: #f0fdf4;
+    --adm-danger-bg:  #fef2f2;
+    --adm-warn-bg:    #fffbeb;
+    --adm-info-bg:    #eff6ff;
+}
+
+/* ═══════════════════════════════════════════════════
+   2. PAGE BACKGROUND
+   ═══════════════════════════════════════════════════ */
+body {
+    background: var(--adm-bg) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   3. SIDEBAR — Flat modern dark green
+   ═══════════════════════════════════════════════════ */
+.sidebar {
+    background: #18272e !important;   /* flat dark, no gradient */
+    border-right: none !important;
+    box-shadow: 2px 0 12px rgba(0,0,0,.15) !important;
+}
+
+.sidebar-header {
+    background: #111f25 !important;
+    border-bottom: 1px solid rgba(255,255,255,.07) !important;
+    padding: 16px 20px !important;
+}
+
+.sidebar-nav a {
+    color: rgba(255,255,255,.75) !important;
+    border-radius: var(--adm-radius-sm) !important;
+    padding: 8px 12px !important;
+    font-size: .88rem !important;
+    transition: all .18s ease !important;
+}
+.sidebar-nav a:hover {
+    background: rgba(255,255,255,.08) !important;
+    color: #fff !important;
+}
+.sidebar-nav li.active > a,
+.sidebar-nav a.active {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+.nav-group-header {
+    color: rgba(255,255,255,.5) !important;
+    font-size: .72rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .06em !important;
+    padding: 14px 14px 5px !important;
+    border-radius: 0 !important;
+}
+.nav-group-header:hover {
+    background: rgba(255,255,255,.06) !important;
+    color: rgba(255,255,255,.75) !important;
+    border-radius: var(--adm-radius-sm) !important;
+}
+
+/* Sidebar scrollbar subtle */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+
+/* ═══════════════════════════════════════════════════
+   4. ADMIN HEADER (top bar)
+   ═══════════════════════════════════════════════════ */
+.admin-header {
+    background: #fff !important;
+    border-bottom: 1px solid var(--adm-border) !important;
+    box-shadow: none !important;
+    height: 58px !important;
+}
+
+.page-title {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: var(--adm-text) !important;
+    letter-spacing: -.01em !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   5. CARDS — Clean white with subtle border
+   ═══════════════════════════════════════════════════ */
+.card,
+.admin-table-card,
+.ds-section {
+    background: var(--adm-surface) !important;
+    border: 1px solid var(--adm-border) !important;
+    border-radius: var(--adm-radius) !important;
+    box-shadow: var(--adm-shadow-xs) !important;
+    transition: box-shadow .2s ease !important;
+}
+.card:hover {
+    box-shadow: var(--adm-shadow-sm) !important;
+}
+
+.card-header {
+    background: #fafbfa !important;
+    border-bottom: 1px solid var(--adm-border) !important;
+    border-radius: var(--adm-radius) var(--adm-radius) 0 0 !important;
+    padding: 14px 20px !important;
+    font-weight: 700 !important;
+    font-size: .95rem !important;
+    color: var(--adm-text) !important;
+}
+
+.card-body {
+    padding: 20px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   6. PAGE HEADER — Clean, not heavy
+   ═══════════════════════════════════════════════════ */
+.page-header,
+.admin-page-header {
+    background: #fff !important;
+    border: 1px solid var(--adm-border) !important;
+    border-radius: var(--adm-radius) !important;
+    padding: 16px 22px !important;
+    margin-bottom: 20px !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   7. TABLES — Clean modern style
+   ═══════════════════════════════════════════════════ */
+.table {
+    font-size: .9rem !important;
+    border-color: var(--adm-border) !important;
+    margin-bottom: 0 !important;
+}
+
+.table thead th {
+    background: #f9fafb !important;
+    color: #374151 !important;
+    font-weight: 700 !important;
+    font-size: .78rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    border-bottom: 2px solid var(--adm-border) !important;
+    padding: 10px 14px !important;
+    white-space: nowrap !important;
+}
+
+.table tbody td {
+    padding: 11px 14px !important;
+    vertical-align: middle !important;
+    border-color: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+.table-hover tbody tr:hover td {
+    background: #f0fdf4 !important;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   8. BUTTONS — Modern flat style
+   ═══════════════════════════════════════════════════ */
+.btn {
+    border-radius: var(--adm-radius-sm) !important;
+    font-weight: 600 !important;
+    font-size: .88rem !important;
+    padding: 7px 16px !important;
+    transition: all .18s ease !important;
+    border-width: 1.5px !important;
+}
+
+.btn-primary {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+.btn-primary:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    box-shadow: 0 3px 8px rgba(26,95,42,.25) !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-sm {
+    padding: 4px 10px !important;
+    font-size: .8rem !important;
+    border-radius: 6px !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+.btn-outline-primary:hover {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+}
+
+/* Action button group */
+.btn-group-action {
+    display: flex;
+    gap: 4px;
+    flex-wrap: nowrap;
+}
+.btn-group-action .btn {
+    padding: 4px 10px !important;
+    font-size: .78rem !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   9. FORM CONTROLS — Clean modern inputs
+   ═══════════════════════════════════════════════════ */
+.form-control,
+.form-select {
+    border-radius: 10px !important;
+    border: 1.5px solid #d1d5db !important;
+    font-size: .9rem !important;
+    padding: 10px 14px !important;
+    transition: border-color .18s, box-shadow .18s !important;
+    background-color: #fff !important;
+    min-height: 44px !important;
+    line-height: 1.4 !important;
+}
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(26,95,42,.12) !important;
+    outline: none !important;
+}
+
+.form-label {
+    font-weight: 600 !important;
+    font-size: .87rem !important;
+    color: #374151 !important;
+    margin-bottom: 5px !important;
+}
+
+.form-text {
+    font-size: .8rem !important;
+    color: var(--adm-muted) !important;
+    margin-top: 4px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   10. ALERTS — Soft modern style
+   ═══════════════════════════════════════════════════ */
+.alert {
+    border-radius: var(--adm-radius-sm) !important;
+    border-left-width: 4px !important;
+    border-top-width: 1px !important;
+    border-right-width: 1px !important;
+    border-bottom-width: 1px !important;
+    padding: 12px 16px !important;
+    font-size: .9rem !important;
+    font-weight: 500 !important;
+}
+.alert-success {
+    background: var(--adm-success-bg) !important;
+    border-color: #86efac !important;
+    border-left-color: #16a34a !important;
+    color: #14532d !important;
+}
+.alert-danger {
+    background: var(--adm-danger-bg) !important;
+    border-color: #fca5a5 !important;
+    border-left-color: #dc2626 !important;
+    color: #7f1d1d !important;
+}
+.alert-warning {
+    background: var(--adm-warn-bg) !important;
+    border-color: #fde68a !important;
+    border-left-color: #d97706 !important;
+    color: #78350f !important;
+}
+.alert-info {
+    background: var(--adm-info-bg) !important;
+    border-color: #bfdbfe !important;
+    border-left-color: #2563eb !important;
+    color: #1e3a8a !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   11. BADGES — Soft modern
+   ═══════════════════════════════════════════════════ */
+.badge {
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    font-size: .72rem !important;
+    padding: 3px 8px !important;
+    letter-spacing: .02em !important;
+}
+
+/* Soft badge variants */
+.badge-soft-success { background:#dcfce7; color:#15803d; }
+.badge-soft-danger  { background:#fee2e2; color:#dc2626; }
+.badge-soft-warning { background:#fef9c3; color:#a16207; }
+.badge-soft-info    { background:#dbeafe; color:#1d4ed8; }
+.badge-soft-primary { background:#d1fae5; color:#065f46; }
+.badge-soft-muted   { background:#f3f4f6; color:#4b5563; }
+
+/* ═══════════════════════════════════════════════════
+   12. TABS — Modern underline style
+   ═══════════════════════════════════════════════════ */
+.nav-tabs {
+    border-bottom: 2px solid var(--adm-border) !important;
+    gap: 4px !important;
+}
+.nav-tabs .nav-link {
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 10px 18px !important;
+    font-weight: 600 !important;
+    font-size: .9rem !important;
+    color: var(--adm-muted) !important;
+    transition: color .15s !important;
+    margin-bottom: -2px !important;
+}
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color) !important;
+    border-bottom-color: rgba(26,95,42,.3) !important;
+    background: transparent !important;
+}
+.nav-tabs .nav-link.active {
+    color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-color) !important;
+    background: transparent !important;
+    font-weight: 700 !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   13. PAGINATION — Clean
+   ═══════════════════════════════════════════════════ */
+.pagination .page-link {
+    border-radius: 6px !important;
+    margin: 0 2px !important;
+    border-color: var(--adm-border) !important;
+    color: var(--adm-text) !important;
+    font-size: .88rem !important;
+    padding: 6px 12px !important;
+}
+.pagination .page-item.active .page-link {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   14. HELP TIP BOX — Non-developer guidance
+   ═══════════════════════════════════════════════════ */
+.admin-help-tip {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--adm-radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    font-size: .88rem;
+    color: #14532d;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+.admin-help-tip .help-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: .7rem;
+    margin-top: 1px;
+}
+.admin-help-tip ul { margin: 6px 0 0 0; padding-left: 18px; }
+.admin-help-tip ul li { margin-bottom: 3px; }
+
+/* ═══════════════════════════════════════════════════
+   15. STAT CARDS (Dashboard)
+   ═══════════════════════════════════════════════════ */
+.ds-card {
+    border-radius: var(--adm-radius) !important;
+    border: 1px solid var(--adm-border) !important;
+    box-shadow: var(--adm-shadow-xs) !important;
+    transition: all .2s ease !important;
+}
+.ds-card:hover {
+    border-color: var(--primary-color) !important;
+    box-shadow: var(--adm-shadow-sm) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   16. MODAL — Cleaner dialogs
+   ═══════════════════════════════════════════════════ */
+.modal-content {
+    border-radius: var(--adm-radius) !important;
+    border: none !important;
+    box-shadow: var(--adm-shadow-md) !important;
+}
+.modal-header {
+    background: #fafbfa !important;
+    border-bottom: 1px solid var(--adm-border) !important;
+    border-radius: var(--adm-radius) var(--adm-radius) 0 0 !important;
+    padding: 16px 20px !important;
+}
+.modal-footer {
+    border-top: 1px solid var(--adm-border) !important;
+    padding: 14px 20px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   17. EMPTY STATE
+   ═══════════════════════════════════════════════════ */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--adm-muted);
+}
+.empty-state i {
+    font-size: 2.5rem;
+    opacity: .3;
+    margin-bottom: 12px;
+    display: block;
+}
+.empty-state p {
+    font-size: .95rem;
+    margin-bottom: 16px;
+}
+
+/* ═══════════════════════════════════════════════════
+   18. CONTENT AREA SPACING
+   ═══════════════════════════════════════════════════ */
+.page-content {
+    padding: 20px 22px !important;
+}
+@media (max-width: 768px) {
+    .page-content { padding: 14px 14px !important; }
+    .card-body { padding: 16px !important; }
+}
+
+/* ═══════════════════════════════════════════════════
+   19. SCROLLBAR — subtle global style
+   ═══════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ═══════════════════════════════════════════════════
+   20. MISC — Small polish
+   ═══════════════════════════════════════════════════ */
+/* Remove focus outline on non-keyboard elements */
+*:focus:not(:focus-visible) { outline: none; }
+*:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+/* Input group */
+.input-group-text {
+    background: #f9fafb !important;
+    border-color: #d1d5db !important;
+    border-radius: var(--adm-radius-sm) !important;
+    color: #6b7280 !important;
+}
+
+/* Divider */
+hr { border-color: var(--adm-border) !important; opacity: 1 !important; }
+
+/* Table responsive wrapper — no extra border */
+.table-responsive { border: none !important; }
+
+/* Select2 / custom dropdowns */
+.select2-container--bootstrap-5 .select2-selection {
+    border-radius: var(--adm-radius-sm) !important;
+}
+
+/* Flash message auto-dismiss animation */
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.alert { animation: fadeSlideIn .25s ease; }
+
+/* ── Desktop: topbar-brand hidden (sidebar already shows logo) ─────────
+   On mobile (<992px) the sidebar slides off-screen, so the topbar-brand
+   remains the only visible logo — keep it visible there.           ── */
+@media (min-width: 992px) {
+    .admin-topbar-brand { display: none !important; }
+}

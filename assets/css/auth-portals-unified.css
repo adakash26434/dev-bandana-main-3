@@ -1,0 +1,256 @@
+/**
+ * Unified auth surfaces — member/login, admin/index (login), verify.php
+ * Typography (NE + EN mix), spacing, card alignment, alerts.
+ */
+body.auth-portal-page {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background: #eef0f3;
+}
+
+/* Compact centered auth shell for member/admin login */
+body.auth-portal-page .split-wrap {
+  width: min(1020px, calc(100% - 52px));
+  height: min(760px, calc(100dvh - 16px));
+  min-height: 0;
+  margin: 8px auto;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: #fff;
+  box-shadow: 0 22px 46px rgba(15, 23, 42, 0.13);
+  grid-template-columns: 0.94fr 1.06fr;
+}
+
+body.auth-portal-page .split-left,
+body.auth-portal-page .split-right {
+  min-height: 100%;
+}
+
+/* Tighter visual hierarchy like compact enterprise auth screens */
+body.auth-portal-page .split-left {
+  padding-top: 28px;
+  padding-bottom: 20px;
+}
+
+body.auth-portal-page .split-left .sl-top {
+  margin-bottom: 8px;
+}
+
+body.auth-portal-page .split-left .sl-hero .eyebrow {
+  margin-bottom: 12px;
+}
+
+body.auth-portal-page .split-left .sl-hero h1 {
+  margin-bottom: 12px;
+}
+
+body.auth-portal-page .split-left .sl-hero p {
+  max-width: 390px;
+  font-size: 0.9rem;
+}
+
+body.auth-portal-page .split-left .sl-features {
+  margin-top: 12px;
+  gap: 8px;
+}
+
+/* Readable mixed Nepali / English */
+body.auth-portal-page .split-right,
+body.auth-portal-page .split-left .sl-hero p,
+body.auth-portal-page .sl-bottom,
+body.auth-portal-page .vp-wrap,
+body.auth-portal-page .vp-card,
+body.auth-portal-page .vp-sub,
+body.auth-portal-page .vp-help,
+body.auth-portal-page .alert,
+body.auth-portal-page .alert-error,
+body.auth-portal-page .field-feedback,
+body.auth-portal-page .foot-link,
+body.auth-portal-page .tracker-link,
+body.auth-portal-page .security-note {
+  word-spacing: 0.06em;
+}
+
+body.auth-portal-page .vp-sub,
+body.auth-portal-page .sr-sub,
+body.auth-portal-page .sl-hero p {
+  line-height: 1.65;
+}
+
+/* Form card — same visual weight */
+body.auth-portal-page .sr-inner,
+body.auth-portal-page .vp-card {
+  border-radius: 20px;
+  padding: 22px 22px 20px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow:
+    0 20px 44px rgba(15, 23, 42, 0.07),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+}
+
+body.auth-portal-page .sr-inner {
+  max-width: 420px;
+}
+
+body.auth-portal-page .split-right {
+  align-items: center;
+}
+
+/* Titles + badge centered (member / admin right panel) */
+body.auth-portal-page .split-right .sr-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body.auth-portal-page .split-right .sr-title,
+body.auth-portal-page .split-right .sr-sub {
+  text-align: center;
+}
+
+body.auth-portal-page .split-right .sr-sub {
+  max-width: 26rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 18px;
+}
+
+/* Tabs — clear separation from messages */
+body.auth-portal-page .tabs {
+  margin-top: 2px;
+  margin-bottom: 18px;
+  padding: 5px;
+  gap: 5px;
+}
+
+body.auth-portal-page .tab-btn {
+  letter-spacing: 0.04em;
+  word-spacing: 0.05em;
+}
+
+/* Alerts (member) + admin error */
+body.auth-portal-page .alert,
+body.auth-portal-page .alert-error,
+body.auth-portal-page .alert-info,
+body.auth-portal-page .alert-warning,
+body.auth-portal-page .alert-success {
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.55;
+}
+
+body.auth-portal-page .alert i,
+body.auth-portal-page .alert-error i,
+body.auth-portal-page .alert-info i,
+body.auth-portal-page .alert-warning i,
+body.auth-portal-page .alert-success i {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Fields */
+body.auth-portal-page .field,
+body.auth-portal-page .vp-field {
+  margin-bottom: 16px;
+}
+
+body.auth-portal-page .field label,
+body.auth-portal-page .vp-field label {
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+  word-spacing: 0.05em;
+  line-height: 1.35;
+}
+
+body.auth-portal-page .field input,
+body.auth-portal-page .vp-field input {
+  letter-spacing: 0.02em;
+}
+
+body.auth-portal-page .vp-field .hint {
+  line-height: 1.5;
+  margin-top: 6px;
+  word-spacing: 0.05em;
+}
+
+/* Verify page main title block */
+body.auth-portal-page .vp-wrap > .vp-icon + h1 {
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body.auth-portal-page .vp-sub {
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 4px;
+}
+
+body.auth-portal-page .vp-sub b {
+  font-weight: 700;
+}
+
+body.auth-portal-page .vp-btn {
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+body.auth-portal-page .vp-help {
+  line-height: 1.65;
+  max-width: 32rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Member footer + OAuth */
+body.auth-portal-page .foot-link {
+  margin-top: 18px;
+  line-height: 1.55;
+}
+
+body.auth-portal-page .oauth-divider {
+  margin-top: 22px;
+  margin-bottom: 16px;
+  letter-spacing: 0.08em;
+}
+
+/* Left panel feature chips — tighten mixed script */
+body.auth-portal-page .sl-feat span {
+  line-height: 1.35;
+  word-spacing: 0.05em;
+}
+
+/* Admin security note */
+body.auth-portal-page .security-note {
+  line-height: 1.55;
+  word-spacing: 0.05em;
+  margin-top: 18px;
+}
+
+@media (max-width: 900px) {
+  body.auth-portal-page .split-wrap {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+    grid-template-columns: 1fr;
+  }
+
+  body.auth-portal-page .split-right .sr-title,
+  body.auth-portal-page .split-right .sr-sub {
+    text-align: center;
+  }
+}

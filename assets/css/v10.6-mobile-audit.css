@@ -1,0 +1,187 @@
+/* ════════════════════════════════════════════════════════════
+   v10.6 — Full mobile audit fixes (Issue #17)
+   ────────────────────────────────────────────────────────────
+   New file. Include AFTER all other CSS in includes/header.php
+   and admin/_partials/header.php.
+
+       <link rel="stylesheet" href="<?= url('assets/css/v10.6-mobile-audit.css') ?>">
+
+   Scope: every page (public, member, admin). Idempotent — only
+   adds rules, does not override existing semantics.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 1. Prevent iOS auto-zoom on input focus (font-size < 16px triggers zoom) */
+@media (max-width: 767px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="search"],
+    input[type="url"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="time"],
+    select,
+    textarea,
+    .form-control,
+    .form-select {
+        font-size: 16px !important;
+    }
+}
+
+/* ── 2. Universal table wrapper — any unwrapped <table> scrolls horizontally */
+@media (max-width: 767px) {
+    main table:not(.no-mobile-scroll),
+    .container table:not(.no-mobile-scroll),
+    .card-body > table:not(.no-mobile-scroll) {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+}
+
+/* ── 3. Image overflow safety — long product/news images can break layout */
+@media (max-width: 767px) {
+    main img:not([width]),
+    article img:not([width]),
+    .content img:not([width]),
+    .card img:not([width]),
+    .news-content img,
+    .page-content img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* ── 4. Modal full-height + scrollable body on mobile */
+@media (max-width: 575px) {
+    .modal-dialog {
+        margin: 8px !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+    .modal-content {
+        max-height: calc(100vh - 16px);
+    }
+    .modal-body {
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .modal-footer {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .modal-footer .btn {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
+/* ── 5. Floating widget stacking — prevent overlap of:
+       WhatsApp + Chatbot + Useful-links + Scroll-accessibility */
+@media (max-width: 480px) {
+    .whatsapp-float        { bottom: 20px  !important; right: 10px !important; z-index: 9990; }
+    .chatbot-widget        { bottom: 84px  !important; right: 10px !important; z-index: 9989; }
+    .useful-links-widget   { bottom: 20px  !important; left:  10px !important; z-index: 9988; }
+    #scrollAccessibilityPanel.sa-panel { bottom: 84px !important; left: 10px !important; z-index: 9987; }
+    .satisfaction-widget   { bottom: 148px !important; right: 10px !important; z-index: 9986; }
+}
+
+/* ── 6. Long-text overflow break on mobile (URLs, IDs, emails) */
+@media (max-width: 575px) {
+    .text-truncate-mobile,
+    .member-id,
+    .card-number,
+    code,
+    .badge,
+    .breadcrumb-item {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+}
+
+/* ── 7. Bootstrap row gutters — prevent horizontal scroll on very small screens */
+@media (max-width: 360px) {
+    .container, .container-fluid, .container-sm, .container-md, .container-lg {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    .row { margin-left: -8px; margin-right: -8px; }
+    .row > [class*="col-"] { padding-left: 8px; padding-right: 8px; }
+}
+
+/* ── 8. Tap targets — minimum 44×44 px (WCAG / Apple HIG) */
+@media (max-width: 767px) {
+    .btn:not(.btn-sm):not(.btn-link),
+    .nav-link,
+    .dropdown-item,
+    .pagination .page-link {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* ── 9. Card grids — single column < 480px (avoid forced 2-col cramping) */
+@media (max-width: 480px) {
+    .row-cols-2 > [class*="col-"] { flex: 0 0 100%; max-width: 100%; }
+}
+
+/* ── 10. Member ID Card — keep aspect ratio + readable on small phones */
+@media (max-width: 480px) {
+    .member-id-card,
+    .id-card-front,
+    .id-card-back {
+        max-width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        transform: none !important;
+    }
+    .id-card-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .id-card-actions .btn {
+        width: 100%;
+    }
+}
+
+/* ── 11. Sidebar drawer — close on outside tap (handled in JS); ensure
+       backdrop covers full viewport */
+@media (max-width: 991px) {
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 1040;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s;
+    }
+    .sidebar-backdrop.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* ── 12. Datepicker dropdown — keep within viewport */
+@media (max-width: 480px) {
+    .datepicker, .nepali-datepicker, .ui-datepicker {
+        max-width: calc(100vw - 16px) !important;
+        left: 8px !important;
+        right: 8px !important;
+    }
+}
+
+/* ── 13. Toast/alert positioning */
+@media (max-width: 480px) {
+    .toast-container, .alert-floating {
+        left: 8px !important;
+        right: 8px !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+}

@@ -1,0 +1,31 @@
+/* v7 adjusted layer for admin panel (safe overrides) */
+:root{
+  --v7a-green:#0d5c2e;
+  --v7a-green2:#1a8a47;
+  --v7a-gold:#f59e0b;
+}
+body{
+  background:
+    radial-gradient(1200px 620px at -10% -20%, rgba(45,185,114,.06), transparent 60%),
+    radial-gradient(900px 520px at 110% 0%, rgba(245,158,11,.05), transparent 55%),
+    #f6faf7 !important;
+}
+.admin-header{
+  background: linear-gradient(180deg,#ffffff,#f8fffb) !important;
+  border-bottom:1px solid #deefe4 !important;
+  box-shadow:0 8px 20px rgba(15,23,42,.06) !important;
+}
+.sidebar{
+  background: linear-gradient(180deg,var(--v7a-green),#145021) !important;
+}
+.stat-mini,.ds-card,.admin-stat-card{
+  border-radius:14px !important;
+  box-shadow:0 6px 16px rgba(15,23,42,.06) !important;
+}
+.group-badge,.badge{
+  background:linear-gradient(135deg,var(--v7a-gold),#fcd34d) !important;
+  color:#1f2937 !important;
+}
+@media (max-width: 900px){
+  body{ padding-bottom: calc(64px + env(safe-area-inset-bottom,0px)) !important; }
+}

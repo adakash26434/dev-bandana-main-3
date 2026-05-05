@@ -1,0 +1,1044 @@
+/* v9.6 — fixed mobile menu (no chevron-button hack), brand hide, bottom-nav, login centering */
+:root {
+  --v9-surface: #ffffff;
+  --v9-border: #e5e7eb;
+  --v9-text: #1f2937;
+  --v9-muted: #6b7280;
+  --v9-shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+}
+
+.v9-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.v9-table-scroll > table { min-width: 640px; }
+
+/* ════════════════════════════════════════════════════════════
+   BRAND: hide name/text whenever a logo image is present
+   (strict; works across public, admin, member)
+   ════════════════════════════════════════════════════════════ */
+.pfl-brand-content.has-logo .pfl-brand-text,
+.mem-topbar-brand.has-logo .mem-brand-text,
+.sidebar-brand.has-logo .sidebar-brand-text,
+.admin-topbar-brand.has-logo .brand-text,
+.footer-logo.has-logo .footer-sahakari-name,
+.split-left .sl-top.has-logo .sl-brand-name,
+.split-left .sl-top.has-logo .sl-brand-tag,
+.split-left .sl-top.has-logo .sl-brand-meta {
+  display: none !important;
+}
+/* If markup didn't add .has-logo but an img exists inside the brand, hide siblings */
+.pfl-brand-content:has(img.pfl-brand-logo) .pfl-brand-text,
+.mem-topbar-brand:has(img) .mem-brand-text,
+.admin-topbar-brand:has(img) .brand-text,
+.sidebar-brand:has(img.sidebar-brand-logo) .sidebar-brand-text { display: none !important; }
+
+.pfl-brand-content,
+.mem-topbar-brand,
+.sidebar-brand,
+.admin-topbar-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.pfl-brand-content { gap: 12px; min-width: 0; }
+.pfl-brand-content.has-logo { gap: 0; }
+.pfl-brand-logo-fallback,
+.mem-logo-fallback,
+.admin-logo-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 95, 42, 0.12);
+  color: var(--primary-color, #1a5f2a);
+  font-size: 18px;
+}
+
+.sidebar-brand,
+.admin-topbar-brand { gap: 10px; }
+.sidebar-brand { color: #fff; }
+.sidebar-brand:hover { color: #fff; opacity: .98; }
+.sidebar-brand-logo,
+.admin-topbar-brand img {
+  display: block;
+  width: auto;
+  object-fit: contain;
+}
+.sidebar-brand-logo {
+  height: 48px;
+  max-width: 100%;
+  border-radius: 12px;
+  background: rgba(255,255,255,.12);
+  padding: 6px;
+}
+.sidebar-brand-text,
+.admin-topbar-brand .brand-text {
+  font-weight: 700;
+  line-height: 1.1;
+}
+.admin-topbar-brand {
+  color: var(--primary-color, #1a5f2a);
+  gap: 8px;
+}
+.admin-topbar-brand:hover { color: var(--primary-color, #1a5f2a); }
+.admin-topbar-brand img {
+  height: 38px;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 4px;
+  box-shadow: 0 1px 2px rgba(15,23,42,.08);
+}
+
+.footer-logo.has-logo { gap: 0 !important; }
+
+/* ════════════════════════════════════════════════════════════
+   MEMBER PORTAL: banner logo (rectangular — गोलो होइन)
+   ════════════════════════════════════════════════════════════ */
+.mem-topbar-brand img {
+  height: 42px !important;
+  width: auto !important;
+  max-width: 180px !important;
+  border-radius: 8px !important;        /* banner style — गोलो छैन */
+  object-fit: contain !important;
+  background: rgba(255,255,255,.12) !important;
+  padding: 4px !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15) !important;
+  flex-shrink: 0 !important;
+}
+
+/* Login left panel logo — banner style (गोलो होइन) */
+.split-left .sl-logo {
+  width: auto !important;
+  min-width: 60px !important;
+  height: auto !important;
+  border-radius: 12px !important;       /* गोलो होइन, आयताकार */
+  overflow: visible !important;
+  padding: 6px 10px !important;
+}
+.split-left .sl-logo img {
+  border-radius: 10px !important;       /* banner — गोलो छैन */
+  width: auto !important;
+  height: 68px !important;
+  max-width: 200px !important;
+  object-fit: contain !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.6 — Universal font: enforce project font everywhere
+   (admin login, member login were drifting to system fonts)
+   ════════════════════════════════════════════════════════════ */
+html, body, input, button, select, textarea {
+  font-family: 'Mukta', 'Noto Sans Devanagari', 'Hind Siliguri', 'Segoe UI', sans-serif !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Nepali Datepicker readability fix (global)
+   Issue: month/year text केही theme मा hover हुँदा मात्र देखिन्थ्यो
+   ════════════════════════════════════════════════════════════ */
+.ndp-container .ndp-header,
+.ndp-calendar .ndp-nav-header,
+.nepali-datepicker-calendar .header {
+  background: var(--primary-color, #1a5f2a) !important;
+  color: #ffffff !important;
+}
+
+.ndp-container .ndp-header *,
+.ndp-calendar .ndp-nav-header *,
+.nepali-datepicker-calendar .header * {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Month/Year selector foreground स्पष्ट देखियोस् */
+.ndp-container .ndp-header select,
+.ndp-calendar .ndp-nav-header select,
+.nepali-datepicker-calendar .header select {
+  background: #ffffff !important;
+  color: #14532d !important;
+  border: 1px solid rgba(20,83,45,.25) !important;
+  border-radius: 8px !important;
+}
+
+.ndp-container .ndp-header option,
+.ndp-calendar .ndp-nav-header option,
+.nepali-datepicker-calendar .header option {
+  color: #111827 !important;
+  background: #ffffff !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   PUBLIC MOBILE DRAWER
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 991px) {
+  .v9-table-scroll > table { min-width: 560px; }
+
+  /* Public drawer is inside sticky header wrapper.
+     Raise that stacking context above the backdrop so the menu stays clickable
+     exactly like the admin sidebar. */
+  body.header-v2 .pfl-header-wrapper {
+    z-index: 200020 !important;
+  }
+  body.header-v2 .pfl-main-header,
+  body.header-v2 .pfl-nav-area {
+    position: relative !important;
+    z-index: 200021 !important;
+  }
+  body.mobile-nav-open.header-v2 .pfl-top-bar {
+    pointer-events: none !important;
+  }
+  body.mobile-nav-open.header-v2 .pfl-nav-area,
+  body.mobile-nav-open.header-v2 #mainNavV2 {
+    pointer-events: auto !important;
+  }
+
+  .pfl-main-header {
+    position: sticky;
+    top: 0;
+    z-index: 2000;
+    background: #fff;
+  }
+  .pfl-brand-area {
+    padding: 10px 12px !important;
+    min-width: 0;
+    flex: 1 1 auto;
+    width: auto !important;
+    max-width: calc(100% - 58px) !important;
+  }
+  /* Wide banner logo — height fix नगर्नु (नत्र अक्षर सानो देखिन्छ) */
+  .pfl-brand-logo {
+    height: auto !important;
+    max-height: 50px !important;
+    width: auto !important;
+    max-width: min(calc(100vw - 88px), 380px) !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+  }
+  .pfl-nav-area {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    margin-left: auto;
+    background: transparent !important;
+  }
+  .pfl-mobile-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    flex-shrink: 0;
+  }
+  /* ════════════════════════════════════════════════════
+     PUBLIC MOBILE DRAWER — ADMIN-STYLE (dark green, branded)
+     Scoped to body.header-v2 + extra-specific selectors so it
+     beats every legacy white-drawer rule in style.css.
+     ════════════════════════════════════════════════════ */
+  body.header-v2 .pfl-nav-area .main-nav,
+  body.header-v2 nav.main-nav,
+  body.header-v2 #mainNavV2,
+  body.header-v2 #mainNav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    width: min(86vw, 320px) !important;
+    max-width: 320px !important;
+    height: 100dvh !important;
+    transform: translate3d(-110%, 0, 0) !important;
+    transition: transform .28s ease !important;
+    z-index: 200010 !important;
+    background: linear-gradient(180deg, var(--primary-dark, #114b1e) 0%, var(--primary-color, #1a5f2a) 100%) !important;
+    box-shadow: 4px 0 28px rgba(0,0,0,.35) !important;
+    padding: 0 0 88px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    color: #fff !important;
+    pointer-events: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+  }
+  /* Open — accept BOTH new (.nav-open/.open) AND legacy (.active) classes */
+  body.header-v2 .pfl-nav-area .main-nav.nav-open,
+  body.header-v2 .pfl-nav-area .main-nav.open,
+  body.header-v2 .pfl-nav-area .main-nav.active,
+  body.header-v2 nav.main-nav.nav-open,
+  body.header-v2 nav.main-nav.open,
+  body.header-v2 nav.main-nav.active,
+  body.header-v2 #mainNavV2.nav-open,
+  body.header-v2 #mainNavV2.open,
+  body.header-v2 #mainNavV2.active,
+  body.header-v2 #mainNav.nav-open,
+  body.header-v2 #mainNav.open,
+  body.header-v2 #mainNav.active {
+    transform: translate3d(0, 0, 0) !important;
+    left: 0 !important;
+    right: auto !important;
+  }
+
+  /* Brand banner at top of drawer (logo) */
+  body.header-v2 .main-nav::before {
+    content: '' !important;
+    display: block !important;
+    height: 96px !important;
+    margin: 0 0 8px !important;
+    background-color: rgba(0,0,0,.22) !important;
+    background-image: var(--pfl-mobile-logo) !important;
+    background-repeat: no-repeat !important;
+    background-position: 16px center !important;
+    background-size: auto 56px !important;
+    border-bottom: 1px solid rgba(255,255,255,.14) !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Close button — light circle on dark bg */
+  body.header-v2 .main-nav .close-menu {
+    display: inline-flex !important;
+    position: absolute !important;
+    top: 18px !important;
+    right: 14px !important;
+    width: 38px !important;
+    height: 38px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: rgba(255,255,255,.20) !important;
+    color: #fff !important;
+    z-index: 3 !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    transition: background .18s !important;
+  }
+  body.header-v2 .main-nav .close-menu:hover { background: rgba(255,255,255,.32) !important; }
+
+  /* Backdrop */
+  .menu-overlay,
+  .mobile-nav-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(15, 23, 42, 0.55) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity .25s ease, visibility .25s ease !important;
+    z-index: 200000 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
+  }
+  .menu-overlay.active,
+  .mobile-nav-backdrop.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    pointer-events: auto !important;
+  }
+
+  /* Menu list */
+  body.header-v2 .main-nav .nav-menu {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    padding: 8px 10px !important;
+    list-style: none !important;
+    margin: 0 !important;
+    width: 100% !important;
+    background: transparent !important;
+  }
+  body.header-v2 .main-nav .nav-menu > li {
+    width: 100% !important;
+    border-bottom: none !important;
+    background: transparent !important;
+  }
+  /* Menu items — readable white text on dark bg, applied EVERYWHERE the
+     legacy CSS tries to set white-on-white or grey placeholders. */
+  body.header-v2 .main-nav .nav-menu > li > a,
+  body.header-v2 .pfl-nav-area .nav-menu > li > a,
+  body.header-v2 .pfl-nav-area .nav-menu > li.active > a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 44px !important;
+    padding: 12px 14px !important;
+    color: #ffffff !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    border-radius: 10px !important;
+    border-bottom: none !important;
+    transform: none !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: .01em !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    transition: background .15s, color .15s !important;
+  }
+  body.header-v2 .main-nav .nav-menu > li > a:hover,
+  body.header-v2 .pfl-nav-area .nav-menu > li > a:hover {
+    background: rgba(255,255,255,.12) !important;
+    color: #ffffff !important;
+  }
+  /* Active item — gold accent left bar */
+  body.header-v2 .main-nav .nav-menu > li.active > a,
+  body.header-v2 .pfl-nav-area .nav-menu > li.active > a {
+    color: #ffffff !important;
+    background: rgba(255,255,255,.18) !important;
+    border-left: 3px solid #f5c518 !important;
+    padding-left: 11px !important;
+  }
+  /* Kill the gold underline pseudo from desktop look */
+  body.header-v2 .main-nav .nav-menu > li > a::after,
+  body.header-v2 .pfl-nav-area .nav-menu > li > a::after,
+  body.header-v2 .pfl-nav-area .nav-menu > li.active > a::after {
+    display: none !important;
+    content: none !important;
+  }
+  /* Chevron */
+  body.header-v2 .main-nav .nav-menu > li > a > i.fa-chevron-down {
+    transition: transform .22s ease !important;
+    font-size: .72rem !important;
+    margin-left: auto !important;
+    opacity: .8 !important;
+    color: rgba(255,255,255,.9) !important;
+  }
+  body.header-v2 .main-nav .nav-menu .has-dropdown.open > a > i.fa-chevron-down,
+  body.header-v2 .main-nav .nav-menu .has-sub.open > a > i.fa-chevron-down {
+    transform: rotate(180deg) !important;
+    opacity: 1 !important;
+    color: #f5c518 !important;
+  }
+  /* Sub-menu — inset darker panel */
+  body.header-v2 .main-nav .nav-menu .dropdown,
+  body.header-v2 .main-nav .nav-menu .sub-menu {
+    position: static !important;
+    float: none !important;
+    display: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-height: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow: visible !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    margin: 4px 0 6px !important;
+    padding: 4px 0 !important;
+    background: rgba(0,0,0,.28) !important;
+    border-radius: 10px !important;
+    list-style: none !important;
+  }
+  body.header-v2 .main-nav .nav-menu .has-dropdown.open > .dropdown,
+  body.header-v2 .main-nav .nav-menu .has-sub.open > .sub-menu {
+    display: block !important;
+    opacity: 1 !important;
+    max-height: 800px !important;
+    padding: 6px 0 !important;
+  }
+  body.header-v2 .main-nav .nav-menu .dropdown li,
+  body.header-v2 .main-nav .nav-menu .sub-menu li {
+    width: 100% !important;
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255,255,255,.06) !important;
+  }
+  body.header-v2 .main-nav .nav-menu .dropdown li:last-child,
+  body.header-v2 .main-nav .nav-menu .sub-menu li:last-child {
+    border-bottom: 0 !important;
+  }
+  body.header-v2 .main-nav .nav-menu .dropdown li a,
+  body.header-v2 .main-nav .nav-menu .sub-menu li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 14px 10px 30px !important;
+    border-bottom: none !important;
+    color: rgba(255,255,255,.88) !important;
+    background: transparent !important;
+    font-size: .87rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  body.header-v2 .main-nav .nav-menu .dropdown li a i,
+  body.header-v2 .main-nav .nav-menu .sub-menu li a i {
+    color: #f5c518 !important;
+    width: 16px !important;
+    text-align: center !important;
+    font-size: .8rem !important;
+  }
+  body.header-v2 .main-nav .nav-menu .dropdown li a:hover,
+  body.header-v2 .main-nav .nav-menu .sub-menu li a:hover {
+    background: rgba(255,255,255,.12) !important;
+    color: #ffffff !important;
+    padding-left: 30px !important;
+  }
+
+  body.admin-nav-open { overflow: hidden !important; }
+  .sidebar {
+    width: min(86vw, 320px) !important;
+    max-width: 320px !important;
+    z-index: 1200 !important;
+    box-shadow: var(--v9-shadow);
+  }
+  .sidebar.active { transform: translateX(0) !important; }
+  .sidebar-close {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+  .sidebar-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(15,23,42,.5) !important;
+    z-index: 1100 !important;
+    display: block !important;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility .25s ease;
+  }
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .main-content {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+  .admin-header {
+    padding: 10px 12px !important;
+    min-height: 60px;
+    height: auto !important;
+    gap: 10px;
+    z-index: 1100 !important;
+  }
+  .header-left,
+  .page-title-wrap {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .header-left { gap: 10px !important; }
+  .page-title {
+    font-size: 1rem !important;
+    line-height: 1.2;
+    max-width: 54vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .header-right { gap: 8px !important; }
+  .page-content { padding: 14px 14px 88px !important; }
+  .notification-bell,
+  .user-dropdown,
+  .btn-view-site { min-height: 40px; }
+
+  /* Hide stray exit/logout icon in sidebar collapsed area on mobile (per request) */
+  .sidebar-user-strip a[href*="logout"]:not(.show-mobile) {
+    display: none !important;
+  }
+
+  .mem-topbar {
+    padding: 10px 12px !important;
+    gap: 10px;
+  }
+  .mem-topbar-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .mem-topbar-right { gap: 8px !important; }
+  .mem-topbar-name { display: none !important; }
+  .mem-topbar-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0 !important;
+  }
+  .mem-topbar-btn i {
+    font-size: 1rem;
+    margin: 0;
+  }
+  .bell-dropdown {
+    width: min(92vw, 360px) !important;
+    max-width: 92vw !important;
+    right: 0 !important;
+    left: auto !important;
+  }
+  .mem-container {
+    padding: 14px 12px 88px !important;
+  }
+  .mem-nav {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    margin: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+    box-shadow: 0 -12px 26px rgba(15,23,42,.14) !important;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+  .mem-nav-item {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 4px !important;
+    font-size: .66rem !important;
+  }
+  .mem-nav-item i { font-size: 1rem !important; }
+  .mem-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .admin-topbar-brand .brand-text,
+  .header-date-pill,
+  .admin-name {
+    display: none !important;
+  }
+  .page-title { max-width: 58vw; }
+  .sidebar-brand-logo { height: 44px; }
+}
+
+/* Header v2 mobile drawer overrides (kept) */
+@media (max-width: 991px) {
+  body.header-v2 .pfl-nav-area {
+    width: auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+  }
+  body.header-v2 .pfl-nav-area::before { display: none !important; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   MEMBER DASHBOARD — defensive cards (kept)
+   ════════════════════════════════════════════════════════════ */
+body.mem-wrapper {
+  background: #f6faf7 !important;
+  margin: 0 !important;
+}
+.mem-container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 100px; }
+.mem-stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+  gap: 12px !important;
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+.mem-stat {
+  background: #ffffff !important;
+  border-radius: 14px !important;
+  padding: 16px 14px !important;
+  text-align: center !important;
+  box-shadow: 0 2px 10px rgba(15,23,42,.06) !important;
+  border: 1px solid #e5e7eb !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+.mem-stat-num { font-size: 1.8rem !important; font-weight: 800 !important; line-height: 1.1 !important; color: var(--primary-color, #1a5f2a) !important; }
+.mem-stat-label { font-size: .72rem !important; color: #6b7280 !important; font-weight: 600 !important; }
+.mem-stat-icon { font-size: 1.3rem !important; opacity: .85 !important; margin: 0 0 2px !important; color: var(--primary-color, #1a5f2a); }
+
+.mem-card {
+  background: #ffffff !important;
+  border-radius: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 2px 10px rgba(15,23,42,.06) !important;
+  margin-bottom: 16px !important;
+  overflow: hidden !important;
+}
+.mem-card-header { padding: 14px 16px !important; border-bottom: 1px solid #f1f5f9 !important; display: flex !important; justify-content: space-between !important; align-items: center !important; background: #fafefb !important; }
+.mem-card-title { font-size: .92rem !important; font-weight: 700 !important; color: #1f2937 !important; display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 !important; }
+.mem-card-title i { color: var(--primary-color, #1a5f2a) !important; }
+.mem-card-body { padding: 14px 16px !important; }
+
+.mem-app-item { display: flex !important; gap: 12px !important; padding: 10px 0 !important; border-bottom: 1px solid #f3f4f6 !important; align-items: flex-start !important; }
+.mem-app-item:last-child { border-bottom: 0 !important; }
+.mem-app-icon { width: 38px !important; height: 38px !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; color: #fff !important; font-size: .9rem !important; flex-shrink: 0 !important; background: var(--primary-color, #1a5f2a) !important; }
+.mem-app-info { flex: 1 !important; min-width: 0 !important; }
+.mem-app-service { font-weight: 700 !important; font-size: .85rem !important; }
+.mem-app-detail { font-size: .78rem !important; color: #4b5563 !important; margin-top: 2px !important; word-break: break-word !important; }
+.mem-app-date { font-size: .7rem !important; color: #9ca3af !important; margin-top: 2px !important; }
+.mem-app-right { display: flex !important; flex-direction: column !important; align-items: flex-end !important; gap: 4px !important; flex-shrink: 0 !important; }
+
+.mem-actions { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important; gap: 10px !important; }
+.mem-action-btn { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 8px !important; padding: 14px 8px !important; background: #f9fafb !important; border: 1px solid #e5e7eb !important; border-radius: 12px !important; text-decoration: none !important; color: #1f2937 !important; font-size: .78rem !important; font-weight: 600 !important; text-align: center !important; transition: transform .15s, box-shadow .15s !important; }
+.mem-action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,.08); }
+.mem-action-icon { width: 42px !important; height: 42px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; color: #fff !important; font-size: 1rem !important; background: var(--primary-color, #1a5f2a) !important; }
+
+.mem-greeting h2 { font-size: 1.15rem !important; margin: 0 0 4px !important; color: var(--primary-color, #1a5f2a) !important; font-weight: 800 !important; }
+.mem-greeting p { margin: 0 !important; color: #6b7280 !important; font-size: .85rem !important; }
+.mem-empty { text-align: center !important; padding: 28px 14px !important; color: #6b7280 !important; font-size: .85rem !important; }
+.mem-empty-icon { font-size: 1.8rem !important; display: block !important; margin-bottom: 6px !important; opacity: .6 !important; }
+
+@media (max-width: 768px) {
+  .mem-grid-2 { grid-template-columns: 1fr !important; }
+  .charts-row { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 575px) {
+  .mem-container { padding: 14px 10px 96px !important; }
+  .mem-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+  .mem-stat { padding: 14px 8px !important; }
+  .mem-stat-num { font-size: 1.5rem !important; }
+  .mem-stat-label { font-size: .68rem !important; }
+  .mem-actions { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+  .mem-action-btn { padding: 12px 4px !important; font-size: .7rem !important; }
+  .mem-action-icon { width: 36px !important; height: 36px !important; font-size: .9rem !important; }
+  .mem-card-header { padding: 12px 14px !important; }
+  .mem-card-body { padding: 12px 14px !important; }
+  .mem-card-title { font-size: .85rem !important; }
+  .mem-app-item { padding: 10px 0 !important; }
+  .mem-app-service { font-size: .8rem !important; }
+  .mem-app-detail { font-size: .72rem !important; }
+}
+
+/* Admin tabs scrollable on mobile */
+@media (max-width: 768px) {
+  .nav-tabs, .admin-tabs, .tab-list, .dashboard-tabs, .tabs-container {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    gap: 4px !important;
+  }
+  .nav-tabs > *, .admin-tabs > *, .tab-list > *, .dashboard-tabs > *, .tabs-container > * {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+  }
+  .stat-card, .admin-stat-card, .dashboard-stat { min-width: 0 !important; }
+  .stats-grid, .admin-stats, .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.6 — LOGIN PANELS: center & polish (admin + member + public)
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .split-wrap { grid-template-columns: 1fr !important; }
+  .split-left {
+    padding: 36px 22px 32px !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+  .split-left .sl-top {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .split-left .sl-hero,
+  .split-left .sl-bottom {
+    text-align: center !important;
+    width: 100% !important;
+  }
+  .split-left .sl-hero p {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .split-left .sl-features {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    grid-template-columns: 1fr 1fr !important;
+    max-width: 360px !important;
+    gap: 10px !important;
+  }
+  .split-left .sl-feat {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+  .split-right {
+    padding: 32px 22px 40px !important;
+  }
+  .sr-inner { margin: 0 auto !important; }
+}
+@media (max-width: 575px) {
+  .split-left .sl-features { grid-template-columns: 1fr !important; max-width: 280px !important; }
+  .sl-hero h1 { font-size: 1.55rem !important; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.6 — BOTTOM NAV for ADMIN + PUBLIC (mobile only)
+   Mirrors the member portal feel.
+   ════════════════════════════════════════════════════════════ */
+.mob-bottomnav {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mob-bottomnav {
+    display: flex !important;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 950;
+    background: #ffffff;
+    box-shadow: 0 -10px 24px rgba(15,23,42,.12);
+    border-top: 1px solid #eef2f7;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+    border-radius: 16px 16px 0 0;
+  }
+  .mob-bottomnav .mob-bn-item {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 2px;
+    text-decoration: none;
+    color: #6b7280;
+    font-size: .66rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.1;
+    border-radius: 10px;
+    transition: background .15s, color .15s;
+  }
+  .mob-bottomnav .mob-bn-item i {
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+  .mob-bottomnav .mob-bn-item.active {
+    color: var(--primary-color, #1a5f2a);
+    background: rgba(26,95,42,.10);
+  }
+  .mob-bottomnav .mob-bn-item:hover { color: var(--primary-color, #1a5f2a); }
+  /* Body padding so content isn't covered by bottom-nav */
+  body.has-bottomnav { padding-bottom: 78px !important; }
+  body.has-bottomnav .main-footer { padding-bottom: 80px !important; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.6 — Public navbar dropdown chevron polish
+   (replaces ugly default rendering)
+   ════════════════════════════════════════════════════════════ */
+.nav-menu .has-dropdown > a > i.fa-chevron-down,
+.nav-menu .has-sub > a > i.fa-chevron-down {
+  font-size: .72rem;
+  margin-left: 6px;
+  opacity: .65;
+  transition: transform .22s ease, opacity .22s ease;
+}
+.nav-menu .has-dropdown:hover > a > i.fa-chevron-down,
+.nav-menu .has-sub:hover > a > i.fa-chevron-down { opacity: 1; }
+
+/* ════════════════════════════════════════════════════════════
+   v9.6 — Universal color cascade — ensure admin-set color
+   leaks into corners that hard-coded greens
+   ════════════════════════════════════════════════════════════ */
+.mem-topbar { background: linear-gradient(135deg, var(--primary-color, #1a5f2a), var(--primary-light, #2e8b4a)) !important; }
+.mem-nav-item.active { background: var(--primary-color, #1a5f2a) !important; color: #fff !important; }
+.bell-dd-head { background: linear-gradient(135deg, var(--primary-color, #1a5f2a), var(--primary-light, #2e8b4a)) !important; }
+.split-left {
+  background:
+    radial-gradient(1200px 600px at -10% 110%, rgba(245,158,11,.18), transparent 60%),
+    radial-gradient(900px 500px at 110% -10%, rgba(255,255,255,.16), transparent 60%),
+    linear-gradient(135deg, var(--primary-dark, #114b1e) 0%, var(--primary-color, #1a5f2a) 55%, var(--primary-light, #2e8b4a) 100%) !important;
+}
+.submit-btn,
+button.submit-btn {
+  background: linear-gradient(135deg, var(--primary-dark, #144a21), var(--primary-light, #2e8b4a)) !important;
+}
+/* NOTE:
+   .btn-coop.btn-outline को contrast नबिग्रियोस् भनेर
+   solid variant मात्र target गरिएको छ। */
+.btn-coop:not(.btn-outline) { background: var(--primary-color) !important; color:#fff !important; }
+.btn-coop:not(.btn-outline):hover { background: var(--primary-dark) !important; color:#fff !important; }
+.sr-back { color: var(--primary-color, #1a5f2a) !important; }
+.sr-title { color: var(--primary-dark, #144a21) !important; }
+.tab-btn.active { color: var(--primary-color, #1a5f2a) !important; }
+
+/* Admin sidebar color: pull from primary */
+.sidebar { background: linear-gradient(180deg, var(--primary-dark, #114b1e), var(--primary-color, #1a5f2a)) !important; }
+
+/* ════════════════════════════════════════════════════════════
+   v9.7 — Mobile drawer fixes + UI polish
+   - Dropdowns always expand DOWN (कहिल्यै मथि नजाने)
+   - Public navbar dropdown ko icon clean look
+   - Login screens centered on mobile
+   - Admin/Member uniform Mukta font
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Force dropdowns to flow DOWN inside mobile drawer ── */
+@media (max-width: 991px) {
+  body.header-v2 .main-nav .nav-menu .has-dropdown,
+  body.header-v2 .main-nav .nav-menu .has-sub {
+    position: relative !important;
+  }
+  body.header-v2 .main-nav .nav-menu .dropdown,
+  body.header-v2 .main-nav .nav-menu .sub-menu {
+    /* कहिल्यै top: auto / bottom: 100% होइन — सधैं parent पछि flow garne */
+    top: auto !important;
+    bottom: auto !important;
+    left: 0 !important;
+    right: auto !important;
+    transform: none !important;
+    margin-top: 4px !important;
+  }
+  /* "More" / थप dropdown — last item पनि overflow-scroll मा देखियोस् */
+  body.header-v2 .main-nav .nav-menu {
+    padding-bottom: 80px !important; /* footer clearance */
+  }
+}
+
+/* ── Public navbar dropdown — desktop ko menu icon clean (no junk) ── */
+.nav-menu .has-dropdown > a > i.fa-chevron-down {
+  font-size: .68rem !important;
+  margin-left: 6px !important;
+  opacity: .8 !important;
+}
+/* purano broken icon hide if any */
+.nav-menu .dropdown li a i:empty { display: none !important; }
+
+/* ════════════════════════════════════════════════════════════
+   v9.7 — Login screen polish (Admin + Member)
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .split-wrap {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  .split-left {
+    padding: 30px 24px !important;
+    min-height: 240px !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+  .split-right {
+    padding: 30px 24px !important;
+  }
+  .split-form-wrap,
+  .login-form-wrap,
+  .form-wrap {
+    max-width: 420px !important;
+    margin: 0 auto !important;
+    text-align: left !important;
+  }
+  /* Center heading texts on mobile */
+  .split-right h1, .split-right h2, .split-right .form-title {
+    text-align: center !important;
+  }
+}
+
+/* ── Login: branding when logo है then hide site name (consistent rule) ── */
+.split-left .has-logo .brand-name,
+.split-left .has-logo .brand-text,
+.login-brand.has-logo .brand-name,
+.login-brand.has-logo .brand-sub {
+  display: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.7 — Uniform fonts across public/admin/member
+   ════════════════════════════════════════════════════════════ */
+html, body,
+.admin-wrapper, .admin-content, .admin-card, .admin-table-card,
+.mem-wrapper, .mem-container,
+input, select, textarea, button, .btn,
+.form-control, .form-select, .nav-link {
+  font-family: 'Mukta','Noto Sans Devanagari','Segoe UI','Noto Sans',sans-serif !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.7+ — Member portal logo (rectangular banner)
+   user-request अनुसार round logo हटाएर banner style कायम
+   ════════════════════════════════════════════════════════════ */
+.mem-topbar-brand img {
+  height: 42px !important;
+  width: auto !important;
+  max-width: 180px !important;
+  border-radius: 8px !important;
+  object-fit: contain !important;
+  border: 0 !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.8 — DROPDOWN POSITION INSIDE DRAWER (HARD FIX)
+   पुरानो style.css ले dropdown लाई position: absolute / fixed
+   गराइदिने केसमा drawer बाहिर (बायाँ) dekhincha. Yelaai सधैं
+   parent ko ठीक तल flow garaune.
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 991px) {
+  body.header-v2 .main-nav .nav-menu .has-dropdown,
+  body.header-v2 .main-nav .nav-menu .has-sub,
+  body.header-v2 #mainNavV2 .has-dropdown,
+  body.header-v2 #mainNav .has-dropdown {
+    position: relative !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+  body.header-v2 .main-nav .nav-menu .dropdown,
+  body.header-v2 .main-nav .nav-menu .sub-menu,
+  body.header-v2 #mainNavV2 .dropdown,
+  body.header-v2 #mainNav .dropdown {
+    position: static !important;     /* drawer flow मा बस्ने */
+    top: auto !important;
+    bottom: auto !important;
+    left: 0 !important;
+    right: auto !important;
+    transform: none !important;
+    float: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 4px 0 6px !important;
+    box-shadow: none !important;
+  }
+  /* Closed: 0 height */
+  body.header-v2 .main-nav .nav-menu .has-dropdown:not(.open) > .dropdown,
+  body.header-v2 #mainNavV2 .has-dropdown:not(.open) > .dropdown,
+  body.header-v2 #mainNav .has-dropdown:not(.open) > .dropdown {
+    display: none !important;
+    max-height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  /* Open: TALA flow */
+  body.header-v2 .main-nav .nav-menu .has-dropdown.open > .dropdown,
+  body.header-v2 #mainNavV2 .has-dropdown.open > .dropdown,
+  body.header-v2 #mainNav .has-dropdown.open > .dropdown {
+    display: block !important;
+    max-height: 1200px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  /* "थप / More" — last item samma scroll garna footer clearance */
+  body.header-v2 .main-nav .nav-menu {
+    padding-bottom: 120px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   v9.8 — ADMIN SIDEBAR CLOSE BUTTON: HIDE ON DESKTOP
+   Pahile @media (max-width:991px) bhitra display:flex thiyo
+   तर desktop ma default <button> visible thiyo (logo ko tala
+   cross dekhincha). Now explicitly hidden on desktop.
+   ════════════════════════════════════════════════════════════ */
+.sidebar-close,
+#sidebarClose {
+  display: none !important;
+}
+@media (max-width: 991px) {
+  .sidebar-close,
+  #sidebarClose {
+    display: flex !important;
+  }
+}

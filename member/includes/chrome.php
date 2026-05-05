@@ -1,0 +1,252 @@
+<?php
+/**
+ * ════════════════════════════════════════════════════════════
+ * MEMBER PANEL — Unified Chrome (Topbar + Nav + Bell)
+ * ════════════════════════════════════════════════════════════
+ * Use गर्ने तरिका (हरेक member/*.php मा):
+ *
+ *   require_once __DIR__ . '/_bootstrap.php';
+ *   requireMemberLogin();
+ *   memberSecurityHeaders();
+ *   $mem = currentMember();
+ *
+ *   // ... page specific PHP ...
+ *
+ *   $pageTitle = 'Profile — ' . SITE_NAME;
+ *   $extraHead = '<style>...page-specific css...</style>';
+ *   require __DIR__ . '/includes/chrome.php';   // emits <head>, <body>, topbar, nav
+ *
+ *   // ... page body ...
+ *
+ *   require __DIR__ . '/includes/chrome-foot.php';  // closes container, body, html
+ * ════════════════════════════════════════════════════════════
+ */
+
+if (!defined('SITE_URL')) require_once __DIR__ . '/../../includes/config.php';
+if (!isset($mem) && function_exists('currentMember')) $mem = currentMember();
+
+$_siteUrl  = SITE_URL;
+$_siteName = function_exists('getSetting') ? getSetting('site_name', 'आकाश सहकारी') : 'आकाश सहकारी';
+$_logoPath = function_exists('getSetting')
+    ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
+    : 'assets/images/logo.png';
+$_memName  = $mem['name'] ?? 'Member';
+$_memAvatar = trim((string)($mem['avatar_url'] ?? ''));
+$_memId    = (int)($mem['id'] ?? 0);
+
+// Topbar: KYC photo जोड्ने (id लिंक वा इमेल/मोबाइल मिलान — profile.php जस्तै)
+if ($_memAvatar === '') {
+    try {
+        $_dbA = getDB();
+        if ($_dbA) {
+            if (!empty($mem['kyc_application_id'])) {
+                $_stA = $_dbA->prepare('SELECT photo FROM kyc_applications WHERE id=? LIMIT 1');
+                $_stA->execute([(int)$mem['kyc_application_id']]);
+                $_photo = trim((string)($_stA->fetchColumn() ?: ''));
+                if ($_photo !== '') {
+                    $_memAvatar = $_photo;
+                }
+            }
+            if ($_memAvatar === '') {
+                $_kw = [];
+                $_kp = [];
+                $_em = strtolower(trim((string)($mem['email'] ?? '')));
+                $_ph = preg_replace('/[^0-9]/', '', (string)($mem['phone'] ?? ''));
+                if ($_em !== '') {
+                    $_kw[] = 'LOWER(email)=?';
+                    $_kp[] = $_em;
+                }
+                if ($_ph !== '') {
+                    $_kw[] = 'mobile=?';
+                    $_kp[] = $_ph;
+                }
+                if ($_kw !== []) {
+                    $_sql = 'SELECT photo FROM kyc_applications WHERE (' . implode(' OR ', $_kw) . ')
+                            AND TRIM(IFNULL(photo,\'\')) != \'\' ORDER BY id DESC LIMIT 1';
+                    $_stA = $_dbA->prepare($_sql);
+                    $_stA->execute($_kp);
+                    $_photo = trim((string)($_stA->fetchColumn() ?: ''));
+                    if ($_photo !== '') {
+                        $_memAvatar = $_photo;
+                    }
+                }
+            }
+        }
+    } catch (\Throwable $ignored) {
+    }
+}
+
+// साइट-रूट सापेक्ष पथलाई पूर्ण URL (member/ मा relative नभाँडियोस्)
+if ($_memAvatar !== '' && !preg_match('#^(https?:)?//#i', $_memAvatar)) {
+    $_memAvatar = rtrim($_siteUrl, '/') . '/' . ltrim($_memAvatar, '/');
+}
+
+if (!isset($pageTitle)) $pageTitle = 'Member — ' . $_siteName;
+if (!isset($extraHead)) $extraHead = '';
+
+/* Auto-detect active nav from filename */
+$_self  = basename($_SERVER['PHP_SELF'] ?? '');
+$_active = $_self === 'index.php' || $_self === ''  ? 'dashboard'
+        : ($_self === 'notifications.php'           ? 'notifications'
+        : ($_self === 'id-card.php'                 ? 'idcard'
+        : ($_self === 'tracker.php'                 ? 'tracker'
+        : ($_self === 'profile.php'                 ? 'profile'
+        : ($_self === 'welfare.php'                 ? 'welfare'
+        : ($_self === 'certificate.php'             ? 'certificate'
+        : ($_self === 'scan.php'                    ? 'scan'
+        : ($_self === 'attend.php'                  ? 'attend'
+        : ($_self === 'service-request.php'         ? 'service' : '')))))))));
+
+/* Notifications for bell */
+$_unread = function_exists('getMemberUnreadCount') ? getMemberUnreadCount($_memId) : 0;
+$_bellNotifs = [];
+if ($_memId) {
+    try {
+        $_db = getDB();
+        $_st = $_db->prepare("SELECT * FROM member_notifications WHERE member_id=? ORDER BY created_at DESC LIMIT 5");
+        $_st->execute([$_memId]);
+        $_bellNotifs = $_st->fetchAll(PDO::FETCH_ASSOC);
+    } catch (\Throwable $e) { $_bellNotifs = []; }
+}
+
+/* ID Card link सधैं देखाउने — generate नभएको भए id-card.php भित्रै "Pending" screen देखाउँछ */
+$_hasIdCard = true;
+?>
+<!DOCTYPE html>
+<html lang="ne" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title><?php echo htmlspecialchars($pageTitle); ?></title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<?php if (function_exists('memberHeadAssets')) memberHeadAssets(); ?>
+<link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/member.css?v=9.8">
+<link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/eye-candy-v7.css?v=7">
+<link rel="stylesheet" href="<?php echo $_siteUrl; ?>assets/css/site-banner-logo.css?v=1">
+<style>
+/* ── Member Bell Dropdown (unified) ── */
+.bell-wrap{position:relative;}
+.bell-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;width:340px;max-height:460px;overflow-y:auto;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:1000;color:#1f2937;}
+.bell-dropdown.open{display:block;}
+.bell-dd-head{padding:12px 14px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;border-radius:12px 12px 0 0;}
+.bell-dd-head .title{font-weight:700;font-size:.9rem;}
+.bell-dd-head .badge{background:#fbbf24;color:#1f2937;font-size:.7rem;padding:2px 7px;border-radius:10px;font-weight:700;}
+.bell-dd-empty{padding:30px 16px;text-align:center;color:#6b7280;font-size:.85rem;}
+.bell-dd-item{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid #f3f4f6;cursor:pointer;transition:background .15s;}
+.bell-dd-item:hover{background:#f9fafb;}
+.bell-dd-item.unread{background:#f0fdf4;}
+.bell-dd-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;}
+.bell-dd-body{flex:1;min-width:0;}
+.bell-dd-title{font-weight:600;font-size:.82rem;color:#111827;}
+.bell-dd-msg{font-size:.74rem;color:#6b7280;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.bell-dd-time{font-size:.68rem;color:#9ca3af;margin-top:3px;}
+.bell-dd-foot{padding:10px 14px;text-align:center;border-top:1px solid #e5e7eb;background:#f9fafb;border-radius:0 0 12px 12px;}
+.bell-dd-foot a{color:var(--primary-color);font-weight:600;font-size:.82rem;text-decoration:none;}
+.mem-bell-btn{position:relative;background:none;border:0;cursor:pointer;color:inherit;padding:8px;border-radius:8px;transition:background .15s;}
+.mem-bell-btn:hover{background:rgba(255,255,255,.15);}
+.mem-bell-btn .mem-notif-dot{position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;border-radius:10px;font-size:.62rem;font-weight:700;padding:1px 5px;min-width:16px;text-align:center;}
+</style>
+<?php echo $extraHead; ?>
+</head>
+<body class="mem-wrapper">
+
+<!-- ══ Unified Topbar ══ -->
+<div class="mem-topbar">
+    <a href="<?php echo $_siteUrl; ?>" class="mem-topbar-brand <?php echo !empty($_logoPath) ? 'has-logo' : 'no-logo'; ?>">
+        <?php if ($_logoPath): ?>
+        <img src="<?php echo $_siteUrl . htmlspecialchars($_logoPath); ?>" alt="Logo">
+        <?php else: ?>
+        <div class="mem-logo-fallback"><i class="fas fa-leaf"></i></div>
+        <div class="mem-brand-text">
+            <span class="mem-brand-name"><?php echo htmlspecialchars($_siteName); ?></span>
+            <span class="mem-brand-sub">MEMBER PORTAL</span>
+        </div>
+        <?php endif; ?>
+    </a>
+    <div class="mem-topbar-right">
+
+        <!-- Bell -->
+        <div class="bell-wrap">
+            <button class="mem-bell-btn" id="bellBtn" title="Notifications" type="button">
+                <i class="fas fa-bell"></i>
+                <?php if ($_unread > 0): ?><span class="mem-notif-dot"><?php echo $_unread > 9 ? '9+' : $_unread; ?></span><?php endif; ?>
+            </button>
+            <div class="bell-dropdown" id="bellDropdown">
+                <div class="bell-dd-head">
+                    <span class="title"><i class="fas fa-bell"></i> सूचनाहरू</span>
+                    <?php if ($_unread > 0): ?><span class="badge"><?php echo $_unread; ?> नयाँ</span><?php endif; ?>
+                </div>
+                <?php if (empty($_bellNotifs)): ?>
+                <div class="bell-dd-empty">
+                    <i class="fas fa-bell-slash" style="font-size:1.4rem;display:block;margin-bottom:6px;opacity:.5;"></i>
+                    कुनै सूचना छैन।
+                </div>
+                <?php else:
+                    $_iconMap = [
+                        'success'=>['fas fa-circle-check','#16a34a','#f0fdf4'],
+                        'error'  =>['fas fa-circle-xmark','#dc2626','#fef2f2'],
+                        'warning'=>['fas fa-triangle-exclamation','#d97706','#fffbeb'],
+                        'info'   =>['fas fa-circle-info','#1565c0','#eff6ff'],
+                    ];
+                    foreach ($_bellNotifs as $_n):
+                        $_ic = $_iconMap[$_n['type']] ?? $_iconMap['info'];
+                ?>
+                <div class="bell-dd-item <?php echo !$_n['is_read'] ? 'unread' : ''; ?>" onclick="window.location='<?php echo $_siteUrl; ?>member/notifications.php'">
+                    <div class="bell-dd-icon" style="background:<?php echo $_ic[2]; ?>;color:<?php echo $_ic[1]; ?>;">
+                        <i class="<?php echo $_ic[0]; ?>"></i>
+                    </div>
+                    <div class="bell-dd-body">
+                        <div class="bell-dd-title"><?php echo htmlspecialchars($_n['title']); ?></div>
+                        <div class="bell-dd-msg"><?php echo htmlspecialchars($_n['message'] ?? ''); ?></div>
+                        <div class="bell-dd-time"><?php echo function_exists('formatNepaliDate') ? formatNepaliDate($_n['created_at'], true) : $_n['created_at']; ?></div>
+                    </div>
+                </div>
+                <?php endforeach; endif; ?>
+                <div class="bell-dd-foot">
+                    <a href="<?php echo $_siteUrl; ?>member/notifications.php">सबै सूचना हेर्नुहोस् →</a>
+                </div>
+            </div>
+        </div>
+
+        <?php if ($_memAvatar !== ''): ?>
+        <div class="mem-topbar-avatar-stack">
+            <img src="<?php echo htmlspecialchars($_memAvatar); ?>"
+                 class="mem-topbar-avatar mem-topbar-avatar-img" alt=""
+                 onerror="this.style.display='none';var f=this.nextElementSibling;if(f)f.classList.add('mem-topbar-avatar-fallback--show');">
+            <div class="mem-topbar-avatar mem-topbar-avatar-fallback" aria-hidden="true"><?php echo htmlspecialchars(mb_substr($_memName, 0, 1)); ?></div>
+        </div>
+        <?php else: ?>
+        <div class="mem-topbar-avatar mem-topbar-avatar-fallback mem-topbar-avatar-fallback--show" aria-hidden="true">
+            <?php echo htmlspecialchars(mb_substr($_memName, 0, 1)); ?>
+        </div>
+        <?php endif; ?>
+        <span class="mem-topbar-name"><?php echo htmlspecialchars($_memName); ?></span>
+        <a href="<?php echo $_siteUrl; ?>member/logout.php" class="mem-topbar-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>
+
+<div class="mem-container">
+
+    <!-- ══ Unified Nav ══ -->
+    <nav class="mem-nav">
+        <a href="<?php echo $_siteUrl; ?>member/" class="mem-nav-item <?php echo $_active==='dashboard'?'active':''; ?>"><i class="fas fa-house"></i>Dashboard</a>
+        <a href="<?php echo $_siteUrl; ?>member/tracker.php" class="mem-nav-item <?php echo $_active==='tracker'?'active':''; ?>"><i class="fas fa-magnifying-glass-chart"></i>Tracker</a>
+        <a href="<?php echo $_siteUrl; ?>member/notifications.php" class="mem-nav-item <?php echo $_active==='notifications'?'active':''; ?>" style="position:relative;">
+            <i class="fas fa-bell"></i>सूचनाहरू
+            <?php if ($_unread > 0): ?><span class="mem-notif-dot" style="position:static;margin-left:4px;"><?php echo $_unread; ?></span><?php endif; ?>
+        </a>
+        <?php if ($_hasIdCard): ?>
+        <a href="<?php echo $_siteUrl; ?>member/id-card.php" class="mem-nav-item <?php echo $_active==='idcard'?'active':''; ?>"><i class="fas fa-id-card"></i>ID Card</a>
+        <?php endif; ?>
+        <a href="<?php echo $_siteUrl; ?>member/welfare.php" class="mem-nav-item <?php echo $_active==='welfare'?'active':''; ?>"><i class="fas fa-heart-pulse"></i>कल्याण दाबी</a>
+        <a href="<?php echo $_siteUrl; ?>member/election-vote.php" class="mem-nav-item <?php echo $_active==='election'?'active':''; ?>"><i class="fas fa-check-to-slot"></i>मतदान</a>
+        <a href="<?php echo $_siteUrl; ?>member/scan.php" class="mem-nav-item <?php echo $_active==='scan'?'active':''; ?>"><i class="fas fa-qrcode"></i>QR स्क्यान</a>
+        <a href="<?php echo $_siteUrl; ?>member/attend.php" class="mem-nav-item <?php echo $_active==='attend'?'active':''; ?>"><i class="fas fa-calendar-check"></i>उपस्थिति</a>
+        <a href="<?php echo $_siteUrl; ?>member/service-request.php" class="mem-nav-item <?php echo $_active==='service'?'active':''; ?>"><i class="fas fa-concierge-bell"></i>सेवा अनुरोध</a>
+        <a href="<?php echo $_siteUrl; ?>member/certificate.php" class="mem-nav-item <?php echo $_active==='certificate'?'active':''; ?>"><i class="fas fa-certificate"></i>प्रमाणपत्र</a>
+        <a href="<?php echo $_siteUrl; ?>member/profile.php" class="mem-nav-item <?php echo $_active==='profile'?'active':''; ?>"><i class="fas fa-user-circle"></i>प्रोफाइल</a>
+        <a href="<?php echo $_siteUrl; ?>" class="mem-nav-item"><i class="fas fa-globe"></i>Main Site</a>
+    </nav>

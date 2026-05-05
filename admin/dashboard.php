@@ -1,0 +1,573 @@
+<?php
+/**
+ * Admin Dashboard — v10.3
+ * Restored 2-tab layout (Office Dashboard + Smart Credential Manager)
+ * + Sadasya Anurodh (member request) badge.
+ */
+require_once __DIR__ . '/_bootstrap.php';
+
+$pageTitle   = 'ड्यासबोर्ड';
+$currentPage = 'dashboard';
+
+require_once 'includes/admin-header.php';
+
+/* Optional helper includes — fail-soft if absent */
+@require_once __DIR__ . '/../includes/auth-roles.php';
+@require_once __DIR__ . '/../includes/credentials-crypto.php';
+
+/* PDO handle */
+if (!isset($pdo) && isset($db)) { $pdo = $db; }
+if (!isset($pdo) && function_exists('getDB')) { $pdo = getDB(); }
+
+/* ── Stats — gracefully fall back to 0 if any table missing ── */
+$stats = [
+    'members'   => 0,
+    'pending'   => 0, // KYC pending
+    'kycDue'    => 0, // KYC due for risk review
+    'loans'     => 0,
+    'notices'   => 0,
+    'requests'  => 0, // सदस्य अनुरोध (member registration pending)
+    'pwResets'  => 0, // password reset pending
+    'programAttend' => 0, // program attendance total
+    'programUnique' => 0, // unique members attended
+];
+try { $stats['members']  = (int)$pdo->query("SELECT COUNT(*) FROM members WHERE approval_status='approved'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['pending']  = (int)$pdo->query("SELECT COUNT(*) FROM kyc_applications WHERE status IN ('pending','incomplete')")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['kycDue']   = (int)$pdo->query("SELECT COUNT(*) FROM kyc_applications WHERE status='approved' AND risk_review_status='due_review'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['loans']    = (int)$pdo->query("SELECT COUNT(*) FROM loan_applications WHERE status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['notices']  = (int)$pdo->query("SELECT COUNT(*) FROM notices WHERE is_active = 1")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['requests'] = (int)$pdo->query("SELECT COUNT(*) FROM members WHERE approval_status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['pwResets'] = (int)$pdo->query("SELECT COUNT(*) FROM member_password_reset_requests WHERE status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['programAttend'] = (int)$pdo->query("SELECT COUNT(*) FROM member_program_attendance")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $stats['programUnique'] = (int)$pdo->query("SELECT COUNT(DISTINCT member_id) FROM member_program_attendance")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+
+$dashPendingAttendanceReq = 0;
+$dashAttendRecent = [];
+$dashAttendTopPrograms = [];
+try {
+    $dashPendingAttendanceReq = (int)$pdo->query("SELECT COUNT(*) FROM member_program_attendance_requests WHERE status='pending'")->fetchColumn();
+} catch (Throwable $e) {
+    error_log("[dashboard attend-req] " . $e->getMessage());
+}
+try {
+    $dashAttendRecent = $pdo->query(
+        "SELECT a.program_title, a.member_card_no, a.attended_at, COALESCE(NULLIF(m.name,''), '') AS member_name
+         FROM member_program_attendance a
+         LEFT JOIN members m ON m.id = a.member_id
+         ORDER BY a.attended_at DESC LIMIT 10"
+    )->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    error_log("[dashboard attend-recent] " . $e->getMessage());
+}
+try {
+    $dashAttendTopPrograms = $pdo->query(
+        "SELECT program_title, COUNT(*) AS c FROM member_program_attendance GROUP BY program_title ORDER BY c DESC LIMIT 8"
+    )->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    error_log("[dashboard attend-top] " . $e->getMessage());
+}
+
+$sadasyaBadge = $stats['requests'] + $stats['pwResets'];
+
+  /* ── Welfare Claims Stats ── */
+  $welfarePending=0;$welfareReview=0;$welfareApproved=0;$welfareByType=[];$welfareRecent=[];
+  try {
+      $welfarePending  = (int)$pdo->query("SELECT COUNT(*) FROM member_welfare_claims WHERE status='pending'")->fetchColumn();
+      $welfareReview   = (int)$pdo->query("SELECT COUNT(*) FROM member_welfare_claims WHERE status='under_review'")->fetchColumn();
+      $welfareApproved = (int)$pdo->query("SELECT COUNT(*) FROM member_welfare_claims WHERE status='approved'")->fetchColumn();
+      $welfareByType = $pdo->query("SELECT claim_type,COUNT(*) AS total,
+          SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) AS pending_count,
+          SUM(CASE WHEN status='under_review' THEN 1 ELSE 0 END) AS review_count,
+          SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) AS approved_count,
+          SUM(COALESCE(claim_amount,0)) AS total_amount
+          FROM member_welfare_claims GROUP BY claim_type ORDER BY pending_count DESC,total DESC"
+      )->fetchAll(PDO::FETCH_ASSOC);
+      $welfareRecent=$pdo->query("SELECT id, member_name AS claimant_name, claim_type, status, claim_amount, created_at FROM member_welfare_claims ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+  } catch (Throwable $e) { error_log("[dashboard welfare] ".$e->getMessage()); }
+  $welfareBadge=$welfarePending+$welfareReview;
+  $welfareClaimTypes=['maternity'=>['np'=>'सुत्केरी सुविधा','icon'=>'fa-baby','color'=>'#e91e63','bg'=>'#fce4ec'],'death'=>['np'=>'मृत्यु सुविधा','icon'=>'fa-heart-broken','color'=>'#607d8b','bg'=>'#eceff1'],'insurance'=>['np'=>'बीमा दाबी','icon'=>'fa-shield-halved','color'=>'#7c3aed','bg'=>'#ede9fe'],'medical'=>['np'=>'उपचार खर्च','icon'=>'fa-hospital','color'=>'#059669','bg'=>'#d1fae5'],'accident'=>['np'=>'दुर्घटना सुविधा','icon'=>'fa-triangle-exclamation','color'=>'#f97316','bg'=>'#ffedd5'],'other'=>['np'=>'अन्य सुविधा','icon'=>'fa-gift','color'=>'#d97706','bg'=>'#fef3c7']];
+
+/* Recent activity */
+$log = [];
+try { $log = $pdo->query("SELECT * FROM admin_activity_log ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+
+/* Smart Credential Manager — fetch credentials (staff+ can view) */
+$creds = [];
+$credsError = '';
+try {
+    $creds = $pdo->query(
+        "SELECT id, site_name, site_url, site_logo, username, category
+           FROM office_credentials
+          WHERE is_active = 1
+          ORDER BY category, sort_order, site_name"
+    )->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    $credsError = 'Smart Credential table अहिले उपलब्ध छैन — DB Setup चलाउनुहोस्।';
+}
+
+/* Pending member requests preview (for Sadasya Anurodh badge area) */
+$pendingMembers = [];
+try {
+    $pendingMembers = $pdo->query(
+        "SELECT id, name, phone, email, created_at
+           FROM members
+          WHERE approval_status='pending'
+          ORDER BY created_at DESC LIMIT 5"
+    )->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+?>
+
+<style>
+  .ds-card{border:1px solid #e5e7eb;border-radius:14px;background:#fff;padding:18px;
+           display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;
+           box-shadow:0 2px 8px rgba(0,0,0,0.04);transition:all .2s;height:100%;}
+  .ds-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(26,95,42,0.12);
+                 border-color:var(--primary-color);color:inherit;text-decoration:none;}
+  .ds-icon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;
+           font-size:1.4rem;color:#fff;flex-shrink:0;
+           background:linear-gradient(135deg,var(--primary-color),var(--primary-light));}
+  .ds-icon.warn{background:linear-gradient(135deg,#d97706,#f59e0b);}
+  .ds-icon.info{background:linear-gradient(135deg,#1e40af,#3b82f6);}
+  .ds-icon.alt{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+  .ds-icon.danger{background:linear-gradient(135deg,#b91c1c,#ef4444);}
+  .ds-val{font-size:1.7rem;font-weight:700;line-height:1;color:#111827;}
+  .ds-lbl{font-size:.82rem;color:#6b7280;margin-top:4px;}
+  .ds-section{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;margin-top:18px;}
+  .ds-section h2{font-size:1.05rem;margin:0 0 14px;display:flex;align-items:center;gap:8px;color:var(--primary-color);}
+
+  /* Tabs */
+  .ds-tabs{display:flex;gap:6px;border-bottom:2px solid #e5e7eb;margin-bottom:18px;flex-wrap:wrap;}
+  .ds-tab{padding:10px 18px;background:transparent;border:none;border-bottom:3px solid transparent;
+          font-weight:600;font-size:.95rem;color:#6b7280;cursor:pointer;transition:all .15s;
+          display:inline-flex;align-items:center;gap:8px;margin-bottom:-2px;}
+  .ds-tab:hover{color:var(--primary-color);}
+  .ds-tab.active{color:var(--primary-color);border-bottom-color:var(--primary-color);}
+  .ds-tab .badge-pill{background:#dc2626;color:#fff;border-radius:999px;font-size:.7rem;
+                      padding:2px 8px;font-weight:700;line-height:1.2;}
+  .ds-pane{display:none;}
+  .ds-pane.active{display:block;}
+
+  /* Credential cards */
+  .cred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+  .cred-card{border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;
+             transition:all .15s;display:flex;flex-direction:column;gap:8px;}
+  .cred-card:hover{border-color:var(--primary-color);box-shadow:0 4px 12px rgba(26,95,42,.1);}
+  .cred-head{display:flex;align-items:center;gap:10px;}
+  .cred-logo{width:36px;height:36px;border-radius:8px;background:#f3f4f6;display:grid;
+             place-items:center;overflow:hidden;flex-shrink:0;color:#6b7280;}
+  .cred-logo img{width:100%;height:100%;object-fit:contain;}
+  .cred-name{font-weight:700;font-size:.95rem;color:#111827;}
+  .cred-cat{font-size:.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;}
+  .cred-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;}
+  .cred-btn{flex:1;min-width:80px;padding:6px 10px;border-radius:8px;border:1px solid #e5e7eb;
+            background:#f9fafb;font-size:.8rem;font-weight:600;cursor:pointer;color:#374151;
+            display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;}
+  .cred-btn:hover{background:var(--primary-color);color:#fff;border-color:var(--primary-color);}
+
+  .wf-type-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f3f4f6;}.wf-type-row:last-child{border-bottom:none;}
+    .wf-type-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
+    .wf-type-name{flex-grow:1;font-size:.88rem;font-weight:600;color:#111827;}
+    .wf-badge{border-radius:999px;font-size:.72rem;font-weight:700;padding:2px 8px;display:inline-block;text-decoration:none;}
+    .wf-badge.pending{background:#fef9c3;color:#854d0e;}.wf-badge.review{background:#dbeafe;color:#1e40af;}.wf-badge.approved{background:#dcfce7;color:#166534;}
+    .wf-summary-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+    .wf-stat-chip{flex:1;min-width:90px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;text-align:center;text-decoration:none;color:inherit;}
+    .wf-stat-chip .val{font-size:1.4rem;font-weight:700;line-height:1;}.wf-stat-chip .lbl{font-size:.72rem;color:#6b7280;margin-top:2px;}
+    /* Pending member list */
+  .pm-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6;}
+  .pm-row:last-child{border-bottom:none;}
+  .pm-avatar{width:38px;height:38px;border-radius:50%;background:#fef3c7;color:#92400e;
+             display:grid;place-items:center;font-weight:700;flex-shrink:0;}
+  .pm-info{flex-grow:1;min-width:0;}
+  .pm-name{font-weight:600;font-size:.92rem;color:#111827;}
+  .pm-meta{font-size:.78rem;color:#6b7280;}
+</style>
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+  <h1 style="font-size:1.3rem;margin:0;color:var(--primary-color);font-weight:700;">
+    <i class="fas fa-gauge"></i> Office Dashboard
+  </h1>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="member-online-portal.php?status=pending" class="btn btn-outline-warning btn-sm position-relative">
+      <i class="fas fa-user-clock"></i> सदस्य अनुरोध
+      <?php if ($sadasyaBadge > 0): ?>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          <?= $sadasyaBadge ?>
+        </span>
+      <?php endif; ?>
+    </a>
+    <a href="settings.php" class="btn btn-outline-secondary btn-sm">
+      <i class="fas fa-cog"></i> सेटिङ
+    </a>
+  </div>
+</div>
+
+<!-- ===== TABS ===== -->
+<div class="ds-tabs" role="tablist">
+  <button type="button" class="ds-tab active" data-tab="office" role="tab">
+    <i class="fas fa-gauge-high"></i> Office Dashboard
+  </button>
+  <button type="button" class="ds-tab" data-tab="creds" role="tab">
+    <i class="fas fa-key"></i> Smart Credential Manager
+  </button>
+  <button type="button" class="ds-tab" data-tab="requests" role="tab">
+    <i class="fas fa-user-clock"></i> सदस्य अनुरोध
+    <?php if ($sadasyaBadge > 0): ?><span class="badge-pill"><?= $sadasyaBadge ?></span><?php endif; ?>
+  </button>
+  <button type="button" class="ds-tab" data-tab="welfare" role="tab">
+    <i class="fas fa-hand-holding-heart"></i> कल्याण दाबी
+    <?php if ($welfareBadge > 0): ?><span class="badge-pill"><?= $welfareBadge ?></span><?php endif; ?>
+  </button>
+  <button type="button" class="ds-tab" data-tab="programs" role="tab">
+    <i class="fas fa-clipboard-check"></i> कार्यक्रम उपस्थिति
+    <?php if ($dashPendingAttendanceReq > 0): ?><span class="badge-pill"><?= (int)$dashPendingAttendanceReq ?></span><?php endif; ?>
+  </button>
+</div>
+
+<!-- ===== TAB 1: OFFICE DASHBOARD ===== -->
+<div class="ds-pane active" id="pane-office">
+  <div class="row g-3">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <a href="members.php" class="ds-card">
+        <div class="ds-icon"><i class="fas fa-users"></i></div>
+        <div><div class="ds-val"><?= $stats['members'] ?></div><div class="ds-lbl">सक्रिय सदस्य</div></div>
+      </a>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <a href="kyc-applications.php?status=pending" class="ds-card">
+        <div class="ds-icon warn"><i class="fas fa-id-card-clip"></i></div>
+        <div><div class="ds-val"><?= $stats['pending'] ?></div><div class="ds-lbl">पेन्डिङ/अपूर्ण KYC</div></div>
+      </a>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <a href="kyc-risk-reviews.php?filter=due" class="ds-card">
+        <div class="ds-icon danger"><i class="fas fa-shield-halved"></i></div>
+        <div><div class="ds-val"><?= $stats['kycDue'] ?></div><div class="ds-lbl">KYC Due for Review</div></div>
+      </a>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <a href="loan-applications.php" class="ds-card">
+        <div class="ds-icon info"><i class="fas fa-coins"></i></div>
+        <div><div class="ds-val"><?= $stats['loans'] ?></div><div class="ds-lbl">पेन्डिङ ऋण</div></div>
+      </a>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <a href="notices.php" class="ds-card">
+        <div class="ds-icon alt"><i class="fas fa-bullhorn"></i></div>
+        <div><div class="ds-val"><?= $stats['notices'] ?></div><div class="ds-lbl">प्रकाशित सूचना</div></div>
+      </a>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <a href="program-attendance.php" class="ds-card">
+        <div class="ds-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-clipboard-check"></i></div>
+        <div>
+          <div class="ds-val"><?= $stats['programAttend'] ?></div>
+          <div class="ds-lbl">Program Attendance</div>
+          <div class="small text-muted">Unique: <?= $stats['programUnique'] ?></div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="kyc-applications.php" class="btn btn-success btn-sm"><i class="fas fa-id-card-clip"></i> KYC आवेदन</a>
+      <a href="members.php" class="btn btn-outline-success btn-sm"><i class="fas fa-user-plus"></i> सदस्य</a>
+      <a href="notices.php" class="btn btn-outline-success btn-sm"><i class="fas fa-bullhorn"></i> सूचना</a>
+      <a href="loan-applications.php" class="btn btn-outline-success btn-sm"><i class="fas fa-coins"></i> ऋण</a>
+      <a href="reports.php" class="btn btn-outline-success btn-sm"><i class="fas fa-chart-line"></i> रिपोर्ट</a>
+      <a href="programs.php" class="btn btn-outline-success btn-sm"><i class="fas fa-calendar-plus"></i> कार्यक्रम</a>
+      <a href="program-attendance.php" class="btn btn-outline-success btn-sm"><i class="fas fa-clipboard-check"></i> उपस्थिति रिपोर्ट</a>
+      <a href="../verify.php" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-shield-halved"></i> Member Verify</a>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <h2><i class="fas fa-clock-rotate-left"></i> हालैको गतिविधि</h2>
+    <?php if (empty($log)): ?>
+      <div class="text-center py-4" style="color:#6b7280;">
+        <div style="font-size:2rem;margin-bottom:6px;"><i class="fas fa-inbox"></i></div>
+        <div>हाल कुनै गतिविधि छैन।</div>
+      </div>
+    <?php else: ?>
+      <div class="list-group list-group-flush">
+        <?php foreach ($log as $l): ?>
+          <div class="list-group-item d-flex align-items-center gap-3 px-0">
+            <div style="width:34px;height:34px;border-radius:50%;background:#dcfce7;color:#166534;display:grid;place-items:center;flex-shrink:0;">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div style="font-weight:600;font-size:.9rem;"><?= htmlspecialchars($l['action'] ?? '') ?></div>
+              <div style="font-size:.75rem;color:#6b7280;">
+                <?= !empty($l['created_at']) ? date('Y-m-d H:i', strtotime($l['created_at'])) : '' ?>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </div>
+</div>
+
+<!-- ===== TAB 2: SMART CREDENTIAL MANAGER ===== -->
+<div class="ds-pane" id="pane-creds">
+  <div class="ds-section" style="margin-top:0;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <h2 style="margin:0;"><i class="fas fa-key"></i> Smart Credential Manager</h2>
+      <a href="credentials.php" class="btn btn-success btn-sm">
+        <i class="fas fa-arrow-up-right-from-square"></i> पूरै पेज खोल्नुहोस्
+      </a>
+    </div>
+
+    <?php if ($credsError): ?>
+      <div class="alert alert-warning mb-3"><i class="fas fa-triangle-exclamation"></i> <?= $credsError ?></div>
+    <?php elseif (empty($creds)): ?>
+      <div class="text-center py-5" style="color:#6b7280;">
+        <div style="font-size:2.4rem;margin-bottom:8px;"><i class="fas fa-key"></i></div>
+        <div>अहिलेसम्म कुनै credential save गरिएको छैन।</div>
+        <a href="credentials.php" class="btn btn-success btn-sm mt-3">
+          <i class="fas fa-plus"></i> नयाँ Credential थप्नुहोस्
+        </a>
+      </div>
+    <?php else: ?>
+      <div class="cred-grid">
+        <?php foreach ($creds as $c): ?>
+          <div class="cred-card">
+            <div class="cred-head">
+              <div class="cred-logo">
+                <?php if (!empty($c['site_logo'])): ?>
+                  <img src="<?= htmlspecialchars($c['site_logo']) ?>" alt="">
+                <?php else: ?>
+                  <i class="fas fa-globe"></i>
+                <?php endif; ?>
+              </div>
+              <div style="flex-grow:1;min-width:0;">
+                <div class="cred-name text-truncate" title="<?= htmlspecialchars($c['site_name']) ?>">
+                  <?= htmlspecialchars($c['site_name']) ?>
+                </div>
+                <div class="cred-cat"><?= htmlspecialchars($c['category'] ?: 'general') ?></div>
+              </div>
+            </div>
+            <div style="font-size:.8rem;color:#6b7280;" class="text-truncate">
+              <i class="fas fa-user"></i> <?= htmlspecialchars($c['username']) ?>
+            </div>
+            <div class="cred-actions">
+              <a href="<?= htmlspecialchars($c['site_url']) ?>" target="_blank" rel="noopener" class="cred-btn">
+                <i class="fas fa-up-right-from-square"></i> Open
+              </a>
+              <a href="credentials.php#cred-<?= (int)$c['id'] ?>" class="cred-btn">
+                <i class="fas fa-eye"></i> Details
+              </a>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </div>
+</div>
+
+<!-- ===== TAB 3: सदस्य अनुरोध ===== -->
+<div class="ds-pane" id="pane-requests">
+  <div class="ds-section" style="margin-top:0;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <h2 style="margin:0;"><i class="fas fa-user-clock"></i> सदस्य अनुरोध</h2>
+      <a href="member-online-portal.php?status=pending" class="btn btn-warning btn-sm">
+        <i class="fas fa-list"></i> सबै हेर्नुहोस्
+      </a>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-4">
+        <a href="member-online-portal.php?status=pending" class="ds-card" title="पेन्डिङ दर्ता अनुरोध हेर्नुहोस्">
+          <div class="ds-icon warn"><i class="fas fa-user-plus"></i></div>
+          <div><div class="ds-val"><?= $stats['requests'] ?></div><div class="ds-lbl">पेन्डिङ दर्ता</div></div>
+        </a>
+      </div>
+      <div class="col-6 col-md-4">
+        <a href="member-online-portal.php?tab=resets" class="ds-card" title="Password reset अनुरोध हेर्नुहोस्">
+          <div class="ds-icon danger"><i class="fas fa-key"></i></div>
+          <div><div class="ds-val"><?= $stats['pwResets'] ?></div><div class="ds-lbl">Password Reset</div></div>
+        </a>
+      </div>
+    </div>
+
+    <h2 style="font-size:.95rem;color:var(--primary-color);margin:18px 0 8px;">
+      <i class="fas fa-clock"></i> हालैका दर्ता अनुरोधहरू
+    </h2>
+    <?php if (empty($pendingMembers)): ?>
+      <div class="text-center py-4" style="color:#6b7280;">
+        <div style="font-size:2rem;margin-bottom:6px;"><i class="fas fa-circle-check"></i></div>
+        <div>कुनै पेन्डिङ अनुरोध छैन।</div>
+      </div>
+    <?php else: ?>
+      <?php foreach ($pendingMembers as $m): ?>
+        <div class="pm-row">
+          <div class="pm-avatar">
+            <?php
+            $pmName = trim((string)($m['name'] ?? $m['full_name'] ?? $m['full_name_np'] ?? ''));
+            $pmInitial = $pmName !== '' ? mb_substr($pmName, 0, 1, 'UTF-8') : '?';
+            ?>
+            <?= htmlspecialchars($pmInitial) ?>
+          </div>
+          <div class="pm-info">
+            <div class="pm-name"><?= htmlspecialchars($pmName !== '' ? $pmName : '?') ?></div>
+            <div class="pm-meta">
+              <i class="fas fa-mobile-screen-button"></i> <?= htmlspecialchars($m['phone'] ?? '—') ?>
+              &nbsp;·&nbsp;
+              <?= !empty($m['created_at']) ? date('Y-m-d H:i', strtotime($m['created_at'])) : '' ?>
+            </div>
+          </div>
+          <a href="member-online-portal.php?view=<?= (int)$m['id'] ?>" class="btn btn-sm btn-outline-success">
+            <i class="fas fa-eye"></i> हेर्नुहोस्
+          </a>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
+</div>
+
+<!-- ===== TAB: कल्याण दाबी (pane-welfare — URL #welfare) ===== -->
+<div class="ds-pane" id="pane-welfare">
+  <div class="ds-section" style="margin-top:0;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <h2 style="margin:0;"><i class="fas fa-hand-holding-heart" style="color:#e91e63;"></i> कल्याण दाबी व्यवस्थापन</h2>
+      <a href="welfare-claims.php" class="btn btn-sm btn-outline-success"><i class="fas fa-arrow-up-right-from-square"></i> सबै दाबी</a>
+    </div>
+    <div class="wf-summary-bar">
+      <a href="welfare-claims.php?status=pending" class="wf-stat-chip"><div class="val" style="color:#d97706;"><?= $welfarePending ?></div><div class="lbl">पेन्डिङ</div></a>
+      <a href="welfare-claims.php?status=under_review" class="wf-stat-chip"><div class="val" style="color:#1e40af;"><?= $welfareReview ?></div><div class="lbl">समीक्षाधीन</div></a>
+      <a href="welfare-claims.php?status=approved" class="wf-stat-chip"><div class="val" style="color:#166534;"><?= $welfareApproved ?></div><div class="lbl">स्वीकृत</div></a>
+    </div>
+    <?php if (empty($welfareByType)): ?>
+      <div class="text-center py-3" style="color:#9ca3af;font-size:.85rem;">कुनै दाबी छैन।</div>
+    <?php else: ?>
+      <?php foreach ($welfareByType as $wt): $tk = $wt['claim_type']; $tm = $welfareClaimTypes[$tk] ?? ['np' => $tk, 'icon' => 'fa-circle', 'color' => '#6b7280', 'bg' => '#f3f4f6']; ?>
+        <div class="wf-type-row">
+          <div class="wf-type-icon" style="background:<?= $tm['bg'] ?>;color:<?= $tm['color'] ?>;"><i class="fas <?= $tm['icon'] ?>"></i></div>
+          <div class="wf-type-name"><?= htmlspecialchars($tm['np']) ?><div style="font-size:.7rem;font-weight:400;color:#6b7280;"><?= (int)($wt['total'] ?? 0) ?> दाबी</div></div>
+          <div class="d-flex gap-1 flex-wrap">
+            <?php if ((int)($wt['pending_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=pending" class="wf-badge pending"><?= (int)$wt['pending_count'] ?> पेन्डिङ</a><?php endif; ?>
+            <?php if ((int)($wt['review_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=under_review" class="wf-badge review"><?= (int)$wt['review_count'] ?> समीक्षा</a><?php endif; ?>
+            <?php if ((int)($wt['approved_count'] ?? 0) > 0): ?><span class="wf-badge approved"><?= (int)$wt['approved_count'] ?> स्वीकृत</span><?php endif; ?>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+
+    <h3 style="font-size:.95rem;color:var(--primary-color);margin:22px 0 10px;"><i class="fas fa-list"></i> पछिल्ला दाबीहरू</h3>
+    <?php if (empty($welfareRecent)): ?>
+      <div class="text-center py-3" style="color:#6b7280;font-size:.88rem;">अहिलेसम्म कुनै दाबी रेकर्ड छैन।</div>
+    <?php else: ?>
+      <div class="table-responsive border rounded">
+        <table class="table table-sm table-hover mb-0 align-middle">
+          <thead class="table-light"><tr><th>दाबीकर्ता</th><th>प्रकार</th><th>स्थिति</th><th>रकम</th><th>मिति</th><th></th></tr></thead>
+          <tbody>
+            <?php foreach ($welfareRecent as $wr): $wtk = (string)($wr['claim_type'] ?? 'other'); $wtm = $welfareClaimTypes[$wtk] ?? ['np' => $wtk]; ?>
+              <tr>
+                <td><?= htmlspecialchars((string)($wr['claimant_name'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars($wtm['np'] ?? $wtk, ENT_QUOTES, 'UTF-8') ?></td>
+                <td><span class="badge bg-secondary"><?= htmlspecialchars((string)($wr['status'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span></td>
+                <td><?= $wr['claim_amount'] !== null && $wr['claim_amount'] !== '' ? htmlspecialchars((string)$wr['claim_amount'], ENT_QUOTES, 'UTF-8') : '—' ?></td>
+                <td class="small text-muted"><?= !empty($wr['created_at']) ? htmlspecialchars(date('Y-m-d H:i', strtotime((string)$wr['created_at'])), ENT_QUOTES, 'UTF-8') : '—' ?></td>
+                <td><a class="btn btn-sm btn-outline-success" href="welfare-claims.php?action=view&id=<?= (int)($wr['id'] ?? 0) ?>"><i class="fas fa-eye"></i></a></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php endif; ?>
+  </div>
+</div>
+
+<!-- ===== TAB: कार्यक्रम उपस्थिति ===== -->
+<div class="ds-pane" id="pane-programs">
+  <div class="ds-section" style="margin-top:0;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <h2 style="margin:0;"><i class="fas fa-clipboard-check"></i> कार्यक्रम उपस्थिति</h2>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="program-attendance.php" class="btn btn-success btn-sm"><i class="fas fa-table"></i> पूरै रिपोर्ट</a>
+        <a href="programs.php" class="btn btn-outline-success btn-sm"><i class="fas fa-calendar-plus"></i> कार्यक्रम व्यवस्थापन</a>
+      </div>
+    </div>
+    <p class="small text-muted mb-3">कुल रेकर्ड, खोज/मिति फिल्टर, पृष्ठ-पृष्ठ हेर्ने र Excel निर्यात <a href="program-attendance.php">उपस्थिति रिपोर्ट</a> पृष्ठमा छन्।</p>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-4">
+        <a href="program-attendance.php" class="ds-card">
+          <div class="ds-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-user-check"></i></div>
+          <div><div class="ds-val"><?= (int)$stats['programAttend'] ?></div><div class="ds-lbl">कुल उपस्थिति रेकर्ड</div></div>
+        </a>
+      </div>
+      <div class="col-6 col-md-4">
+        <a href="program-attendance.php" class="ds-card">
+          <div class="ds-icon info"><i class="fas fa-users"></i></div>
+          <div><div class="ds-val"><?= (int)$stats['programUnique'] ?></div><div class="ds-lbl">भिन्न सदस्य (member_id)</div></div>
+        </a>
+      </div>
+      <div class="col-6 col-md-4">
+        <a href="program-attendance.php" class="ds-card">
+          <div class="ds-icon warn"><i class="fas fa-hourglass-half"></i></div>
+          <div><div class="ds-val"><?= (int)$dashPendingAttendanceReq ?></div><div class="ds-lbl">उपस्थिति अनुरोध पेन्डिङ</div></div>
+        </a>
+      </div>
+    </div>
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <h3 style="font-size:.95rem;color:var(--primary-color);margin:0 0 10px;"><i class="fas fa-chart-bar"></i> बढी उपस्थिति भएका कार्यक्रम</h3>
+        <?php if (empty($dashAttendTopPrograms)): ?>
+          <div class="text-center py-4" style="color:#6b7280;font-size:.9rem;">अहिलेसम्म कुनै उपस्थिति रेकर्ड छैन।</div>
+        <?php else: ?>
+          <div class="list-group list-group-flush border rounded overflow-hidden">
+            <?php foreach ($dashAttendTopPrograms as $tp): ?>
+              <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                <span class="text-truncate me-2" title="<?= htmlspecialchars((string)($tp['program_title'] ?? '')) ?>"><?= htmlspecialchars((string)($tp['program_title'] ?? '')) ?></span>
+                <span class="badge bg-primary rounded-pill"><?= (int)($tp['c'] ?? 0) ?></span>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+      <div class="col-lg-6">
+        <h3 style="font-size:.95rem;color:var(--primary-color);margin:0 0 10px;"><i class="fas fa-clock"></i> पछिल्लो उपस्थिति</h3>
+        <?php if (empty($dashAttendRecent)): ?>
+          <div class="text-center py-4" style="color:#6b7280;font-size:.9rem;">डाटा छैन।</div>
+        <?php else: ?>
+          <div class="list-group list-group-flush border rounded overflow-hidden">
+            <?php foreach ($dashAttendRecent as $ar): ?>
+              <div class="list-group-item py-2 px-3">
+                <div style="font-weight:600;font-size:.88rem;" class="text-truncate"><?= htmlspecialchars((string)($ar['program_title'] ?? '')) ?></div>
+                <div style="font-size:.75rem;color:#6b7280;">
+                  <?= htmlspecialchars(trim((string)($ar['member_name'] ?? '') ?: ((string)($ar['member_card_no'] ?? '') ?: '—'))) ?>
+                  &nbsp;·&nbsp;
+                  <?= !empty($ar['attended_at']) ? htmlspecialchars(date('Y-m-d H:i', strtotime((string)$ar['attended_at']))) : '' ?>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs  = document.querySelectorAll('.ds-tab');
+  const panes = document.querySelectorAll('.ds-pane');
+  const tabIds = ['office','creds','requests','welfare','programs'];
+  function activate(name){
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    panes.forEach(p => p.classList.toggle('active', p.id === 'pane-' + name));
+    try { localStorage.setItem('aks_dash_tab', name); } catch(e) {}
+    if (history.replaceState) history.replaceState(null, '', '#' + name);
+  }
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.tab)));
+  // Restore last tab from URL hash or localStorage
+  const fromHash = (location.hash || '').replace('#','');
+  const fromLS   = (function(){ try { return localStorage.getItem('aks_dash_tab') || ''; } catch(e){ return ''; } })();
+  const initial  = tabIds.includes(fromHash) ? fromHash
+                  : (tabIds.includes(fromLS) ? fromLS : 'office');
+  if (initial !== 'office') activate(initial);
+})();
+</script>
+
+<?php require_once 'includes/admin-footer.php'; ?>

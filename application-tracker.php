@@ -1,0 +1,2237 @@
+<?php
+require_once 'includes/config.php';
+/* ensure-tables: silent fail — DB tables नभए पनि page crash नगर्ने */
+try { require_once 'includes/ensure-tables.php'; } catch (\Throwable $e) { error_log('tracker ensure-tables: ' . $e->getMessage()); }
+$pageTitle = isEnglish() ? 'Application Status Tracker' : 'आवेदन स्थिति ट्र्याकर';
+require_once 'includes/header.php';
+
+$allResults       = [];
+$error            = '';
+$success          = '';
+/* सुरक्षा verification flag — phone/email खोज्दा सुरक्षा code जाँच गर्नुपर्छ */
+$verificationOk   = false;
+$needsVerify      = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $searchType = $_POST['search_type'] ?? 'tracking_id';
+    if (!in_array($searchType, ['tracking_id', 'phone', 'email'], true)) {
+        $searchType = 'tracking_id';
+    }
+
+    /* Phone/Email search मा: search_value = verification section बाट नै आउँछ
+       Tracking ID search मा: search_value = separate field बाट */
+    if (in_array($searchType, ['phone', 'email'], true)) {
+        $secPhone = mb_substr(trim((string) ($_POST['sec_phone'] ?? '')), 0, 24);
+        $secEmail = mb_substr(trim((string) ($_POST['sec_email'] ?? '')), 0, 160);
+        /* Search value directly verification fields बाट — duplicate entry छैन */
+        $searchValue = ($searchType === 'phone') ? $secPhone : $secEmail;
+    } else {
+        $searchValue = trim((string) ($_POST['search_value'] ?? ''));
+        $secPhone    = '';
+        $secEmail    = '';
+    }
+
+    $maxSvLen = $searchType === 'tracking_id' ? 96 : 180;
+    if (mb_strlen($searchValue) > $maxSvLen) {
+        $searchValue = mb_substr($searchValue, 0, $maxSvLen);
+    }
+
+    if (!verifyCSRFToken()) {
+        $error = isEnglish() ? 'Security check failed. Please try again.' : 'सुरक्षा जाँच असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।';
+
+    /* ── Tracking ID search — directly verify ── */
+    } elseif ($searchType === 'tracking_id' && empty($searchValue)) {
+        $error = isEnglish() ? 'Please enter a Tracking ID.' : 'कृपया Tracking ID प्रविष्ट गर्नुहोस्।';
+
+    /* ── Phone / Email खोज्दा Security verification अनिवार्य ──
+       Last 4 digits of phone + first 3 letters of email (before @) मिल्नुपर्छ
+       जस्तै: phone=9827157000, email=ram@gmail.com → code = "4567ram"
+       अब search value = sec_phone वा sec_email — duplicate entry छैन! */
+    } elseif (in_array($searchType, ['phone', 'email'])) {
+        $secCode      = trim($_POST['security_code'] ?? '');
+        $needsVerify  = true;
+
+        if (empty($secPhone) || empty($secEmail)) {
+            $error = isEnglish()
+                ? 'Please enter both your phone number and email address.'
+                : 'कृपया आफ्नो फोन नम्बर र इमेल दुवै प्रविष्ट गर्नुहोस्।';
+        } elseif (empty($secCode)) {
+            $error = isEnglish()
+                ? 'Please enter the security verification code.'
+                : 'कृपया सुरक्षा प्रमाणीकरण कोड प्रविष्ट गर्नुहोस्।';
+        } else {
+            /* Build expected code:
+               — phone खोज्दा: phone को अन्तिम 4 अंक + email को @ अघिका पहिला 3 अक्षर
+               — email खोज्दा: email को @ अघिका पहिला 3 अक्षर + phone को अन्तिम 4 अंक
+               दुवै case मा code = (last 4 of phone) + (first 3 of email) */
+            $phonePart = preg_replace('/\D/', '', $secPhone);   /* digits only */
+            $last4     = strlen($phonePart) >= 4 ? substr($phonePart, -4) : $phonePart;
+            $emailPart = '';
+            if ($secEmail && strpos($secEmail, '@') !== false) {
+                $emailPart = strtolower(substr($secEmail, 0, strpos($secEmail, '@')));
+                $emailPart = substr($emailPart, 0, 3); /* first 3 chars */
+            }
+            $expectedCode = strtolower($last4 . $emailPart);
+
+            if (strtolower($secCode) === $expectedCode) {
+                $verificationOk = true;
+            } else {
+                $error = isEnglish()
+                    ? 'Verification code does not match. Please check your phone number and email.'
+                    : 'सुरक्षा कोड मिलेन। कृपया आफ्नो फोन नम्बर र इमेल जाँच गर्नुहोस्।';
+            }
+        }
+    } elseif ($searchType === 'tracking_id' && $searchValue !== '') {
+        /* Tracking ID खोज्दा verification आवश्यक छैन (खाली = माथि नै error) */
+        $verificationOk = true;
+    }
+
+    /* Verification pass भयो — database खोज्छु */
+    if ($verificationOk) {
+        try {
+            $db = getDB();
+
+            // रोजगारी आवेदन खोज्ने
+            try {
+                if ($searchType === 'tracking_id') {
+                    $stmt = $db->prepare("SELECT ja.*, c.title as job_title, c.title_np as job_title_np, 'job' as app_type
+                                          FROM job_applications ja
+                                          LEFT JOIN careers c ON ja.career_id = c.id
+                                          WHERE ja.tracking_id = ?");
+                    $stmt->execute([$searchValue]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT ja.*, c.title as job_title, c.title_np as job_title_np, 'job' as app_type
+                                          FROM job_applications ja
+                                          LEFT JOIN careers c ON ja.career_id = c.id
+                                          WHERE ja.phone = ? ORDER BY ja.created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT ja.*, c.title as job_title, c.title_np as job_title_np, 'job' as app_type
+                                          FROM job_applications ja
+                                          LEFT JOIN careers c ON ja.career_id = c.id
+                                          WHERE ja.email = ? ORDER BY ja.created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $jobResults = $stmt->fetchAll();
+                if ($jobResults) $allResults = array_merge($allResults, $jobResults);
+            } catch (Exception $e) {}
+
+            // ऋण आवेदन खोज्ने
+            try {
+                if ($searchType === 'tracking_id') {
+                    $stmt = $db->prepare("SELECT *, 'loan' as app_type FROM loan_applications WHERE tracking_id = ?");
+                    $stmt->execute([$searchValue]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'loan' as app_type FROM loan_applications WHERE mobile = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'loan' as app_type FROM loan_applications WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $loanResults = $stmt->fetchAll();
+                if ($loanResults) $allResults = array_merge($allResults, $loanResults);
+            } catch (Exception $e) {}
+
+            // खाता आवेदन खोज्ने
+            try {
+                if ($searchType === 'tracking_id') {
+                    $stmt = $db->prepare("SELECT *, 'account' as app_type FROM account_applications WHERE tracking_id = ?");
+                    $stmt->execute([$searchValue]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'account' as app_type FROM account_applications WHERE mobile = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'account' as app_type FROM account_applications WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $accResults = $stmt->fetchAll();
+                if ($accResults) $allResults = array_merge($allResults, $accResults);
+            } catch (Exception $e) {}
+
+            // गुनासो खोज्ने — tracking_id (GRV-YYYYMMDD-XXXXXX) वा legacy numeric id दुवै support
+            try {
+                if ($searchType === 'tracking_id') {
+                    $rawSv = trim($searchValue);
+                    // Match by full tracking_id (case-insensitive) OR legacy numeric id
+                    $numericId = (int) preg_replace('/[^0-9]/', '', $rawSv);
+                    $stmt = $db->prepare("SELECT *, 'grievance' as app_type FROM grievances WHERE UPPER(tracking_id) = UPPER(?) OR id = ?");
+                    $stmt->execute([$rawSv, $numericId]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'grievance' as app_type FROM grievances WHERE phone = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'grievance' as app_type FROM grievances WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $grvResults = $stmt->fetchAll();
+                if ($grvResults) $allResults = array_merge($allResults, $grvResults);
+            } catch (Exception $e) {}
+
+            // KYC आवेदन खोज्ने — tracking_id वा legacy id दुवै support
+            try {
+                if ($searchType === 'tracking_id') {
+                    $rawSv = trim($searchValue);
+                    $numericId = (int) preg_replace('/[^0-9]/', '', $rawSv);
+                    $stmt = $db->prepare("SELECT *, 'kyc' as app_type FROM kyc_applications WHERE UPPER(tracking_id) = UPPER(?) OR id = ?");
+                    $stmt->execute([$rawSv, $numericId]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'kyc' as app_type FROM kyc_applications WHERE mobile = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'kyc' as app_type FROM kyc_applications WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $kycResults = $stmt->fetchAll();
+                if ($kycResults) $allResults = array_merge($allResults, $kycResults);
+            } catch (Exception $e) {}
+
+            // लिलामी बोलपत्र खोज्ने
+            try {
+                if ($searchType === 'tracking_id') {
+                    $bidId = 0;
+                    if (preg_match('/BID-?(\d+)/i', $searchValue, $matches)) {
+                        $bidId = (int) $matches[1];
+                    } elseif (ctype_digit(trim($searchValue))) {
+                        $bidId = (int) trim($searchValue);
+                    }
+                    $stmt = $db->prepare("SELECT ab.*, an.title as auction_title, 'auction_bid' as app_type
+                                          FROM auction_bids ab
+                                          LEFT JOIN auction_notices an ON ab.auction_id = an.id
+                                          WHERE ab.id = ?");
+                    $stmt->execute([$bidId > 0 ? $bidId : 0]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT ab.*, an.title as auction_title, 'auction_bid' as app_type
+                                          FROM auction_bids ab
+                                          LEFT JOIN auction_notices an ON ab.auction_id = an.id
+                                          WHERE ab.bidder_phone = ? ORDER BY ab.created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT ab.*, an.title as auction_title, 'auction_bid' as app_type
+                                          FROM auction_bids ab
+                                          LEFT JOIN auction_notices an ON ab.auction_id = an.id
+                                          WHERE ab.bidder_email = ? ORDER BY ab.created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $bidResults = $stmt->fetchAll();
+                if ($bidResults) $allResults = array_merge($allResults, $bidResults);
+            } catch (Exception $e) {}
+
+            // भेटघाट बुकिङ खोज्ने
+            try {
+                if ($searchType === 'tracking_id') {
+                    $apptId = 0;
+                    if (preg_match('/APT-?(\d+)/i', $searchValue, $matches)) {
+                        $apptId = (int) $matches[1];
+                    } elseif (ctype_digit(trim($searchValue))) {
+                        $apptId = (int) trim($searchValue);
+                    }
+                    $stmt = $db->prepare("SELECT *, 'appointment' as app_type FROM appointments WHERE id = ?");
+                    $stmt->execute([$apptId > 0 ? $apptId : 0]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'appointment' as app_type FROM appointments WHERE phone = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'appointment' as app_type FROM appointments WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $apptResults = $stmt->fetchAll();
+                if ($apptResults) $allResults = array_merge($allResults, $apptResults);
+            } catch (Exception $e) {}
+
+            /* सदस्य सर्वेक्षण खोज्ने — FBK-YYYY-XXXXXX format को tracking_id बाट खोज्छु */
+            try {
+                if ($searchType === 'tracking_id') {
+                    $stmt = $db->prepare("SELECT *, 'feedback' as app_type FROM member_feedback WHERE tracking_id = ?");
+                    $stmt->execute([$searchValue]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'feedback' as app_type FROM member_feedback WHERE phone = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'feedback' as app_type FROM member_feedback WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $fbResults = $stmt->fetchAll();
+                if ($fbResults) $allResults = array_merge($allResults, $fbResults);
+            } catch (Exception $e) {}
+
+            // सदस्य कल्याण दाबी खोज्ने
+            try {
+                if ($searchType === 'tracking_id') {
+                    $wlfId = $searchValue;
+                    if (preg_match('/WLF-?[\w-]+/i', $searchValue)) {
+                        $wlfId = $searchValue;
+                    }
+                    $stmt = $db->prepare("SELECT *, 'welfare_claim' as app_type FROM member_welfare_claims WHERE tracking_id = ?");
+                    $stmt->execute([$wlfId]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'welfare_claim' as app_type FROM member_welfare_claims WHERE phone = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'welfare_claim' as app_type FROM member_welfare_claims WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $wlfResults = $stmt->fetchAll();
+                if ($wlfResults) $allResults = array_merge($allResults, $wlfResults);
+            } catch (Exception $e) {}
+
+            try {
+                if ($searchType === 'tracking_id') {
+                    $stmt = $db->prepare("SELECT *, 'digital_service' as app_type FROM digital_service_requests WHERE tracking_id = ?");
+                    $stmt->execute([$searchValue]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'digital_service' as app_type FROM digital_service_requests WHERE phone = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'digital_service' as app_type FROM digital_service_requests WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $digitalResults = $stmt->fetchAll();
+                if ($digitalResults) $allResults = array_merge($allResults, $digitalResults);
+            } catch (Exception $e) {}
+
+            // Vendor enlistment खोज्ने
+            try {
+                if ($searchType === 'tracking_id') {
+                    $stmt = $db->prepare("SELECT *, 'vendor' as app_type FROM vendors WHERE tracking_id = ?");
+                    $stmt->execute([$searchValue]);
+                } elseif ($searchType === 'phone') {
+                    $stmt = $db->prepare("SELECT *, 'vendor' as app_type FROM vendors WHERE phone = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                } else {
+                    $stmt = $db->prepare("SELECT *, 'vendor' as app_type FROM vendors WHERE email = ? ORDER BY created_at DESC");
+                    $stmt->execute([$searchValue]);
+                }
+                $vendorResults = $stmt->fetchAll();
+                if ($vendorResults) $allResults = array_merge($allResults, $vendorResults);
+            } catch (Exception $e) {}
+
+            if (empty($allResults)) {
+                /* खोजिएको आवेदन नभेटिएमा — helpful message */
+                if ($searchType === 'tracking_id') {
+                    $error = isEnglish()
+                        ? 'No application found with this Tracking ID. Please check the ID and try again.'
+                        : 'यो Tracking ID मा कुनै आवेदन भेटिएन। कृपया ID सही छ भनी जाँच गर्नुहोस्।<br><small class="text-muted">उदाहरण format: JOB-20240101-XXXX, DSR-XXXX-XXXXXX, GRV-123</small>';
+                } elseif ($searchType === 'phone') {
+                    $error = isEnglish()
+                        ? 'No application found with this phone number. Please check the number.'
+                        : 'यो फोन नम्बरमा कुनै आवेदन भेटिएन। आवेदन गर्दा प्रयोग गरेको फोन नम्बर राख्नुहोस्।';
+                } else {
+                    $error = isEnglish()
+                        ? 'No application found with this email address.'
+                        : 'यो email मा कुनै आवेदन भेटिएन। आवेदन गर्दा प्रयोग गरेको email राख्नुहोस्।';
+                }
+            } else {
+                /* आवेदन भेटिएमा directly देखाउँछु — कुनै extra verification चाहिँदैन */
+                $success = isEnglish()
+                    ? count($allResults) . ' application(s) found.'
+                    : count($allResults) . ' आवेदन भेटियो।';
+            }
+        } catch (Exception $e) {
+            $error = isEnglish() ? 'An error occurred. Please try again.' : 'त्रुटि भयो। कृपया पुनः प्रयास गर्नुहोस्।';
+        }
+    }
+}
+
+/* ── v9.9: Public ID Card preview eligibility ──
+   Phone/Email verification सफल भएपछि, यदि उक्त phone वा email सँग
+   members table मा approved + id_card_generated=1 भएको row छ भने,
+   एउटा signed token बनाएर "View Digital ID Card" लिङ्क देखाउने।
+   यो tracker.php को verification reuse गर्छ — extra OTP नभई secured छ। */
+$publicIdCardLink = '';
+$publicIdCardName = '';
+if (!empty($verificationOk) && !empty($needsVerify) && in_array(($_POST['search_type'] ?? ''), ['phone','email'], true)) {
+    try {
+        $_db = getDB();
+        $_phoneNorm = preg_replace('/\D/', '', ($_POST['sec_phone'] ?? ''));
+        $_emailNorm = strtolower(trim($_POST['sec_email'] ?? ''));
+        if ($_db && $_phoneNorm && $_emailNorm) {
+            $_stmt = $_db->prepare(
+                "SELECT id, name, member_card_no FROM members
+                 WHERE (REPLACE(REPLACE(phone,' ',''),'-','') = ? OR REPLACE(REPLACE(phone,' ',''),'-','') LIKE ?)
+                   AND LOWER(email) = ?
+                   AND approval_status = 'approved'
+                   AND id_card_generated = 1
+                   AND is_active = 1
+                 LIMIT 1"
+            );
+            $_likePhone = '%' . substr($_phoneNorm, -10);
+            $_stmt->execute([$_phoneNorm, $_likePhone, $_emailNorm]);
+            $_pmem = $_stmt->fetch(PDO::FETCH_ASSOC);
+            if ($_pmem) {
+                /* HMAC-signed short-lived token (15 min) — replay-safe public preview */
+                $_secret = defined('AUTH_SECRET') ? AUTH_SECRET : (defined('SECRET_KEY') ? SECRET_KEY : 'aakash-fallback-secret-2026');
+                $_exp    = time() + 900;
+                $_payload= $_pmem['id'] . '.' . $_exp;
+                $_sig    = hash_hmac('sha256', $_payload, $_secret);
+                $publicIdCardLink = SITE_URL . 'tracker-id-card.php?mid=' . urlencode($_pmem['id'])
+                                  . '&exp=' . $_exp . '&sig=' . urlencode($_sig);
+                $publicIdCardName = $_pmem['name'];
+            }
+        }
+    } catch (\Throwable $e) { error_log('public id-card eligibility: ' . $e->getMessage()); }
+}
+
+function getStatusBadgeClass($status) {
+    return match($status) {
+        'pending' => 'bg-warning text-dark',
+        'shortlisted', 'in_progress', 'reviewed', 'under_review', 'processing' => 'bg-info text-white',
+        'interviewed', 'confirmed' => 'bg-secondary text-white',
+        'selected', 'approved', 'accepted', 'resolved', 'completed', 'disbursed', 'paid' => 'bg-success text-white',
+        'rejected', 'closed', 'cancelled' => 'bg-danger text-white',
+        default => 'bg-secondary text-white'
+    };
+}
+
+function getStatusText($status, $type = 'job') {
+    if ($type === 'grievance') {
+        return match($status) {
+            'pending' => 'समीक्षाधीन / Pending',
+            'in_progress' => 'कार्यान्वयनमा / In Progress',
+            'resolved' => 'समाधान भयो / Resolved',
+            'closed' => 'बन्द गरियो / Closed',
+            default => $status
+        };
+    }
+    if ($type === 'loan') {
+        return match($status) {
+            'pending' => 'पेन्डिङ / Pending',
+            'processing' => 'प्रक्रियामा / Processing',
+            'approved' => 'स्वीकृत / Approved',
+            'rejected' => 'अस्वीकृत / Rejected',
+            'disbursed' => 'वितरण भयो / Disbursed',
+            default => $status
+        };
+    }
+    if ($type === 'kyc' || $type === 'account') {
+        return match($status) {
+            'pending' => 'समीक्षाधीन / Pending',
+            'approved' => 'स्वीकृत / Approved',
+            'rejected' => 'अस्वीकृत / Rejected',
+            default => $status
+        };
+    }
+    if ($type === 'auction_bid') {
+        return match($status) {
+            'pending' => 'समीक्षाधीन / Pending',
+            'accepted' => 'स्वीकृत / Accepted',
+            'rejected' => 'अस्वीकृत / Rejected',
+            default => $status
+        };
+    }
+    if ($type === 'appointment') {
+        return match($status) {
+            'pending' => 'पेन्डिङ / Pending',
+            'confirmed' => 'पुष्टि भयो / Confirmed',
+            'completed' => 'सम्पन्न / Completed',
+            'cancelled' => 'रद्द गरियो / Cancelled',
+            default => $status
+        };
+    }
+    if ($type === 'feedback') {
+        return match($status) {
+            'pending' => 'समीक्षाधीन / Pending',
+            'reviewed' => 'समीक्षा भयो / Reviewed',
+            'resolved' => 'समाधान भयो / Resolved',
+            default => $status
+        };
+    }
+    if ($type === 'welfare_claim') {
+        return match($status) {
+            'pending' => 'पेन्डिङ / Pending',
+            'under_review' => 'समीक्षाधीन / Under Review',
+            'approved' => 'स्वीकृत / Approved',
+            'rejected' => 'अस्वीकृत / Rejected',
+            'paid' => 'भुक्तान भयो / Paid',
+            'completed' => 'सम्पन्न / Completed',
+            default => $status
+        };
+    }
+    if ($type === 'digital_service') {
+        return match($status) {
+            'pending' => 'पेन्डिङ / Pending',
+            'processing' => 'प्रक्रियामा / Processing',
+            'approved' => 'स्वीकृत / Approved',
+            'rejected' => 'अस्वीकृत / Rejected',
+            'completed' => 'सम्पन्न / Completed',
+            default => $status
+        };
+    }
+    return match($status) {
+        'pending' => 'पेन्डिङ / Pending',
+        'shortlisted' => 'छनोट भयो / Shortlisted',
+        'interviewed' => 'अन्तर्वार्ता भयो / Interviewed',
+        'selected' => 'चयन भयो / Selected',
+        'rejected' => 'अस्वीकृत / Rejected',
+        default => $status
+    };
+}
+
+function getAppTypeLabel($type) {
+    return match($type) {
+        'job' => ['icon' => 'fa-briefcase', 'label' => 'रोजगारी आवेदन', 'label_en' => 'Job Application', 'color' => 'primary'],
+        'loan' => ['icon' => 'fa-hand-holding-usd', 'label' => 'ऋण आवेदन', 'label_en' => 'Loan Application', 'color' => 'success'],
+        'account' => ['icon' => 'fa-user-plus', 'label' => 'खाता खोल्ने आवेदन', 'label_en' => 'Account Application', 'color' => 'info'],
+        'grievance' => ['icon' => 'fa-exclamation-circle', 'label' => 'गुनासो', 'label_en' => 'Grievance', 'color' => 'warning'],
+        'kyc' => ['icon' => 'fa-id-card', 'label' => 'KYC अद्यावधिक', 'label_en' => 'KYC Update', 'color' => 'secondary'],
+        'auction_bid' => ['icon' => 'fa-gavel', 'label' => 'लिलामी बोलपत्र', 'label_en' => 'Auction Bid', 'color' => 'danger'],
+        'appointment' => ['icon' => 'fa-calendar-check', 'label' => 'भेटघाट बुक', 'label_en' => 'Appointment', 'color' => 'teal'],
+        'feedback' => ['icon' => 'fa-comments', 'label' => 'सदस्य सर्वेक्षण/गुनासो', 'label_en' => 'Feedback/Survey', 'color' => 'purple'],
+        'welfare_claim' => ['icon' => 'fa-hand-holding-heart', 'label' => 'कल्याण दाबी', 'label_en' => 'Welfare Claim', 'color' => 'pink'],
+        'digital_service' => ['icon' => 'fa-mobile-alt', 'label' => 'डिजिटल सेवा अनुरोध', 'label_en' => 'Digital Service Request', 'color' => 'info'],
+        'vendor' => ['icon' => 'fa-store', 'label' => 'सप्लायर दर्ता', 'label_en' => 'Vendor Enlistment', 'color' => 'warning'],
+        default => ['icon' => 'fa-file-alt', 'label' => 'आवेदन', 'label_en' => 'Application', 'color' => 'dark']
+    };
+}
+?>
+
+<!-- Page Banner — Premium Hero -->
+<section class="tracker-hero-section">
+    <div class="tracker-hero-bg-pattern"></div>
+    <div class="container position-relative">
+        <div class="tracker-hero-content text-center">
+            <div class="tracker-hero-icon-wrap mb-3">
+                <div class="tracker-hero-icon-ring">
+                    <i class="fas fa-radar"></i>
+                </div>
+                <div class="tracker-hero-ping"></div>
+            </div>
+            <h1 class="tracker-hero-title">
+                <?php echo isEnglish() ? 'Application Status Tracker' : 'आवेदन स्थिति ट्र्याकर'; ?>
+            </h1>
+            <p class="tracker-hero-sub">
+                <?php echo isEnglish()
+                    ? 'Track your Job, Loan, Account, Grievance &amp; more — all in one place.'
+                    : 'रोजगारी, ऋण, खाता, गुनासो लगायत सबै आवेदनको स्थिति — एकैठाउँमा।'; ?>
+            </p>
+            <nav aria-label="breadcrumb" class="d-flex justify-content-center">
+                <ol class="breadcrumb tracker-breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>"><?php echo $L['home']; ?></a></li>
+                    <li class="breadcrumb-item active"><?php echo isEnglish() ? 'Track Application' : 'आवेदन ट्र्याक'; ?></li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <!-- Application Type Icons — Eye-Catching Pills -->
+                <div class="tracker-types-strip mb-4">
+                    <p class="tracker-types-label"><?php echo isEnglish() ? 'Track any application type:' : 'जुनसुकै आवेदन ट्र्याक गर्नुहोस्:'; ?></p>
+                    <div class="tracker-type-pills">
+                        <div class="type-pill" style="--pill-color:#3b82f6">
+                            <div class="type-pill-icon"><i class="fas fa-briefcase"></i></div>
+                            <span><?php echo isEnglish() ? 'Job' : 'रोजगारी'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#10b981">
+                            <div class="type-pill-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                            <span><?php echo isEnglish() ? 'Loan' : 'ऋण'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#06b6d4">
+                            <div class="type-pill-icon"><i class="fas fa-user-plus"></i></div>
+                            <span><?php echo isEnglish() ? 'Account' : 'खाता'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#f59e0b">
+                            <div class="type-pill-icon"><i class="fas fa-exclamation-circle"></i></div>
+                            <span><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#6b7280">
+                            <div class="type-pill-icon"><i class="fas fa-id-card"></i></div>
+                            <span>KYC</span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#ef4444">
+                            <div class="type-pill-icon"><i class="fas fa-gavel"></i></div>
+                            <span><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#20c997">
+                            <div class="type-pill-icon"><i class="fas fa-calendar-check"></i></div>
+                            <span><?php echo isEnglish() ? 'Appointment' : 'भेटघाट'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#6f42c1">
+                            <div class="type-pill-icon"><i class="fas fa-comments"></i></div>
+                            <span><?php echo isEnglish() ? 'Survey' : 'सर्वेक्षण'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#e91e63">
+                            <div class="type-pill-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                            <span><?php echo isEnglish() ? 'Welfare' : 'सुविधा'; ?></span>
+                        </div>
+                        <div class="type-pill" style="--pill-color:#0ea5e9">
+                            <div class="type-pill-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <span><?php echo isEnglish() ? 'Digital' : 'डिजिटल'; ?></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Form Card — Premium -->
+                <div class="tracker-search-card card shadow mb-4">
+                    <div class="tracker-search-header">
+                        <div class="tracker-search-header-icon">
+                            <i class="fas fa-magnifying-glass-chart"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold"><?php echo isEnglish() ? 'Track All Your Applications' : 'सबै आवेदनहरू एकै ठाउँमा खोज्नुहोस्'; ?></h5>
+                            <p class="mb-0 opacity-75 small"><?php echo isEnglish() ? 'Enter Tracking ID, Phone or Email' : 'Tracking ID, फोन वा इमेल राख्नुहोस्'; ?></p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="" id="trackerForm" class="needs-validation" novalidate>
+                            <?php echo csrfField(); ?>
+                            <div class="row g-3">
+                                <!-- Search Type — expands to col-12 when phone/email (no separate search value) -->
+                                <div id="colSearchType" class="col-md-4">
+                                    <label class="form-label"><i class="fas fa-filter"></i> <?php echo isEnglish() ? 'Search By' : 'खोज्ने तरिका'; ?></label>
+                                    <select name="search_type" class="form-select form-select-lg" id="searchType">
+                                        <option value="tracking_id" <?php echo ($_POST['search_type'] ?? 'tracking_id') === 'tracking_id' ? 'selected' : ''; ?>>
+                                            <?php echo isEnglish() ? 'Tracking ID / Reference No.' : 'ट्र्याकिङ ID / सन्दर्भ नं.'; ?>
+                                        </option>
+                                        <option value="phone" <?php echo ($_POST['search_type'] ?? '') === 'phone' ? 'selected' : ''; ?>>
+                                            <?php echo isEnglish() ? 'Phone Number' : 'फोन नम्बर'; ?>
+                                        </option>
+                                        <option value="email" <?php echo ($_POST['search_type'] ?? '') === 'email' ? 'selected' : ''; ?>>
+                                            <?php echo isEnglish() ? 'Email Address' : 'इमेल ठेगाना'; ?>
+                                        </option>
+                                    </select>
+                                    <!-- Phone/Email चुनेपछि यहाँ tip देखाउने -->
+                                    <small id="searchTypeTip" class="text-muted" style="display:none">
+                                        <i class="fas fa-info-circle me-1 text-info"></i>
+                                        <span id="tipPhone" style="display:none"><?php echo isEnglish() ? 'Enter your phone number &amp; email below — they will be used for search &amp; verification.' : 'तल फोन र इमेल राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
+                                        <span id="tipEmail" style="display:none"><?php echo isEnglish() ? 'Enter your email &amp; phone below — they will be used for search &amp; verification.' : 'तल इमेल र फोन राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
+                                    </small>
+                                </div>
+
+                                <!-- Search Value — only for Tracking ID; hidden when phone/email -->
+                                <div id="colSearchValue" class="col-md-8">
+                                    <label class="form-label" id="searchLabel"><i class="fas fa-hashtag"></i> <?php echo isEnglish() ? 'Enter Tracking ID' : 'ट्र्याकिङ ID प्रविष्ट गर्नुहोस्'; ?></label>
+                                    <input type="text" name="search_value" id="searchValue" class="form-control form-control-lg"
+                                           placeholder="<?php echo isEnglish() ? 'e.g.: JOB-20240101-XXXX' : 'जस्तै: JOB-20240101-XXXX'; ?>"
+                                           value="<?php echo htmlspecialchars($_POST['search_value'] ?? ''); ?>">
+                                    <small class="text-muted">
+                                        <span id="hintTrackingId"><?php echo isEnglish() ? 'e.g.: JOB-20240101-XXXX, FBK-2082-XXXXXX, WLF-XXXX-XXXXXX' : 'जस्तै: JOB-20240101-XXXX, FBK-2082-XXXXXX, WLF-XXXX-XXXXXX'; ?></span>
+                                    </small>
+                                </div>
+
+                                <!-- ── Security Verification Section ──
+                                     Phone / Email बाट खोज्दा मात्र देखिन्छ (JS ले control गर्छ)
+                                     सुरक्षाको लागि: phone को अन्तिम 4 अंक + email को @ अघिका पहिला 3 अक्षर
+                                     जस्तै phone=9827157000, email=ram@gmail.com → code = "4567ram" -->
+                                <div id="verifySection" style="display:none;" class="col-12">
+                                    <div class="card bg-light border-warning">
+                                        <div class="card-body py-3">
+                                            <h6 class="mb-1 text-warning-emphasis" id="verifySectionTitle">
+                                                <i class="fas fa-shield-alt me-2 text-warning"></i>
+                                                <?php echo isEnglish() ? 'Search & Identity Verification' : 'खोज र पहिचान प्रमाणीकरण'; ?>
+                                            </h6>
+                                            <p class="text-muted small mb-3" id="verifySectionDesc">
+                                                <?php echo isEnglish()
+                                                    ? 'Enter the phone number &amp; email you used when applying — they are used for both search &amp; identity verification.'
+                                                    : 'आवेदन गर्दा प्रयोग गरेको फोन नम्बर र इमेल राख्नुहोस् — यिनै नम्बर खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छन्।'; ?>
+                                            </p>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-md-4">
+                                                    <label class="form-label small"><i class="fas fa-phone me-1 text-muted"></i>
+                                                        <?php echo isEnglish() ? 'Phone Number (used when applying)' : 'फोन नम्बर (आवेदनमा प्रयोग गरिएको)'; ?>
+                                                    </label>
+                                                    <input type="tel" name="sec_phone" id="secPhone" class="form-control"
+                                                           placeholder="<?php echo isEnglish() ? '10-digit phone number' : '१०-अंकको फोन नम्बर'; ?>"
+                                                           value="<?php echo htmlspecialchars($_POST['sec_phone'] ?? ''); ?>">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small"><i class="fas fa-envelope me-1 text-muted"></i>
+                                                        <?php echo isEnglish() ? 'Email Address (used when applying)' : 'इमेल ठेगाना (आवेदनमा प्रयोग गरिएको)'; ?>
+                                                    </label>
+                                                    <input type="email" name="sec_email" id="secEmail" class="form-control"
+                                                           placeholder="akashpame@gmail.com"
+                                                           value="<?php echo htmlspecialchars($_POST['sec_email'] ?? ''); ?>">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small"><i class="fas fa-key me-1 text-warning"></i>
+                                                        <?php echo isEnglish() ? 'Security Code' : 'सुरक्षा कोड'; ?>
+                                                    </label>
+                                                    <!-- type="password" — security code browser मा नदेखियोस् भनेर -->
+                                                    <input type="password" name="security_code" id="securityCode" class="form-control"
+                                                           placeholder="<?php echo isEnglish() ? 'auto-generated below' : 'तल स्वतः बन्छ'; ?>"
+                                                           maxlength="10" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <!-- Security code preview — JS ले live बनाउँछ -->
+                                            <div id="secCodePreview" class="small rounded-2 p-2" style="background:#fff7e0;border:1px dashed #ffc107;display:none;">
+                                                <i class="fas fa-info-circle text-warning me-1"></i>
+                                                <span id="secCodeText"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- खोज बटन -->
+                                <div class="col-12 d-flex align-items-center gap-3 flex-wrap">
+                                    <button type="submit" class="btn btn-tracker-search btn-lg px-5">
+                                        <i class="fas fa-search me-2"></i><?php echo isEnglish() ? 'Search Application' : 'आवेदन खोज्नुहोस्'; ?>
+                                    </button>
+                                    <small class="text-muted" id="verifyNote">
+                                        <i class="fas fa-lock text-success me-1"></i>
+                                        <?php echo isEnglish()
+                                            ? 'Tracking ID search — no extra verification needed.'
+                                            : 'Tracking ID बाट खोज्दा थप प्रमाणीकरण आवश्यक छैन।'; ?>
+                                    </small>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <?php if ($error): ?>
+                <div class="alert alert-warning tracker-alert alert-dismissible fade show d-flex align-items-start gap-2">
+                    <i class="fas fa-exclamation-triangle fa-lg mt-1 flex-shrink-0"></i>
+                    <div><?php echo $error; ?></div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                </div>
+                <?php endif; ?>
+
+                <?php if ($success && !empty($allResults)): ?>
+                <div class="alert alert-success tracker-alert d-flex align-items-center gap-2 py-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span><?php echo count($allResults); ?> <?php echo isEnglish() ? 'application(s) found.' : 'आवेदन भेटियो।'; ?></span>
+                </div>
+                <?php endif; ?>
+
+                <?php if (!empty($publicIdCardLink)): ?>
+                <!-- v9.9: Public Digital ID Card preview — verified phone+email match approved member -->
+                <div class="public-id-card-cta mb-3" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 6px 20px rgba(26,95,42,.25);">
+                    <div style="width:54px;height:54px;background:rgba(255,255,255,.18);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-id-card" style="font-size:1.5rem;"></i>
+                    </div>
+                    <div style="flex:1;min-width:200px;">
+                        <div style="font-weight:700;font-size:1rem;margin-bottom:2px;">
+                            <?php echo isEnglish() ? '🪪 Your Digital Member ID Card' : '🪪 तपाईंको डिजिटल सदस्य परिचयपत्र'; ?>
+                        </div>
+                        <div style="font-size:.85rem;opacity:.92;">
+                            <?php echo isEnglish()
+                                ? 'Verified for ' . htmlspecialchars($publicIdCardName) . '. Click to preview your official member ID card.'
+                                : htmlspecialchars($publicIdCardName) . ' को आधिकारिक डिजिटल परिचयपत्र हेर्नुहोस् (verified phone + email)।'; ?>
+                        </div>
+                    </div>
+                    <a href="<?php echo htmlspecialchars($publicIdCardLink); ?>" target="_blank" rel="noopener"
+                       style="background:#fff;color:var(--primary-color);text-decoration:none;padding:10px 20px;border-radius:10px;font-weight:700;font-size:.92rem;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;">
+                        <i class="fas fa-eye"></i>
+                        <?php echo isEnglish() ? 'View ID Card' : 'ID Card हेर्नुहोस्'; ?>
+                    </a>
+                </div>
+                <?php endif; ?>
+
+                <?php if (!empty($allResults)): ?>
+                <?php
+                    $doneStatuses = ['completed','approved','resolved','closed','rejected','selected','cancelled','disbursed','paid','accepted'];
+                    $activeCount = 0; $doneCount = 0;
+                    foreach ($allResults as $_r) {
+                        $s = $_r['status'] ?? 'pending';
+                        if (in_array($s, $doneStatuses)) $doneCount++; else $activeCount++;
+                    }
+                ?>
+                <!-- Tab Navigation -->
+                <div class="tracker-tabs-nav mb-3">
+                    <button class="tracker-tab-btn active" data-tab="active">
+                        <i class="fas fa-clock-rotate-left"></i>
+                        <?php echo isEnglish() ? 'Active / New' : 'नयाँ / सक्रिय'; ?>
+                        <?php if ($activeCount > 0): ?><span class="tab-count-badge tab-badge-active"><?php echo $activeCount; ?></span><?php endif; ?>
+                    </button>
+                    <button class="tracker-tab-btn" data-tab="done">
+                        <i class="fas fa-check-circle"></i>
+                        <?php echo isEnglish() ? 'Completed / Old' : 'पुरानो / सम्पन्न'; ?>
+                        <?php if ($doneCount > 0): ?><span class="tab-count-badge tab-badge-done"><?php echo $doneCount; ?></span><?php endif; ?>
+                    </button>
+                    <div class="tracker-tab-empty-msg" id="tabEmptyMsg" style="display:none;">
+                        <i class="fas fa-inbox"></i>
+                        <span id="tabEmptyText"><?php echo isEnglish() ? 'No applications in this category.' : 'यस श्रेणीमा कुनै आवेदन छैन।'; ?></span>
+                    </div>
+                </div>
+
+                <style>
+                .tracker-tabs-nav {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                    border-bottom: 2px solid #e9ecef;
+                    padding-bottom: 0;
+                }
+                .tracker-tab-btn {
+                    background: none;
+                    border: none;
+                    border-bottom: 3px solid transparent;
+                    padding: 10px 20px;
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    color: #666;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: -2px;
+                    border-radius: 6px 6px 0 0;
+                    transition: all 0.2s;
+                }
+                .tracker-tab-btn:hover { color: var(--primary-color); background: #f8fff9; }
+                .tracker-tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: #f0faf2; }
+                .tab-count-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 50%;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                }
+                .tab-badge-active { background: #ffc107; color: #333; }
+                .tab-badge-done { background: #6c757d; color: #fff; }
+                .tracker-tab-empty-msg {
+                    flex: 1;
+                    text-align: center;
+                    color: #999;
+                    font-size: 0.9rem;
+                    padding: 8px;
+                }
+                .result-card[data-tab-group="done"] { border-left-style: dashed !important; opacity: 0.88; }
+                </style>
+
+                <!-- All Results -->
+                <div class="results-container">
+                    <?php foreach ($allResults as $app):
+                        $typeInfo = getAppTypeLabel($app['app_type']);
+                        $_status = $app['status'] ?? 'pending';
+                        $_tabGroup = in_array($_status, $doneStatuses) ? 'done' : 'active';
+                    ?>
+                    <div class="result-card-premium mb-4" data-tab-group="<?php echo $_tabGroup; ?>" <?php if ($_tabGroup === 'done'): ?>style="display:none;"<?php endif; ?>>
+                        <div class="rcp-accent rcp-accent-<?php echo $typeInfo['color']; ?>"></div>
+                        <div class="rcp-body">
+                            <div class="rcp-header">
+                                <div class="rcp-icon-wrap rcp-icon-<?php echo $typeInfo['color']; ?>">
+                                    <i class="fas <?php echo $typeInfo['icon']; ?>"></i>
+                                </div>
+                                <div class="rcp-meta">
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                                        <span class="rcp-type-badge rcp-badge-<?php echo $typeInfo['color']; ?>">
+                                            <i class="fas <?php echo $typeInfo['icon']; ?> me-1"></i><?php echo isEnglish() ? $typeInfo['label_en'] : $typeInfo['label']; ?>
+                                        </span>
+                                        <span class="rcp-status-badge <?php echo getStatusBadgeClass($app['status'] ?? 'pending'); ?> rcp-status-glow">
+                                            <?php echo getStatusText($app['status'] ?? 'pending', $app['app_type']); ?>
+                                        </span>
+                                    </div>
+
+                                    <h5 class="mb-1">
+                                        <?php
+                                        if ($app['app_type'] === 'job') {
+                                            echo htmlspecialchars($app['job_title_np'] ?? $app['job_title'] ?? 'रोजगारी आवेदन');
+                                        } elseif ($app['app_type'] === 'grievance') {
+                                            echo htmlspecialchars($app['subject'] ?? 'गुनासो');
+                                        } elseif ($app['app_type'] === 'auction_bid') {
+                                            echo htmlspecialchars($app['auction_title'] ?? 'लिलामी बोलपत्र');
+                                        } elseif ($app['app_type'] === 'loan') {
+                                            echo htmlspecialchars($app['loan_type'] ?? 'ऋण आवेदन');
+                                        } elseif ($app['app_type'] === 'account') {
+                                            echo htmlspecialchars($app['account_type'] ?? 'खाता आवेदन');
+                                        } elseif ($app['app_type'] === 'appointment') {
+                                            $purposeLabels = [
+                                                'account_inquiry' => isEnglish() ? 'Account Inquiry' : 'खाता जानकारी',
+                                                'loan_inquiry' => isEnglish() ? 'Loan Inquiry' : 'ऋण जानकारी',
+                                                'kyc_update' => isEnglish() ? 'KYC Update' : 'केवाइसी अपडेट',
+                                                'loan_repayment' => isEnglish() ? 'Loan Repayment' : 'ऋण भुक्तानी',
+                                                'account_opening' => isEnglish() ? 'Account Opening' : 'खाता खोल्ने',
+                                                'other' => isEnglish() ? 'Other' : 'अन्य'
+                                            ];
+                                            echo htmlspecialchars($purposeLabels[$app['purpose'] ?? 'other'] ?? 'भेटघाट');
+                                        } elseif ($app['app_type'] === 'feedback') {
+                                            echo htmlspecialchars($app['subject'] ?? $app['type'] ?? 'सर्वेक्षण/गुनासो');
+                                        } elseif ($app['app_type'] === 'welfare_claim') {
+                                            $claimTypes = [
+                                                'maternity' => isEnglish() ? 'Maternity Benefit' : 'सुत्केरी सुविधा',
+                                                'death' => isEnglish() ? 'Death Benefit' : 'मृत्यु सुविधा',
+                                                'insurance' => isEnglish() ? 'Insurance Claim' : 'बीमा दाबी',
+                                                'medical' => isEnglish() ? 'Medical Expense' : 'उपचार खर्च',
+                                                'other' => isEnglish() ? 'Other Benefit' : 'अन्य सुविधा'
+                                            ];
+                                            echo htmlspecialchars($claimTypes[$app['claim_type'] ?? 'other'] ?? 'कल्याण दाबी');
+                                        } elseif ($app['app_type'] === 'digital_service') {
+                                            $dsLabels = ['statement_request'=>'खाता विवरण','bill_payment'=>'बिल भुक्तानी','mobile_recharge'=>'मोबाइल रिचार्ज','fund_transfer'=>'रकम स्थानान्तरण','loan_statement'=>'ऋण विवरण','cheque_book'=>'चेकबुक','atm_card'=>'ATM कार्ड','internet_banking'=>'इन्टरनेट बैंकिङ','mobile_banking'=>'मोबाइल बैंकिङ','other_service'=>'अन्य सेवा'];
+                                            echo htmlspecialchars($dsLabels[$app['service_type'] ?? ''] ?? $app['service_type_np'] ?? $app['service_type'] ?? 'डिजिटल सेवा अनुरोध');
+                                        } else {
+                                            echo isEnglish() ? $typeInfo['label_en'] : $typeInfo['label'];
+                                        }
+                                        ?>
+                                    </h5>
+
+                                    <div class="rcp-chips mt-1">
+                                        <span class="rcp-chip"><i class="fas fa-user"></i><?php echo htmlspecialchars(substr($app['full_name'] ?? $app['name'] ?? $app['member_name'] ?? $app['requester_name'] ?? $app['bidder_name'] ?? '-', 0, 30)); ?></span>
+                                        <span class="rcp-chip"><i class="fas fa-calendar-alt"></i><?php echo date('Y-m-d', strtotime($app['created_at'])); ?></span>
+                                        <?php if (!empty($app['tracking_id'])): ?>
+                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i><?php echo htmlspecialchars($app['tracking_id']); ?></span>
+                                        <?php elseif ($app['app_type'] === 'grievance'): ?>
+                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i>GRV-<?php echo $app['id']; ?></span>
+                                        <?php elseif ($app['app_type'] === 'kyc'): ?>
+                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i>KYC-<?php echo $app['id']; ?></span>
+                                        <?php elseif ($app['app_type'] === 'auction_bid'): ?>
+                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i>BID-<?php echo $app['id']; ?></span>
+                                        <?php elseif ($app['app_type'] === 'appointment'): ?>
+                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i>APT-<?php echo $app['id']; ?></span>
+                                        <?php elseif ($app['app_type'] === 'feedback'): ?>
+                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i>FBK-<?php echo $app['id']; ?></span>
+                                        <?php endif; ?>
+                                    </div><!-- /.rcp-chips -->
+                                </div><!-- /.rcp-meta -->
+                            </div><!-- /.rcp-header -->
+                            <!-- Details toggle button -->
+                            <div class="rcp-details-toggle mt-2">
+                                <button class="btn btn-sm btn-outline-primary rcp-toggle-btn" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#details-<?php echo $app['app_type'] . '-' . $app['id']; ?>"
+                                        aria-expanded="false">
+                                    <i class="fas fa-chevron-down me-1"></i><?php echo isEnglish() ? 'View Details' : 'विवरण हेर्नुहोस्'; ?>
+                                </button>
+                            </div>
+
+                            <!-- Expandable Details -->
+                            <div class="collapse" id="details-<?php echo $app['app_type'] . '-' . $app['id']; ?>">
+                                <div class="rcp-timeline-wrap">
+
+                                    <!-- ══ Applicant Detail Info Grid (all types) ══ -->
+                                    <?php
+                                    $diName   = $app['full_name']  ?? $app['name']        ?? $app['member_name']   ?? $app['requester_name'] ?? $app['bidder_name']  ?? '';
+                                    $diPhone  = $app['mobile']     ?? $app['phone']        ?? $app['bidder_phone']  ?? '';
+                                    $diEmail  = $app['email']      ?? $app['bidder_email'] ?? '';
+                                    $diAddr   = $app['address']    ?? $app['permanent_address'] ?? '';
+                                    $diMemId  = $app['member_id']  ?? '';
+                                    $diBranch = $app['branch']     ?? '';
+                                    $diDate   = !empty($app['created_at']) ? date('Y-m-d  H:i', strtotime($app['created_at'])) : '';
+                                    ?>
+                                    <div class="di-grid mb-3">
+                                        <?php if ($diName): ?><div class="di-item"><span class="di-label"><i class="fas fa-user"></i> <?php echo isEnglish() ? 'Name' : 'नाम'; ?></span><span class="di-value"><?php echo e($diName); ?></span></div><?php endif; ?>
+                                        <?php if ($diPhone): ?><div class="di-item"><span class="di-label"><i class="fas fa-phone"></i> <?php echo isEnglish() ? 'Phone' : 'फोन'; ?></span><span class="di-value"><?php echo e($diPhone); ?></span></div><?php endif; ?>
+                                        <?php if ($diEmail): ?><div class="di-item"><span class="di-label"><i class="fas fa-envelope"></i> <?php echo isEnglish() ? 'Email' : 'इमेल'; ?></span><span class="di-value" style="word-break:break-all"><?php echo e(mb_substr($diEmail,0,30)); ?></span></div><?php endif; ?>
+                                        <?php if ($diMemId): ?><div class="di-item"><span class="di-label"><i class="fas fa-id-badge"></i> <?php echo isEnglish() ? 'Member ID' : 'सदस्य नं.'; ?></span><span class="di-value"><?php echo e($diMemId); ?></span></div><?php endif; ?>
+                                        <?php if ($diDate): ?><div class="di-item"><span class="di-label"><i class="fas fa-calendar-alt"></i> <?php echo isEnglish() ? 'Submitted' : 'दर्ता मिति'; ?></span><span class="di-value"><?php echo $diDate; ?></span></div><?php endif; ?>
+                                        <?php if ($diBranch): ?><div class="di-item"><span class="di-label"><i class="fas fa-building"></i> <?php echo isEnglish() ? 'Branch' : 'शाखा'; ?></span><span class="di-value"><?php echo e($diBranch); ?></span></div><?php endif; ?>
+
+                                        <?php if ($app['app_type'] === 'loan'): ?>
+                                        <?php if (!empty($app['loan_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-tag"></i> <?php echo isEnglish() ? 'Loan Type' : 'ऋण प्रकार'; ?></span><span class="di-value"><?php echo e($app['loan_type']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['loan_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Requested Amount' : 'अनुरोधित रकम'; ?></span><span class="di-value fw-bold text-success">रु. <?php echo number_format((float)$app['loan_amount']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['loan_purpose'])): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-info-circle"></i> <?php echo isEnglish() ? 'Purpose' : 'उद्देश्य'; ?></span><span class="di-value"><?php echo e(mb_substr($app['loan_purpose'],0,80)); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['occupation'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Occupation' : 'पेशा'; ?></span><span class="di-value"><?php echo e($app['occupation']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['monthly_income'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-wallet"></i> <?php echo isEnglish() ? 'Monthly Income' : 'मासिक आय'; ?></span><span class="di-value">रु. <?php echo number_format((float)$app['monthly_income']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['guarantor_name'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-user-check"></i> <?php echo isEnglish() ? 'Guarantor' : 'जमानतकर्ता'; ?></span><span class="di-value"><?php echo e($app['guarantor_name']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['collateral_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-shield-alt"></i> <?php echo isEnglish() ? 'Collateral' : 'धितो'; ?></span><span class="di-value"><?php echo e($app['collateral_type']); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'account'): ?>
+                                        <?php if (!empty($app['account_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-wallet"></i> <?php echo isEnglish() ? 'Account Type' : 'खाता प्रकार'; ?></span><span class="di-value"><?php echo e($app['account_type']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['gender'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-venus-mars"></i> <?php echo isEnglish() ? 'Gender' : 'लिङ्ग'; ?></span><span class="di-value"><?php echo e($app['gender']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['dob_bs'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-birthday-cake"></i> <?php echo isEnglish() ? 'DOB (BS)' : 'जन्म मिति (बि.स.)'; ?></span><span class="di-value"><?php echo e($app['dob_bs']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['citizenship_no'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-id-card"></i> <?php echo isEnglish() ? 'Citizenship No.' : 'नागरिकता नं.'; ?></span><span class="di-value"><?php echo e($app['citizenship_no']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['initial_deposit'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Initial Deposit' : 'प्रारम्भिक जम्मा'; ?></span><span class="di-value fw-bold text-success">रु. <?php echo number_format((float)$app['initial_deposit']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['occupation'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Occupation' : 'पेशा'; ?></span><span class="di-value"><?php echo e($app['occupation']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['nominee_name'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-user-friends"></i> <?php echo isEnglish() ? 'Nominee' : 'हकदार'; ?></span><span class="di-value"><?php echo e($app['nominee_name']); ?></span></div><?php endif; ?>
+                                        <?php if ($diAddr): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Address' : 'ठेगाना'; ?></span><span class="di-value"><?php echo e(mb_substr($diAddr,0,80)); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'grievance'): ?>
+                                        <?php if (!empty($app['category'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-tag"></i> <?php echo isEnglish() ? 'Category' : 'श्रेणी'; ?></span><span class="di-value"><?php echo e($app['category']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['subject'])): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-heading"></i> <?php echo isEnglish() ? 'Subject' : 'विषय'; ?></span><span class="di-value"><?php echo e(mb_substr($app['subject'],0,100)); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['description'])): ?><div class="di-item di-item-full"><span class="di-label"><i class="fas fa-align-left"></i> <?php echo isEnglish() ? 'Description' : 'विवरण'; ?></span><span class="di-value"><?php echo nl2br(e(mb_substr($app['description'],0,250))); ?><?php if(mb_strlen($app['description'])>250):?>…<?php endif;?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'kyc'): ?>
+                                        <?php if (!empty($app['citizenship_no'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-id-card"></i> <?php echo isEnglish() ? 'Citizenship No.' : 'नागरिकता नं.'; ?></span><span class="di-value"><?php echo e($app['citizenship_no']); ?></span></div><?php endif; ?>
+                                        <?php if ($diAddr): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Address' : 'ठेगाना'; ?></span><span class="di-value"><?php echo e(mb_substr($diAddr,0,80)); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'appointment'): ?>
+                                        <?php $aptPurposeLabels=['account_inquiry'=>'खाता जानकारी','loan_inquiry'=>'ऋण जानकारी','kyc_update'=>'KYC अपडेट','loan_repayment'=>'ऋण भुक्तानी','account_opening'=>'खाता खोल्ने','other'=>'अन्य']; ?>
+                                        <?php if (!empty($app['purpose'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-question-circle"></i> <?php echo isEnglish() ? 'Purpose' : 'उद्देश्य'; ?></span><span class="di-value"><?php echo e($aptPurposeLabels[$app['purpose']] ?? $app['purpose']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['preferred_date'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-calendar"></i> <?php echo isEnglish() ? 'Pref. Date' : 'मनपर्ने मिति'; ?></span><span class="di-value"><?php echo e($app['preferred_date']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['preferred_time'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-clock"></i> <?php echo isEnglish() ? 'Pref. Time' : 'समय'; ?></span><span class="di-value"><?php echo e($app['preferred_time']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['purpose_detail'])): ?><div class="di-item di-item-full"><span class="di-label"><i class="fas fa-align-left"></i> <?php echo isEnglish() ? 'Details' : 'थप विवरण'; ?></span><span class="di-value"><?php echo nl2br(e(mb_substr($app['purpose_detail'],0,200))); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'digital_service'): ?>
+                                        <?php $dsTypeLabels=['statement_request'=>'खाता विवरण','bill_payment'=>'बिल भुक्तानी','mobile_recharge'=>'मोबाइल रिचार्ज','fund_transfer'=>'रकम स्थानान्तरण','loan_statement'=>'ऋण विवरण','cheque_book'=>'चेकबुक','atm_card'=>'ATM कार्ड','internet_banking'=>'इन्टरनेट बैंकिङ','mobile_banking'=>'मोबाइल बैंकिङ','other_service'=>'अन्य सेवा']; ?>
+                                        <?php if (!empty($app['service_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-mobile-alt"></i> <?php echo isEnglish() ? 'Service Type' : 'सेवा प्रकार'; ?></span><span class="di-value"><?php echo e($dsTypeLabels[$app['service_type']] ?? $app['service_type']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['preferred_contact'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-headset"></i> <?php echo isEnglish() ? 'Contact Via' : 'सम्पर्क माध्यम'; ?></span><span class="di-value"><?php echo e($app['preferred_contact']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['account_no'] ?? $app['account_number'] ?? '')): ?><div class="di-item"><span class="di-label"><i class="fas fa-hashtag"></i> <?php echo isEnglish() ? 'Account No.' : 'खाता नं.'; ?></span><span class="di-value"><?php echo e($app['account_no'] ?? $app['account_number']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['request_details'])): ?><div class="di-item di-item-full"><span class="di-label"><i class="fas fa-align-left"></i> <?php echo isEnglish() ? 'Request Details' : 'अनुरोध विवरण'; ?></span><span class="di-value"><?php echo nl2br(e(mb_substr($app['request_details'],0,250))); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'welfare_claim'): ?>
+                                        <?php $wlfTypeLabels=['maternity'=>'सुत्केरी सुविधा','death'=>'मृत्यु सुविधा','insurance'=>'बीमा दाबी','medical'=>'उपचार खर्च','other'=>'अन्य सुविधा']; ?>
+                                        <?php if (!empty($app['claim_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-hand-holding-heart"></i> <?php echo isEnglish() ? 'Claim Type' : 'दाबीको प्रकार'; ?></span><span class="di-value"><?php echo e($wlfTypeLabels[$app['claim_type']] ?? $app['claim_type']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['claim_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Claimed Amount' : 'दाबी रकम'; ?></span><span class="di-value fw-bold text-info">रु. <?php echo number_format((float)$app['claim_amount']); ?></span></div><?php endif; ?>
+                                        <?php if ($diAddr): ?><div class="di-item"><span class="di-label"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Address' : 'ठेगाना'; ?></span><span class="di-value"><?php echo e(mb_substr($diAddr,0,60)); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['description'])): ?><div class="di-item di-item-full"><span class="di-label"><i class="fas fa-align-left"></i> <?php echo isEnglish() ? 'Description' : 'विवरण'; ?></span><span class="di-value"><?php echo nl2br(e(mb_substr($app['description'],0,200))); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'feedback'): ?>
+                                        <?php if (!empty($app['type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-tag"></i> <?php echo isEnglish() ? 'Type' : 'प्रकार'; ?></span><span class="di-value"><?php echo e($app['type']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['subject'])): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-heading"></i> <?php echo isEnglish() ? 'Subject' : 'विषय'; ?></span><span class="di-value"><?php echo e(mb_substr($app['subject'],0,100)); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['message'])): ?><div class="di-item di-item-full"><span class="di-label"><i class="fas fa-comment"></i> <?php echo isEnglish() ? 'Message' : 'सन्देश'; ?></span><span class="di-value"><?php echo nl2br(e(mb_substr($app['message'],0,200))); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'auction_bid'): ?>
+                                        <?php if (!empty($app['auction_title'])): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-gavel"></i> <?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span><span class="di-value"><?php echo e($app['auction_title']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['bid_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Bid Amount' : 'बोलपत्र रकम'; ?></span><span class="di-value fw-bold text-danger">रु. <?php echo number_format((float)$app['bid_amount']); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'vendor'): ?>
+                                        <?php if (!empty($app['company_name'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-building"></i> <?php echo isEnglish() ? 'Company' : 'कम्पनी'; ?></span><span class="di-value"><?php echo e($app['company_name']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['business_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-tag"></i> <?php echo isEnglish() ? 'Business Type' : 'व्यापारको किसिम'; ?></span><span class="di-value"><?php echo e($app['business_type']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['pan_no'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-file-invoice"></i> PAN No.</span><span class="di-value"><?php echo e($app['pan_no']); ?></span></div><?php endif; ?>
+                                        <?php if ($diAddr): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Address' : 'ठेगाना'; ?></span><span class="di-value"><?php echo e(mb_substr($diAddr,0,80)); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['description'])): ?><div class="di-item di-item-full"><span class="di-label"><i class="fas fa-align-left"></i> <?php echo isEnglish() ? 'Description' : 'विवरण'; ?></span><span class="di-value"><?php echo nl2br(e(mb_substr($app['description'],0,200))); ?></span></div><?php endif; ?>
+
+                                        <?php elseif ($app['app_type'] === 'job'): ?>
+                                        <?php if (!empty($app['job_title_np'] ?? $app['job_title'] ?? '')): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Position Applied' : 'आवेदन दिएको पद'; ?></span><span class="di-value"><?php echo e($app['job_title_np'] ?? $app['job_title'] ?? ''); ?></span></div><?php endif; ?>
+                                        <?php if ($diAddr): ?><div class="di-item"><span class="di-label"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Address' : 'ठेगाना'; ?></span><span class="di-value"><?php echo e(mb_substr($diAddr,0,60)); ?></span></div><?php endif; ?>
+                                        <?php endif; ?>
+                                    </div><!-- /.di-grid -->
+                                    <hr class="my-2 opacity-25">
+
+                                    <?php if ($app['app_type'] === 'job'): ?>
+                                    <!-- Job Application Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['pending', 'shortlisted', 'interviewed', 'selected', 'rejected']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                                <small><?php echo isEnglish() ? 'Applied' : 'आवेदन'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['shortlisted', 'interviewed', 'selected']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-list-check"></i></div>
+                                                <small><?php echo isEnglish() ? 'Shortlist' : 'छनोट'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['interviewed', 'selected']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-comments"></i></div>
+                                                <small><?php echo isEnglish() ? 'Interview' : 'अन्तर्वार्ता'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo $app['status'] === 'selected' ? 'active success' : ($app['status'] === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if ($app['status'] === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-check"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Result' : 'परिणाम'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php elseif ($app['app_type'] === 'grievance'): ?>
+                                    <!-- Grievance Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['pending', 'in_progress', 'resolved', 'closed']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                                <small><?php echo isEnglish() ? 'Submitted' : 'दर्ता'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['in_progress', 'resolved', 'closed']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-cogs"></i></div>
+                                                <small><?php echo isEnglish() ? 'Processing' : 'कार्यान्वयन'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['resolved', 'closed']) ? 'active success' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-check"></i></div>
+                                                <small><?php echo isEnglish() ? 'Resolved' : 'समाधान'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['admin_response'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Response:' : 'प्रतिक्रिया:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_response'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_attachment'])): ?>
+                                    <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
+                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
+                                        <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
+                                           target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                            <i class="fas fa-download me-1"></i><?php echo basename($app['admin_attachment']); ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'appointment'): ?>
+                                    <!-- Appointment Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-calendar-plus"></i></div>
+                                                <small><?php echo isEnglish() ? 'Booked' : 'बुक'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['confirmed', 'completed']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                                                <small><?php echo isEnglish() ? 'Confirmed' : 'पुष्टि'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo ($app['status'] ?? '') === 'completed' ? 'active success' : (($app['status'] ?? '') === 'cancelled' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if (($app['status'] ?? '') === 'cancelled'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-calendar-check"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Complete' : 'सम्पन्न'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['preferred_date'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-clock text-primary"></i> <?php echo isEnglish() ? 'Scheduled:' : 'तालिका:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo htmlspecialchars($app['preferred_date'] . ' ' . ($app['preferred_time'] ?? '')); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['remarks'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_attachment'])): ?>
+                                    <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
+                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
+                                        <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
+                                           target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                            <i class="fas fa-download me-1"></i><?php echo basename($app['admin_attachment']); ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'feedback'): ?>
+                                    <!-- Feedback Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-paper-plane"></i></div>
+                                                <small><?php echo isEnglish() ? 'Submitted' : 'पेश'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['reviewed', 'resolved']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-eye"></i></div>
+                                                <small><?php echo isEnglish() ? 'Reviewed' : 'समीक्षा'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo ($app['status'] ?? '') === 'resolved' ? 'active success' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-check"></i></div>
+                                                <small><?php echo isEnglish() ? 'Resolved' : 'समाधान'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['message'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-comment text-primary"></i> <?php echo isEnglish() ? 'Message:' : 'सन्देश:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['message'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'digital_service'): ?>
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-paper-plane"></i></div>
+                                                <small><?php echo isEnglish() ? 'Submitted' : 'पेश'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['processing', 'approved', 'completed']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-cogs"></i></div>
+                                                <small><?php echo isEnglish() ? 'Processing' : 'प्रक्रिया'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['approved', 'completed']) ? 'active success' : (($app['status'] ?? '') === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if (($app['status'] ?? '') === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-check"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Complete' : 'सम्पन्न'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['admin_remarks'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Response:' : 'प्रतिक्रिया:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_remarks'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_attachment'])): ?>
+                                    <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
+                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
+                                        <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
+                                           target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                            <i class="fas fa-download me-1"></i><?php echo basename($app['admin_attachment']); ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'welfare_claim'): ?>
+                                    <!-- Welfare Claim Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                                <small><?php echo isEnglish() ? 'Applied' : 'दर्ता'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['under_review', 'approved', 'rejected', 'paid', 'completed']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-search"></i></div>
+                                                <small><?php echo isEnglish() ? 'Review' : 'समीक्षा'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['approved', 'paid', 'completed']) ? 'active' : ($app['status'] === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if ($app['status'] === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-thumbs-up"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Decision' : 'निर्णय'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['paid', 'completed']) ? 'active success' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-rupee-sign"></i></div>
+                                                <small><?php echo isEnglish() ? 'Paid' : 'भुक्तान'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['approved_amount'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-money-bill text-success"></i> <?php echo isEnglish() ? 'Approved Amount:' : 'स्वीकृत रकम:'; ?></strong>
+                                        <span class="text-success fw-bold">रु. <?php echo number_format($app['approved_amount']); ?></span>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_remarks'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-comment text-primary"></i> <?php echo isEnglish() ? 'Remarks:' : 'टिप्पणी:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_remarks'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_attachment'])): ?>
+                                    <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
+                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
+                                        <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
+                                           target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                            <i class="fas fa-download me-1"></i><?php echo basename($app['admin_attachment']); ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'loan'): ?>
+                                    <!-- Loan Application Timeline - More Detailed -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                                <small><?php echo isEnglish() ? 'Applied' : 'आवेदन'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['processing', 'approved', 'rejected', 'disbursed']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-cogs"></i></div>
+                                                <small><?php echo isEnglish() ? 'Processing' : 'प्रक्रिया'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['approved', 'disbursed']) ? 'active' : ($app['status'] === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if ($app['status'] === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-thumbs-up"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Decision' : 'निर्णय'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo ($app['status'] ?? '') === 'disbursed' ? 'active success' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                                <small><?php echo isEnglish() ? 'Disbursed' : 'वितरण'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['approved_amount'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-money-bill text-success"></i> <?php echo isEnglish() ? 'Approved Amount:' : 'स्वीकृत रकम:'; ?></strong>
+                                        <span class="text-success fw-bold">रु. <?php echo number_format((float)($app['approved_amount'] ?? 0)); ?></span>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['remarks'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_attachment'])): ?>
+                                    <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
+                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
+                                        <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
+                                           target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                            <i class="fas fa-download me-1"></i><?php echo basename($app['admin_attachment']); ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'account'): ?>
+                                    <!-- Account Application Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                                                <small><?php echo isEnglish() ? 'Applied' : 'आवेदन'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['processing', 'approved', 'rejected']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-id-card"></i></div>
+                                                <small><?php echo isEnglish() ? 'Verification' : 'प्रमाणीकरण'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo ($app['status'] ?? '') === 'approved' ? 'active success' : (($app['status'] ?? '') === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if (($app['status'] ?? '') === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Approved' : 'स्वीकृत'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['remarks'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_attachment'])): ?>
+                                    <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
+                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
+                                        <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
+                                           target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                            <i class="fas fa-download me-1"></i><?php echo basename($app['admin_attachment']); ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'kyc'): ?>
+                                    <!-- KYC Application Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-upload"></i></div>
+                                                <small><?php echo isEnglish() ? 'Submitted' : 'पेश'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['approved', 'rejected']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-search"></i></div>
+                                                <small><?php echo isEnglish() ? 'Verify' : 'जाँच'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo ($app['status'] ?? '') === 'approved' ? 'active success' : (($app['status'] ?? '') === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if (($app['status'] ?? '') === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-check"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Updated' : 'अपडेट'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['remarks'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($app['admin_attachment'])): ?>
+                                    <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
+                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
+                                        <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
+                                           target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                            <i class="fas fa-download me-1"></i><?php echo basename($app['admin_attachment']); ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php elseif ($app['app_type'] === 'auction_bid'): ?>
+                                    <!-- Auction Bid Timeline -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-gavel"></i></div>
+                                                <small><?php echo isEnglish() ? 'Bid' : 'बोलपत्र'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'] ?? 'pending', ['accepted', 'rejected']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-balance-scale"></i></div>
+                                                <small><?php echo isEnglish() ? 'Evaluate' : 'मूल्यांकन'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo ($app['status'] ?? '') === 'accepted' ? 'active success' : (($app['status'] ?? '') === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if (($app['status'] ?? '') === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-trophy"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Result' : 'परिणाम'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($app['bid_amount'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-tag text-primary"></i> <?php echo isEnglish() ? 'Bid Amount:' : 'बोलपत्र रकम:'; ?></strong>
+                                        <span class="fw-bold">रु. <?php echo number_format($app['bid_amount']); ?></span>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php else: ?>
+                                    <!-- Generic Timeline for Unknown Types -->
+                                    <div class="status-timeline">
+                                        <div class="d-flex justify-content-between position-relative">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-step active">
+                                                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                                <small><?php echo isEnglish() ? 'Submitted' : 'दर्ता'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['approved', 'accepted', 'rejected']) ? 'active' : ''; ?>">
+                                                <div class="step-icon"><i class="fas fa-search"></i></div>
+                                                <small><?php echo isEnglish() ? 'Review' : 'समीक्षा'; ?></small>
+                                            </div>
+                                            <div class="timeline-step <?php echo in_array($app['status'], ['approved', 'accepted']) ? 'active success' : ($app['status'] === 'rejected' ? 'active rejected' : ''); ?>">
+                                                <div class="step-icon">
+                                                    <?php if ($app['status'] === 'rejected'): ?>
+                                                    <i class="fas fa-times"></i>
+                                                    <?php else: ?>
+                                                    <i class="fas fa-check"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <small><?php echo isEnglish() ? 'Decision' : 'निर्णय'; ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($app['admin_notes']) || !empty($app['remarks'])): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-comment text-primary"></i> <?php echo isEnglish() ? 'Notes:' : 'टिप्पणी:'; ?></strong>
+                                        <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_notes'] ?? $app['remarks'] ?? '')); ?></p>
+                                    </div>
+                                    <?php endif; ?>
+                                </div><!-- /.rcp-timeline-wrap / collapse inner -->
+                            </div><!-- /.collapse -->
+                        </div><!-- /.rcp-body -->
+                    </div><!-- /.result-card-premium -->
+                    <?php endforeach; ?>
+                </div><!-- /.results-container -->
+                <?php endif; ?>
+
+                <!-- Help Info — Visual Callout -->
+                <div class="tracker-help-strip mt-5">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="tracker-help-card">
+                                <div class="thc-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+                                    <i class="fas fa-hashtag"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1"><?php echo isEnglish() ? 'Tracking ID' : 'ट्र्याकिङ ID'; ?></h6>
+                                    <p class="mb-0 text-muted small"><?php echo isEnglish() ? 'JOB-XXXX, GRV-123, WLF-XXXX, DSR-XXXX' : 'JOB-XXXX, GRV-123, WLF-XXXX, DSR-XXXX'; ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tracker-help-card">
+                                <div class="thc-icon" style="background:linear-gradient(135deg,#10b981,#065f46)">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1"><?php echo isEnglish() ? 'Phone Search' : 'फोनद्वारा खोज'; ?></h6>
+                                    <p class="mb-0 text-muted small"><?php echo isEnglish() ? 'Phone number used during application' : 'आवेदनमा प्रयोग गरेको फोन नम्बर'; ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tracker-help-card">
+                                <div class="thc-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309)">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1"><?php echo isEnglish() ? 'Need Help?' : 'सहायता चाहिन्छ?'; ?></h6>
+                                    <p class="mb-0 text-muted small"><a href="<?php echo SITE_URL; ?>contact.php" class="text-warning-emphasis fw-semibold"><?php echo isEnglish() ? 'Contact us →' : 'हामीलाई सम्पर्क गर्नुहोस् →'; ?></a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+/* Tracker form: search type बदल्दा placeholder र hint update गर्ने */
+function updateSearchHint() {
+    const searchType = document.getElementById('searchType');
+    const searchValue = document.getElementById('searchValue');
+    const hintTrackingId = document.getElementById('hintTrackingId');
+    const hintPhone = document.getElementById('hintPhone');
+    const hintEmail = document.getElementById('hintEmail');
+    if (!searchType) return;
+
+    const val = searchType.value;
+    if (hintTrackingId) hintTrackingId.style.display = val === 'tracking_id' ? '' : 'none';
+    if (hintPhone) hintPhone.style.display = val === 'phone' ? '' : 'none';
+    if (hintEmail) hintEmail.style.display = val === 'email' ? '' : 'none';
+
+    if (searchValue) {
+        if (val === 'phone') {
+            searchValue.placeholder = '<?php echo isEnglish() ? "e.g.: 9827157000" : "जस्तै: 9827157000"; ?>';
+        } else if (val === 'email') {
+            searchValue.placeholder = '<?php echo isEnglish() ? "e.g.: akashpame@gmail.com" : "जस्तै: akashpame@gmail.com"; ?>';
+        } else {
+            searchValue.placeholder = '<?php echo isEnglish() ? "e.g.: JOB-20240101-XXXX, WLF-XXXX-XXXXXX" : "जस्तै: JOB-20240101-XXXX, WLF-XXXX-XXXXXX"; ?>';
+        }
+    }
+}
+const searchTypeEl = document.getElementById('searchType');
+if (searchTypeEl) {
+    searchTypeEl.addEventListener('change', updateSearchHint);
+    updateSearchHint();
+}
+
+/* Tracker Result Tabs: show/hide cards by tab group */
+(function() {
+    var tabBtns = document.querySelectorAll('.tracker-tab-btn');
+    var emptyMsg = document.getElementById('tabEmptyMsg');
+
+    function switchTab(targetTab) {
+        var cards = document.querySelectorAll('[data-tab-group]');
+        var visibleCount = 0;
+        cards.forEach(function(card) {
+            if (card.getAttribute('data-tab-group') === targetTab) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        tabBtns.forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-tab') === targetTab);
+        });
+        if (emptyMsg) {
+            emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+    }
+
+    tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            switchTab(this.getAttribute('data-tab'));
+        });
+    });
+
+    var activeCards = document.querySelectorAll('[data-tab-group="active"]');
+    if (activeCards.length === 0) {
+        switchTab('done');
+    }
+})();
+</script>
+
+<style>
+/* ============================================================
+   TRACKER PAGE — PREMIUM UI/UX STYLES
+   ============================================================ */
+
+/* ── Custom colors (keep for badge classes) ── */
+.bg-teal   { background-color: #20c997 !important; }
+.bg-purple { background-color: #6f42c1 !important; }
+.bg-pink   { background-color: #e91e63 !important; }
+.bg-warning.text-dark { color: #333 !important; }
+.text-teal { color: #20c997 !important; }
+.text-purple { color: #6f42c1 !important; }
+.text-pink { color: #e91e63 !important; }
+
+/* ── Detail Info Grid — applicant info in tracker detail panel ── */
+.di-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+.di-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.di-item-wide  { grid-column: span 2; }
+.di-item-full  { grid-column: 1 / -1; }
+.di-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.di-label i { margin-right: 3px; font-size: 0.65rem; }
+.di-value {
+    font-size: 0.85rem;
+    color: #212529;
+    font-weight: 500;
+    line-height: 1.35;
+    word-break: break-word;
+}
+@media (max-width: 576px) {
+    .di-grid { grid-template-columns: 1fr 1fr; }
+    .di-item-wide  { grid-column: 1 / -1; }
+}
+.border-teal   { border-color: #20c997 !important; }
+.border-purple { border-color: #6f42c1 !important; }
+.border-pink   { border-color: #e91e63 !important; }
+
+/* ── HERO SECTION ── */
+.tracker-hero-section {
+    background: linear-gradient(135deg, #0f3d1f 0%, var(--primary-color) 40%, #2eb554 100%);
+    padding: 60px 0 50px;
+    position: relative;
+    overflow: hidden;
+}
+.tracker-hero-bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(46,181,84,0.15) 0%, transparent 40%),
+        radial-gradient(circle at 60% 80%, rgba(255,255,255,0.03) 0%, transparent 35%);
+    pointer-events: none;
+}
+.tracker-hero-content {
+    position: relative;
+    z-index: 2;
+}
+.tracker-hero-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+.tracker-hero-icon-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    color: #fff;
+    backdrop-filter: blur(8px);
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+.tracker-hero-ping {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(46,181,84,0.4);
+    animation: tracker-ping 2s ease-out infinite;
+}
+@keyframes tracker-ping {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    80%  { transform: scale(1.6); opacity: 0; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+.tracker-hero-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+}
+.tracker-hero-sub {
+    color: rgba(255,255,255,0.78);
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.tracker-breadcrumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 6px 16px;
+    display: inline-flex;
+}
+.tracker-breadcrumb .breadcrumb-item a { color: rgba(255,255,255,0.8); }
+.tracker-breadcrumb .breadcrumb-item.active { color: rgba(255,255,255,0.55); }
+.tracker-breadcrumb .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.4); }
+
+/* ── TYPE PILLS ── */
+.tracker-types-strip {
+    text-align: center;
+}
+.tracker-types-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+}
+.tracker-type-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+.type-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid rgba(0,0,0,0.07);
+    border-radius: 50px;
+    padding: 7px 14px 7px 8px;
+    cursor: default;
+    transition: all 0.22s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.type-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    border-color: var(--pill-color);
+}
+.type-pill-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--pill-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.type-pill span {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+/* ── SEARCH CARD ── */
+.tracker-search-card {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(var(--primary-rgb,26,95,42),0.14) !important;
+}
+.tracker-search-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #2eb554 100%);
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #fff;
+}
+.tracker-search-header-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.tracker-search-card .card-body {
+    padding: 28px;
+    background: #fff;
+}
+.tracker-search-card .form-control,
+.tracker-search-card .form-select {
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    padding: 10px 14px;
+    transition: all 0.2s;
+}
+.tracker-search-card .form-control:focus,
+.tracker-search-card .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb,26,95,42),0.1);
+}
+.tracker-search-card .form-control-lg {
+    font-size: 1.05rem;
+    padding: 13px 16px;
+}
+.btn-tracker-search {
+    background: linear-gradient(135deg, var(--primary-color), #2eb554);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb,26,95,42),0.3);
+    transition: all 0.25s;
+}
+.btn-tracker-search:hover {
+    background: linear-gradient(135deg, #0f3d1f, var(--primary-color));
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 20px rgba(var(--primary-rgb,26,95,42),0.4);
+}
+.btn-tracker-search:active {
+    transform: translateY(0);
+}
+
+/* ── RESULT CARDS — Premium ── */
+.result-card-premium {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    overflow: hidden;
+    transition: all 0.28s ease;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+.result-card-premium:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    transform: translateY(-2px);
+}
+.result-card-premium[data-tab-group="done"] {
+    opacity: 0.82;
+    filter: grayscale(0.15);
+}
+.rcp-accent {
+    height: 5px;
+    width: 100%;
+}
+.rcp-accent-primary  { background: linear-gradient(90deg,#3b82f6,#1d4ed8); }
+.rcp-accent-success  { background: linear-gradient(90deg,#10b981,#059669); }
+.rcp-accent-info     { background: linear-gradient(90deg,#06b6d4,#0284c7); }
+.rcp-accent-warning  { background: linear-gradient(90deg,#f59e0b,#d97706); }
+.rcp-accent-danger   { background: linear-gradient(90deg,#ef4444,#b91c1c); }
+.rcp-accent-secondary { background: linear-gradient(90deg,#6b7280,#374151); }
+.rcp-accent-teal     { background: linear-gradient(90deg,#20c997,#0f766e); }
+.rcp-accent-purple   { background: linear-gradient(90deg,#6f42c1,#4f28a0); }
+.rcp-accent-pink     { background: linear-gradient(90deg,#e91e63,#be185d); }
+
+.rcp-body {
+    padding: 20px 22px 22px;
+}
+.rcp-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.rcp-icon-wrap {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    color: #fff;
+}
+.rcp-icon-primary  { background: linear-gradient(135deg,#3b82f6,#1d4ed8); }
+.rcp-icon-success  { background: linear-gradient(135deg,#10b981,#059669); }
+.rcp-icon-info     { background: linear-gradient(135deg,#06b6d4,#0284c7); }
+.rcp-icon-warning  { background: linear-gradient(135deg,#f59e0b,#d97706); }
+.rcp-icon-danger   { background: linear-gradient(135deg,#ef4444,#b91c1c); }
+.rcp-icon-secondary { background: linear-gradient(135deg,#6b7280,#374151); }
+.rcp-icon-teal     { background: linear-gradient(135deg,#20c997,#0f766e); }
+.rcp-icon-purple   { background: linear-gradient(135deg,#6f42c1,#4f28a0); }
+.rcp-icon-pink     { background: linear-gradient(135deg,#e91e63,#be185d); }
+
+.rcp-meta { flex: 1; min-width: 0; }
+
+/* Type + Status badges */
+.rcp-type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.2px;
+}
+.rcp-badge-primary  { background: #3b82f6; }
+.rcp-badge-success  { background: #10b981; }
+.rcp-badge-info     { background: #06b6d4; }
+.rcp-badge-warning  { background: #f59e0b; }
+.rcp-badge-danger   { background: #ef4444; }
+.rcp-badge-secondary { background: #6b7280; }
+.rcp-badge-teal     { background: #20c997; }
+.rcp-badge-purple   { background: #6f42c1; }
+.rcp-badge-pink     { background: #e91e63; }
+
+.rcp-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+.rcp-status-glow.bg-success { box-shadow: 0 0 0 3px rgba(40,167,69,0.18); }
+.rcp-status-glow.bg-warning { box-shadow: 0 0 0 3px rgba(255,193,7,0.2); }
+.rcp-status-glow.bg-danger  { box-shadow: 0 0 0 3px rgba(220,53,69,0.18); }
+.rcp-status-glow.bg-info    { box-shadow: 0 0 0 3px rgba(23,162,184,0.18); }
+
+/* Meta chips row */
+.rcp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+.rcp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 0.76rem;
+    color: #475569;
+}
+.rcp-chip i { font-size: 0.7rem; color: #94a3b8; }
+
+/* Timeline wrap separator */
+.rcp-timeline-wrap {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 16px;
+    margin-top: 4px;
+}
+
+/* ── STATUS TIMELINE — Enhanced ── */
+.status-timeline { padding: 0 5px; }
+.timeline-line {
+    position: absolute;
+    top: 18px;
+    left: 12%;
+    right: 12%;
+    height: 3px;
+    background: linear-gradient(90deg, #e2e8f0, #cbd5e1);
+    z-index: 0;
+    border-radius: 3px;
+}
+.timeline-step {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    flex: 1;
+}
+.timeline-step .step-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #adb5bd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 6px;
+    font-size: 14px;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+.timeline-step.active .step-icon {
+    background: linear-gradient(135deg, var(--primary-color), #2eb554);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(var(--primary-rgb,26,95,42),0.35);
+}
+.timeline-step.active.success .step-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 3px 12px rgba(16,185,129,0.35);
+}
+.timeline-step.active.rejected .step-icon {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    box-shadow: 0 3px 12px rgba(239,68,68,0.35);
+}
+.timeline-step small {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #94a3b8;
+    display: block;
+    margin-top: 2px;
+}
+.timeline-step.active small { color: var(--primary-color); }
+.timeline-step.active.success small { color: #10b981; }
+.timeline-step.active.rejected small { color: #ef4444; }
+
+/* Admin response/remark blocks */
+.admin-response-block {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 12px;
+}
+.admin-response-block p { margin-bottom: 0; color: #374151; }
+
+/* ── TRACKER TABS ── */
+.tracker-tabs-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0;
+    margin-bottom: 20px;
+}
+.tracker-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 10px 20px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: -2px;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.2s;
+}
+.tracker-tab-btn:hover { color: var(--primary-color); background: #f0fdf4; }
+.tracker-tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: #f0fdf4;
+}
+.tab-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0 6px;
+}
+.tab-badge-active { background: var(--primary-color); color: #fff; }
+.tab-badge-done   { background: #94a3b8; color: #fff; }
+.tracker-tab-empty-msg {
+    flex: 1;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    padding: 8px;
+}
+
+/* ── HELP STRIP ── */
+.tracker-help-strip {
+    border-top: 2px solid #f1f5f9;
+    padding-top: 30px;
+}
+.tracker-help-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px 18px;
+    height: 100%;
+    transition: all 0.22s ease;
+}
+.tracker-help-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(var(--primary-rgb,26,95,42),0.1);
+    transform: translateY(-2px);
+}
+.thc-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* ── ALERT IMPROVEMENTS ── */
+.alert-warning.tracker-alert {
+    border-radius: 12px;
+    border: none;
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+}
+.alert-success.tracker-alert {
+    border-radius: 12px;
+    border: none;
+    background: #f0fdf4;
+    border-left: 4px solid #10b981;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .tracker-hero-title { font-size: 1.5rem; }
+    .tracker-hero-icon-ring { width: 64px; height: 64px; font-size: 1.7rem; }
+    .type-pill span { font-size: 0.76rem; }
+    .type-pill { padding: 5px 10px 5px 6px; }
+    .type-pill-icon { width: 26px; height: 26px; font-size: 11px; }
+    .rcp-icon-wrap { width: 44px; height: 44px; font-size: 1.1rem; }
+    .timeline-step .step-icon { width: 30px; height: 30px; font-size: 11px; }
+    .timeline-step small { font-size: 9.5px; }
+    .rcp-body { padding: 14px 14px 16px; }
+    .tracker-search-card .card-body { padding: 18px; }
+    .tracker-search-header { padding: 16px 18px; }
+}
+@media (max-width: 480px) {
+    .tracker-type-pills { gap: 6px; }
+    .type-pill { padding: 4px 8px 4px 5px; gap: 5px; }
+}
+
+/* Details toggle button */
+.rcp-details-toggle {
+    text-align: right;
+}
+.rcp-toggle-btn {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.rcp-toggle-btn[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+.rcp-toggle-btn i {
+    transition: transform 0.2s;
+    display: inline-block;
+}
+/* Timeline wrap inside collapse */
+.rcp-timeline-wrap {
+    border-top: 1px solid #f1f5f9;
+    padding: 16px 4px 4px;
+    margin-top: 12px;
+}
+
+</style>
+
+<script>
+/* ================================================================
+   Application Tracker — Security Verification Section JS
+   — Phone / Email चुन्दा सुरक्षा section देखाउँछ
+   — Phone + Email field fill हुँदा security code live preview देखाउँछ
+   ================================================================ */
+(function() {
+    const searchType   = document.getElementById('searchType');
+    const verifySection = document.getElementById('verifySection');
+    const verifyNote   = document.getElementById('verifyNote');
+    const secPhone     = document.getElementById('secPhone');
+    const secEmail     = document.getElementById('secEmail');
+    const secCode      = document.getElementById('securityCode');
+    const codePreview  = document.getElementById('secCodePreview');
+    const codeText     = document.getElementById('secCodeText');
+
+    /* hint spans */
+    const hintTid   = document.getElementById('hintTrackingId');
+    const hintPhone = document.getElementById('hintPhone');
+    const hintEmail = document.getElementById('hintEmail');
+
+    /* security code = last 4 digits of phone + first 3 chars of email-prefix */
+    function buildCode() {
+        const ph  = (secPhone  ? secPhone.value  : '').replace(/\D/g, '');
+        const em  = (secEmail  ? secEmail.value  : '');
+        const last4  = ph.length >= 4 ? ph.slice(-4) : ph;
+        const prefix = em.includes('@') ? em.split('@')[0].slice(0, 3).toLowerCase() : '';
+        return last4 + prefix;
+    }
+
+    /* Element refs for column visibility */
+    const colSearchType  = document.getElementById('colSearchType');
+    const colSearchValue = document.getElementById('colSearchValue');
+    const searchValueInp = document.getElementById('searchValue');
+    const searchTypeTip  = document.getElementById('searchTypeTip');
+    const tipPhone       = document.getElementById('tipPhone');
+    const tipEmail       = document.getElementById('tipEmail');
+
+    /* Show/hide sections based on selected search type */
+    function updateUI() {
+        const v = searchType ? searchType.value : 'tracking_id';
+        const needsVerify = (v === 'phone' || v === 'email');
+
+        /* ── Search Value column ──
+           Tracking ID: दाँया col-md-8 मा field देखाउने + required
+           Phone/Email: field लुकाउने, type dropdown नै col-12 बन्छ */
+        if (colSearchValue) colSearchValue.style.display = needsVerify ? 'none' : '';
+        if (searchValueInp) {
+            if (needsVerify) {
+                searchValueInp.removeAttribute('required');
+                searchValueInp.value = ''; /* clear to avoid stale value */
+            } else {
+                searchValueInp.setAttribute('required', '');
+            }
+        }
+
+        /* ── Search Type column width ── */
+        if (colSearchType) {
+            colSearchType.className = needsVerify ? 'col-12' : 'col-md-4';
+        }
+
+        /* ── Tip below dropdown ── */
+        if (searchTypeTip) searchTypeTip.style.display = needsVerify ? '' : 'none';
+        if (tipPhone) tipPhone.style.display = v === 'phone' ? '' : 'none';
+        if (tipEmail) tipEmail.style.display = v === 'email' ? '' : 'none';
+
+        /* ── Verify section ── */
+        verifySection.style.display = needsVerify ? '' : 'none';
+
+        if (verifyNote) {
+            if (needsVerify) {
+                verifyNote.innerHTML = '<i class="fas fa-shield-alt text-warning me-1"></i>'
+                    + '<?php echo isEnglish() ? "Your phone/email below is used for both search &amp; identity verification." : "तलको फोन/इमेल नै खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।"; ?>';
+            } else {
+                verifyNote.innerHTML = '<i class="fas fa-lock text-success me-1"></i>'
+                    + '<?php echo isEnglish() ? "Tracking ID search — no extra verification needed." : "Tracking ID बाट खोज्दा थप प्रमाणीकरण आवश्यक छैन।"; ?>';
+            }
+        }
+
+        /* Hint spans — no longer needed for phone/email (field is hidden) */
+        if (hintTid)   hintTid.style.display = v === 'tracking_id' ? '' : 'none';
+    }
+
+    /* Live security code preview */
+    function updateCodePreview() {
+        const code = buildCode();
+        if (code.length >= 2) {
+            codePreview.style.display = '';
+            codeText.textContent = '<?php echo isEnglish() ? "Your security code: " : "तपाईंको सुरक्षा कोड: "; ?>' + code
+                + ' — <?php echo isEnglish() ? "copy this into the Security Code box above." : "माथिको Security Code बाकसमा टाइप गर्नुहोस्।"; ?>';
+            /* auto-fill */
+            if (secCode) secCode.value = code;
+        } else {
+            codePreview.style.display = 'none';
+        }
+    }
+
+    if (searchType) searchType.addEventListener('change', function() { updateUI(); updateCodePreview(); });
+    if (secPhone)   secPhone.addEventListener('input', updateCodePreview);
+    if (secEmail)   secEmail.addEventListener('input', updateCodePreview);
+
+    /* Run on page load (in case form is re-submitted with phone/email selected) */
+    updateUI();
+    updateCodePreview();
+})();
+</script>
+
+<?php require_once 'includes/footer.php'; ?>

@@ -1,0 +1,180 @@
+/**
+ * public-modern.css — Public Site Modern Polish v1.0
+ * ====================================================
+ * style.css माथि load हुन्छ — override layer मात्र।
+ * ─── Guide ─────────────────────────────────────────
+ *  रंग:  assets/css/design-tokens.css मा बदल्नुहोस्
+ *  Font: includes/header.php मा Google Font link बदल्नुहोस्
+ * ────────────────────────────────────────────────────
+ */
+
+/* ═══════════════════════════════════════════
+   GLOBAL SMOOTH — Transitions & scrolling
+   ═══════════════════════════════════════════ */
+html { scroll-behavior: smooth; }
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ═══════════════════════════════════════════
+   CARDS — Cleaner, modern
+   ═══════════════════════════════════════════ */
+.card {
+    border-radius: 14px !important;
+    border: 1px solid #eaecef !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
+    transition: transform .22s ease, box-shadow .22s ease !important;
+    overflow: hidden !important;
+}
+.card:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 24px rgba(26,95,42,.12) !important;
+}
+.card-title {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+}
+
+/* ═══════════════════════════════════════════
+   NAVBAR — Clean, sticky, modern
+   ═══════════════════════════════════════════ */
+.navbar {
+    transition: box-shadow .2s ease !important;
+}
+.navbar-scrolled,
+.navbar.shadow-sm {
+    box-shadow: 0 2px 12px rgba(0,0,0,.10) !important;
+}
+.navbar-nav .nav-link {
+    font-weight: 600 !important;
+    font-size: .9rem !important;
+    letter-spacing: .01em !important;
+    transition: color .18s !important;
+}
+
+/* ═══════════════════════════════════════════
+   BUTTONS — Modern rounded flat
+   ═══════════════════════════════════════════ */
+.btn {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all .2s ease !important;
+}
+.btn-primary {
+    background: var(--primary-color, #1a5f2a) !important;
+    border-color: var(--primary-color, #1a5f2a) !important;
+}
+.btn-primary:hover {
+    background: var(--primary-dark, #144a21) !important;
+    border-color: var(--primary-dark, #144a21) !important;
+    box-shadow: 0 4px 12px rgba(26,95,42,.28) !important;
+    transform: translateY(-1px) !important;
+}
+.btn-outline-primary {
+    color: var(--primary-color, #1a5f2a) !important;
+    border-color: var(--primary-color, #1a5f2a) !important;
+}
+.btn-outline-primary:hover {
+    background: var(--primary-color, #1a5f2a) !important;
+    color: #fff !important;
+}
+
+/* ═══════════════════════════════════════════
+   FORM CONTROLS — Clean modern inputs
+   ═══════════════════════════════════════════ */
+.form-control,
+.form-select {
+    border-radius: 10px !important;
+    border: 1.5px solid #d1d5db !important;
+    padding: 10px 14px !important;
+    font-size: .95rem !important;
+    transition: border-color .18s, box-shadow .18s !important;
+    min-height: 44px !important;
+    line-height: 1.4 !important;
+}
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color, #1a5f2a) !important;
+    box-shadow: 0 0 0 3px rgba(26,95,42,.12) !important;
+    outline: none !important;
+}
+.form-label {
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 5px !important;
+    font-size: .9rem !important;
+}
+
+/* ═══════════════════════════════════════════
+   SECTION TITLES — Consistent hierarchy
+   ═══════════════════════════════════════════ */
+.section-title,
+.section-heading {
+    font-weight: 800 !important;
+    letter-spacing: -.01em !important;
+    line-height: 1.25 !important;
+}
+
+/* ═══════════════════════════════════════════
+   TABLES — Clean public tables
+   ═══════════════════════════════════════════ */
+.table {
+    font-size: .92rem !important;
+}
+.table thead th {
+    background: #f8faf9 !important;
+    font-weight: 700 !important;
+    color: #374151 !important;
+    border-bottom-width: 2px !important;
+    border-color: #e5e7eb !important;
+}
+.table tbody tr:hover td {
+    background: #f0fdf4 !important;
+}
+
+/* ═══════════════════════════════════════════
+   ALERTS & NOTICE BADGES
+   ═══════════════════════════════════════════ */
+.alert {
+    border-radius: 10px !important;
+    border-left-width: 4px !important;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER — Clean modern footer
+   ═══════════════════════════════════════════ */
+footer a:hover {
+    opacity: .85 !important;
+    text-decoration: underline !important;
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR — Subtle
+   ═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+
+/* ═══════════════════════════════════════════
+   FOCUS VISIBLE — Accessibility modern
+   ═══════════════════════════════════════════ */
+*:focus:not(:focus-visible) { outline: none; }
+*:focus-visible {
+    outline: 2px solid var(--primary-color, #1a5f2a);
+    outline-offset: 3px;
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE — Better touch targets
+   ═══════════════════════════════════════════ */
+@media (max-width: 767px) {
+    .btn { min-height: 44px; padding: 10px 18px !important; }
+    .form-control, .form-select { font-size: 16px !important; } /* prevent iOS zoom */
+}
+
+/* ═══════════════════════════════════════════
+   PAGE BANNER — Cleaner style
+   ═══════════════════════════════════════════ */
+.page-banner h1 {
+    font-size: clamp(1.2rem, 3vw, 1.6rem) !important;
+}

@@ -1,0 +1,59 @@
+# Basic production hardening for Apache/LiteSpeed
+
+Options -Indexes
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# includes/*.local.php — HTTP बाट direct access बन्द (include path ले साइट चल्छ)
+RedirectMatch 403 (?i)^/includes/[^/]+\.local\.php$
+
+# Block direct access to sensitive files
+<FilesMatch "\.(md|sql|log|env|ini|sh|yml|yaml|bak|gz|tar)$">
+    Require all denied
+</FilesMatch>
+
+# install wizard lock — HTTP बाट पढ्न नदिने
+<Files "install.lock">
+    Require all denied
+</Files>
+
+# Dangerous dotfiles (`.well-known/*` को फाइल नाम डटले सुरु हुँदैन — ACME ठीक)
+<FilesMatch "^\.(git|env|htpasswd|user\.ini)$">
+    Require all denied
+</FilesMatch>
+
+# Protect internal folders
+RedirectMatch 403 ^/database/?$
+RedirectMatch 403 ^/database/.*
+RedirectMatch 403 ^/logs/?$
+RedirectMatch 403 ^/logs/.*
+RedirectMatch 403 ^/scripts/?$
+RedirectMatch 403 ^/scripts/.*
+
+# Prevent script execution inside uploads + install.php जब install.lock छ
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # SEO — dynamic robots + sitemap (domain/subdir SITE_URL सँग मेल)
+    RewriteRule ^robots\.txt$ robots.php [L]
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+    RewriteRule ^assets/uploads/.*\.(php|phtml|php3|php4|php5|phar|pl|py|jsp|asp|cgi|sh)$ - [F,L,NC]
+    RewriteCond %{DOCUMENT_ROOT}/install.lock -f
+    RewriteRule ^install\.php$ - [F,L,NC]
+</IfModule>
+
+# Custom error pages
+ErrorDocument 404 /404.php
+ErrorDocument 500 /500.php
+ErrorDocument 403 /404.php
+ErrorDocument 400 /404.php
+
+# PHP error display — production safety (display_errors off, log on)
+<IfModule mod_php.c>
+    php_flag  display_errors Off
+    php_flag  log_errors On
+    php_value error_reporting 32767
+</IfModule>

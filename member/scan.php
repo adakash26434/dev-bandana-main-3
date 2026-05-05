@@ -1,0 +1,197 @@
+<?php
+/**
+ * Member Portal — कार्यक्रम QR स्क्यान (क्यामेरा)
+ * सफल scan पछि attend.php?qr_token=... मा जान्छ — त्यहाँ Check-in (OK) थिच्नुपर्छ।
+ */
+require_once __DIR__ . '/_bootstrap.php';
+requireMemberLogin();
+memberSecurityHeaders();
+
+$mem = currentMember();
+if (!$mem) {
+    header('Location: login.php?msg=session_expired');
+    exit;
+}
+
+$siteName  = function_exists('getSetting') ? getSetting('site_name', 'सहकारी') : 'सहकारी';
+$pageTitle = 'कार्यक्रम QR स्क्यान — ' . $siteName;
+$base      = rtrim(SITE_URL, '/') . '/';
+
+$extraHead = <<<'HTML'
+<style>
+.scan-wrap { max-width: 520px; margin: 0 auto; }
+.scan-hero {
+  background: linear-gradient(135deg,#ecfdf5,#d1fae5);
+  border: 1px solid #6ee7b7;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: .82rem;
+  color: #065f46;
+  line-height: 1.5;
+}
+#scan-reader {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #0f172a;
+  min-height: 280px;
+}
+#scan-reader video { border-radius: 12px; }
+.scan-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.scan-actions button {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+.scan-btn-start { background: var(--primary-color,#1a8754); color: #fff; }
+.scan-btn-stop { background: #e5e7eb; color: #374151; }
+.scan-err {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #b91c1c;
+  font-size: .85rem;
+}
+.scan-links { margin-top: 18px; text-align: center; font-size: .82rem; }
+.scan-links a { color: var(--primary-color,#1a8754); font-weight: 600; text-decoration: none; }
+.scan-links a:hover { text-decoration: underline; }
+</style>
+HTML;
+
+require __DIR__ . '/includes/chrome.php';
+?>
+
+<main class="mp-main">
+<div class="mp-container scan-wrap">
+  <h1 style="font-size:1.2rem;font-weight:800;color:var(--primary-color,#1a8754);margin:0 0 10px;">
+    <i class="fas fa-qrcode" style="margin-right:8px;"></i>कार्यक्रम QR स्क्यान
+  </h1>
+
+  <div class="scan-hero">
+    <strong>कसरी?</strong> स्थलमा राखिएको <strong>कार्यक्रम QR</strong> क्यामेराले स्क्यान गर्नुहोस्। पछि खुल्ने पृष्ठमा
+    <strong>Check-in / OK</strong> थिच्नुहोस् — उपस्थिति Admin र तपाईंको <strong>उपस्थिति इतिहास</strong>मा जान्छ।
+    (Pre-registration मात्र उपस्थिति होइन।)
+  </div>
+
+  <div id="scan-reader"></div>
+  <div id="scan-err" class="scan-err" role="alert"></div>
+
+  <div class="scan-actions">
+    <button type="button" class="scan-btn-start" id="scanStart"><i class="fas fa-camera me-2"></i>क्यामेरा सुरु</button>
+    <button type="button" class="scan-btn-stop" id="scanStop" style="display:none;"><i class="fas fa-stop me-2"></i>रोक्नुहोस्</button>
+  </div>
+
+  <div class="scan-links">
+    <a href="<?= htmlspecialchars($base) ?>member/attend.php"><i class="fas fa-calendar-check me-1"></i>उपस्थिति र इतिहास</a>
+  </div>
+</div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+(function(){
+  var base = <?= json_encode($base, JSON_UNESCAPED_SLASHES) ?>;
+  var readerEl = document.getElementById('scan-reader');
+  var errEl = document.getElementById('scan-err');
+  var btnStart = document.getElementById('scanStart');
+  var btnStop = document.getElementById('scanStop');
+  var html5Qr = null;
+  var busy = false;
+
+  function showErr(msg) {
+    errEl.style.display = 'block';
+    errEl.textContent = msg;
+  }
+  function hideErr() {
+    errEl.style.display = 'none';
+    errEl.textContent = '';
+  }
+
+  function extractToken(text) {
+    var t = (text || '').trim();
+    if (!t) return '';
+    try {
+      var u = new URL(t, window.location.origin);
+      var q = u.searchParams.get('qr_token') || u.searchParams.get('token');
+      if (q) return String(q).replace(/[^a-zA-Z0-9_-]/g, '');
+    } catch (e) {}
+    if (/^[a-zA-Z0-9_-]{8,80}$/.test(t)) return t;
+    return '';
+  }
+
+  function goAttendance(token) {
+    window.location.href = base + 'member/attend.php?qr_token=' + encodeURIComponent(token);
+  }
+
+  function onScanSuccess(decodedText) {
+    if (busy) return;
+    var token = extractToken(decodedText);
+    if (!token) {
+      showErr('यो QR कार्यक्रम check-in को लागि मान्य देखिँदैन। Admin को कार्यक्रम QR प्रयोग गर्नुहोस्।');
+      return;
+    }
+    busy = true;
+    hideErr();
+    if (html5Qr) {
+      html5Qr.stop().then(function() {
+        try { if (typeof html5Qr.clear === 'function') html5Qr.clear(); } catch (e) {}
+        goAttendance(token);
+      }).catch(function() {
+        goAttendance(token);
+      });
+    } else {
+      goAttendance(token);
+    }
+  }
+
+  btnStart.addEventListener('click', function() {
+    hideErr();
+    if (typeof Html5Qrcode === 'undefined') {
+      showErr('स्क्यान लाइब्रेरी लोड हुन सकेन। इन्टरनेट जाँच गरी पुनः प्रयास गर्नुहोस्।');
+      return;
+    }
+    btnStart.disabled = true;
+    html5Qr = new Html5Qrcode('scan-reader');
+    var cfg = { fps: 10, qrbox: { width: 260, height: 260 } };
+    html5Qr.start(
+      { facingMode: 'environment' },
+      cfg,
+      onScanSuccess,
+      function() {}
+    ).then(function() {
+      btnStart.style.display = 'none';
+      btnStop.style.display = 'inline-block';
+      btnStart.disabled = false;
+    }).catch(function(e) {
+      btnStart.disabled = false;
+      showErr('क्यामेरा खोल्न सकिएन। अनुमति दिनुहोस् वा HTTPS प्रयोग गर्नुहोस्। (' + (e && e.message ? e.message : 'unknown') + ')');
+    });
+  });
+
+  btnStop.addEventListener('click', function() {
+    if (!html5Qr) return;
+    html5Qr.stop().then(function() {
+      try { if (typeof html5Qr.clear === 'function') html5Qr.clear(); } catch (e) {}
+      html5Qr = null;
+      btnStop.style.display = 'none';
+      btnStart.style.display = 'inline-block';
+    }).catch(function() {
+      html5Qr = null;
+      btnStop.style.display = 'none';
+      btnStart.style.display = 'inline-block';
+    });
+  });
+})();
+</script>
+
+<?php require __DIR__ . '/includes/chrome-foot.php'; ?>

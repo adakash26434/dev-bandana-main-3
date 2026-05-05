@@ -1,0 +1,35 @@
+/* v7 adjusted layer for member panel (safe overrides) */
+:root{
+  --v7m-green:#0d5c2e;
+  --v7m-green2:#1a8a47;
+  --v7m-gold:#f59e0b;
+}
+body{
+  background:
+    radial-gradient(1200px 600px at -10% -20%, rgba(45,185,114,.07), transparent 60%),
+    radial-gradient(900px 500px at 110% 0%, rgba(245,158,11,.05), transparent 55%),
+    #f6faf7 !important;
+}
+.mem-topbar{
+  background: linear-gradient(135deg,var(--v7m-green),var(--v7m-green2)) !important;
+  box-shadow: 0 6px 18px rgba(13,92,46,.20) !important;
+}
+.mem-topbar-avatar{ border:2px solid rgba(255,255,255,.5) !important; }
+.mem-topbar-btn:hover{ background:rgba(255,255,255,.18) !important; }
+.mem-nav-item{ min-height:44px; border-radius:10px !important; }
+.mem-nav-item.active{
+  background: linear-gradient(135deg,var(--v7m-green),var(--v7m-green2)) !important;
+  color:#fff !important;
+}
+.mem-notif-dot{
+  background: linear-gradient(135deg,#ef4444,#b91c1c) !important;
+  color:#fff !important;
+  font-weight:800 !important;
+}
+.mem-greeting,.mem-hero,.mem-welcome{
+  border-radius:16px !important;
+  box-shadow:0 8px 22px rgba(13,92,46,.14) !important;
+}
+@media (max-width: 900px){
+  body{ padding-bottom: calc(64px + env(safe-area-inset-bottom,0px)) !important; }
+}

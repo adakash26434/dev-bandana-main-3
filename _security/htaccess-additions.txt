@@ -1,0 +1,79 @@
+# ════════════════════════════════════════════════════════════════
+# 🔒 PRODUCTION SECURITY — public_html/.htaccess मा थप्नुहोस्
+# ════════════════════════════════════════════════════════════════
+
+# 1. Sensitive file extensions block
+<FilesMatch "\.(md|sql|log|env|gitignore|tar|gz|bak|sample|yml|yaml|ini|sh|conf)$">
+    Require all denied
+</FilesMatch>
+
+# 2. Setup/debug files lock (production मा access नहोस्)
+# NOTE: cron-cleanup.php URL cron चलाउनु छ भने यो लिस्टबाट हटाउनुहोस् — अनि CRON_TOKEN वा includes/.cron-token प्रयोग गर्नुहोस्।
+<FilesMatch "^(setup\.php|setup-config\.php|debug\.php|run-migration\.php|db-setup\.php|verify-security\.php)$">
+    Require all denied
+</FilesMatch>
+
+# 2b. install wizard — install.lock भएपछि install.php बन्द (मुख्य .htaccess मा पनि छ)
+# RewriteCond %{DOCUMENT_ROOT}/install.lock -f
+# RewriteRule ^install\.php$ - [F,L,NC]
+
+# 3. Dangerous dotfiles (सबै डटफाइल नभएर — ACME .well-known सुरक्षित)
+<FilesMatch "^\.(git|env|htpasswd|user\.ini)$">
+    Require all denied
+</FilesMatch>
+
+# 4. Internal folders block
+RedirectMatch 403 ^/database/?
+RedirectMatch 403 ^/logs/?
+RedirectMatch 403 ^/scripts/?
+RedirectMatch 403 ^/archive/?
+
+# 5. Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Permissions-Policy "geolocation=(), microphone=(self), camera=(self), payment=(), usb=()"
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS}"
+</IfModule>
+
+# 6. Disable directory listing
+Options -Indexes -ExecCGI
+
+# 7. Upload folder मा PHP execute रोक्ने
+<Directory "assets/uploads">
+    <FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+</Directory>
+
+# 8. Block bad bots
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_USER_AGENT} (semrush|ahrefsbot|mj12bot|petalbot|seznam) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# 9. Brotli/Gzip compression (अप्ठ्यारो भए comment गर्नुहोस्)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+# 10. Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# 11. Force HTTPS (cPanel मा SSL छ भने uncomment)
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} !=on
+#     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>

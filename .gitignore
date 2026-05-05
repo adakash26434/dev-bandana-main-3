@@ -1,0 +1,28 @@
+# Runtime schema locks (server/cPanel मा मात्र बन्छन् — commit नगर्नुहोस्)
+.admin-schema.lock
+.schema.lock
+.member-schema.lock
+
+# cPanel/Apache PHP error_log — server मा मात्र; repo/commit नगर्नुहोस्
+error_log
+**/error_log
+
+# Zip artifacts (avoid accidental commit of bundles)
+*.zip
+
+# Clean zip output (scripts/package-clean-site.sh)
+dist/
+
+# Credential vault auto-generated key (never commit)
+includes/.cred-master.key
+
+# Cron URL token (never commit)
+includes/.cron-token
+
+# Superadmin initial seed (never commit passwords)
+includes/superadmin-config.local.php
+
+# Per-server DB + license (never commit — avoids cPanel git merge conflicts)
+includes/database.local.php
+# Legacy single-file DB config on old installs — not tracked; pull will not touch it
+includes/database.php
