@@ -110,6 +110,34 @@ try {
     $hasRecentElectionMilestone = false;
 }
 
+/* ── Services dropdown links (admin/services.php बाट) ── */
+$navServiceLinks = [];
+try {
+    if ($db) {
+        $svcRows = $db->query("SELECT id, title, title_en, title_np, icon FROM services WHERE is_active = 1 ORDER BY display_order, id LIMIT 30")->fetchAll();
+        $slugifyService = static function (string $label, int $id): string {
+            $s = trim(mb_strtolower($label, 'UTF-8'));
+            if ($s === '') return 'service-' . $id;
+            if (mb_strpos($s, 'बचत') !== false || mb_strpos($s, 'saving') !== false) return 'saving';
+            if (mb_strpos($s, 'ऋण') !== false || mb_strpos($s, 'loan') !== false || mb_strpos($s, 'rin') !== false) return 'loan';
+            if (mb_strpos($s, 'रेमिट') !== false || mb_strpos($s, 'remit') !== false) return 'remittance';
+            $ascii = trim(strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $label)), '-');
+            return $ascii !== '' ? $ascii : ('service-' . $id);
+        };
+        foreach ($svcRows as $sv) {
+            $rawTitle = (string) (($currentLang === 'en' && !empty($sv['title_en'])) ? $sv['title_en'] : (!empty($sv['title_np']) ? $sv['title_np'] : ($sv['title'] ?? '')));
+            $title = trim($rawTitle);
+            if ($title === '') continue;
+            $icon = trim((string) ($sv['icon'] ?? 'fas fa-star'));
+            if ($icon === '') $icon = 'fas fa-star';
+            $anchor = $slugifyService((string) ($sv['title'] ?? $title), (int) $sv['id']);
+            $navServiceLinks[] = ['title' => $title, 'icon' => $icon, 'anchor' => $anchor];
+        }
+    }
+} catch (Throwable $e) {
+    $navServiceLinks = [];
+}
+
 $currentPage = getCurrentPage();
 $currentLang = getCurrentLang();
 $L = getLangStrings();
@@ -772,9 +800,15 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                     <li class="has-dropdown <?php echo $currentPage == 'services' ? 'active' : ''; ?>">
                         <a href="<?php echo SITE_URL; ?>services.php"><?php echo $L['services']; ?> <i class="fas fa-chevron-down"></i></a>
                         <ul class="dropdown">
-                            <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>services.php#loan"><i class="fas fa-hand-holding-usd"></i> <?php echo $L['loan']; ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>services.php#remittance"><i class="fas fa-money-bill-wave"></i> <?php echo $L['remittance']; ?></a></li>
+                            <?php if (!empty($navServiceLinks)): ?>
+                                <?php foreach ($navServiceLinks as $_svc): ?>
+                                    <li><a href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_svc['anchor']); ?>"><i class="<?php echo htmlspecialchars($_svc['icon']); ?>"></i> <?php echo htmlspecialchars($_svc['title']); ?></a></li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>
+                                <li><a href="<?php echo SITE_URL; ?>services.php#loan"><i class="fas fa-hand-holding-usd"></i> <?php echo $L['loan']; ?></a></li>
+                                <li><a href="<?php echo SITE_URL; ?>services.php#remittance"><i class="fas fa-money-bill-wave"></i> <?php echo $L['remittance']; ?></a></li>
+                            <?php endif; ?>
                         </ul>
                     </li>
                     <li class="<?php echo $currentPage == 'interest-rates' ? 'active' : ''; ?>">
@@ -1007,9 +1041,15 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                             <li class="has-dropdown <?php echo $currentPage == 'services' ? 'active' : ''; ?>">
                                 <a href="<?php echo SITE_URL; ?>services.php"><?php echo $L['services']; ?> <i class="fas fa-chevron-down"></i></a>
                                 <ul class="dropdown">
-                                    <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>services.php#loan"><i class="fas fa-hand-holding-usd"></i> <?php echo $L['loan']; ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>services.php#remittance"><i class="fas fa-money-bill-wave"></i> <?php echo $L['remittance']; ?></a></li>
+                                    <?php if (!empty($navServiceLinks)): ?>
+                                        <?php foreach ($navServiceLinks as $_svc): ?>
+                                            <li><a href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_svc['anchor']); ?>"><i class="<?php echo htmlspecialchars($_svc['icon']); ?>"></i> <?php echo htmlspecialchars($_svc['title']); ?></a></li>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>
+                                        <li><a href="<?php echo SITE_URL; ?>services.php#loan"><i class="fas fa-hand-holding-usd"></i> <?php echo $L['loan']; ?></a></li>
+                                        <li><a href="<?php echo SITE_URL; ?>services.php#remittance"><i class="fas fa-money-bill-wave"></i> <?php echo $L['remittance']; ?></a></li>
+                                    <?php endif; ?>
                                     <?php
                                     // Fetch dynamic pages for services menu
                                     try {

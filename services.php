@@ -13,6 +13,24 @@ try {
 } catch (Exception $e) {
     $services = [];
 }
+
+if (!function_exists('service_anchor_id')) {
+    function service_anchor_id(array $service, int $fallbackIndex = 0): string
+    {
+        $id = (int)($service['id'] ?? 0);
+        $title = trim((string)($service['title'] ?? ''));
+        $titleNp = trim((string)($service['title_np'] ?? ''));
+        $label = $title !== '' ? $title : $titleNp;
+        $norm = mb_strtolower($label !== '' ? $label : $titleNp, 'UTF-8');
+        if (mb_strpos($norm, 'बचत') !== false || mb_strpos($norm, 'saving') !== false) return 'saving';
+        if (mb_strpos($norm, 'ऋण') !== false || mb_strpos($norm, 'loan') !== false || mb_strpos($norm, 'rin') !== false) return 'loan';
+        if (mb_strpos($norm, 'रेमिट') !== false || mb_strpos($norm, 'remit') !== false) return 'remittance';
+        $ascii = trim(strtolower((string)preg_replace('/[^a-z0-9]+/i', '-', $title)), '-');
+        if ($ascii !== '') return $ascii;
+        if ($id > 0) return 'service-' . $id;
+        return 'service-' . $fallbackIndex;
+    }
+}
 ?>
 
 <!-- Page Banner -->
@@ -43,7 +61,7 @@ try {
         <div class="row">
             <?php if (!empty($services)): ?>
                 <?php foreach ($services as $index => $service): ?>
-                <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo ($index ?? 0) * 50; ?>" id="<?php echo strtolower(str_replace(' ', '-', $service['title'])); ?>">
+                <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo ($index ?? 0) * 50; ?>" id="<?php echo htmlspecialchars(service_anchor_id($service, (int)$index)); ?>">
                     <div class="service-detail-card">
                         <?php if (!empty($service['show_new_badge'])): ?>
                         <span class="new-badge"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></span>

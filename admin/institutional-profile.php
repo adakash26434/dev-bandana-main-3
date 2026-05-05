@@ -120,7 +120,9 @@ if ($tableExists && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute(array_values($fields));
                 $_SESSION['flash_success'] = 'नयाँ प्रोफाइल सफलतापूर्वक थपियो।';
             } else {
-                $sets = implode(', ', array_map(fn($k) => "{$k} = ?", array_keys($fields)));
+                $sets = implode(', ', array_map(function ($k) {
+                    return "{$k} = ?";
+                }, array_keys($fields)));
                 $stmt = $db->prepare("UPDATE institutional_profile SET {$sets} WHERE id = ?");
                 $stmt->execute([...array_values($fields), $id]);
                 $_SESSION['flash_success'] = 'प्रोफाइल अपडेट भयो।';
@@ -244,7 +246,9 @@ if ($viewAction === 'list'): ?>
 
 <?php
 $totalRecords = count($profiles);
-$activeCount  = count(array_filter($profiles, fn($p) => $p['is_active']));
+$activeCount  = count(array_filter($profiles, function ($p) {
+    return !empty($p['is_active']);
+}));
 echo adminPageHeader(
     'संस्थागत प्रोफाइल व्यवस्थापन',
     'fa-building-columns',
@@ -388,7 +392,9 @@ $formTitle = $isEdit
     : '<i class="fas fa-plus-circle me-2"></i>नयाँ संस्थागत प्रोफाइल थप्नुहोस्';
 
 /* Helper: pre-fill value or default */
-$v = fn(string $key, $default = '') => $isEdit ? ($r[$key] ?? $default) : $default;
+$v = function (string $key, $default = '') use ($isEdit, $r) {
+    return $isEdit ? ($r[$key] ?? $default) : $default;
+};
 
 echo adminPageHeader(
     $isEdit ? 'प्रोफाइल सम्पादन' : 'नयाँ प्रोफाइल',
