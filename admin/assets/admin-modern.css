@@ -898,12 +898,12 @@ form.kyc-form .row > [class*="col-"],
 /* clearer table grid lines */
 .main-content .admin-table-card .table th,
 .main-content .admin-table-card .table td {
-    border-bottom: 1px solid #e5e7eb !important;
+    border-bottom: 1px solid #d1d5db !important;
 }
 
 .main-content .admin-table-card .table th:not(:last-child),
 .main-content .admin-table-card .table td:not(:last-child) {
-    border-right: 1px solid #f1f3f5 !important;
+    border-right: 1px solid #d8dde3 !important;
 }
 
 /* action button color tune: edit (blue), delete (red) */
@@ -948,11 +948,62 @@ form.kyc-form .row > [class*="col-"],
 /* Stronger visual separators for header row */
 .main-content .admin-table-card .table thead th {
     border-top: 1px solid #e5e7eb !important;
-    border-bottom: 2px solid #d1d5db !important;
+    border-bottom: 2px solid #c3cad3 !important;
 }
 
 .main-content .admin-table-card .table thead th:not(:last-child) {
-    border-right: 1px solid #e5e7eb !important;
+    border-right: 1px solid #cfd6df !important;
+}
+
+/* extra-strong grid for all admin tables */
+.main-content .table {
+    border-collapse: collapse !important;
+}
+
+.main-content .table > :not(caption) > * > * {
+    border-color: #d2d8e0 !important;
+}
+
+.main-content .table tbody tr + tr td {
+    border-top: 1px solid #d2d8e0 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   27. Nav-pills visibility fix (always readable, not white-washed)
+   ───────────────────────────────────────────────────────────── */
+.main-content .nav-pills .nav-link {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    border: 1px solid #d7dde5 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    opacity: 1 !important;
+}
+
+.main-content .nav-pills .nav-link:hover {
+    background: #e8edf3 !important;
+    color: #111827 !important;
+    border-color: #c8d0da !important;
+}
+
+.main-content .nav-pills .nav-link.active,
+.main-content .nav-pills .show > .nav-link {
+    background: #1f7a46 !important;
+    color: #ffffff !important;
+    border-color: #1f7a46 !important;
+}
+
+.main-content .nav-pills .nav-link .badge {
+    background: #e5e7eb !important;
+    color: #1f2937 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.main-content .nav-pills .nav-link.active .badge,
+.main-content .nav-pills .show > .nav-link .badge {
+    background: rgba(255,255,255,0.22) !important;
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,0.28) !important;
 }
 
 /* Auto-generated list/form tabs from footer script */
@@ -970,4 +1021,81 @@ form.kyc-form .row > [class*="col-"],
 .admin-search-wrap .input-group,
 .admin-table-card .card-body > form .input-group {
     max-width: 420px !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   26. Global icon standardization
+   ───────────────────────────────────────────────────────────── */
+
+/* All button icons: consistent size/alignment */
+.btn i.fas,
+.btn i.far,
+.btn i.fa,
+.nav-link i.fas,
+.nav-link i.far,
+.nav-link i.fa {
+    font-size: 0.86rem !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
+}
+
+/* Table action icon buttons: same look everywhere */
+.main-content table td .btn-sm i.fas,
+.main-content table td .btn-sm i.far,
+.main-content table td .btn-sm i.fa {
+    font-size: 0.82rem !important;
+}
+
+.main-content table td .btn-sm {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    padding: 0 !important;
+    border-radius: 7px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Edit / view / delete icon colors (global for table actions) */
+.main-content table td .btn-outline-primary,
+.main-content table td .btn-primary {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: #1d4ed8 !important;
+}
+
+.main-content table td .btn-outline-primary:hover,
+.main-content table td .btn-primary:hover {
+    background: #eaf1ff !important;
+    border-color: #eaf1ff !important;
+    color: #1e40af !important;
+}
+
+.main-content table td .btn-outline-secondary,
+.main-content table td .btn-secondary {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: #475569 !important;
+}
+
+.main-content table td .btn-outline-secondary:hover,
+.main-content table td .btn-secondary:hover {
+    background: #eef2f7 !important;
+    border-color: #eef2f7 !important;
+    color: #334155 !important;
+}
+
+.main-content table td .btn-outline-danger,
+.main-content table td .btn-danger {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: #be123c !important;
+}
+
+.main-content table td .btn-outline-danger:hover,
+.main-content table td .btn-danger:hover {
+    background: #ffecef !important;
+    border-color: #ffecef !important;
+    color: #9f1239 !important;
 }

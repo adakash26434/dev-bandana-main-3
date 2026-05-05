@@ -470,7 +470,7 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
     ?>
 
     <!-- Tab Navigation -->
-    <ul class="nav nav-pills mb-4">
+    <ul class="nav nav-tabs admin-nav-tabs mb-4">
         <li class="nav-item">
             <a class="nav-link <?php echo $tab === 'dynamic' ? 'active' : ''; ?>" href="pages.php?tab=dynamic">
                 <i class="fas fa-file-alt"></i> गतिशील पृष्ठहरू (Dynamic)
@@ -499,11 +499,6 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
             </div>
         </div>
         <div class="card-body p-0">
-            <div class="alert alert-info border-0 rounded-0 mb-0 small">
-                <i class="fas fa-circle-info me-1"></i>
-                <strong>गोपनीयता नीति / सेवाका सर्तहरू / कुकी नीति</strong> सम्पादन गर्न
-                <a href="pages.php?tab=dynamic&f_menu=footer" class="fw-semibold">Footer filter</a> प्रयोग गर्नुहोस्।
-            </div>
             <form method="GET" class="px-3 py-2 border-bottom bg-light d-flex gap-2 align-items-end flex-wrap">
                 <input type="hidden" name="tab" value="dynamic">
                 <div>
@@ -628,20 +623,6 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header">
-            <h5><i class="fas fa-info-circle"></i> जानकारी</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>गतिशील पृष्ठहरू</strong> - यी पृष्ठहरू <code>/page.php?slug=[slug]</code> URL मा देखिन्छन्।</p>
-            <ul>
-                <li><strong>Slug:</strong> URL मा प्रयोग हुने unique identifier (जस्तै: membership, privacy-policy)</li>
-                <li><strong>मेनुमा देखाउनुहोस्:</strong> यो पृष्ठलाई navigation menu मा देखाउन चाहनुहुन्छ भने check गर्नुहोस्</li>
-                <li><strong>मेनु स्थिति:</strong> कुन dropdown मा देखाउने (हाम्रो बारेमा, सेवाहरू, थप)</li>
-            </ul>
-        </div>
-    </div>
-
     <?php else: ?>
     <!-- Static Pages (About Sections) -->
     <div class="card">
@@ -678,23 +659,6 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header">
-            <h5><i class="fas fa-info-circle"></i> जानकारी</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>स्थिर विषयवस्तु</strong> - यी सेक्सनहरूको content <code>/about.php</code> पेजमा देखिन्छन्:</p>
-            <ul>
-                <li><strong>हाम्रो बारेमा / परिचय (मुख्य लेख):</strong> <a href="pages.php?tab=dynamic">गतिशील पृष्ठहरू</a> → slug <code>about</code> (दोहोरो स्थिर सम्पादन हटाइयो)</li>
-                <li><strong>हाम्रो इतिहास:</strong> <a href="about-settings.php" class="text-primary">About Page (इतिहास) Settings</a> बाट सम्पादन गर्नुहोस् — History photo र content त्यहाँ छ।</li>
-                <li><strong>हाम्रो दृष्टिकोण:</strong> Vision card (#vision)</li>
-                <li><strong>हाम्रो लक्ष्य:</strong> Mission card (#vision)</li>
-                <li><strong>मूल मान्यताहरू:</strong> Values section (#values)</li>
-                <li><strong>अध्यक्षको सन्देश:</strong> गृहपृष्ठ र About Us (#chairman)</li>
-                <li><strong>प्रमुख कार्यकारी अधिकृतको सन्देश:</strong> गृहपृष्ठ र About Us (#ceo)</li>
-            </ul>
-        </div>
-    </div>
     <?php endif; ?>
 
     <?php

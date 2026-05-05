@@ -227,6 +227,29 @@
         normalizeAdminTabs();
 
         /* ─────────────────────────────────────────────────────
+           Hide verbose guidance/info blocks for cleaner UI
+           (keep dismissible success/error alerts visible)
+           ───────────────────────────────────────────────────── */
+        function hideAdminGuidanceBlocks() {
+            document.querySelectorAll('.admin-help-tip').forEach(function(el) {
+                el.style.display = 'none';
+            });
+
+            document.querySelectorAll('.alert.alert-info:not([data-keep-info])').forEach(function(el) {
+                el.style.display = 'none';
+            });
+
+            document.querySelectorAll('.card .card-header h5, .card .card-header h6').forEach(function(h) {
+                var t = (h.textContent || '').replace(/\s+/g, ' ').trim();
+                if (/^जानकारी$| जानकारी$|^info$/i.test(t) || /गतिशील पृष्ठहरू|स्थिर विषयवस्तु/i.test(t)) {
+                    var card = h.closest('.card');
+                    if (card) card.style.display = 'none';
+                }
+            });
+        }
+        hideAdminGuidanceBlocks();
+
+        /* ─────────────────────────────────────────────────────
            DELETE links: GET delete link → safe POST+CSRF form
            — a[href*="action=delete"] ले GET delete बाट जोगाउँछ
            ───────────────────────────────────────────────────── */
