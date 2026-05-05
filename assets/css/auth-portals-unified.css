@@ -323,6 +323,7 @@ body.auth-portal-page .vp-btn {
   font-size: .9rem !important;
   font-weight: 700 !important;
   padding: 10px 14px !important;
+  color: var(--text-on-primary, #fff) !important;
 }
 
 body.auth-portal-page .alert,
@@ -418,14 +419,14 @@ body.auth-portal-page.verify-auth-page .vp-outer {
 /* Verify page: keep original strong header contrast */
 body.auth-portal-page .verify-form-card__head {
   background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754)) !important;
-  color: #fff !important;
+  color: var(--text-on-primary,#fff) !important;
   border-bottom-color: transparent !important;
 }
 
 body.auth-portal-page .verify-form-card__head h1,
 body.auth-portal-page .verify-form-card__head .vp-sub,
 body.auth-portal-page .verify-form-card__head .vp-sub b {
-  color: #fff !important;
+  color: var(--text-on-primary,#fff) !important;
 }
 
 @media (max-width: 900px) {

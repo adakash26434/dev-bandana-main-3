@@ -63,14 +63,14 @@ try {
   body { margin: 0; font-family: 'Mukta','Noto Sans Devanagari',sans-serif; background: #f7f9f8; color: #111827; }
   .mp-header {
     background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color, #1a8754) 55%, var(--primary-light, #3aa76b) 100%);
-    color: #fff; padding: 10px 16px;
+    color: var(--text-on-primary,#fff); padding: 10px 16px;
     box-shadow: 0 8px 18px rgba(13,92,46,.22);
     border-bottom: 1px solid rgba(255,255,255,.16);
     position: sticky; top: 0; z-index: 50;
     display: flex; align-items: center; justify-content: space-between;
     gap: 12px;
   }
-  .mp-brand { display: flex; align-items: center; min-width: 0; text-decoration:none; color:#fff; }
+  .mp-brand { display: flex; align-items: center; min-width: 0; text-decoration:none; color:var(--text-on-primary,#fff); }
   .mp-logo-wrap {
     background: #fff; border-radius: 12px; padding: 5px 14px;
     height: 50px; display: flex; align-items: center;
@@ -85,10 +85,10 @@ try {
   .mp-actions { display: flex; align-items: center; gap: 9px; }
   .mp-action-btn {
     width: 40px; height: 40px; border-radius: 11px; border: 1px solid rgba(255,255,255,.28);
-    background: rgba(255,255,255,.16); color: #fff; cursor: pointer; font-size: 16px;
+    background: rgba(255,255,255,.16); color: var(--text-on-primary,#fff); cursor: pointer; font-size: 16px;
     display: grid; place-items: center; transition: all .15s ease; text-decoration: none;
   }
-  .mp-action-btn:hover { background: rgba(255,255,255,.30); transform: translateY(-1px); }
+  .mp-action-btn:hover { background: rgba(255,255,255,.30); color: var(--text-on-primary,#fff); transform: translateY(-1px); }
   .mp-user-chip {
     background: rgba(255,255,255,.15); padding: 7px 13px; border-radius: 999px;
     border: 1px solid rgba(255,255,255,.24);

@@ -12,10 +12,28 @@
  */
 if (!function_exists('getSetting')) return;
 
-$_p = getSetting('primary_color', 'var(--primary-color)');
-$_s = getSetting('secondary_color', getSetting('topbar_color', '#c0392b'));
-$_h = getSetting('header_color', getSetting('topbar_color', $_s));
-$_f = getSetting('footer_color',  'var(--primary-color)');
+$__normalizeHex = function ($value, $fallback = '#1a5f2a') {
+    $v = trim((string)$value);
+    if ($v === '') return strtolower($fallback);
+    if (preg_match('/^#([0-9a-fA-F]{3})$/', $v, $m)) {
+        $h = strtolower($m[1]);
+        return '#' . $h[0].$h[0].$h[1].$h[1].$h[2].$h[2];
+    }
+    if (preg_match('/^#([0-9a-fA-F]{6})$/', $v, $m)) {
+        return '#' . strtolower($m[1]);
+    }
+    return strtolower($fallback);
+};
+
+$_pRaw = getSetting('primary_color', '#1a5f2a');
+$_sRaw = getSetting('secondary_color', getSetting('topbar_color', '#c0392b'));
+$_hRaw = getSetting('header_color', getSetting('topbar_color', $_sRaw));
+$_fRaw = getSetting('footer_color', $_pRaw);
+
+$_p = $__normalizeHex($_pRaw, '#1a5f2a');
+$_s = $__normalizeHex($_sRaw, '#c0392b');
+$_h = $__normalizeHex($_hRaw, $_s);
+$_f = $__normalizeHex($_fRaw, $_p);
 
 /* HEX color लाई dark/light shift गर्ने helper (clamped) */
 $__shift = function ($hex, $amt = 36) {
@@ -58,12 +76,13 @@ $__luminance = function ($hex) {
 };
 
 $__bestText = function ($hex) use ($__luminance) {
-    return ($__luminance($hex) > 0.58) ? '#111827' : '#ffffff';
+    return ($__luminance($hex) > 0.56) ? '#111827' : '#ffffff';
 };
 
 $_onPrimary   = $__bestText($_p);
 $_onSecondary = $__bestText($_s);
 $_onHeader    = $__bestText($_h);
+$_onFooter    = $__bestText($_f);
 ?>
 <style id="dynamic-brand-colors">
 :root {
@@ -81,5 +100,46 @@ $_onHeader    = $__bestText($_h);
     --text-on-primary: <?= htmlspecialchars($_onPrimary, ENT_QUOTES) ?>;
     --text-on-secondary: <?= htmlspecialchars($_onSecondary, ENT_QUOTES) ?>;
     --text-on-header: <?= htmlspecialchars($_onHeader, ENT_QUOTES) ?>;
+    --text-on-footer: <?= htmlspecialchars($_onFooter, ENT_QUOTES) ?>;
+}
+
+/* Contrast-safe brand surfaces (public/admin/member/verify) */
+.btn-primary,
+.bg-primary,
+.badge.bg-primary,
+.text-bg-primary,
+.submit-btn,
+.vp-btn,
+.mem-submit-btn,
+.pav-btn {
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.btn-secondary,
+.bg-secondary,
+.badge.bg-secondary,
+.text-bg-secondary {
+    color: var(--text-on-secondary, #fff) !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-tabs .nav-link.active {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.sidebar-nav li.active > a,
+.sidebar-nav a.active {
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.top-bar, .topbar, .header-top, .site-topbar {
+    color: var(--text-on-header, #fff);
+}
+
+footer,
+.site-footer {
+    color: var(--text-on-footer, #fff);
 }
 </style>
