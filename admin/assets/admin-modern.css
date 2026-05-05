@@ -3186,6 +3186,16 @@ aside.sidebar {
     background: transparent !important;
 }
 
+/* Menu item separators (restore subtle bottom lines) */
+.sidebar-nav > ul > li > a,
+.sidebar-nav .nav-group-header {
+    border-bottom: 1px solid #eef2f7 !important;
+}
+
+.sidebar-nav .nav-submenu > li > a {
+    border-bottom: 1px solid #f3f4f6 !important;
+}
+
 .sidebar-nav a:hover,
 .sidebar-nav .nav-group-header:hover,
 .sidebar-nav .nav-submenu > li > a:hover {
@@ -3206,6 +3216,28 @@ aside.sidebar {
 .sidebar-nav li.active > a .nav-icon-wrap i,
 .sidebar-nav a.active .nav-icon-wrap i {
     color: #166534 !important;
+}
+
+/* Consistent click/open color (beats legacy admin.css rules) */
+aside.sidebar .sidebar-nav .nav-group-header.open,
+aside.sidebar .sidebar-nav .nav-group-header.open:hover,
+aside.sidebar .sidebar-nav li.active > a,
+aside.sidebar .sidebar-nav a.active,
+aside.sidebar .sidebar-nav .nav-submenu li.active > a,
+aside.sidebar .sidebar-nav .nav-submenu li.active > a:hover {
+    background: #dcfce7 !important;
+    color: #14532d !important;
+    border-left: 3px solid #16a34a !important;
+}
+
+aside.sidebar .sidebar-nav .nav-group-header.open .nav-group-icon,
+aside.sidebar .sidebar-nav .nav-group-header.open .nav-group-label,
+aside.sidebar .sidebar-nav .nav-group-header.open .nav-arrow,
+aside.sidebar .sidebar-nav li.active > a i,
+aside.sidebar .sidebar-nav a.active i,
+aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
+    color: #166534 !important;
+    opacity: 1 !important;
 }
 
 /* सूचना गिन्ने बैज — हल्का हरियो; रातो समूह बैज तलै छुट्टै */

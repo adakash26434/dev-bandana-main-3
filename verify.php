@@ -231,7 +231,7 @@ if ($result && !empty($result['ok'])) {
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=3">
-<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=3">
+<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=4">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/eye-candy-verify-v7.css?v=10">
 <?php @require_once __DIR__ . '/assets/css/_color-vars.php'; ?>
 <style>
@@ -408,7 +408,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 }
 </style>
 </head>
-<body class="auth-portal-page">
+<body class="auth-portal-page verify-auth-page">
 <div class="vp-outer">
 
     <a href="<?php echo SITE_URL; ?>" class="page-back"><i class="fas fa-arrow-left"></i> मुख्य पृष्ठ</a>

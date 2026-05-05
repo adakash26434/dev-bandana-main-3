@@ -393,6 +393,28 @@ body.auth-portal-page .tab-btn {
   justify-content: center !important;
 }
 
+/* Verify page exact centering */
+body.auth-portal-page.verify-auth-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 12px 24px;
+}
+
+body.auth-portal-page.verify-auth-page .vp-outer {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  body.auth-portal-page.verify-auth-page {
+    align-items: flex-start;
+    padding-top: 14px;
+  }
+}
+
 /* Verify page: keep original strong header contrast */
 body.auth-portal-page .verify-form-card__head {
   background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754)) !important;
