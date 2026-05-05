@@ -311,7 +311,7 @@ if ($logoPath) {
 <title>Member Login — <?php echo htmlspecialchars($siteName); ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php memberHeadAssets(); ?>
-<link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>assets/css/auth-portals-unified.css?v=2">
+<link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>assets/css/auth-portals-unified.css?v=3">
 <link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>member/assets/member.css?v=10">
 <style>
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }

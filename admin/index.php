@@ -322,7 +322,7 @@ $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . l
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=9.7">
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=2">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=3">
     <link rel="stylesheet" href="assets/admin-modern.css?v=4.9">
     <?php if (file_exists(__DIR__ . '/../assets/css/_color-vars.php')) require __DIR__ . '/../assets/css/_color-vars.php'; ?>
     <style>
