@@ -909,26 +909,65 @@ form.kyc-form .row > [class*="col-"],
 /* action button color tune: edit (blue), delete (red) */
 .main-content .admin-table-card td .btn-outline-primary,
 .main-content .admin-table-card td .btn-edit-svc {
-    background: #eef4ff !important;
-    border-color: #bfd3ff !important;
+    background: transparent !important;
+    border-color: transparent !important;
     color: #1d4ed8 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    border-radius: 6px !important;
 }
 
 .main-content .admin-table-card td .btn-outline-primary:hover,
 .main-content .admin-table-card td .btn-edit-svc:hover {
-    background: #dbe8ff !important;
-    border-color: #9db8ff !important;
+    background: #eaf1ff !important;
+    border-color: #eaf1ff !important;
     color: #1e40af !important;
 }
 
 .main-content .admin-table-card td .btn-outline-danger {
-    background: #fff1f2 !important;
-    border-color: #fecdd3 !important;
+    background: transparent !important;
+    border-color: transparent !important;
     color: #be123c !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    border-radius: 6px !important;
 }
 
 .main-content .admin-table-card td .btn-outline-danger:hover {
-    background: #ffe4e6 !important;
-    border-color: #fda4af !important;
+    background: #ffecef !important;
+    border-color: #ffecef !important;
     color: #9f1239 !important;
+}
+
+/* Stronger visual separators for header row */
+.main-content .admin-table-card .table thead th {
+    border-top: 1px solid #e5e7eb !important;
+    border-bottom: 2px solid #d1d5db !important;
+}
+
+.main-content .admin-table-card .table thead th:not(:last-child) {
+    border-right: 1px solid #e5e7eb !important;
+}
+
+/* Auto-generated list/form tabs from footer script */
+.admin-auto-tabs {
+    margin-top: 8px !important;
+}
+
+/* search/filter bars center aligned and consistent */
+.admin-search-wrap,
+.admin-table-card .card-body > form.row.g-2.align-items-end,
+.admin-table-card .card-body > form.row.g-3.align-items-end {
+    align-items: center !important;
+}
+
+.admin-search-wrap .input-group,
+.admin-table-card .card-body > form .input-group {
+    max-width: 420px !important;
 }

@@ -67,6 +67,9 @@ if (($epid = (int)($_GET['edit'] ?? 0)) > 0) {
 
 $posts = $db->query('SELECT p.*, ct.name_np AS ctype_name FROM election_posts p LEFT JOIN committee_types ct ON ct.id=p.committee_type_id ORDER BY p.display_order, p.id')->fetchAll(PDO::FETCH_ASSOC) ?: [];
 $committeeTypes = $db->query('SELECT id, name_np FROM committee_types WHERE is_active=1 ORDER BY display_order, id')->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$panel = (string)($_GET['panel'] ?? 'list');
+if (!in_array($panel, ['list', 'form'], true)) $panel = 'list';
+if ($editPost) $panel = 'form';
 ?>
 <div class="container-fluid py-3">
 <?php
@@ -79,8 +82,53 @@ echo adminPageHeader(
 ?>
 <?php if ($f = getFlash()): ?><div class="mb-3"><?php echo adminAlert($f['type'], $f['message']); ?></div><?php endif; ?>
 
-<div class="row g-3">
-    <div class="col-lg-5">
+<ul class="nav nav-tabs admin-nav-tabs mb-0">
+    <li class="nav-item"><a class="nav-link <?php echo $panel==='list' ? 'active' : ''; ?>" href="?panel=list"><i class="fas fa-list me-2"></i>पद सूची <span class="badge bg-success ms-1"><?php echo count($posts); ?></span></a></li>
+    <li class="nav-item"><a class="nav-link <?php echo $panel==='form' ? 'active' : ''; ?>" href="?panel=form"><i class="fas fa-plus-circle me-2"></i><?php echo $editPost ? 'पद सम्पादन' : 'नयाँ पद थप्नुहोस्'; ?></a></li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade <?php echo $panel==='list' ? 'show active' : ''; ?>" id="ep-list">
+    <div class="row g-3">
+    <div class="col-12">
+        <div class="card admin-table-card">
+            <div class="card-header"><h6 class="mb-0"><i class="fas fa-list me-2"></i>पद सूची (<?php echo count($posts); ?>)</h6></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead><tr><th>पद</th><th>समिति</th><th>सिट</th><th>मत</th><th>क्रम</th><th></th></tr></thead>
+                    <tbody>
+                    <?php foreach ($posts as $p): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($p['title_np']); ?>
+                                <?php if (empty($p['is_active'])): ?><span class="badge bg-secondary ms-1">निष्क्रिय</span><?php endif; ?>
+                            </td>
+                            <td class="small text-muted"><?php echo htmlspecialchars($p['ctype_name'] ?? '—'); ?></td>
+                            <td><?php echo (int)$p['default_seats']; ?></td>
+                            <td><?php echo (int)$p['default_max_votes']; ?></td>
+                            <td><?php echo (int)$p['display_order']; ?></td>
+                            <td class="text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary" href="?edit=<?php echo (int)$p['id']; ?>&panel=form"><i class="fas fa-pen"></i></a>
+                                <form method="post" class="d-inline" onsubmit="return confirm('यो पद मेटाउने?');">
+                                    <?php echo csrfField(); ?>
+                                    <input type="hidden" name="action" value="delete_post">
+                                    <input type="hidden" name="post_id" value="<?php echo (int)$p['id']; ?>">
+                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (empty($posts)): ?><tr><td colspan="6" class="text-center text-muted py-3">अझै पद थपिएको छैन।</td></tr><?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <div class="tab-pane fade <?php echo $panel==='form' ? 'show active' : ''; ?>" id="ep-form">
+    <div class="row g-3">
+    <div class="col-12">
         <div class="card admin-table-card">
             <div class="card-header"><h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i><?php echo $editPost ? 'पद सम्पादन' : 'नयाँ पद थप्नुहोस्'; ?></h6></div>
             <div class="card-body">
@@ -119,44 +167,14 @@ echo adminPageHeader(
                     </div>
                     <div class="col-12 d-flex gap-2">
                         <button class="btn btn-primary"><i class="fas fa-save me-1"></i>बचत</button>
-                        <a class="btn btn-outline-secondary" href="election-posts.php">नयाँ</a>
+                        <a class="btn btn-outline-secondary" href="election-posts.php?panel=form">नयाँ</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <div class="col-lg-7">
-        <div class="card admin-table-card">
-            <div class="card-header"><h6 class="mb-0"><i class="fas fa-list me-2"></i>पद सूची (<?php echo count($posts); ?>)</h6></div>
-            <div class="table-responsive">
-                <table class="table table-sm mb-0 align-middle">
-                    <thead><tr><th>पद</th><th>समिति</th><th>सिट</th><th>मत</th><th>क्रम</th><th></th></tr></thead>
-                    <tbody>
-                    <?php foreach ($posts as $p): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($p['title_np']); ?>
-                                <?php if (empty($p['is_active'])): ?><span class="badge bg-secondary ms-1">निष्क्रिय</span><?php endif; ?>
-                            </td>
-                            <td class="small text-muted"><?php echo htmlspecialchars($p['ctype_name'] ?? '—'); ?></td>
-                            <td><?php echo (int)$p['default_seats']; ?></td>
-                            <td><?php echo (int)$p['default_max_votes']; ?></td>
-                            <td><?php echo (int)$p['display_order']; ?></td>
-                            <td class="text-nowrap">
-                                <a class="btn btn-sm btn-outline-primary" href="?edit=<?php echo (int)$p['id']; ?>"><i class="fas fa-pen"></i></a>
-                                <form method="post" class="d-inline" onsubmit="return confirm('यो पद मेटाउने?');">
-                                    <?php echo csrfField(); ?>
-                                    <input type="hidden" name="action" value="delete_post">
-                                    <input type="hidden" name="post_id" value="<?php echo (int)$p['id']; ?>">
-                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    <?php if (empty($posts)): ?><tr><td colspan="6" class="text-center text-muted py-3">अझै पद थपिएको छैन।</td></tr><?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    </div>
+    </div>
     </div>
 </div>
 </div>

@@ -153,6 +153,10 @@ $cands = $cands->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 $committeeTypes = $db->query('SELECT id, name_np FROM committee_types WHERE is_active=1 ORDER BY display_order, id')->fetchAll(PDO::FETCH_ASSOC) ?: [];
 $postsMaster = $db->query('SELECT * FROM election_posts WHERE is_active=1 ORDER BY display_order, id')->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$panel = (string)($_GET['panel'] ?? 'positions'); // positions|candidates
+if (!in_array($panel, ['positions', 'candidates'], true)) $panel = 'positions';
+if ($editCand) $panel = 'candidates';
+if ($editPos) $panel = 'positions';
 ?>
 <div class="container-fluid py-3">
 <?php
@@ -182,8 +186,23 @@ if (count($allCycles) > 1):
 </div></div>
 <?php endif; ?>
 
+<ul class="nav nav-tabs admin-nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link <?php echo $panel === 'positions' ? 'active' : ''; ?>" href="?cycle=<?php echo $cycleId; ?>&panel=positions">
+            <i class="fas fa-briefcase me-2"></i>पद व्यवस्थापन
+            <span class="badge bg-success ms-1"><?php echo count($positions); ?></span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link <?php echo $panel === 'candidates' ? 'active' : ''; ?>" href="?cycle=<?php echo $cycleId; ?>&panel=candidates">
+            <i class="fas fa-user-plus me-2"></i>उम्मेदवार व्यवस्थापन
+            <span class="badge bg-success ms-1"><?php echo count($cands); ?></span>
+        </a>
+    </li>
+</ul>
+
 <div class="row g-3">
-    <div class="col-lg-5">
+    <div class="col-lg-5 <?php echo $panel === 'positions' ? '' : 'd-none'; ?>">
         <div class="card admin-table-card mb-3">
             <div class="card-header"><h6 class="mb-0"><i class="fas fa-briefcase me-2"></i><?php echo $editPos ? 'पद सम्पादन' : 'नयाँ पद थप्नुहोस्'; ?></h6></div>
             <div class="card-body">
@@ -245,7 +264,7 @@ if (count($allCycles) > 1):
                         </div>
                     </div>
                     <div class="col-12 d-flex gap-2"><button class="btn btn-primary"><i class="fas fa-save me-1"></i>बचत</button>
-                        <a class="btn btn-outline-secondary" href="election-candidates.php?cycle=<?php echo $cycleId; ?>">नयाँ</a></div>
+                        <a class="btn btn-outline-secondary" href="election-candidates.php?cycle=<?php echo $cycleId; ?>&panel=positions">नयाँ</a></div>
                 </form>
                 <script>
                 (function(){
@@ -281,7 +300,7 @@ if (count($allCycles) > 1):
                             <td><?php echo (int)$p['seats']; ?></td>
                             <td><?php echo $cnt; ?></td>
                             <td class="text-nowrap">
-                                <a class="btn btn-sm btn-outline-primary" href="?cycle=<?php echo $cycleId; ?>&edit_pos=<?php echo (int)$p['id']; ?>"><i class="fas fa-pen"></i></a>
+                                <a class="btn btn-sm btn-outline-primary" href="?cycle=<?php echo $cycleId; ?>&panel=positions&edit_pos=<?php echo (int)$p['id']; ?>"><i class="fas fa-pen"></i></a>
                                 <form method="post" class="d-inline" onsubmit="return confirm('यो पद, सबै उम्मेदवार र मत मेटाउने?');">
                                     <?php echo csrfField(); ?>
                                     <input type="hidden" name="action" value="delete_position">
@@ -298,7 +317,7 @@ if (count($allCycles) > 1):
         </div>
     </div>
 
-    <div class="col-lg-7">
+    <div class="col-lg-7 <?php echo $panel === 'candidates' ? '' : 'd-none'; ?>">
         <div class="card admin-table-card mb-3">
             <div class="card-header"><h6 class="mb-0"><i class="fas fa-user-plus me-2"></i><?php echo $editCand ? 'उम्मेदवार सम्पादन' : 'नयाँ उम्मेदवार थप्नुहोस्'; ?></h6></div>
             <div class="card-body">
@@ -358,7 +377,7 @@ if (count($allCycles) > 1):
                         <textarea class="form-control" name="bio_en" rows="2"><?php echo htmlspecialchars($editCand['bio_en'] ?? ''); ?></textarea>
                     </div>
                     <div class="col-12 d-flex gap-2"><button class="btn btn-primary"><i class="fas fa-save me-1"></i>बचत</button>
-                        <a class="btn btn-outline-secondary" href="election-candidates.php?cycle=<?php echo $cycleId; ?>">नयाँ</a></div>
+                        <a class="btn btn-outline-secondary" href="election-candidates.php?cycle=<?php echo $cycleId; ?>&panel=candidates">नयाँ</a></div>
                 </form>
                 <?php endif; ?>
             </div>
@@ -378,7 +397,7 @@ if (count($allCycles) > 1):
                             <td class="small"><?php echo $pos ? htmlspecialchars($pos['title_np']) : '—'; ?></td>
                             <td><?php echo htmlspecialchars($cd['symbol_no'] ?? ''); ?></td>
                             <td class="text-nowrap">
-                                <a class="btn btn-sm btn-outline-primary" href="?cycle=<?php echo $cycleId; ?>&edit_cand=<?php echo (int)$cd['id']; ?>"><i class="fas fa-pen"></i></a>
+                                <a class="btn btn-sm btn-outline-primary" href="?cycle=<?php echo $cycleId; ?>&panel=candidates&edit_cand=<?php echo (int)$cd['id']; ?>"><i class="fas fa-pen"></i></a>
                                 <form method="post" class="d-inline" onsubmit="return confirm('उम्मेदवार र सम्बन्धित मतहरू मेटाउने?');">
                                     <?php echo csrfField(); ?>
                                     <input type="hidden" name="action" value="delete_candidate">

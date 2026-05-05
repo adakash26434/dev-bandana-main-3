@@ -107,6 +107,126 @@
         document.addEventListener('shown.bs.modal', injectCsrf);
 
         /* ─────────────────────────────────────────────────────
+           AUTO SPLIT: list + form एउटै row भए tabs बनाउने
+           उद्देश्य: admin pages मा गजंगुज layout कम गर्नु
+           ───────────────────────────────────────────────────── */
+        function autoSplitListFormRows() {
+            var hasEditIntent = /(?:\?|&)(edit|edit_|action=add|action=edit|panel=form|panel=candidates|panel=positions)=?/i.test(window.location.search);
+            var rows = document.querySelectorAll('.container-fluid .row, .admin-page .row');
+            rows.forEach(function(row, idx) {
+                if (row.closest('.tab-content')) return;
+                if (row.dataset.autoSplitDone === '1') return;
+                var cols = Array.prototype.slice.call(row.children).filter(function(ch) {
+                    return ch.className && /col-/.test(ch.className);
+                });
+                if (cols.length !== 2) return;
+
+                var c1 = cols[0], c2 = cols[1];
+                var c1HasForm = !!c1.querySelector('form');
+                var c2HasForm = !!c2.querySelector('form');
+                var c1HasList = !!(c1.querySelector('table') || c1.querySelector('.table-responsive'));
+                var c2HasList = !!(c2.querySelector('table') || c2.querySelector('.table-responsive'));
+                if (!(c1HasForm && c2HasList) && !(c2HasForm && c1HasList)) return;
+
+                var formCol = c1HasForm ? c1 : c2;
+                var listCol = c1HasForm ? c2 : c1;
+                var nav = document.createElement('ul');
+                nav.className = 'nav nav-tabs admin-nav-tabs mb-2 admin-auto-tabs';
+
+                var liList = document.createElement('li');
+                liList.className = 'nav-item';
+                liList.innerHTML = '<button type="button" class="nav-link"><i class="fas fa-list me-2"></i>सूची</button>';
+                var liForm = document.createElement('li');
+                liForm.className = 'nav-item';
+                liForm.innerHTML = '<button type="button" class="nav-link"><i class="fas fa-pen me-2"></i>फर्म</button>';
+                nav.appendChild(liList);
+                nav.appendChild(liForm);
+
+                row.parentNode.insertBefore(nav, row);
+
+                var btnList = liList.querySelector('.nav-link');
+                var btnForm = liForm.querySelector('.nav-link');
+                function show(which) {
+                    if (which === 'form') {
+                        listCol.style.display = 'none';
+                        formCol.style.display = '';
+                        btnForm.classList.add('active');
+                        btnList.classList.remove('active');
+                    } else {
+                        formCol.style.display = 'none';
+                        listCol.style.display = '';
+                        btnList.classList.add('active');
+                        btnForm.classList.remove('active');
+                    }
+                }
+                btnList.addEventListener('click', function() { show('list'); });
+                btnForm.addEventListener('click', function() { show('form'); });
+                show(hasEditIntent ? 'form' : 'list');
+                row.dataset.autoSplitDone = '1';
+            });
+        }
+        autoSplitListFormRows();
+
+        /* ─────────────────────────────────────────────────────
+           TAB STANDARDIZATION (global)
+           Rule:
+             1) 'सूची' tab first
+             2) 'नयाँ थप्नुहोस्' tab second
+           ───────────────────────────────────────────────────── */
+        function normalizeAdminTabs() {
+            var tabBars = document.querySelectorAll('.admin-nav-tabs');
+            tabBars.forEach(function(bar) {
+                var items = Array.prototype.slice.call(bar.querySelectorAll(':scope > .nav-item'));
+                if (!items.length) return;
+
+                function getLabelEl(item) {
+                    return item.querySelector('.nav-link, button.nav-link, a.nav-link');
+                }
+                function textOf(item) {
+                    var el = getLabelEl(item);
+                    return ((el ? el.textContent : item.textContent) || '').replace(/\s+/g, ' ').trim();
+                }
+                function isListTab(txt) {
+                    return /(सूची|list|records|items|data)/i.test(txt);
+                }
+                function isFormTab(txt) {
+                    return /(नयाँ|थप्नुहोस्|add|create|new|edit|सम्पादन)/i.test(txt);
+                }
+
+                var listItem = null;
+                var formItem = null;
+                items.forEach(function(it) {
+                    var t = textOf(it);
+                    if (!listItem && isListTab(t)) listItem = it;
+                    if (!formItem && isFormTab(t)) formItem = it;
+                });
+
+                if (listItem && formItem && listItem !== formItem) {
+                    // enforce order: list first, form second
+                    bar.prepend(listItem);
+                    if (listItem.nextSibling !== formItem) {
+                        listItem.insertAdjacentElement('afterend', formItem);
+                    }
+
+                    // enforce label wording
+                    var listEl = getLabelEl(listItem);
+                    var formEl = getLabelEl(formItem);
+                    if (listEl) {
+                        var listBadge = listEl.querySelector('.badge');
+                        var listBadgeHtml = listBadge ? listBadge.outerHTML : '';
+                        listEl.innerHTML = '<i class="fas fa-list me-2"></i>सूची' + (listBadgeHtml ? (' ' + listBadgeHtml) : '');
+                    }
+                    if (formEl) {
+                        var formBadge = formEl.querySelector('.badge');
+                        var formBadgeHtml = formBadge ? formBadge.outerHTML : '';
+                        formEl.innerHTML = '<i class="fas fa-plus-circle me-2"></i>नयाँ थप्नुहोस्' + (formBadgeHtml ? (' ' + formBadgeHtml) : '');
+                    }
+                }
+            });
+        }
+        normalizeAdminTabs();
+
+        /* ─────────────────────────────────────────────────────
            DELETE links: GET delete link → safe POST+CSRF form
            — a[href*="action=delete"] ले GET delete बाट जोगाउँछ
            ───────────────────────────────────────────────────── */

@@ -124,6 +124,8 @@ $tab = (string)($_GET['tab'] ?? 'all'); // all|upcoming|active|past|draft
 $qSearch = trim((string)($_GET['q'] ?? ''));
 $qFrom   = trim((string)($_GET['from'] ?? ''));
 $qTo     = trim((string)($_GET['to'] ?? ''));
+$panel   = (string)($_GET['panel'] ?? 'list'); // list|form
+if (!in_array($panel, ['list', 'form'], true)) $panel = 'list';
 
 $cycles = $db->query('SELECT * FROM election_cycles ORDER BY sort_order ASC, id DESC')->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -174,6 +176,7 @@ if ($editId > 0) {
     $st = $db->prepare('SELECT * FROM election_cycles WHERE id=? LIMIT 1');
     $st->execute([$editId]);
     $editRow = $st->fetch(PDO::FETCH_ASSOC) ?: null;
+    if ($editRow) $panel = 'form';
 }
 $milestoneRows = [];
 if ($milestonesFor > 0) {
@@ -218,8 +221,24 @@ echo adminPageHeader(
     <?php endif; ?>
 </div>
 
-<div class="row g-3">
-    <div class="col-lg-5">
+<ul class="nav nav-tabs admin-nav-tabs mb-0">
+    <li class="nav-item">
+        <a class="nav-link <?php echo $panel === 'list' ? 'active' : ''; ?>" href="?<?php echo http_build_query(array_merge($_GET, ['panel' => 'list'])); ?>">
+            <i class="fas fa-list me-2"></i>सूची
+            <span class="badge bg-success ms-1"><?php echo count($filtered); ?></span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link <?php echo $panel === 'form' ? 'active' : ''; ?>" href="?<?php echo http_build_query(array_merge($_GET, ['panel' => 'form'])); ?>">
+            <i class="fas fa-plus-circle me-2"></i><?php echo $editRow ? 'चक्र सम्पादन' : 'नयाँ चक्र थप्नुहोस्'; ?>
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade <?php echo $panel === 'list' ? 'show active' : ''; ?>" id="ec-list">
+    <div class="row g-3">
+    <div class="col-12">
         <div class="card admin-table-card h-100">
             <div class="card-header py-2">
                 <ul class="nav nav-pills nav-sm gap-1 small">
@@ -268,7 +287,7 @@ echo adminPageHeader(
                                 <?php if (!empty($c['show_in_navbar'])): ?><span class="badge bg-primary">मेनु</span><?php endif; ?>
                             </td>
                             <td class="text-nowrap">
-                                <a class="btn btn-sm btn-outline-primary" href="election-information.php?edit=<?php echo (int)$c['id']; ?>" title="सम्पादन"><i class="fas fa-pen"></i></a>
+                                <a class="btn btn-sm btn-outline-primary" href="election-information.php?edit=<?php echo (int)$c['id']; ?>&panel=form" title="सम्पादन"><i class="fas fa-pen"></i></a>
                                 <a class="btn btn-sm btn-outline-secondary" href="election-information.php?milestones=<?php echo (int)$c['id']; ?>" title="तालिका"><i class="fas fa-list-ol"></i></a>
                                 <a class="btn btn-sm btn-outline-success" href="election-candidates.php?cycle=<?php echo (int)$c['id']; ?>" title="उम्मेदवार"><i class="fas fa-user-tie"></i></a>
                             </td>
@@ -282,7 +301,11 @@ echo adminPageHeader(
             </div>
         </div>
     </div>
-    <div class="col-lg-7">
+    </div>
+    </div>
+    <div class="tab-pane fade <?php echo $panel === 'form' ? 'show active' : ''; ?>" id="ec-form">
+    <div class="row g-3">
+    <div class="col-12">
         <div class="card admin-table-card">
             <div class="card-header"><h6 class="mb-0"><?php echo $editRow ? 'चक्र सम्पादन' : 'नयाँ चक्र थप्नुहोस्'; ?></h6></div>
             <div class="card-body">
@@ -366,7 +389,7 @@ echo adminPageHeader(
                         <?php if ($editRow): ?>
                             <a href="election-information.php?milestones=<?php echo (int)$editRow['id']; ?>" class="btn btn-success"><i class="fas fa-list-ol me-1"></i>कार्यतालिका व्यवस्थापन</a>
                         <?php endif; ?>
-                        <a href="election-information.php" class="btn btn-outline-secondary">नयाँ फारम</a>
+                        <a href="election-information.php?panel=form" class="btn btn-outline-secondary">नयाँ फारम</a>
                     </div>
                 </form>
                 <?php if ($editRow): ?>
@@ -379,6 +402,8 @@ echo adminPageHeader(
                 <?php endif; ?>
             </div>
         </div>
+    </div>
+</div>
     </div>
 </div>
 
