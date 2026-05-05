@@ -684,12 +684,12 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <?php if (!empty($settings['himal_bg'])): ?>
                         <img src="../<?php echo htmlspecialchars($settings['himal_bg']); ?>"
                              alt="Himal Background" class="img-fluid mb-2 rounded"
-                             style="max-height:90px; width:100%; object-fit:cover;">
+                             style="max-height:150px; width:100%; object-fit:cover;">
                         <div class="mb-2">
                             <small class="text-success"><i class="fas fa-check-circle"></i> फोटो अपलोड भएको छ</small>
                         </div>
                     <?php else: ?>
-                        <div class="mb-2 p-3 rounded" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light)); min-height:60px; display:flex;align-items:center;justify-content:center;">
+                        <div class="mb-2 p-3 rounded" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light)); min-height:110px; display:flex;align-items:center;justify-content:center;">
                             <small class="text-white opacity-75"><i class="fas fa-mountain me-1"></i> हिमाल फोटो छैन — gradient देखिन्छ</small>
                         </div>
                     <?php endif; ?>
