@@ -732,3 +732,165 @@ textarea.form-control:focus {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   22. Sidebar minimal/simple mode
+   ───────────────────────────────────────────────────────────── */
+.sidebar {
+    background: #143126 !important;
+    box-shadow: none !important;
+    border-right: 1px solid rgba(255,255,255,.08) !important;
+}
+
+.sidebar-header {
+    background: #11291f !important;
+    box-shadow: none !important;
+}
+
+.sidebar .nav-icon-wrap {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    transform: none !important;
+}
+
+.sidebar-nav a {
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    padding: 7px 10px !important;
+}
+
+.sidebar-nav li.active > a,
+.sidebar-nav a.active {
+    background: rgba(255,255,255,0.16) !important;
+    border-left: 3px solid #9fdbb7 !important;
+    padding-left: 9px !important;
+}
+
+.nav-group-header {
+    background: transparent !important;
+    border-radius: 6px !important;
+    font-size: .78rem !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   23. Strict form layout:
+   Desktop max 2 columns, mobile strict 1 column
+   ───────────────────────────────────────────────────────────── */
+.admin-form-page form .row > [class*="col-"],
+form.kyc-form .row > [class*="col-"],
+.tab-pane form .row > [class*="col-"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+}
+
+@media (min-width: 992px) {
+    .admin-form-page form .row > [class*="col-"],
+    .tab-pane form .row > [class*="col-"] {
+        width: 50% !important;
+        max-width: 50% !important;
+        flex: 0 0 50% !important;
+    }
+    .admin-form-page form .row > .col-12,
+    .admin-form-page form .row > .col-lg-12,
+    .admin-form-page form .row > .col-md-12,
+    .tab-pane form .row > .col-12,
+    .tab-pane form .row > .col-lg-12,
+    .tab-pane form .row > .col-md-12 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .admin-form-page form .row > [class*="col-"],
+    .tab-pane form .row > [class*="col-"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   24. Neutral buttons:
+   keep only primary + danger color emphasis
+   ───────────────────────────────────────────────────────────── */
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-secondary,
+.btn-outline-success,
+.btn-outline-info,
+.btn-outline-warning,
+.btn-outline-secondary,
+.btn-outline-primary {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-color: #cfd8d3 !important;
+}
+
+.btn-success:hover,
+.btn-info:hover,
+.btn-warning:hover,
+.btn-secondary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover,
+.btn-outline-warning:hover,
+.btn-outline-secondary:hover,
+.btn-outline-primary:hover {
+    background: #f3f6f4 !important;
+    color: #111827 !important;
+    border-color: #b8c7be !important;
+}
+
+.btn-primary {
+    background: #1f7a46 !important;
+    border-color: #1f7a46 !important;
+    color: #fff !important;
+}
+
+.btn-primary:hover {
+    background: #176238 !important;
+    border-color: #176238 !important;
+}
+
+.btn-danger,
+.btn-outline-danger {
+    color: #b42323 !important;
+    border-color: #e3aaaa !important;
+}
+
+.btn-danger {
+    background: #fbecec !important;
+}
+
+.btn-danger:hover,
+.btn-outline-danger:hover {
+    background: #f7dede !important;
+    border-color: #d99191 !important;
+    color: #962222 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   25. Force plain table header colors (no gradients)
+   ───────────────────────────────────────────────────────────── */
+.main-content table thead th,
+.main-content .table thead th,
+.main-content .admin-table-card table thead th,
+.main-content .admin-table-card .table thead th,
+.main-content .card .table thead th,
+.main-content .card .table-responsive .table thead th,
+.main-content .data-table thead th,
+.main-content .table-col-header th {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    border-color: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 700 !important;
+}

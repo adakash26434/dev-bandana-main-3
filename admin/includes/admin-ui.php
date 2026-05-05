@@ -367,6 +367,9 @@ function adminFiscalYearSelect(string $name, string $selected = '', bool $requir
    Usage: echo adminHelpTip('यो पृष्ठबाट संस्थाका सूचनाहरू थप्न सकिन्छ।', ['सूचना थप्न: "+ नयाँ सूचना" बटन थिच्नुस्।']);
    ────────────────────────────────────────────────────────────── */
 function adminHelpTip(string $mainText, array $steps = [], string $icon = 'fa-circle-info'): string {
+    // UX cleanup: helper tips are kept in code but hidden from admin UI.
+    return '';
+
     $stepsHtml = '';
     if ($steps) {
         $stepsHtml = '<ul style="margin:6px 0 0 0;padding-left:18px;">';
