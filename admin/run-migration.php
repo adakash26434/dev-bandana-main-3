@@ -46,20 +46,6 @@ $allowCustomSql = false;
  */
 /* splitSqlStatements() → see admin/includes/sql-utils.php (included by db-setup.php first) */
 if (!function_exists('splitSqlStatements')) { require_once __DIR__ . '/includes/sql-utils.php'; }
-            $buffer .= $line . "\n";
-            // Current delimiter line अन्तमा भेटियो? statement पूरा भयो
-            if (substr(rtrim($line), -strlen($delim)) === $delim) {
-                $stmt = rtrim(rtrim($buffer), "\r\n ");
-                $stmt = substr($stmt, 0, -strlen($delim));
-                $stmt = trim($stmt);
-                if ($stmt !== '') $statements[] = $stmt;
-                $buffer = '';
-            }
-        }
-        if (trim($buffer) !== '') $statements[] = trim($buffer);
-        return $statements;
-    }
-}
 
 /* SQL File Upload को लागि variables */
 $uploadResult   = '';
@@ -74,11 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['run_uploaded_sql'])) 
         $uploadResult = '<div class="alert alert-danger"><i class="fas fa-ban me-2"></i>सुरक्षा जाँच असफल। पुन: प्रयास गर्नुहोस्।</div>';
     } elseif (empty($_FILES['sql_file']) || $_FILES['sql_file']['error'] !== UPLOAD_ERR_OK) {
         $errCode = $_FILES['sql_file']['error'] ?? 99;
-        $errMsg  = match($errCode) {
-            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'File size धेरै ठूलो छ।',
-            UPLOAD_ERR_NO_FILE => '.sql file choose गर्नुहोस्।',
-            default            => 'Upload असफल (error code: ' . $errCode . ')',
-        };
+        if ($errCode === UPLOAD_ERR_INI_SIZE || $errCode === UPLOAD_ERR_FORM_SIZE) {
+            $errMsg = 'File size धेरै ठूलो छ।';
+        } elseif ($errCode === UPLOAD_ERR_NO_FILE) {
+            $errMsg = '.sql file choose गर्नुहोस्।';
+        } else {
+            $errMsg = 'Upload असफल (error code: ' . $errCode . ')';
+        }
         $uploadResult = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>' . $errMsg . '</div>';
     } else {
         $file = $_FILES['sql_file'];

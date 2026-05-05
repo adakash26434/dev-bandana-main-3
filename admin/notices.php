@@ -99,7 +99,7 @@ $flash = getFlash();
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($notices) . '</span>'
 );
 ?>
-<?php echo adminHelpTip('यो पृष्ठबाट संस्थाका सूचनाहरू थप्न, सम्पादन गर्न र हटाउन सकिन्छ।', ['नयाँ सूचना थप्न: माथिको "+" बटन थिच्नुहोस्।', 'सूचना publish/unpublish गर्न: Active/Inactive बटन थिच्नुहोस्।', 'सूचना हटाउन: रातो Delete बटन थिच्नुहोस् (यो कार्य पूर्ववत हुन सक्दैन)।']); ?> ?>
+<?php echo adminHelpTip('यो पृष्ठबाट संस्थाका सूचनाहरू थप्न, सम्पादन गर्न र हटाउन सकिन्छ।', ['नयाँ सूचना थप्न: माथिको "+" बटन थिच्नुहोस्।', 'सूचना publish/unpublish गर्न: Active/Inactive बटन थिच्नुहोस्।', 'सूचना हटाउन: रातो Delete बटन थिच्नुहोस् (यो कार्य पूर्ववत हुन सक्दैन)।']); ?>
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
 

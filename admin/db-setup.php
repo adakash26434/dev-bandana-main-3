@@ -660,7 +660,7 @@ if ($bootstrapMode && !$bootstrapSetupUnlocked) {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light p-4">
-<div class="container" style="max-width:520px;">
+<div class="container dbs-bootstrap-wrap">
   <h5 class="mb-3">DB Setup — पहिलो पटक unlock</h5>
   <?php if (is_array($flash) && count($flash) >= 2): ?>
   <div class="alert alert-<?php echo $flash[0] === 'success' ? 'success' : 'danger'; ?> small py-2"><?php echo htmlspecialchars((string) $flash[1], ENT_QUOTES, 'UTF-8'); ?></div>
@@ -723,7 +723,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
 <div class="bootstrap-banner">
   <i class="fas fa-tools me-2"></i>BOOTSTRAP MODE — Database connect भएन वा Admin user छैन। Setup पूरा भएपछि login पेज देखिनेछ।
   <?php if (!empty($bootstrapAutoUnlockFromDbFile)): ?>
-  <div style="font-size:0.85rem;font-weight:500;opacity:0.95;margin-top:8px;">
+  <div class="dbs-boot-note">
     <code>includes/database.local.php</code> मा DB name/user भरिएको छ — सिधै यहाँ credentials मिलाउनुहोस् वा <code>install.sql</code> चलाउनुहोस्।
   </div>
   <?php endif; ?>
@@ -735,7 +735,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
 
     <!-- Page Header -->
     <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-        <div style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;padding:14px 18px;border-radius:14px;">
+        <div class="dbs-page-icon">
             <i class="fas fa-database fa-xl"></i>
         </div>
         <div>
@@ -794,11 +794,11 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
         <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
                 <?php if ($db): ?>
-                    <div style="font-size:2rem;color:var(--primary-color);"><i class="fas fa-check-circle"></i></div>
+                    <div class="dbs-stat-icon is-ok"><i class="fas fa-check-circle"></i></div>
                     <div class="fw-bold mt-1">DB Connected</div>
                     <div class="text-muted small">Database जोडिएको छ</div>
                 <?php else: ?>
-                    <div style="font-size:2rem;color:var(--danger);"><i class="fas fa-times-circle"></i></div>
+                    <div class="dbs-stat-icon is-bad"><i class="fas fa-times-circle"></i></div>
                     <div class="fw-bold mt-1">DB Disconnected</div>
                     <div class="text-muted small">Connection छैन</div>
                 <?php endif; ?>
@@ -808,7 +808,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
         <!-- Tables Status -->
         <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <div style="font-size:2rem;color:<?php echo $tablesMissing>0?'#dc3545':'var(--primary-color)'; ?>;">
+                <div class="dbs-stat-icon <?php echo $tablesMissing>0 ? 'is-bad' : 'is-ok'; ?>">
                     <i class="fas fa-table"></i>
                 </div>
                 <div class="fw-bold mt-1"><?php echo $tablesFound; ?>/<?php echo count($allTables); ?> Tables</div>
@@ -821,7 +821,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
         <!-- SQL File -->
         <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <div style="font-size:2rem;color:<?php echo $sqlExists?'#0d6efd':'#999'; ?>;">
+                <div class="dbs-stat-icon <?php echo $sqlExists ? 'is-info' : 'is-muted'; ?>">
                     <i class="fas fa-file-code"></i>
                 </div>
                 <div class="fw-bold mt-1"><?php echo $sqlExists?'install.sql OK':'install.sql छैन'; ?></div>
@@ -834,7 +834,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
         <!-- Setup Lock -->
         <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <div style="font-size:2rem;color:<?php echo $setupLocked?'var(--primary-color)':'#dc3545'; ?>;">
+                <div class="dbs-stat-icon <?php echo $setupLocked ? 'is-ok' : 'is-bad'; ?>">
                     <i class="fas fa-<?php echo $setupLocked?'lock':'lock-open'; ?>"></i>
                 </div>
                 <div class="fw-bold mt-1"><?php echo $setupLocked?'setup.php Locked':'setup.php Unlocked'; ?></div>
@@ -849,10 +849,9 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
         <div class="col-lg-8">
 
             <!-- ── Full Database Setup ── -->
-            <div class="card border-0 shadow-sm mb-4"
-                 style="border-left:4px solid var(--primary-color) !important;">
+            <div class="card border-0 shadow-sm mb-4 dbs-card dbs-card-primary">
                 <div class="card-header py-3 d-flex align-items-center gap-2"
-                     style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+                     >
                     <i class="fas fa-play-circle fa-lg"></i>
                     <div>
                         <h5 class="mb-0">Full Database Setup चलाउनुहोस्</h5>
@@ -862,8 +861,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                 <div class="card-body">
 
                     <?php if ($sqlExists): ?>
-                    <div class="d-flex align-items-start gap-3 p-3 rounded-3 mb-3"
-                         style="background:#e8f5e9;border:1px solid #a5d6a7;">
+                    <div class="d-flex align-items-start gap-3 p-3 rounded-3 mb-3 dbs-soft-ok">
                         <i class="fas fa-file-code fa-xl text-success mt-1"></i>
                         <div>
                             <div class="fw-semibold">install.sql</div>
@@ -904,10 +902,9 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
             </div>
 
             <!-- ── TESTING HARD RESET ── -->
-            <div class="card border-0 shadow-sm mb-4"
-                 style="border-left:4px solid #dc3545 !important;">
+            <div class="card border-0 shadow-sm mb-4 dbs-card dbs-card-danger">
                 <div class="card-header py-3 d-flex align-items-center gap-2"
-                     style="background:linear-gradient(135deg,#dc3545,#b42330);color:#fff;">
+                     >
                     <i class="fas fa-skull-crossbones fa-lg"></i>
                     <div>
                         <h5 class="mb-0">Testing Hard Reset (पुरानो data हटाउने)</h5>
@@ -934,15 +931,14 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
             </div>
 
             <!-- ── Server SQL Files (database/ folder) ── -->
-            <div class="card border-0 shadow-sm mb-4"
-                 style="border-left:4px solid #0d6efd !important;">
+            <div class="card border-0 shadow-sm mb-4 dbs-card dbs-card-info">
                 <div class="card-header py-3 d-flex align-items-center gap-2"
-                     style="background:linear-gradient(135deg,#0d6efd,#0b5ed7);color:#fff;">
+                     >
                     <i class="fas fa-folder-open fa-lg"></i>
                     <div>
                         <h5 class="mb-0">Database Folder SQL Files</h5>
                         <small class="opacity-75">
-                            <code style="background:rgba(255,255,255,.15);padding:1px 5px;border-radius:4px;">
+                            <code class="dbs-inline-code">
                                 public_html/database/
                             </code>
                             — <?php echo count($serverSqlFiles); ?> .sql file<?php echo count($serverSqlFiles)!==1?'s':''; ?> भेटियो
@@ -953,7 +949,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                     </span>
                 </div>
                 <!-- ── Upload New SQL File → Save to database/ folder ── -->
-                <div class="p-3 border-bottom" style="background:#f8f9fe;">
+                <div class="p-3 border-bottom dbs-upload-strip">
                     <form method="POST" enctype="multipart/form-data"
                           class="d-flex align-items-end gap-2 flex-wrap"
                           onsubmit="return confirm('यो SQL file database/ folder मा save गर्ने?\n\nSave भएपछि तल list मा देखिनेछ — त्यहाँबाट Run गर्न मिल्छ।')">
@@ -967,7 +963,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                             <input type="file" name="new_sql_file" accept=".sql"
                                    class="form-control form-control-sm" required
                                    id="newSqlFileInput">
-                            <div class="form-text" style="font-size:.7rem;">
+                            <div class="form-text dbs-mini-help">
                                 .sql file मात्र — max 50MB। Save भएपछि तल list मा देखिन्छ।
                             </div>
                         </div>
@@ -1000,7 +996,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                     <?php else: ?>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0 small">
-                            <thead style="background:#e8f0fe;">
+                            <thead class="dbs-soft-head">
                                 <tr>
                                     <th class="ps-3"><i class="fas fa-file-code me-1 text-primary"></i>File Name</th>
                                     <th><i class="fas fa-weight-hanging me-1 text-muted"></i>Size</th>
@@ -1017,7 +1013,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                                             <div>
                                                 <div class="fw-semibold"><?php echo htmlspecialchars($sf['name']); ?></div>
                                                 <?php if ($sf['name'] === 'install.sql'): ?>
-                                                <span class="badge bg-success" style="font-size:.6rem;">मुख्य file</span>
+                                                <span class="badge bg-success dbs-mini-badge">मुख्य file</span>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -1049,8 +1045,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-2 text-muted small border-top"
-                         style="background:#f8f9fa;">
+                    <div class="p-2 text-muted small border-top dbs-table-footnote">
                         <i class="fas fa-info-circle me-1 text-primary"></i>
                         नयाँ .sql file थप्न: cPanel → File Manager → <code>public_html/database/</code> मा upload गर्नुहोस् — यहाँ automatically देखिनेछ।
                     </div>
@@ -1061,7 +1056,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
             <!-- ── SQL File Upload ── -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header py-2 d-flex align-items-center gap-2"
-                     style="background:#6c757d;color:#fff;">
+                     >
                     <i class="fas fa-file-upload"></i>
                     <div>
                         <h6 class="mb-0">Computer बाट SQL Upload गरेर Run गर्नुहोस्</h6>
@@ -1094,7 +1089,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
             <!-- ── Core Tables Only ── -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header py-2"
-                     style="background:#6c757d;color:#fff;">
+                     >
                     <h6 class="mb-0"><i class="fas fa-table me-2"></i>Core Tables मात्र बनाउनुहोस्</h6>
                 </div>
                 <div class="card-body">
@@ -1120,14 +1115,14 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
             <!-- setup.php Lock Control -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header py-2"
-                     style="background:<?php echo $setupLocked?'var(--primary-color)':'#dc3545'; ?>;color:#fff;">
+                     >
                     <h6 class="mb-0">
                         <i class="fas fa-<?php echo $setupLocked?'lock':'lock-open'; ?> me-2"></i>
                         setup.php Access Control
                     </h6>
                 </div>
                 <div class="card-body text-center">
-                    <div class="mb-2" style="font-size:2.5rem;color:<?php echo $setupLocked?'var(--primary-color)':'#dc3545'; ?>;">
+                    <div class="mb-2 dbs-lock-icon <?php echo $setupLocked ? 'is-locked' : 'is-unlocked'; ?>">
                         <i class="fas fa-<?php echo $setupLocked?'shield-check':'shield-exclamation'; ?>"></i>
                     </div>
                     <p class="small text-muted mb-3">
@@ -1178,14 +1173,13 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
             <!-- DB Credentials — Editable Form -->
             <div class="card border-0 shadow-sm">
                 <div class="card-header py-2 d-flex align-items-center gap-2"
-                     style="background:linear-gradient(135deg,#2c3e50,#4a5568);color:#fff;">
+                     >
                     <i class="fas fa-key"></i>
                     <div>
                         <h6 class="mb-0">DB Credentials बदल्नुहोस्</h6>
-                        <small class="opacity-75" style="font-size:.7rem;">includes/database.local.php</small>
+                        <small class="opacity-75 dbs-mini-help">includes/database.local.php</small>
                     </div>
-                    <span class="ms-auto badge"
-                          style="background:rgba(255,255,255,.2);font-size:.6rem;">
+                    <span class="ms-auto badge dbs-head-badge">
                         <?php echo $adminDbCredWritable ? '✓ Writable' : '✗ Read-only'; ?>
                     </span>
                 </div>
@@ -1205,18 +1199,18 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
 
                         <!-- DB Host -->
                         <div class="mb-2">
-                            <label class="form-label fw-semibold mb-1" style="font-size:.8rem;">
+                            <label class="form-label fw-semibold mb-1 dbs-form-label-sm">
                                 <i class="fas fa-server me-1 text-muted"></i>DB Host
                             </label>
                             <input type="text" name="db_host" class="form-control form-control-sm"
                                    value="<?php echo htmlspecialchars(defined('DB_HOST') ? DB_HOST : 'localhost'); ?>"
                                    placeholder="localhost" required>
-                            <div class="form-text" style="font-size:.7rem;">Shared hosting मा सधैं <code>localhost</code></div>
+                            <div class="form-text dbs-mini-help">Shared hosting मा सधैं <code>localhost</code></div>
                         </div>
 
                         <!-- DB Name -->
                         <div class="mb-2">
-                            <label class="form-label fw-semibold mb-1" style="font-size:.8rem;">
+                            <label class="form-label fw-semibold mb-1 dbs-form-label-sm">
                                 <i class="fas fa-database me-1 text-muted"></i>Database Name
                             </label>
                             <input type="text" name="db_name" class="form-control form-control-sm"
@@ -1226,7 +1220,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
 
                         <!-- DB User -->
                         <div class="mb-2">
-                            <label class="form-label fw-semibold mb-1" style="font-size:.8rem;">
+                            <label class="form-label fw-semibold mb-1 dbs-form-label-sm">
                                 <i class="fas fa-user me-1 text-muted"></i>DB Username
                             </label>
                             <input type="text" name="db_user" class="form-control form-control-sm"
@@ -1236,7 +1230,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
 
                         <!-- DB Password -->
                         <div class="mb-2">
-                            <label class="form-label fw-semibold mb-1" style="font-size:.8rem;">
+                            <label class="form-label fw-semibold mb-1 dbs-form-label-sm">
                                 <i class="fas fa-lock me-1 text-muted"></i>DB Password
                             </label>
                             <div class="input-group input-group-sm">
@@ -1253,17 +1247,17 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
 
                         <!-- Site URL -->
                         <div class="mb-3">
-                            <label class="form-label fw-semibold mb-1" style="font-size:.8rem;">
+                            <label class="form-label fw-semibold mb-1 dbs-form-label-sm">
                                 <i class="fas fa-globe me-1 text-muted"></i>Site URL
                             </label>
                             <input type="url" name="site_url" class="form-control form-control-sm"
                                    value="<?php echo htmlspecialchars(defined('SITE_URL') ? SITE_URL : ''); ?>"
                                    placeholder="https://yourdomain.com.np/">
-                            <div class="form-text" style="font-size:.7rem;">Trailing slash (/) अनिवार्य — auto-add हुन्छ।</div>
+                            <div class="form-text dbs-mini-help">Trailing slash (/) अनिवार्य — auto-add हुन्छ।</div>
                         </div>
 
                         <!-- Warning -->
-                        <div class="p-2 rounded-2 mb-3" style="background:#fff3cd;border:1px solid #ffc107;font-size:.72rem;">
+                        <div class="p-2 rounded-2 mb-3 dbs-cred-warning">
                             <i class="fas fa-exclamation-triangle text-warning me-1"></i>
                             <strong>सावधान!</strong> गलत credentials राख्यो भने site काम गर्दैन। Save गर्नु अघि values confirm गर्नुहोस्।
                         </div>
@@ -1282,7 +1276,7 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
     <!-- ══ TABLE STATUS ══ -->
     <div class="card border-0 shadow-sm mt-2">
         <div class="card-header py-2 d-flex align-items-center justify-content-between"
-             style="background:#343a40;color:#fff;">
+             >
             <span><i class="fas fa-table me-2"></i>Database Tables Status</span>
             <span class="badge <?php echo $tablesMissing===0?'bg-success':'bg-warning text-dark'; ?>">
                 <?php echo $tablesFound; ?>/<?php echo count($allTables); ?> Tables
@@ -1294,12 +1288,11 @@ if (defined('BOOTSTRAP_MODE') && BOOTSTRAP_MODE):
                 <?php foreach ($allTables as $tbl => $label):
                     $exists = $tableStatus[$tbl] ?? false; ?>
                 <div class="col-6 col-md-4 col-lg-3">
-                    <div class="d-flex align-items-center gap-2 p-2 border-bottom border-end"
-                         style="font-size:.82rem;">
+                    <div class="d-flex align-items-center gap-2 p-2 border-bottom border-end dbs-table-status-item">
                         <i class="fas fa-<?php echo $exists?'check-circle text-success':'times-circle text-danger'; ?>"></i>
                         <div>
-                            <div class="fw-semibold text-truncate" style="max-width:120px;"><?php echo htmlspecialchars($label); ?></div>
-                            <code class="text-muted" style="font-size:.7rem;"><?php echo htmlspecialchars($tbl); ?></code>
+                            <div class="fw-semibold text-truncate dbs-table-status-label"><?php echo htmlspecialchars($label); ?></div>
+                            <code class="text-muted dbs-mini-help"><?php echo htmlspecialchars($tbl); ?></code>
                         </div>
                     </div>
                 </div>

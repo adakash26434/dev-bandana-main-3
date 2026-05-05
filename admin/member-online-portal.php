@@ -707,7 +707,7 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
 <?php else: /* ── Member List ── */ ?>
 
 <!-- Tab Nav -->
-<ul class="nav nav-tabs mb-3">
+<ul class="nav nav-tabs admin-nav-tabs mb-3">
     <li class="nav-item">
         <a class="nav-link <?php echo $activeTab==='members'?'active':''; ?>" href="?tab=members">
             <i class="fas fa-users me-1"></i>Members

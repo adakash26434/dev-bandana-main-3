@@ -108,7 +108,7 @@ $flash = getFlash();
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($images) . ' तस्बिरहरू</span>'
 );
 ?>
-<?php echo adminHelpTip('यो पृष्ठबाट Photo Gallery मा तस्बिरहरू थप्न र हटाउन सकिन्छ।', ['Photo थप्न: "Photo Upload" form मा file छान्नुहोस्।', 'Multiple photos: एकैपटक धेरै photos छान्न सकिन्छ।', 'Photo हटाउन: तस्बिरको Delete बटन थिच्नुहोस्।']); ?> ?>
+<?php echo adminHelpTip('यो पृष्ठबाट Photo Gallery मा तस्बिरहरू थप्न र हटाउन सकिन्छ।', ['Photo थप्न: "Photo Upload" form मा file छान्नुहोस्।', 'Multiple photos: एकैपटक धेरै photos छान्न सकिन्छ।', 'Photo हटाउन: तस्बिरको Delete बटन थिच्नुहोस्।']); ?>
 
 <?php if ($flash && $flash['type'] === 'success'): ?>
 <div class="alert alert-success alert-dismissible fade show mb-3"><i class="fas fa-check-circle me-2"></i><?php echo $flash['message']; ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>

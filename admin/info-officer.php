@@ -57,6 +57,11 @@ $allMembers = [];
 try {
     $allMembers = $db->query("SELECT id, name, name_en, position, position_np, position_en, photo, category, phone, email FROM team_members ORDER BY display_order, name")->fetchAll();
 } catch (Exception $e) {}
+
+$panel = (string)($_GET['panel'] ?? 'list');
+if (!in_array($panel, ['list', 'form'], true)) {
+    $panel = 'list';
+}
 ?>
 
 <?php
@@ -70,12 +75,26 @@ if ($error) echo adminAlert('error', $error);
 ?>
 <div class="container-fluid py-4">
 
-    <div class="row g-4">
+    <ul class="nav admin-nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'list' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#info-officer-list-tab" type="button" role="tab">
+                <i class="fas fa-list me-1"></i> सूची
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'form' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#info-officer-form-tab" type="button" role="tab">
+                <i class="fas fa-plus me-1"></i> नयाँ थप्नुहोस्
+            </button>
+        </li>
+    </ul>
 
-        <!-- हालको सूचना अधिकारी -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;">
+    <div class="tab-content info-officer-page">
+        <div class="tab-pane fade <?php echo $panel === 'list' ? 'show active' : ''; ?>" id="info-officer-list-tab" role="tabpanel">
+            <div class="row g-4">
+                <!-- हालको सूचना अधिकारी -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-id-badge me-2"></i>हालको सूचना अधिकारी</h5>
                 </div>
                 <div class="card-body text-center py-4">
@@ -95,7 +114,7 @@ if ($error) echo adminAlert('error', $error);
                         <?php if (!empty($currentOfficer['name_en'])): ?>
                             <p class="text-muted small mb-2"><?php echo htmlspecialchars($currentOfficer['name_en']); ?></p>
                         <?php endif; ?>
-                        <p class="fw-semibold mb-2" style="color:#0ea5e9;">
+                        <p class="fw-semibold mb-2 current-officer-position">
                             <?php echo htmlspecialchars($currentOfficer['position_np'] ?: $currentOfficer['position']); ?>
                         </p>
                         <?php if (!empty($currentOfficer['phone'])): ?>
@@ -104,7 +123,7 @@ if ($error) echo adminAlert('error', $error);
                         <?php if (!empty($currentOfficer['email'])): ?>
                             <p class="text-muted small mb-0"><i class="fas fa-envelope me-1"></i><?php echo htmlspecialchars($currentOfficer['email']); ?></p>
                         <?php endif; ?>
-                        <span class="badge mt-3" style="background:#0ea5e9;">
+                        <span class="badge mt-3 bg-primary">
                             <i class="fas fa-check-circle me-1"></i>सूचना अधिकारी
                         </span>
                     <?php else: ?>
@@ -117,9 +136,25 @@ if ($error) echo adminAlert('error', $error);
                 </div>
             </div>
         </div>
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-circle-info me-2"></i>सूचनाको हकसम्बन्धी जानकारी (RTI)</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-0">
+                                सूचनाको हक ऐन, २०६४ अन्तर्गत हरेक सार्वजनिक निकायले सूचना अधिकारी तोक्नु पर्छ।
+                                यहाँ तोकिएको व्यक्ति <strong>सूचना अधिकारी</strong> को रूपमा website मा देखाइनेछ र
+                                सूचना माग गर्दा सम्पर्क गर्न मिल्नेछ।
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- टिम सदस्य चयन गर्नुहोस् -->
-        <div class="col-lg-8">
+        <div class="tab-pane fade <?php echo $panel === 'form' ? 'show active' : ''; ?>" id="info-officer-form-tab" role="tabpanel">
+            <!-- टिम सदस्य चयन गर्नुहोस् -->
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom">
                     <h5 class="mb-0"><i class="fas fa-users me-2 text-primary"></i>सूचना अधिकारी चयन गर्नुहोस्</h5>
@@ -162,7 +197,7 @@ if ($error) echo adminAlert('error', $error);
                                             <?php echo csrfField(); ?>
                                             <input type="hidden" name="member_id" value="<?php echo $m['id']; ?>">
                                             <button type="submit" name="set_officer" value="1"
-                                                    class="btn btn-sm" style="background:#0ea5e9;color:#fff;"
+                                                    class="btn btn-sm btn-primary"
                                                     onclick="return confirm('<?php echo htmlspecialchars($m['name']); ?> लाई सूचना अधिकारी बनाउने?')">
                                                 <i class="fas fa-user-check me-1"></i>तोक्नुहोस्
                                             </button>
@@ -199,17 +234,6 @@ if ($error) echo adminAlert('error', $error);
             </div>
         </div>
     </div>
-
-    <!-- RTI जानकारी -->
-    <div class="card border-0 shadow-sm mt-4">
-        <div class="card-body">
-            <h6 class="fw-bold mb-2"><i class="fas fa-info-circle text-info me-2"></i>सूचनाको हकसम्बन्धी जानकारी (RTI)</h6>
-            <p class="text-muted small mb-0">
-                सूचनाको हक ऐन, २०६४ अन्तर्गत हरेक सार्वजनिक निकायले सूचना अधिकारी तोक्नु पर्छ।
-                यहाँ तोकिएको व्यक्ति <strong>सूचना अधिकारी</strong> को रूपमा website मा देखाइनेछ र
-                सूचना माग गर्दा सम्पर्क गर्न मिल्नेछ।
-            </p>
-        </div>
     </div>
 
 </div>

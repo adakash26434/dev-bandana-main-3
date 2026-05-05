@@ -194,13 +194,31 @@ try {
 echo adminPageHeader('साइट सेटिङ्स', 'fa-cogs', 'आकाश सहकारी वेबसाइटको सामान्य सेटिङ्स');
 ?>
 <?php echo adminHelpTip('यो पृष्ठबाट Website को नाम, Logo, रंग, र सम्पर्क विवरण परिवर्तन गर्न सकिन्छ।', ['Logo बदल्न: "Site Logo" section मा जानुहोस्।', 'रंग बदल्न: "Primary Color" section मा color picker प्रयोग गर्नुहोस्।', 'परिवर्तन गरेपछि: "Save" बटन थिच्नुहोस्।']); ?>
-$_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['message']);
+<?php $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['message']); ?>
+<?php
+$panel = (string)($_GET['panel'] ?? 'general');
+if (!in_array($panel, ['general', 'branding'], true)) {
+    $panel = 'general';
+}
 ?>
-<form method="POST" action="settings.php" enctype="multipart/form-data">
+<form method="POST" action="settings.php" enctype="multipart/form-data" class="settings-page-compact">
     <?php echo csrfField(); ?>
-    <div class="row">
-        <!-- Basic Settings -->
-        <div class="col-lg-8">
+    <ul class="nav admin-nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'general' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#settings-general-tab" type="button" role="tab">
+                <i class="fas fa-list me-1"></i> सूची
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'branding' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#settings-branding-tab" type="button" role="tab">
+                <i class="fas fa-plus me-1"></i> नयाँ थप्नुहोस्
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade <?php echo $panel === 'general' ? 'show active' : ''; ?>" id="settings-general-tab" role="tabpanel">
+        <div class="row">
+        <div class="col-lg-12">
             <div class="card mb-4">
                 <div class="card-header">
                     <h5><i class="fas fa-globe"></i> साइट जानकारी</h5>
@@ -602,10 +620,21 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                     </div>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-save"></i> सेटिङ्स सेभ गर्नुहोस्
+                    </button>
+                </div>
+            </div>
+        </div>
+        </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
+        <div class="tab-pane fade <?php echo $panel === 'branding' ? 'show active' : ''; ?>" id="settings-branding-tab" role="tabpanel">
+        <div class="row">
+        <div class="col-lg-12">
+            <!-- Sidebar -->
             <!-- Logo -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -762,6 +791,9 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                 </div>
             </div>
         </div>
+        </div>
+        </div>
+    </div>
     </div>
 </form>
 

@@ -273,7 +273,7 @@ try {
         <!-- Tabs: Applications | Notifications -->
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white p-0">
-                <ul class="nav nav-tabs px-3 pt-2" id="memTabs">
+                <ul class="nav nav-tabs admin-nav-tabs px-3 pt-2" id="memTabs">
                     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabApps">
                         <i class="fas fa-file-alt me-1"></i>आवेदनहरू (<?php echo count($viewApps); ?>)
                     </a></li>

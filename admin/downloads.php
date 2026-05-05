@@ -78,7 +78,7 @@ $flash = getFlash();
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($downloads) . ' फाइलहरू</span>'
 );
 ?>
-<?php echo adminHelpTip('यो पृष्ठबाट डाउनलोड गर्न मिल्ने फाइलहरू (forms, reports, etc.) थप्न र हटाउन सकिन्छ।', ['PDF/Word file थप्न: "+" बटन थिच्नुहोस्।', 'File size: 5MB भन्दा कम राख्नुहोस्।', 'Category छनोट: सही category मा राख्नुहोस् ताकि visitors सजिलै भेट्टाउन सकून्।']); ?> ?>
+<?php echo adminHelpTip('यो पृष्ठबाट डाउनलोड गर्न मिल्ने फाइलहरू (forms, reports, etc.) थप्न र हटाउन सकिन्छ।', ['PDF/Word file थप्न: "+" बटन थिच्नुहोस्।', 'File size: 5MB भन्दा कम राख्नुहोस्।', 'Category छनोट: सही category मा राख्नुहोस् ताकि visitors सजिलै भेट्टाउन सकून्।']); ?>
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type']==='success'?'success':'danger', $flash['message']); } ?>
 

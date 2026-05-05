@@ -224,7 +224,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="adminTable">
                         <thead>
-                            <tr style="background:var(--primary-color);color:#fff;">
+                            <tr class="ma-table-head-row">
                                 <th class="ps-3">#</th>
                                 <th><i class="fas fa-user me-1"></i>पूरा नाम</th>
                                 <th><i class="fas fa-at me-1"></i>युजरनेम</th>
@@ -239,7 +239,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                             <?php if (empty($admins)): ?>
                             <tr>
                                 <td colspan="8" class="text-center py-5">
-                                    <div style="font-size:3rem;opacity:.18;" class="mb-2">
+                                    <div class="ma-empty-icon mb-2">
                                         <i class="fas fa-users-slash"></i>
                                     </div>
                                     <div class="text-muted fw-semibold">कुनै admin user DB मा छैन।</div>
@@ -260,22 +260,17 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         <!-- Avatar circle -->
-                                        <div style="
-                                            width:34px;height:34px;border-radius:50%;
-                                            background:linear-gradient(135deg,var(--primary-color),var(--primary-light));
-                                            color:#fff;font-weight:700;font-size:.9rem;
-                                            display:flex;align-items:center;justify-content:center;
-                                            flex-shrink:0;">
+                                        <div class="ma-avatar-chip">
                                             <?php echo mb_strtoupper(mb_substr($adm['full_name'],0,1,'UTF-8'),'UTF-8'); ?>
                                         </div>
                                         <div>
-                                            <div class="fw-semibold" style="line-height:1.2;">
+                                            <div class="fw-semibold ma-tight-line">
                                                 <?php echo htmlspecialchars($adm['full_name'], ENT_QUOTES, 'UTF-8'); ?>
                                                 <?php if ($isMe): ?>
-                                                <span class="badge bg-primary ms-1" style="font-size:.55rem;">तपाईं</span>
+                                                <span class="badge bg-primary ms-1 ma-you-badge">तपाईं</span>
                                                 <?php endif; ?>
                                             </div>
-                                            <small class="text-muted" style="font-size:.72rem;">
+                                            <small class="text-muted ma-id-text">
                                                 ID: <?php echo $adm['id']; ?>
                                             </small>
                                         </div>
@@ -284,8 +279,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
 
                                 <!-- username -->
                                 <td>
-                                    <code class="small px-2 py-1 rounded"
-                                          style="background:#f0f0f0;color:#333;">
+                                    <code class="small px-2 py-1 rounded ma-username-chip">
                                         <?php echo htmlspecialchars($adm['username'], ENT_QUOTES, 'UTF-8'); ?>
                                     </code>
                                 </td>
@@ -303,11 +297,11 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                                 <!-- role -->
                                 <td>
                                     <?php if (function_exists('admin_db_role_is_superadmin') && admin_db_role_is_superadmin((string) ($adm['role'] ?? ''))): ?>
-                                    <span class="badge rounded-pill" style="background:var(--danger);">
+                                    <span class="badge rounded-pill ma-role-badge ma-role-super">
                                         <i class="fas fa-crown me-1"></i>Super Admin
                                     </span>
                                     <?php elseif ($adm['role'] === 'admin'): ?>
-                                    <span class="badge rounded-pill" style="background:#0d6efd;">
+                                    <span class="badge rounded-pill ma-role-badge ma-role-admin">
                                         <i class="fas fa-user-shield me-1"></i>Admin
                                     </span>
                                     <?php else: ?>
@@ -320,12 +314,12 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                                 <!-- status -->
                                 <td>
                                     <?php if ($adm['is_active']): ?>
-                                    <span class="badge rounded-pill" style="background:var(--primary-color);">
-                                        <i class="fas fa-circle me-1" style="font-size:.55rem;"></i>सक्रिय
+                                    <span class="badge rounded-pill ma-role-badge ma-status-active">
+                                        <i class="fas fa-circle me-1 ma-status-dot"></i>सक्रिय
                                     </span>
                                     <?php else: ?>
                                     <span class="badge rounded-pill bg-secondary">
-                                        <i class="fas fa-circle me-1" style="font-size:.55rem;"></i>निष्क्रिय
+                                        <i class="fas fa-circle me-1 ma-status-dot"></i>निष्क्रिय
                                     </span>
                                     <?php endif; ?>
                                 </td>
@@ -346,8 +340,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
 
                                         <!-- Password Reset button -->
                                         <button type="button"
-                                                class="btn btn-sm btn-warning"
-                                                style="min-width:82px;"
+                                                class="btn btn-sm btn-warning ma-reset-btn"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#resetModal<?php echo $adm['id']; ?>"
                                                 title="Password Reset">
@@ -394,8 +387,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                                  tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-sm">
                                     <div class="modal-content border-0 shadow">
-                                        <div class="modal-header py-3"
-                                             style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+                                        <div class="modal-header py-3 ma-modal-header">
                                             <h6 class="modal-title mb-0">
                                                 <i class="fas fa-key me-2"></i>Password Reset
                                             </h6>
@@ -405,21 +397,15 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                                         <div class="modal-body p-4">
 
                                             <!-- Admin info pill -->
-                                            <div class="d-flex align-items-center gap-2 p-2 rounded-3 mb-3"
-                                                 style="background:#e8f5e9;">
-                                                <div style="
-                                                    width:32px;height:32px;border-radius:50%;
-                                                    background:linear-gradient(135deg,var(--primary-color),var(--primary-light));
-                                                    color:#fff;font-weight:700;font-size:.85rem;
-                                                    display:flex;align-items:center;justify-content:center;
-                                                    flex-shrink:0;">
+                                            <div class="d-flex align-items-center gap-2 p-2 rounded-3 mb-3 ma-modal-admin-pill">
+                                                <div class="ma-avatar-chip ma-avatar-chip-sm">
                                                     <?php echo mb_strtoupper(mb_substr($adm['full_name'],0,1,'UTF-8'),'UTF-8'); ?>
                                                 </div>
                                                 <div>
                                                     <div class="fw-semibold small">
                                                         <?php echo htmlspecialchars($adm['full_name'], ENT_QUOTES, 'UTF-8'); ?>
                                                     </div>
-                                                    <code class="text-muted" style="font-size:.72rem;">
+                                                    <code class="text-muted ma-id-text">
                                                         @<?php echo htmlspecialchars($adm['username'], ENT_QUOTES, 'UTF-8'); ?>
                                                     </code>
                                                 </div>
@@ -482,8 +468,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                                                          class="form-text"></div>
                                                 </div>
 
-                                                <div class="p-2 rounded-2 small mb-3"
-                                                     style="background:#fff8e1;border:1px solid #ffe082;">
+                                                <div class="p-2 rounded-2 small mb-3 ma-password-hint-box">
                                                     <i class="fas fa-info-circle text-warning me-1"></i>
                                                     ८+ अक्षर — ठूलो+सानो अक्षर + अंक + विशेष चिन्ह सिफारिस छ।
                                                 </div>
@@ -517,8 +502,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
         </div>
 
         <!-- Security note -->
-        <div class="mt-3 p-3 rounded-3 small"
-             style="background:#e8f5e9;border:1px solid #c3e6cb;color:#155724;">
+        <div class="mt-3 p-3 rounded-3 small ma-security-note">
             <i class="fas fa-shield-halved me-2"></i>
             <strong>सुरक्षा नोट:</strong>
             Admin password reset गरेपछि नयाँ पासवर्ड सम्बन्धित admin लाई तुरुन्त व्यक्तिगत रूपमा जानकारी दिनुहोस्।
@@ -529,8 +513,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
     <!-- ════ TAB 2: CREATE ADMIN ════ -->
     <div class="tab-pane fade <?php echo $activeTab==='add'?'show active':''; ?>" id="tab-add">
         <div class="card border-0 shadow-sm">
-            <div class="card-header py-3"
-                 style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+            <div class="card-header py-3 ma-modal-header">
                 <h6 class="mb-0">
                     <i class="fas fa-user-plus me-2"></i>नयाँ Admin User बनाउनुहोस्
                 </h6>
@@ -652,8 +635,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox"
                                        name="is_active" id="isActiveCheck"
-                                       checked role="switch"
-                                       style="width:2.5em;height:1.3em;">
+                                       checked role="switch">
                                 <label class="form-check-label ms-2 fw-semibold" for="isActiveCheck">
                                     सक्रिय (Active)
                                 </label>
@@ -663,8 +645,7 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
                     </div>
 
                     <!-- Password policy hint -->
-                    <div class="mt-3 p-3 rounded-3 small"
-                         style="background:#f0faf0;border:1px solid #c3e6cb;color:#155724;">
+                    <div class="mt-3 p-3 rounded-3 small ma-security-note">
                         <i class="fas fa-shield-halved me-2"></i>
                         <strong>सुरक्षित पासवर्ड:</strong>
                         ठूलो अक्षर (A-Z) + सानो अक्षर (a-z) + अंक (0-9) + विशेष चिन्ह (!@#$) मिसाउनुहोस्।
@@ -698,9 +679,9 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
     function check() {
         if (!c.value) { m.textContent = ''; return; }
         if (n.value === c.value) {
-            m.innerHTML = '<span style="color:green;"><i class="fas fa-check-circle me-1"></i>पासवर्ड मिल्यो</span>';
+            m.innerHTML = '<span class="ma-pass-ok"><i class="fas fa-check-circle me-1"></i>पासवर्ड मिल्यो</span>';
         } else {
-            m.innerHTML = '<span style="color:red;"><i class="fas fa-times-circle me-1"></i>पासवर्ड मिलेन</span>';
+            m.innerHTML = '<span class="ma-pass-bad"><i class="fas fa-times-circle me-1"></i>पासवर्ड मिलेन</span>';
         }
     }
     n.addEventListener('input', check);
@@ -717,9 +698,9 @@ document.querySelectorAll('[id^="resetModal"]').forEach(function (modal) {
     function check() {
         if (!c.value) { m.textContent = ''; return; }
         if (n.value === c.value) {
-            m.innerHTML = '<span style="color:green;"><i class="fas fa-check-circle me-1"></i>पासवर्ड मिल्यो</span>';
+            m.innerHTML = '<span class="ma-pass-ok"><i class="fas fa-check-circle me-1"></i>पासवर्ड मिल्यो</span>';
         } else {
-            m.innerHTML = '<span style="color:red;"><i class="fas fa-times-circle me-1"></i>पासवर्ड मिलेन</span>';
+            m.innerHTML = '<span class="ma-pass-bad"><i class="fas fa-times-circle me-1"></i>पासवर्ड मिलेन</span>';
         }
     }
     n.addEventListener('input', check);

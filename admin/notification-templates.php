@@ -78,14 +78,18 @@ echo adminPageHeader('Notification Templates','fa-envelope-open-text',
 if ($flash) echo adminAlert($flash['type'],$flash['message']);
 ?>
 <div class="container-fluid py-4">
+<div class="notification-template-page admin-form-page">
 <div class="row g-4">
   <!-- LEFT: Sidebar -->
   <div class="col-lg-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-primary text-white"><i class="fas fa-list me-2"></i>Events</div>
+    <div class="card border-0 shadow-sm notif-events-card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <span><i class="fas fa-list me-2"></i>Events</span>
+        <span class="badge bg-light text-dark"><?php echo count($events['admin'] ?? []) + count($events['member'] ?? []); ?> items</span>
+      </div>
       <div class="list-group list-group-flush" style="max-height:600px;overflow-y:auto;">
         <?php foreach ($events as $aud => $list): ?>
-          <div class="list-group-item bg-light fw-bold text-uppercase text-muted small"><?php echo $aud === 'admin' ? '👤 Admin Notifications' : '🔔 Member Notifications'; ?></div>
+          <div class="list-group-item bg-light fw-bold text-uppercase text-muted small"><?php echo $aud === 'admin' ? 'Admin Notifications' : 'Member Notifications'; ?></div>
           <?php foreach ($list as $ek => $elabel):
               foreach (['email','sms'] as $ch):
                   $active = ($selEvent===$ek && $selAud===$aud && $selChan===$ch);
@@ -106,10 +110,10 @@ if ($flash) echo adminAlert($flash['type'],$flash['message']);
 
   <!-- RIGHT: Editor -->
   <div class="col-lg-8">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+    <div class="card border-0 shadow-sm notif-editor-card">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-pen me-2"></i>Edit Template</h5>
-        <span class="badge bg-light text-dark"><?php echo $selAud; ?> / <?php echo $selChan; ?> / <?php echo htmlspecialchars($selEvent); ?></span>
+        <span class="badge bg-light text-dark text-lowercase"><?php echo $selAud; ?> / <?php echo $selChan; ?> / <?php echo htmlspecialchars($selEvent); ?></span>
       </div>
       <div class="card-body">
         <form method="POST">
@@ -137,24 +141,32 @@ if ($flash) echo adminAlert($flash['type'],$flash['message']);
             <small class="text-muted">Available placeholders: <code>{name}</code> <code>{tracking_id}</code> <code>{status}</code> <code>{remarks}</code> <code>{amount}</code> <code>{date}</code> <code>{details}</code> <code>{site_name}</code></small>
           </div>
 
-          <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i>Save Template</button>
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save Template</button>
+            <a href="notification-settings.php?panel=form" class="btn btn-outline-secondary"><i class="fas fa-gear me-1"></i>Settings</a>
+          </div>
         </form>
 
         <hr class="my-4">
 
         <!-- Test send -->
         <h6 class="fw-bold mb-2"><i class="fas fa-paper-plane me-1"></i>Test Send</h6>
-        <form method="POST" class="d-flex gap-2">
+        <form method="POST" class="row g-2 align-items-center">
           <?php echo csrfField(); ?>
           <input type="hidden" name="action" value="test_send">
           <input type="hidden" name="event_type" value="<?php echo htmlspecialchars($selEvent); ?>">
-          <input type="email" name="test_to" class="form-control" placeholder="test@example.com" required>
-          <button type="submit" class="btn btn-outline-primary">Send Test</button>
+          <div class="col-md-8">
+            <input type="email" name="test_to" class="form-control" placeholder="test@example.com" required>
+          </div>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-outline-primary w-100">Send Test</button>
+          </div>
         </form>
         <small class="text-muted d-block mt-2">यो current event को template ले admin notification trigger गर्छ। Email + SMS दुवै gateway settings अनुसार जान्छ।</small>
       </div>
     </div>
   </div>
+</div>
 </div>
 </div>
 <?php require_once 'includes/admin-footer.php'; ?>

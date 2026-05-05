@@ -234,7 +234,7 @@ try {
                     <h5 class="mb-0"><i class="fas fa-arrow-up me-2"></i>PHP Upgrade Guide</h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3 p-3 rounded" style="background:#f8fdf9;border-left:4px solid var(--primary-light);">
+                    <div class="mb-3 p-3 rounded si-upgrade-box si-upgrade-81">
                         <strong>8.0 → 8.1 upgrade गर्दा:</strong>
                         <ul class="mb-0 mt-1 small">
                             <li><code>includes/compatibility.php</code> मा <code>array_is_list()</code> polyfill हटाउन सकिन्छ</li>
@@ -242,7 +242,7 @@ try {
                             <li>Readonly properties use गर्न मिल्छ</li>
                         </ul>
                     </div>
-                    <div class="mb-3 p-3 rounded" style="background:#fff8e1;border-left:4px solid #ff9800;">
+                    <div class="mb-3 p-3 rounded si-upgrade-box si-upgrade-82">
                         <strong>8.1 → 8.2 upgrade गर्दा:</strong>
                         <ul class="mb-0 mt-1 small">
                             <li>Dynamic properties deprecated — check गर्नुहोस्</li>
@@ -250,7 +250,7 @@ try {
                             <li><code>utf8_encode()</code> deprecated: <code>mb_convert_encoding()</code> use गर्नुहोस्</li>
                         </ul>
                     </div>
-                    <div class="p-3 rounded" style="background:#e3f2fd;border-left:4px solid #2196f3;">
+                    <div class="p-3 rounded si-upgrade-box si-upgrade-83">
                         <strong>8.2 → 8.3 upgrade गर्दा:</strong>
                         <ul class="mb-0 mt-1 small">
                             <li>Code changes minimal हुन्छ</li>

@@ -72,7 +72,7 @@ catch (Exception $e) { $news = []; }
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($news) . '</span>'
 );
 ?>
-<?php echo adminHelpTip('यो पृष्ठबाट संस्थाका समाचार र गतिविधि थप्न, सम्पादन गर्न सकिन्छ।', ['समाचार थप्न: "+" बटन थिच्नुहोस्।', 'Photo: JPEG/PNG format, 1MB भन्दा कम राख्नुहोस्।', 'Publish गर्न: form भर्दा "Active" छनोट गर्नुहोस्।']); ?> ?>
+<?php echo adminHelpTip('यो पृष्ठबाट संस्थाका समाचार र गतिविधि थप्न, सम्पादन गर्न सकिन्छ।', ['समाचार थप्न: "+" बटन थिच्नुहोस्।', 'Photo: JPEG/PNG format, 1MB भन्दा कम राख्नुहोस्।', 'Publish गर्न: form भर्दा "Active" छनोट गर्नुहोस्।']); ?>
 
 <?php $flash = getFlash(); if ($flash): ?>
 <div class="alert alert-<?php echo $flash['type']==='success'?'success':'danger'; ?> alert-dismissible fade show mb-3">

@@ -250,7 +250,7 @@ set_exception_handler(function (\Throwable $ex) {
 
     <!-- Admin CSS -->
     <link rel="stylesheet" href="assets/admin.css?v=9.7">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=2.0">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=3.7">
     <link rel="stylesheet" href="../assets/css/v9-mobile-fix.css?v=9.7">
     <link rel="stylesheet" href="../assets/css/site-banner-logo.css?v=1">
 
@@ -459,7 +459,7 @@ set_exception_handler(function (\Throwable $ex) {
       }
     </style>
 </head>
-<body>
+<body class="admin-page-<?php echo htmlspecialchars((string)$currentPage, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="admin-wrapper">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -482,9 +482,9 @@ set_exception_handler(function (\Throwable $ex) {
                     <!-- ── ड्यासबोर्ड (direct link) ── -->
                     <li class="<?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
                         <?php $__dash_total = array_sum($adminAlertCounts) + $unreadMessages; ?>
-                        <a href="dashboard.php" style="display:flex;align-items:center;">
+                        <a href="dashboard.php" class="sidebar-link-flex">
                             <span class="nav-icon-wrap"><i class="fas fa-gauge-high"></i></span>
-                            <span style="flex:1;">ड्यासबोर्ड</span>
+                            <span class="sidebar-link-label">ड्यासबोर्ड</span>
                             <?php if ($__dash_total > 0): ?>
                             <span class="group-badge"><?php echo $__dash_total; ?></span>
                             <?php endif; ?>
@@ -497,7 +497,7 @@ set_exception_handler(function (\Throwable $ex) {
                             <span class="nav-icon-wrap"><i class="fas fa-users-cog"></i></span>
                             <span>Admin व्यवस्थापन</span>
                             <?php if (!empty($_SESSION['is_superadmin'])): ?>
-                            <span style="background:#dc3545;color:#fff;font-size:0.58rem;font-weight:700;padding:1px 5px;border-radius:7px;margin-left:4px;">SA</span>
+                            <span class="sa-mini-badge">SA</span>
                             <?php endif; ?>
                         </a>
                     </li>
@@ -562,10 +562,10 @@ set_exception_handler(function (\Throwable $ex) {
                                 <a href="app-features.php"><span class="nav-icon-wrap"><i class="fas fa-mobile-screen"></i></span><span>एप सुविधाहरू</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='why-choose' ? 'active' : ''; ?>">
-                                <a href="why-choose.php"><span class="nav-icon-wrap"><i class="fas fa-star" style="color:#f39c12;"></i></span><span>किन हामीलाई छान्ने?</span></a>
+                                <a href="why-choose.php"><span class="nav-icon-wrap"><i class="fas fa-star nav-icon-accent nav-icon-gold"></i></span><span>किन हामीलाई छान्ने?</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='partner-facilities' ? 'active' : ''; ?>">
-                                <a href="partner-facilities.php"><span class="nav-icon-wrap"><i class="fas fa-handshake" style="color:var(--primary-light);"></i></span><span>साझेदार सुविधा</span></a>
+                                <a href="partner-facilities.php"><span class="nav-icon-wrap"><i class="fas fa-handshake nav-icon-accent nav-icon-primary-soft"></i></span><span>साझेदार सुविधा</span></a>
                             </li>
                         </ul>
                     </li>
@@ -585,10 +585,10 @@ set_exception_handler(function (\Throwable $ex) {
                                 <a href="committees.php"><span class="nav-icon-wrap"><i class="fas fa-people-group"></i></span><span>समिति/उपसमिति</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='info-officer' ? 'active' : ''; ?>">
-                                <a href="info-officer.php"><span class="nav-icon-wrap"><i class="fas fa-user-shield" style="color:#0ea5e9;"></i></span><span>सूचना अधिकारी (RTI)</span></a>
+                                <a href="info-officer.php"><span class="nav-icon-wrap"><i class="fas fa-user-shield nav-icon-accent nav-icon-cyan"></i></span><span>सूचना अधिकारी (RTI)</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='grievance-officer' ? 'active' : ''; ?>">
-                                <a href="grievance-officer.php"><span class="nav-icon-wrap"><i class="fas fa-user-tie" style="color:#8b5cf6;"></i></span><span>गुनासो अधिकारी</span></a>
+                                <a href="grievance-officer.php"><span class="nav-icon-wrap"><i class="fas fa-user-tie nav-icon-accent nav-icon-purple"></i></span><span>गुनासो अधिकारी</span></a>
                             </li>
                         </ul>
                     </li>
@@ -755,9 +755,9 @@ set_exception_handler(function (\Throwable $ex) {
                         </div>
                         <ul class="nav-submenu <?php echo $activeGroup=='sampark' ? 'open' : ''; ?>" id="group-sampark">
                             <li class="<?php echo $currentPage=='messages' ? 'active' : ''; ?>">
-                                <a href="messages.php" style="display:flex;align-items:center;">
+                                <a href="messages.php" class="sidebar-link-flex">
                                     <span class="nav-icon-wrap"><i class="fas fa-envelope-open-text"></i></span>
-                                    <span style="flex:1;">सन्देशहरू</span>
+                                    <span class="sidebar-link-label">सन्देशहरू</span>
                                     <?php if ($unreadMessages > 0): ?><span class="badge"><?php echo $unreadMessages; ?></span><?php endif; ?>
                                 </a>
                             </li>
@@ -794,7 +794,7 @@ set_exception_handler(function (\Throwable $ex) {
                             </li>
                             <li class="<?php echo $currentPage=='members' ? 'active' : ''; ?>">
                                 <a href="members.php">
-                                    <span class="nav-icon-wrap"><i class="fas fa-user-check" style="color:var(--primary-color);"></i></span>
+                                    <span class="nav-icon-wrap"><i class="fas fa-user-check nav-icon-accent nav-icon-primary"></i></span>
                                     <span>Member Portal</span>
                                 </a>
                             </li>
@@ -813,14 +813,14 @@ set_exception_handler(function (\Throwable $ex) {
                         <ul class="nav-submenu <?php echo $activeGroup=='memportal' ? 'open' : ''; ?>" id="group-memportal">
                             <li class="<?php echo $currentPage=='member-online-portal' ? 'active' : ''; ?>">
                                 <a href="member-online-portal.php">
-                                    <span class="nav-icon-wrap"><i class="fas fa-users-line" style="color:var(--primary-color);"></i></span>
+                                    <span class="nav-icon-wrap"><i class="fas fa-users-line nav-icon-accent nav-icon-primary"></i></span>
                                     <span>दर्ता अनुमोदन</span>
                                     <?php if (!empty($adminAlertCounts['mem_pending'])): ?><span class="badge"><?php echo $adminAlertCounts['mem_pending']; ?></span><?php endif; ?>
                                 </a>
                             </li>
                             <li class="<?php echo ($currentPage=='member-online-portal' && ($_GET['tab'] ?? '')=='resets') ? 'active' : ''; ?>">
                                 <a href="member-online-portal.php?tab=resets">
-                                    <span class="nav-icon-wrap"><i class="fas fa-key" style="color:#d97706;"></i></span>
+                                    <span class="nav-icon-wrap"><i class="fas fa-key nav-icon-accent nav-icon-amber"></i></span>
                                     <span>पासवर्ड Reset</span>
                                     <?php if (!empty($adminAlertCounts['mem_resets'])): ?><span class="badge"><?php echo $adminAlertCounts['mem_resets']; ?></span><?php endif; ?>
                                 </a>
@@ -850,18 +850,18 @@ set_exception_handler(function (\Throwable $ex) {
                             </li>
                             <li class="<?php echo $currentPage=='notification-templates' ? 'active' : ''; ?>">
                                 <a href="notification-templates.php">
-                                <span class="nav-icon-wrap"><i class="fas fa-envelope-open-text" style="color:#7c3aed;"></i></span>
+                                <span class="nav-icon-wrap"><i class="fas fa-envelope-open-text nav-icon-accent nav-icon-violet"></i></span>
                                 <span>सूचना Templates</span>
                             </a>
                             </li>
                             <li class="<?php echo $currentPage=='member-of-year' ? 'active' : ''; ?>">
-                                <a href="member-of-year.php"><span class="nav-icon-wrap"><i class="fas fa-trophy" style="color:#f59e0b;"></i></span><span>वर्षको सर्वश्रेष्ठ सदस्य</span></a>
+                                <a href="member-of-year.php"><span class="nav-icon-wrap"><i class="fas fa-trophy nav-icon-accent nav-icon-gold"></i></span><span>वर्षको सर्वश्रेष्ठ सदस्य</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='about-settings' ? 'active' : ''; ?>">
                                 <a href="about-settings.php"><span class="nav-icon-wrap"><i class="fas fa-landmark"></i></span><span>बारेमा पृष्ठ</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='satisfaction-settings' ? 'active' : ''; ?>">
-                                <a href="satisfaction-settings.php"><span class="nav-icon-wrap"><i class="fas fa-smile" style="color:#e91e63;"></i></span><span>सन्तुष्टि Widget</span></a>
+                                <a href="satisfaction-settings.php"><span class="nav-icon-wrap"><i class="fas fa-smile nav-icon-accent nav-icon-pink"></i></span><span>सन्तुष्टि Widget</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='settings' ? 'active' : ''; ?>">
                                 <a href="settings.php"><span class="nav-icon-wrap"><i class="fas fa-sliders"></i></span><span>सेटिङ्स</span></a>
@@ -904,14 +904,14 @@ set_exception_handler(function (\Throwable $ex) {
                             </li>
                             <li class="<?php echo $currentPage=='error-log' ? 'active' : ''; ?>">
                                 <a href="error-log.php">
-                                    <span class="nav-icon-wrap"><i class="fas fa-bug" style="color:#ef4444;"></i></span>
+                                    <span class="nav-icon-wrap"><i class="fas fa-bug nav-icon-accent nav-icon-red"></i></span>
                                     <span>Error Log</span>
                                 </a>
                             </li>
                             <!-- v5: In-app User Manual / Help & Guide (non-developer friendly) -->
                             <li class="<?php echo $currentPage=='help-guide' ? 'active' : ''; ?>">
                                 <a href="help-guide.php">
-                                    <span class="nav-icon-wrap"><i class="fas fa-book-open" style="color:#16a34a;"></i></span>
+                                    <span class="nav-icon-wrap"><i class="fas fa-book-open nav-icon-accent nav-icon-green"></i></span>
                                     <span>📖 सहायता / Help</span>
                                 </a>
                             </li>
@@ -926,14 +926,14 @@ set_exception_handler(function (\Throwable $ex) {
                             <?php if (!empty($_SESSION['is_superadmin'])): ?>
                             <li class="<?php echo $currentPage=='site-license' ? 'active' : ''; ?>">
                                 <a href="site-license.php">
-                                    <span class="nav-icon-wrap"><i class="fas fa-calendar-check" style="color:#ca8a04;"></i></span>
+                                    <span class="nav-icon-wrap"><i class="fas fa-calendar-check nav-icon-accent nav-icon-amber"></i></span>
                                     <span>साइट म्याद</span>
                                     <span class="sa-label-badge">SA</span>
                                 </a>
                             </li>
                             <li class="<?php echo $currentPage=='db-setup' ? 'active' : ''; ?>">
                                 <a href="db-setup.php">
-                                    <span class="nav-icon-wrap"><i class="fas fa-database" style="color:var(--primary-light);"></i></span>
+                                    <span class="nav-icon-wrap"><i class="fas fa-database nav-icon-accent nav-icon-primary-soft"></i></span>
                                     <span>DB सेटअप</span>
                                     <span class="sa-label-badge">SA</span>
                                 </a>
@@ -949,24 +949,24 @@ set_exception_handler(function (\Throwable $ex) {
 
             <!-- Sidebar user strip — logged-in admin को नाम तल देखाउँछ -->
             <div class="sidebar-user-strip">
-                <div class="sidebar-user-avatar" style="overflow:hidden;">
+                <div class="sidebar-user-avatar sidebar-user-avatar-media">
                     <?php if ($adminPhoto !== ''): ?>
                         <img src="<?php echo htmlspecialchars($adminPhoto, ENT_QUOTES, 'UTF-8'); ?>" alt="Admin"
-                             style="width:100%;height:100%;object-fit:cover;"
-                             onerror="this.style.display='none';this.parentNode.innerHTML='<i class=&quot;fas fa-user&quot; style=&quot;font-size:0.7rem;&quot;></i>';">
+                             class="sidebar-user-avatar-img"
+                             onerror="this.style.display='none';this.parentNode.innerHTML='<i class=&quot;fas fa-user sidebar-user-fallback-icon&quot;></i>';">
                     <?php else: ?>
-                        <i class="fas fa-user" style="font-size:0.7rem;"></i>
+                        <i class="fas fa-user sidebar-user-fallback-icon"></i>
                     <?php endif; ?>
                 </div>
-                <div style="flex:1;min-width:0;overflow:hidden;">
-                    <div style="font-weight:600;font-size:0.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,0.9);">
+                <div class="sidebar-user-meta">
+                    <div class="sidebar-user-name">
                         <?php echo htmlspecialchars($adminName ?? 'Admin'); ?>
                     </div>
-                    <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                    <div class="sidebar-user-role">
                         <?php echo !empty($_SESSION['is_superadmin']) ? 'Superadmin' : 'Administrator'; ?>
                     </div>
                 </div>
-                <a href="logout.php" title="लगआउट" class="sidebar-strip-logout" style="color:rgba(255,255,255,0.45);font-size:0.8rem;transition:color 0.15s;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">
+                <a href="logout.php" title="लगआउट" class="sidebar-strip-logout">
                     <i class="fas fa-right-from-bracket"></i>
                 </a>
             </div>
@@ -1017,26 +1017,26 @@ set_exception_handler(function (\Throwable $ex) {
                     <?php
                     $totalAlerts = array_sum($adminAlertCounts) + $unreadMessages;
 
-                    /* Dropdown मा देखाउने items — label, count, link, icon, color */
+                    /* Dropdown मा देखाउने items — label, count, link, icon, tone */
                     $notifItems = [
-                        ['label'=>'अपठित सन्देश',     'count'=>$unreadMessages,                        'href'=>'messages.php',                       'icon'=>'fa-envelope',            'color'=>'#dc3545'],
-                        ['label'=>'KYC आवेदन',        'count'=>$adminAlertCounts['kyc'],               'href'=>'kyc-applications.php?status=pending', 'icon'=>'fa-id-card',             'color'=>'#fd7e14'],
-                        ['label'=>'ऋण आवेदन',         'count'=>$adminAlertCounts['loan'],              'href'=>'loan-applications.php?status=pending','icon'=>'fa-hand-holding-usd',   'color'=>'#ffc107'],
-                        ['label'=>'खाता आवेदन',       'count'=>$adminAlertCounts['account'],           'href'=>'account-applications.php?status=pending','icon'=>'fa-university',       'color'=>'#6f42c1'],
-                        ['label'=>'डिजिटल सेवा',      'count'=>$adminAlertCounts['digital'],           'href'=>'digital-service-requests.php?status=pending','icon'=>'fa-mobile-alt', 'color'=>'#0dcaf0'],
-                        ['label'=>'जागिर आवेदन',      'count'=>$adminAlertCounts['job'],               'href'=>'job-applications.php?status=pending', 'icon'=>'fa-briefcase',           'color'=>'#198754'],
-                        ['label'=>'गुनासो',            'count'=>$adminAlertCounts['grievance'],         'href'=>'grievances.php?status=pending',       'icon'=>'fa-comment-dots',        'color'=>'#dc3545'],
-                        ['label'=>'सुझाव/प्रतिक्रिया', 'count'=>$adminAlertCounts['feedback'],          'href'=>'feedbacks.php?status=pending',        'icon'=>'fa-star',                'color'=>'#fd7e14'],
-                        ['label'=>'कल्याण दाबी',      'count'=>$adminAlertCounts['welfare'],           'href'=>'welfare-claims.php?status=pending',   'icon'=>'fa-hand-holding-heart',  'color'=>'#20c997'],
-                        ['label'=>'लिलामी बिड',       'count'=>$adminAlertCounts['auction'],           'href'=>'auction-bids.php',                    'icon'=>'fa-gavel',               'color'=>'#6c757d'],
-                        ['label'=>'भेन्डर आवेदन',      'count'=>$adminAlertCounts['vendor'],            'href'=>'vendor-enlistment.php?status=pending','icon'=>'fa-store',               'color'=>'#0d6efd'],
+                        ['label'=>'अपठित सन्देश',     'count'=>$unreadMessages,                        'href'=>'messages.php',                       'icon'=>'fa-envelope',            'tone'=>'red'],
+                        ['label'=>'KYC आवेदन',        'count'=>$adminAlertCounts['kyc'],               'href'=>'kyc-applications.php?status=pending', 'icon'=>'fa-id-card',             'tone'=>'orange'],
+                        ['label'=>'ऋण आवेदन',         'count'=>$adminAlertCounts['loan'],              'href'=>'loan-applications.php?status=pending','icon'=>'fa-hand-holding-usd',   'tone'=>'amber'],
+                        ['label'=>'खाता आवेदन',       'count'=>$adminAlertCounts['account'],           'href'=>'account-applications.php?status=pending','icon'=>'fa-university',       'tone'=>'purple'],
+                        ['label'=>'डिजिटल सेवा',      'count'=>$adminAlertCounts['digital'],           'href'=>'digital-service-requests.php?status=pending','icon'=>'fa-mobile-alt', 'tone'=>'cyan'],
+                        ['label'=>'जागिर आवेदन',      'count'=>$adminAlertCounts['job'],               'href'=>'job-applications.php?status=pending', 'icon'=>'fa-briefcase',           'tone'=>'green'],
+                        ['label'=>'गुनासो',            'count'=>$adminAlertCounts['grievance'],         'href'=>'grievances.php?status=pending',       'icon'=>'fa-comment-dots',        'tone'=>'red'],
+                        ['label'=>'सुझाव/प्रतिक्रिया', 'count'=>$adminAlertCounts['feedback'],          'href'=>'feedbacks.php?status=pending',        'icon'=>'fa-star',                'tone'=>'orange'],
+                        ['label'=>'कल्याण दाबी',      'count'=>$adminAlertCounts['welfare'],           'href'=>'welfare-claims.php?status=pending',   'icon'=>'fa-hand-holding-heart',  'tone'=>'teal'],
+                        ['label'=>'लिलामी बिड',       'count'=>$adminAlertCounts['auction'],           'href'=>'auction-bids.php',                    'icon'=>'fa-gavel',               'tone'=>'slate'],
+                        ['label'=>'भेन्डर आवेदन',      'count'=>$adminAlertCounts['vendor'],            'href'=>'vendor-enlistment.php?status=pending','icon'=>'fa-store',               'tone'=>'blue'],
                     ];
                     /* pending मात्र filter गर्ने — count > 0 भएका मात्र dropdown मा देखाउने */
                     $activeNotifs = array_filter($notifItems, function ($i) {
                         return ($i['count'] ?? 0) > 0;
                     });
                     ?>
-                    <div class="header-item notif-wrapper" style="position:relative;">
+                    <div class="header-item notif-wrapper">
                         <!-- Bell button — सधैं देखिन्छ, count > 0 भए red badge -->
                         <button type="button" class="notification-bell notif-toggle-btn"
                                 title="सूचनाहरू — <?php echo $totalAlerts > 0 ? $totalAlerts . ' pending' : 'सबै हेरिएको'; ?>"
@@ -1048,7 +1048,7 @@ set_exception_handler(function (\Throwable $ex) {
                         </button>
 
                         <!-- Dropdown panel -->
-                        <div class="notif-dropdown" id="notifDropdown" style="display:none;">
+                        <div class="notif-dropdown" id="notifDropdown">
                             <div class="notif-dropdown-header">
                                 <span><i class="fas fa-bell me-1"></i>सूचनाहरू</span>
                                 <?php if ($totalAlerts > 0): ?>
@@ -1065,11 +1065,11 @@ set_exception_handler(function (\Throwable $ex) {
                                 <?php foreach ($activeNotifs as $ni): ?>
                                 <a href="<?php echo ADMIN_URL . htmlspecialchars($ni['href']); ?>"
                                    class="notif-item">
-                                    <span class="notif-item-icon" style="background:<?php echo $ni['color']; ?>15; color:<?php echo $ni['color']; ?>;">
+                                    <span class="notif-item-icon notif-tone-<?php echo htmlspecialchars($ni['tone'], ENT_QUOTES, 'UTF-8'); ?>">
                                         <i class="fas <?php echo $ni['icon']; ?>"></i>
                                     </span>
                                     <span class="notif-item-label"><?php echo $ni['label']; ?></span>
-                                    <span class="notif-item-count" style="background:<?php echo $ni['color']; ?>;">
+                                    <span class="notif-item-count notif-tone-bg-<?php echo htmlspecialchars($ni['tone'], ENT_QUOTES, 'UTF-8'); ?>">
                                         <?php echo $ni['count']; ?>
                                     </span>
                                 </a>
@@ -1086,21 +1086,16 @@ set_exception_handler(function (\Throwable $ex) {
 
                     <div class="header-item">
                         <div class="admin-info">
-                            <span class="admin-name" style="display:inline-flex;align-items:center;gap:8px;">
+                            <span class="admin-name admin-name-inline">
                                 <?php if ($adminPhoto !== ''): ?>
                                     <img src="<?php echo htmlspecialchars($adminPhoto, ENT_QUOTES, 'UTF-8'); ?>" alt="Admin"
-                                         style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #d1e7d9;"
+                                         class="admin-avatar-sm"
                                          onerror="this.style.display='none';">
                                 <?php endif; ?>
                                 <?php echo htmlspecialchars($adminName); ?>
                                 <?php if (!empty($_SESSION['is_superadmin'])): ?>
                                     <!-- Superadmin badge — superadmin login गर्दा देखिन्छ -->
-                                    <span style="
-                                        background:#dc3545;color:#fff;
-                                        font-size:0.6rem;font-weight:700;letter-spacing:0.5px;
-                                        padding:2px 7px;border-radius:10px;
-                                        vertical-align:middle;margin-left:5px;
-                                    ">SUPERADMIN</span>
+                                    <span class="superadmin-pill">SUPERADMIN</span>
                                 <?php endif; ?>
                             </span>
                             <div class="admin-menu">

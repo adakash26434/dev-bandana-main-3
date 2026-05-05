@@ -5,19 +5,7 @@ require_once 'includes/admin-header.php';
 ?>
 
 <div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-info bg-opacity-10 p-3 rounded-3">
-                    <i class="fas fa-list-check fa-2x text-info"></i>
-                </div>
-                <div>
-                    <h2 class="mb-0 fw-bold">Update Checklist</h2>
-                    <p class="text-muted mb-0">Website update गर्नु अघि र पछि follow गर्ने सजिलो steps।</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php echo adminPageHeader('Update Checklist', 'fa-list-check', 'Website update गर्नु अघि र पछि follow गर्ने सजिलो steps।'); ?>
 
     <div class="alert alert-warning d-flex align-items-start gap-2">
         <i class="fas fa-triangle-exclamation mt-1"></i>

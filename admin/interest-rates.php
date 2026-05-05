@@ -75,7 +75,7 @@ $flash = getFlash();
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . $totalRates . ' ब्याज दर</span>'
 );
 ?>
-<?php echo adminHelpTip('यो पृष्ठबाट Savings र Loan को ब्याज दर अपडेट गर्न सकिन्छ।', ['दर बदल्न: सम्बन्धित row को Edit बटन थिच्नुहोस्।', 'नयाँ category थप्न: "+" बटन थिच्नुहोस्।', 'परिवर्तन live site मा तुरुन्त देखिन्छ।']); ?> ?>
+<?php echo adminHelpTip('यो पृष्ठबाट Savings र Loan को ब्याज दर अपडेट गर्न सकिन्छ।', ['दर बदल्न: सम्बन्धित row को Edit बटन थिच्नुहोस्।', 'नयाँ category थप्न: "+" बटन थिच्नुहोस्।', 'परिवर्तन live site मा तुरुन्त देखिन्छ।']); ?>
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
 

@@ -110,6 +110,10 @@ $historyPhoto   = getSetting('history_photo', '');
 $historyNp      = getSetting('history_content_np', '');
 $historyEn      = getSetting('history_content_en', '');
 $establishedYear = getSetting('established_year', '२०७५');
+$panel = (string)($_GET['panel'] ?? 'photo');
+if (!in_array($panel, ['photo', 'content'], true)) {
+    $panel = 'photo';
+}
 
 $pageTitle = 'About Page Settings';
 require_once 'includes/admin-header.php';
@@ -133,11 +137,22 @@ require_once 'includes/admin-ui.php';
     </div>
     <?php endif; ?>
 
-    <div class="row">
+    <ul class="nav admin-nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'photo' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#about-photo-tab" type="button" role="tab">
+                <i class="fas fa-image me-1"></i> फोटो व्यवस्थापन
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'content' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#about-content-tab" type="button" role="tab">
+                <i class="fas fa-file-pen me-1"></i> कन्टेन्ट व्यवस्थापन
+            </button>
+        </li>
+    </ul>
 
-        <!-- History Photo Upload -->
-        <div class="col-lg-5 mb-4">
-            <div class="card">
+    <div class="tab-content about-settings-page">
+        <div class="tab-pane fade <?php echo $panel === 'photo' ? 'show active' : ''; ?>" id="about-photo-tab" role="tabpanel">
+            <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-image me-2"></i>History Section Photo</h5>
                 </div>
@@ -197,9 +212,8 @@ require_once 'includes/admin-ui.php';
             </div>
         </div>
 
-        <!-- History Text & Year -->
-        <div class="col-lg-7 mb-4">
-            <div class="card">
+        <div class="tab-pane fade <?php echo $panel === 'content' ? 'show active' : ''; ?>" id="about-content-tab" role="tabpanel">
+            <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-file-pen me-2"></i>History Content</h5>
                 </div>
@@ -235,7 +249,6 @@ require_once 'includes/admin-ui.php';
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 

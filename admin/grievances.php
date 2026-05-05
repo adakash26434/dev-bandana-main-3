@@ -210,7 +210,7 @@ if ($viewGrv):
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-exclamation-circle me-2"></i>गुनासो विवरण
-            <code style="font-size:0.83rem;background:rgba(255,255,255,0.15);padding:2px 10px;border-radius:6px;margin-left:8px;letter-spacing:1px;">
+            <code class="grv-track-code">
                 <?php echo htmlspecialchars($trackId); ?>
             </code>
         </h5>
@@ -257,7 +257,7 @@ if ($viewGrv):
                 <?php if (!empty($viewGrv['subject'])): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-tag"></i>विषय</div>
-                    <div class="p-3 fw-semibold" style="font-size:0.9rem;color:#374151;">
+                    <div class="p-3 fw-semibold grv-subject-box">
                         <?php echo htmlspecialchars($viewGrv['subject']); ?>
                     </div>
                 </div>
@@ -265,7 +265,7 @@ if ($viewGrv):
 
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-comment-dots"></i>गुनासोको विस्तृत विवरण</div>
-                    <div class="p-3" style="min-height:80px;white-space:pre-wrap;font-size:0.9rem;line-height:1.7;color:#374151;">
+                    <div class="p-3 grv-desc-box">
                         <?php echo nl2br(htmlspecialchars($viewGrv['description'] ?? '—')); ?>
                     </div>
                 </div>
@@ -273,7 +273,7 @@ if ($viewGrv):
                 <?php if (!empty($viewGrv['admin_response'])): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-reply"></i>Admin प्रतिक्रिया <small class="fw-normal text-muted ms-1">(Member ले tracker मा देख्छ)</small></div>
-                    <div class="p-3" style="white-space:pre-wrap;font-size:0.9rem;color:#374151;background:#f0fff4;">
+                    <div class="p-3 grv-response-box">
                         <?php echo nl2br(htmlspecialchars($viewGrv['admin_response'])); ?>
                     </div>
                 </div>
@@ -281,8 +281,8 @@ if ($viewGrv):
 
                 <?php if (!empty($viewGrv['admin_note'])): ?>
                 <div class="adm-info-group">
-                    <div class="adm-info-group-header" style="background:#fff9e6;border-color:#ffc107;"><i class="fas fa-sticky-note" style="color:#b45309;"></i>Admin आन्तरिक टिप्पणी <small class="fw-normal text-muted ms-1">(केवल admin)</small></div>
-                    <div class="p-3" style="white-space:pre-wrap;font-size:0.9rem;color:#5c4400;background:#fffdf0;">
+                    <div class="adm-info-group-header grv-note-head"><i class="fas fa-sticky-note grv-note-icon"></i>Admin आन्तरिक टिप्पणी <small class="fw-normal text-muted ms-1">(केवल admin)</small></div>
+                    <div class="p-3 grv-note-box">
                         <?php echo nl2br(htmlspecialchars($viewGrv['admin_note'])); ?>
                     </div>
                 </div>
@@ -351,13 +351,12 @@ if ($viewGrv):
                             <!-- Admin Internal Note — member देख्दैन -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">
-                                    <i class="fas fa-sticky-note me-1" style="color:#d4900a;"></i>
+                                    <i class="fas fa-sticky-note me-1 grv-note-icon"></i>
                                     Admin आन्तरिक टिप्पणी (Note)
                                     <span class="text-muted fw-normal small">— Member ले देख्दैन</span>
                                 </label>
-                                <textarea name="admin_note" class="form-control" rows="3"
+                                <textarea name="admin_note" class="form-control grv-note-textarea" rows="3"
                                     placeholder="Admin को internal note — member देख्दैन..."
-                                    style="border-color:#ffc107;background:#fffdf0;"
                                 ><?php echo htmlspecialchars($viewGrv['admin_note'] ?? ''); ?></textarea>
                             </div>
 
@@ -468,16 +467,16 @@ if ($viewGrv):
 </div>
 
 <!-- ── Grievances Table ── -->
-<div class="card border-0 shadow-sm" style="border-radius:10px;overflow:hidden;">
+<div class="card border-0 shadow-sm grv-table-card">
     <div class="tbl-header-bar no-print">
-        <h6><i class="fas fa-exclamation-circle me-2" style="color:#b45309;"></i>गुनासो सूची</h6>
+        <h6><i class="fas fa-exclamation-circle me-2 grv-note-icon"></i>गुनासो सूची</h6>
         <span class="result-count-badge"><?php echo count($grievances); ?> गुनासो</span>
     </div>
     <div class="table-responsive">
         <table class="table-hover table app-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th style="width:200px;">व्यक्ति</th>
+                    <th class="grv-person-col">व्यक्ति</th>
                     <th>विषय</th>
                     <th>वर्ग</th>
                     <th>Tracking ID</th>
@@ -503,7 +502,7 @@ if ($viewGrv):
                             <div class="cell-sub"><i class="fas fa-phone fa-xs me-1"></i><?php echo htmlspecialchars($grv['phone'] ?? ''); ?><?php if ($grv['member_id']): ?> · <?php echo htmlspecialchars($grv['member_id']); ?><?php endif; ?></div>
                             <?php else: ?>
                             <div class="cell-main fst-italic text-muted">गुप्त पहिचान</div>
-                            <div class="cell-sub"><span class="badge bg-secondary" style="font-size:0.65rem;">Anonymous</span></div>
+                            <div class="cell-sub"><span class="badge bg-secondary grv-anon-badge">Anonymous</span></div>
                             <?php endif; ?>
                         </div>
                     </div>

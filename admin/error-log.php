@@ -3,10 +3,10 @@
  * Error Log Viewer — Admin बाट site errors हेर्ने / fix गर्ने
  * URL: admin/error-log.php
  */
-require_once __DIR__ . '/includes/admin-header.php';
 $pageTitle   = 'Error Log';
 $currentPage = 'error-log';
 $activeGroup = 'prawidhi';
+require_once __DIR__ . '/includes/admin-header.php';
 
 /* Log file path */
 $logFile = dirname(__DIR__) . '/logs/error.log';
@@ -30,20 +30,11 @@ if (file_exists($logFile)) {
     $logContent = implode("\n", $logLines);
 }
 ?>
-<!DOCTYPE html>
-<html lang="ne">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Error Log — Admin</title>
-<link rel="stylesheet" href="<?php echo ADMIN_URL; ?>assets/css/admin.css?v=9.7">
-</head>
-<body>
-<?php require_once __DIR__ . '/includes/admin-header.php'; ?>
 <div class="container-fluid py-4">
+    <?php echo adminPageHeader('Error Log', 'fa-bug', 'Site errors को latest 200 lines monitoring र quick fix guidance।'); ?>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2><i class="fas fa-bug text-danger me-2"></i>Error Log</h2>
             <p class="text-muted mb-0">Log size: <?php echo round($logSize/1024, 2); ?> KB
                | Last 200 lines मात्र देखाइएको</p>
         </div>
@@ -68,9 +59,7 @@ if (file_exists($logFile)) {
             <small class="text-muted"><?php echo date('Y-m-d H:i'); ?></small>
         </div>
         <div class="card-body p-0">
-            <pre style="background:#1e1e1e;color:#f8f8f2;padding:1.5rem;margin:0;
-                        font-size:0.75rem;max-height:600px;overflow-y:auto;
-                        border-radius:0 0 8px 8px;white-space:pre-wrap;word-break:break-all;"><?php
+            <pre class="error-log-output"><?php
                 /* Color-code PHP errors */
                 $html = htmlspecialchars($logContent);
                 $html = preg_replace('/\[error\]/i',   '<span style="color:#ff5f56">[error]</span>',   $html);
@@ -114,5 +103,3 @@ if (file_exists($logFile)) {
     </div>
 </div>
 <?php require_once __DIR__ . '/includes/admin-footer.php'; ?>
-</body>
-</html>

@@ -75,6 +75,16 @@
 
     document.addEventListener('DOMContentLoaded', function() {
 
+        /* --- Global: native date inputs -> Nepali datepicker fields --- */
+        document.querySelectorAll('input[type="date"]:not([data-keep-gregorian])').forEach(function(inp) {
+            if (inp.dataset.ndpAutoDone === '1') return;
+            inp.dataset.ndpAutoDone = '1';
+            try { inp.type = 'text'; } catch (e) {}
+            inp.classList.add('nepali-datepicker');
+            if (!inp.getAttribute('placeholder')) inp.setAttribute('placeholder', 'YYYY-MM-DD');
+            inp.setAttribute('autocomplete', 'off');
+        });
+
         /* --- Page load मा datepicker init --- */
         initNepaliDatepickers(document);
 
@@ -111,13 +121,20 @@
            उद्देश्य: admin pages मा गजंगुज layout कम गर्नु
            ───────────────────────────────────────────────────── */
         function autoSplitListFormRows() {
+            // Pages with manual tab architecture: do not auto-split.
+            if (/\/admin\/(election-candidates|election-information|election-posts|designations)\.php/i.test(window.location.pathname)) {
+                return;
+            }
             var hasEditIntent = /(?:\?|&)(edit|edit_|action=add|action=edit|panel=form|panel=candidates|panel=positions)=?/i.test(window.location.search);
             var rows = document.querySelectorAll('.container-fluid .row, .admin-page .row');
             rows.forEach(function(row, idx) {
                 if (row.closest('.tab-content')) return;
                 if (row.dataset.autoSplitDone === '1') return;
+                // If page already has custom/manual tabs right above this row, do not auto-split again.
+                var prev = row.previousElementSibling;
+                if (prev && prev.classList && prev.classList.contains('admin-nav-tabs') && !prev.classList.contains('admin-auto-tabs')) return;
                 var cols = Array.prototype.slice.call(row.children).filter(function(ch) {
-                    return ch.className && /col-/.test(ch.className);
+                    return ch.className && /col-/.test(ch.className) && !ch.classList.contains('d-none');
                 });
                 if (cols.length !== 2) return;
 

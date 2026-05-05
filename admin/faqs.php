@@ -82,7 +82,7 @@ require_once 'includes/admin-ui.php';
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($faqs) . '</span>'
 );
 ?>
-<?php echo adminHelpTip('यो पृष्ठबाट Frequently Asked Questions (FAQ) थप्न र अपडेट गर्न सकिन्छ।', ['FAQ थप्न: "+" बटन थिच्नुहोस्।', 'नेपाली र अंग्रेजी दुवैमा लेख्नुहोस् ताकि सबैलाई बुझिओस्।', 'Display Order: सानो number = पहिला देखिन्छ।']); ?> ?>
+<?php echo adminHelpTip('यो पृष्ठबाट Frequently Asked Questions (FAQ) थप्न र अपडेट गर्न सकिन्छ।', ['FAQ थप्न: "+" बटन थिच्नुहोस्।', 'नेपाली र अंग्रेजी दुवैमा लेख्नुहोस् ताकि सबैलाई बुझिओस्।', 'Display Order: सानो number = पहिला देखिन्छ।']); ?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
 

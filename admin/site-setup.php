@@ -109,7 +109,7 @@ try {
     <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
         <div>
             <h4 class="mb-0">
-                <i class="fas fa-sliders me-2" style="color:var(--primary-color);"></i>Site Setup Manager
+                <i class="fas fa-sliders me-2 ss-title-icon"></i>Site Setup Manager
             </h4>
             <small class="text-muted">
                 Admin panel वा
@@ -142,10 +142,10 @@ try {
     <div class="row g-3 mb-4">
         <div class="col-sm-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <div style="font-size:2rem;margin-bottom:6px;">
+                <div class="ss-status-icon">
                     <?php echo $setupLocked
-                        ? '<i class="fas fa-lock" style="color:var(--primary-color);"></i>'
-                        : '<i class="fas fa-lock-open" style="color:var(--danger);"></i>'; ?>
+                        ? '<i class="fas fa-lock ss-icon-locked"></i>'
+                        : '<i class="fas fa-lock-open ss-icon-unlocked"></i>'; ?>
                 </div>
                 <div class="fw-bold"><?php echo $setupLocked ? 'Setup Locked ✓' : '⚠️ Unlocked'; ?></div>
                 <div class="text-muted small mt-1">
@@ -155,7 +155,7 @@ try {
         </div>
         <div class="col-sm-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <div style="font-size:2rem;color:#0d6efd;margin-bottom:6px;"><i class="fas fa-users"></i></div>
+                <div class="ss-status-icon ss-icon-info"><i class="fas fa-users"></i></div>
                 <div class="fw-bold"><?php echo count($admins); ?> Admin Users</div>
                 <div class="text-muted small mt-1">Database मा admin accounts</div>
                 <?php if ($isSuperAdmin): ?>
@@ -165,7 +165,7 @@ try {
         </div>
         <div class="col-sm-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <div style="font-size:2rem;margin-bottom:6px;color:#0d6efd;">
+                <div class="ss-status-icon ss-icon-info">
                     <i class="fas fa-table-list"></i>
                 </div>
                 <div class="fw-bold">DB Setup</div>
@@ -179,7 +179,7 @@ try {
         </div>
         <div class="col-sm-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <div style="font-size:2rem;color:#ffc107;margin-bottom:6px;"><i class="fas fa-landmark"></i></div>
+                <div class="ss-status-icon ss-icon-warn"><i class="fas fa-landmark"></i></div>
                 <div class="fw-bold text-truncate"><?php echo htmlspecialchars($siteName); ?></div>
                 <div class="text-muted small mt-1">Current Site Name</div>
             </div>
@@ -195,7 +195,7 @@ try {
             <?php if ($isSuperAdmin): ?>
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2"
-                     style="background:var(--primary-color);color:white;">
+                     >
                     <span><i class="fas fa-users-cog me-2"></i>Admin खाताहरू</span>
                     <a href="manage-admins.php" class="btn btn-sm btn-light">
                         <i class="fas fa-arrow-right me-1"></i>Admin व्यवस्थापन खोल्नुहोस्
@@ -224,10 +224,10 @@ try {
 
             <!-- ── Site Settings ── -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header py-2" style="background:#0d6efd;color:white;">
+                <div class="card-header py-2">
                     <i class="fas fa-cog me-2"></i>
                     Site Settings
-                    <span style="opacity:0.8;font-size:0.78rem;font-weight:400;">
+                    <span class="ss-site-settings-subtitle">
                         — setup.php र admin panel दुवैले यही table use गर्छन्
                     </span>
                 </div>
@@ -318,7 +318,7 @@ try {
 
             <!-- ── Database — विस्तृत सूची `db-setup.php` मा मात्र (दोहोरो हटाइयो) ── -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background:#198754;color:white;">
+                <div class="card-header py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <span><i class="fas fa-database me-2"></i>Database & migration</span>
                 </div>
                 <div class="card-body">
@@ -342,10 +342,9 @@ try {
             </div>
 
             <!-- ── setup.php Lock / Unlock ── -->
-            <div class="card border-0 shadow-sm mb-4"
-                 style="border-left:4px solid <?php echo $setupLocked ? '#198754' : '#dc3545'; ?> !important;">
+            <div class="card border-0 shadow-sm mb-4 ss-lock-card <?php echo $setupLocked ? 'is-locked' : 'is-unlocked'; ?>">
                 <div class="card-header py-2"
-                     style="background:<?php echo $setupLocked ? '#198754' : '#dc3545'; ?>;color:white;">
+                     >
                     <i class="fas fa-<?php echo $setupLocked ? 'lock' : 'lock-open'; ?> me-2"></i>
                     setup.php — <?php echo $setupLocked ? 'Locked ✓' : '⚠️ Unlocked'; ?>
                 </div>
@@ -399,7 +398,7 @@ try {
 
             <!-- ── Quick Links ── -->
             <div class="card border-0 shadow-sm">
-                <div class="card-header py-2" style="background:#6c757d;color:white;">
+                <div class="card-header py-2">
                     <i class="fas fa-link me-2"></i>Quick Links
                 </div>
                 <div class="list-group list-group-flush small">

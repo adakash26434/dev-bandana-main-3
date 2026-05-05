@@ -270,7 +270,7 @@ if ($action === 'edit_static' && isset($_GET['page'])) {
     <?php echo csrfField(); ?>
                 <input type="hidden" name="page_key" value="<?php echo $pageKey; ?>">
 
-                <ul class="nav nav-tabs mb-3" role="tablist">
+                <ul class="nav nav-tabs admin-nav-tabs mb-3" role="tablist">
                     <li class="nav-item">
                         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#nepali" type="button">
                             <i class="fas fa-language"></i> नेपाली
@@ -392,7 +392,7 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
                     </div>
                 </div>
 
-                <ul class="nav nav-tabs mb-3" role="tablist">
+                <ul class="nav nav-tabs admin-nav-tabs mb-3" role="tablist">
                     <li class="nav-item">
                         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#nepali" type="button">
                             <i class="fas fa-language"></i> नेपाली

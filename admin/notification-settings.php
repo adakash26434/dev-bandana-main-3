@@ -146,6 +146,10 @@ try {
 
 $pageTitle   = 'Notification Settings';
 $currentPage = 'notification-settings'; /* admin sidebar मा active highlight को लागि */
+$panel = (string)($_GET['panel'] ?? 'list');
+if (!in_array($panel, ['list', 'form'], true)) {
+    $panel = 'list';
+}
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 ?>
@@ -160,6 +164,87 @@ require_once 'includes/admin-ui.php';
     <div class="alert alert-<?php echo $flash['type']==='success'?'success':'danger'; ?> alert-dismissible fade show mb-3"><i class="fas fa-<?php echo $flash['type']==='success'?'check-circle':'exclamation-circle'; ?> me-2"></i><?php echo htmlspecialchars($flash['message'], ENT_QUOTES, 'UTF-8'); ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
     <?php endif; ?>
 
+    <ul class="nav admin-nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'list' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#notif-list-tab" type="button" role="tab" aria-selected="<?php echo $panel === 'list' ? 'true' : 'false'; ?>">
+                <i class="fas fa-list me-1"></i> सूची
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?php echo $panel === 'form' ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#notif-form-tab" type="button" role="tab" aria-selected="<?php echo $panel === 'form' ? 'true' : 'false'; ?>">
+                <i class="fas fa-plus me-1"></i> नयाँ थप्नुहोस्
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+    <div class="tab-pane fade <?php echo $panel === 'list' ? 'show active' : ''; ?>" id="notif-list-tab" role="tabpanel">
+    <!-- Notification Log -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Notification Log
+                <small class="text-muted ms-2">(Last 50)</small>
+            </h5>
+            <form method="POST" action="" class="d-inline"
+                  onsubmit="return confirm('30 दिनभन्दा पुराना logs हटाउनुहोस्?');">
+                <input type="hidden" name="action" value="clear_log">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-trash me-1"></i>Old Logs हटाउनुहोस्
+                </button>
+            </form>
+        </div>
+        <div class="card-body p-0">
+            <?php if (empty($logs)): ?>
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-inbox fa-2x mb-2 d-block opacity-25"></i>
+                अझै कुनै notification log छैन।
+            </div>
+            <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Event</th>
+                            <th>Channel</th>
+                            <th>Recipient</th>
+                            <th>स्थिति</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($logs as $log): ?>
+                        <tr>
+                            <td class="text-muted small"><?php echo date('M d H:i', strtotime($log['created_at'])); ?></td>
+                            <td><small><?php echo htmlspecialchars($log['event_type']); ?></small></td>
+                            <td>
+                                <?php if ($log['channel'] === 'email'): ?>
+                                <span class="badge bg-primary"><i class="fas fa-envelope me-1"></i>Email</span>
+                                <?php else: ?>
+                                <span class="badge bg-success"><i class="fas fa-mobile-alt me-1"></i>SMS</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="small"><?php echo htmlspecialchars($log['recipient']); ?></td>
+                            <td>
+                                <?php if ($log['status'] === 'sent'): ?>
+                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Sent</span>
+                                <?php else: ?>
+                                <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Failed</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="small text-muted"><?php echo htmlspecialchars(substr($log['error_msg'] ?? '', 0, 60)); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    </div>
+
+    <div class="tab-pane fade <?php echo $panel === 'form' ? 'show active' : ''; ?>" id="notif-form-tab" role="tabpanel">
     <!-- v10.3 (Issue #5): Template editor shortcut — admin लाई "के पठाइन्छ" तुरुन्तै edit गर्न सजिलो बनाउँदै -->
     <div class="card border-0 shadow-sm mb-4" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-left:5px solid #4f46e5 !important;">
       <div class="card-body d-flex flex-wrap align-items-center gap-3 py-3">
@@ -615,69 +700,7 @@ require_once 'includes/admin-ui.php';
             </div>
         </div>
     </div>
-
-    <!-- Notification Log -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Notification Log
-                <small class="text-muted ms-2">(Last 50)</small>
-            </h5>
-            <form method="POST" action="" class="d-inline"
-                  onsubmit="return confirm('30 दिनभन्दा पुराना logs हटाउनुहोस्?');">
-                <input type="hidden" name="action" value="clear_log">
-                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                <button type="submit" class="btn btn-sm btn-outline-danger">
-                    <i class="fas fa-trash me-1"></i>Old Logs हटाउनुहोस्
-                </button>
-            </form>
-        </div>
-        <div class="card-body p-0">
-            <?php if (empty($logs)): ?>
-            <div class="text-center py-4 text-muted">
-                <i class="fas fa-inbox fa-2x mb-2 d-block opacity-25"></i>
-                अझै कुनै notification log छैन।
-            </div>
-            <?php else: ?>
-            <div class="table-responsive">
-                <table class="table table-sm table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Time</th>
-                            <th>Event</th>
-                            <th>Channel</th>
-                            <th>Recipient</th>
-                            <th>स्थिति</th>
-                            <th>Note</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($logs as $log): ?>
-                        <tr>
-                            <td class="text-muted small"><?php echo date('M d H:i', strtotime($log['created_at'])); ?></td>
-                            <td><small><?php echo htmlspecialchars($log['event_type']); ?></small></td>
-                            <td>
-                                <?php if ($log['channel'] === 'email'): ?>
-                                <span class="badge bg-primary"><i class="fas fa-envelope me-1"></i>Email</span>
-                                <?php else: ?>
-                                <span class="badge bg-success"><i class="fas fa-mobile-alt me-1"></i>SMS</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="small"><?php echo htmlspecialchars($log['recipient']); ?></td>
-                            <td>
-                                <?php if ($log['status'] === 'sent'): ?>
-                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Sent</span>
-                                <?php else: ?>
-                                <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Failed</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="small text-muted"><?php echo htmlspecialchars(substr($log['error_msg'] ?? '', 0, 60)); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-            <?php endif; ?>
-        </div>
+    </div>
     </div>
 
 </div>

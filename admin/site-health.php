@@ -316,7 +316,7 @@ function htmlEsc(s) {
 
           <!-- Tabs -->
           <div class="card-header bg-light border-bottom px-3 py-0">
-              <ul class="nav nav-tabs card-header-tabs" id="fpTabs" role="tablist">
+              <ul class="nav nav-tabs admin-nav-tabs card-header-tabs" id="fpTabs" role="tablist">
                   <li class="nav-item" role="presentation">
                       <button class="nav-link active small" id="fp-text-tab"     data-bs-toggle="tab" data-bs-target="#fp-text"     type="button">Inputs</button>
                   </li>

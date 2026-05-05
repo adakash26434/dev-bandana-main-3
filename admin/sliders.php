@@ -110,7 +110,7 @@ require_once 'includes/admin-ui.php';
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($sliders) . ' स्लाइडरहरू</span>'
 );
 ?>
-<?php echo adminHelpTip('यो पृष्ठबाट Homepage को Slider/Banner Images व्यवस्थापन गर्न सकिन्छ।', ['नयाँ Slider थप्न: "+" बटन थिच्नुहोस्।', 'Image size: 1920×600 pixels उपयुक्त छ।', 'Order मिलाउन: Display Order number बदल्नुहोस् (सानो number = पहिला देखिन्छ)।']); ?> ?>
+<?php echo adminHelpTip('यो पृष्ठबाट Homepage को Slider/Banner Images व्यवस्थापन गर्न सकिन्छ।', ['नयाँ Slider थप्न: "+" बटन थिच्नुहोस्।', 'Image size: 1920×600 pixels उपयुक्त छ।', 'Order मिलाउन: Display Order number बदल्नुहोस् (सानो number = पहिला देखिन्छ)।']); ?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
 
