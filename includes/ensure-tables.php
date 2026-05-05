@@ -429,6 +429,8 @@ function ensurePublicTables(): void {
             'kyc_verified_at' => 'DATETIME NULL',
             'risk_review_due_at' => 'DATE NULL',
             'risk_review_status' => "ENUM('normal','due_review') DEFAULT 'normal'",
+            'grandfather_name' => 'VARCHAR(100) NULL',
+            'spouse_name' => 'VARCHAR(100) NULL',
             'family_details_json' => 'TEXT NULL',
             'aml_details_json' => 'LONGTEXT NULL',
             'permanent_province' => 'VARCHAR(60) NULL',

@@ -351,6 +351,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'kyc_verified_at'      => "DATETIME NULL",
                     'risk_review_due_at'   => "DATE NULL",
                     'risk_review_status'   => "ENUM('normal','due_review') DEFAULT 'normal'",
+                    'grandfather_name'     => "VARCHAR(100) NULL",
+                    'spouse_name'          => "VARCHAR(100) NULL",
                     'family_details_json'  => "TEXT NULL",
                     'left_thumb'           => "VARCHAR(255) NULL",
                     'right_thumb'          => "VARCHAR(255) NULL",
