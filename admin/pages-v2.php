@@ -58,21 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string)($_POST['action'] ?? '') ==
         setFlash('error', 'सेक्सन फेला परेन।');
         redirect('pages-v2.php?tab=static');
     }
+    $titleNp = clean_text($_POST['title_np'] ?? '');
+    if ($titleNp === '') {
+        $titleNp = (string)($staticPages[$pageKey]['title'] ?? '');
+    }
     $contentNp = $_POST['content_np'] ?? '';
     $contentEn = $_POST['content_en'] ?? '';
     try {
-        $checkStmt = $db->prepare("SELECT id FROM site_settings WHERE setting_key = ?");
-        $checkStmt->execute([$pageKey . '_np']);
-        if ($checkStmt->fetch()) {
-            $stmt = $db->prepare("UPDATE site_settings SET setting_value = ? WHERE setting_key = ?");
-            $stmt->execute([$contentNp, $pageKey . '_np']);
-            $stmt->execute([$contentEn, $pageKey . '_en']);
+        $okNp = updateSetting($pageKey . '_np', $contentNp);
+        $okEn = updateSetting($pageKey . '_en', $contentEn);
+        $okTitle = updateSetting($pageKey . '_title_np', $titleNp);
+        if ($okNp && $okEn && $okTitle) {
+            setFlash('success', 'सेक्सन सफलतापूर्वक अपडेट भयो।');
         } else {
-            $stmt = $db->prepare("INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?)");
-            $stmt->execute([$pageKey . '_np', $contentNp]);
-            $stmt->execute([$pageKey . '_en', $contentEn]);
+            setFlash('error', 'सेभ गर्दा समस्या आयो। फेरि प्रयास गर्नुहोस्।');
         }
-        setFlash('success', 'सेक्सन सफलतापूर्वक अपडेट भयो।');
     } catch (Throwable $e) {
         setFlash('error', 'त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।');
     }
@@ -223,6 +223,14 @@ if ($tab === 'dynamic' && $action === 'edit' && $editDynId > 0) {
 // Static edit context
 $editStaticKey = (string) ($_GET['page'] ?? '');
 if (!array_key_exists($editStaticKey, $staticPages)) $editStaticKey = '';
+$staticPagesResolved = [];
+foreach ($staticPages as $key => $info) {
+    $customTitleNp = trim((string)getSetting($key . '_title_np', ''));
+    $staticPagesResolved[$key] = [
+        'title' => $customTitleNp !== '' ? $customTitleNp : (string)$info['title'],
+        'title_en' => (string)$info['title_en'],
+    ];
+}
 $staticNp = $editStaticKey !== '' ? getSetting($editStaticKey . '_np', '') : '';
 $staticEn = $editStaticKey !== '' ? getSetting($editStaticKey . '_en', '') : '';
 
@@ -522,7 +530,7 @@ if ($flash) echo adminAlert($flash['type'], $flash['message']);
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $i = 1; foreach ($staticPages as $key => $info): ?>
+                                                <?php $i = 1; foreach ($staticPagesResolved as $key => $info): ?>
                                                 <tr>
                                                     <td><?php echo $i++; ?></td>
                                                     <td><?php echo htmlspecialchars($info['title'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -558,7 +566,7 @@ if ($flash) echo adminAlert($flash['type'], $flash['message']);
                                                 <label class="form-label fw-semibold">सेक्सन छान्नुहोस्</label>
                                                 <select name="page" class="form-select" required>
                                                     <option value="" selected disabled>— सेक्सन छान्नुहोस् —</option>
-                                                    <?php foreach ($staticPages as $key => $info): ?>
+                                                    <?php foreach ($staticPagesResolved as $key => $info): ?>
                                                         <option value="<?php echo htmlspecialchars((string)$key, ENT_QUOTES, 'UTF-8'); ?>">
                                                             <?php echo htmlspecialchars((string)$info['title'], ENT_QUOTES, 'UTF-8'); ?>
                                                         </option>
@@ -578,8 +586,9 @@ if ($flash) echo adminAlert($flash['type'], $flash['message']);
                                         <input type="hidden" name="page_key" value="<?php echo htmlspecialchars($editStaticKey, ENT_QUOTES, 'UTF-8'); ?>">
 
                                         <div class="mb-3">
-                                            <label class="form-label fw-semibold">सेक्सन</label>
-                                            <div class="form-control" style="background:#f8fafc;"><?php echo htmlspecialchars($staticPages[$editStaticKey]['title'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                            <label class="form-label fw-semibold">सेक्सन नाम (नेपाली)</label>
+                                            <input type="text" name="title_np" class="form-control" required value="<?php echo htmlspecialchars($staticPagesResolved[$editStaticKey]['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            <div class="form-text">यो नाम सूचीमा देखिने शीर्षक हो।</div>
                                         </div>
 
                                         <ul class="nav nav-tabs admin-nav-tabs mb-2" role="tablist">
