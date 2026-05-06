@@ -240,6 +240,23 @@ if (!function_exists('verifyCardCredentials')) {
         try {
             $hasFailedCol = cardTableHasColumn($pdo, 'failed_verify_count');
             $failedExpr = $hasFailedCol ? "c.failed_verify_count" : "0";
+            $hasSadasyataNumber = function_exists('safeColumnExists') ? safeColumnExists('members', 'sadasyata_number') : true;
+            $hasMemberCardNo = function_exists('safeColumnExists') ? safeColumnExists('members', 'member_card_no') : true;
+            $hasMemberId = function_exists('safeColumnExists') ? safeColumnExists('members', 'member_id') : false;
+
+            $memberJoinParts = [];
+            $memberJoinParts[] = "CAST(m.id AS CHAR) COLLATE utf8mb4_unicode_ci = c.member_id COLLATE utf8mb4_unicode_ci";
+            if ($hasSadasyataNumber) {
+                $memberJoinParts[] = "m.sadasyata_number COLLATE utf8mb4_unicode_ci = c.member_id COLLATE utf8mb4_unicode_ci";
+            }
+            if ($hasMemberCardNo) {
+                $memberJoinParts[] = "m.member_card_no COLLATE utf8mb4_unicode_ci = c.member_id COLLATE utf8mb4_unicode_ci";
+            }
+            if ($hasMemberId) {
+                $memberJoinParts[] = "m.member_id COLLATE utf8mb4_unicode_ci = c.member_id COLLATE utf8mb4_unicode_ci";
+            }
+            $memberJoinSql = implode(' OR ', $memberJoinParts);
+
             $sql = "SELECT c.id AS card_id, c.card_no, c.verification_code, c.cvv,
                            c.issued_date, c.status, c.verify_count, {$failedExpr} AS failed_verify_count,
                            m.id AS member_pk,
@@ -250,7 +267,7 @@ if (!function_exists('verifyCardCredentials')) {
                            k.mobile AS kyc_mobile, k.email AS kyc_email, k.father_name AS kyc_father_name
                     FROM member_id_cards c
                     INNER JOIN members m
-                       ON (m.id = c.member_id OR m.sadasyata_number = c.member_id OR m.member_card_no = c.member_id)
+                       ON ({$memberJoinSql})
                     LEFT JOIN kyc_applications k ON k.id = m.kyc_application_id
                     WHERE c.verification_code = :code
                        OR REPLACE(UPPER(c.verification_code), '-', '') = :lookup_key1
