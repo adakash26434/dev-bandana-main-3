@@ -1,7 +1,7 @@
 <?php
 /**
- * साइट लाइसेन्स नवीकरण — सरल manual भुक्तानी सूचना (Khalti/eSewa ID + Txn ref)
- * Superadmin मात्र; vendor लाई इमेल सूचना (यदि इमेल सेट छ भने)
+ * साइट लाइसेन्स नवीकरण — manual भुक्तानी सूचना (Khalti/eSewa + ref)
+ * कार्यालय/लग इन बाहिर पनि पठाउन मिल्छ। रकम सधैं Superadmin को सेटिङ (`site_license_renewal_amount`) बाट — फारमबाट बदलिँदैन।
  */
 declare(strict_types=1);
 
@@ -62,6 +62,39 @@ if (!function_exists('site_license_renewal_cancel_pending')) {
     }
 }
 
+if (!function_exists('site_license_renewal_apply_office_notice')) {
+    /**
+     * भुक्तानी सूचना बचत — रकम POST बाट होइन, सधैं getSetting('site_license_renewal_amount')।
+     *
+     * @return array{ok:bool, id?:int, error?:string}
+     */
+    function site_license_renewal_apply_office_notice(PDO $db, string $gateway, string $txn, string $note, string $submitter, ?int $adminId): array {
+        $allowedGw = ['khalti', 'esewa', 'other'];
+        if (!in_array($gateway, $allowedGw, true)) {
+            return ['ok' => false, 'error' => 'गेटवेइ छान्नुहोस्।'];
+        }
+        $txn = trim($txn);
+        if (mb_strlen($txn) < 3) {
+            return ['ok' => false, 'error' => 'कारोबार नम्बर / Ref कम्तिमा ३ अक्षर हुनुपर्छ।'];
+        }
+        $submitter = trim($submitter);
+        if (mb_strlen($submitter) < 2) {
+            return ['ok' => false, 'error' => 'पठाउने (कार्यालय/नाम) कम्तिमा २ अक्षर लेख्नुहोस्।'];
+        }
+        ensureSiteLicenseRenewalNoticesTable($db);
+        if (site_license_renewal_pending_count($db) > 0) {
+            return ['ok' => false, 'error' => 'पहिले नै भुक्तानी सूचना पेन्डिङ छ। दोहोरो नपठाउनुहोस्। Superadmin वा विक्रेता सम्पर्क गर्नुहोस्।'];
+        }
+        $amt = function_exists('getSetting') ? trim((string) getSetting('site_license_renewal_amount', '')) : '';
+        $aid = ($adminId !== null && $adminId > 0) ? $adminId : null;
+        $st = $db->prepare("INSERT INTO site_license_renewal_notices (status, gateway, txn_reference, amount_reported, note, submitted_by_admin_id, submitted_by_username) VALUES ('pending',?,?,?,?,?,?)");
+        $st->execute([$gateway, $txn, $amt, trim($note), $aid, $submitter]);
+        $newId = (int) $db->lastInsertId();
+
+        return ['ok' => true, 'id' => $newId];
+    }
+}
+
 if (!function_exists('site_license_renewal_notify_vendor')) {
     function site_license_renewal_notify_vendor(PDO $db, array $notice): void {
         if (!function_exists('getSetting')) {
@@ -86,7 +119,7 @@ if (!function_exists('site_license_renewal_notify_vendor')) {
             . '<p><strong>पठाउने (कार्यालय/नाम):</strong> ' . $user . '</p>'
             . '<p><strong>गेटवे:</strong> ' . $gw . '</p>'
             . '<p><strong>Txn / Ref:</strong> ' . $txn . '</p>'
-            . '<p><strong>रकम (रिपोर्ट):</strong> ' . $amt . '</p>'
+            . '<p><strong>रकम (Superadmin सेटिङ अनुसार):</strong> ' . $amt . '</p>'
             . '<p><strong>टिप्पणी:</strong> ' . nl2br($note) . '</p>'
             . '<p><strong>Notice ID:</strong> ' . $id . '</p>'
             . '<p><small>Admin: ' . htmlspecialchars($siteUrl . 'admin/site-license.php', ENT_QUOTES, 'UTF-8') . '</small></p>';

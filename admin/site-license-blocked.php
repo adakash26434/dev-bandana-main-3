@@ -1,8 +1,9 @@
 <?php
 /**
- * म्याद सकिएपछि साधारण admin — सन्देश + logout (admin-header छैन)।
+ * म्याद सकिएपछि साधारण admin — सन्देश, Pay Now + भुक्तानी सूचना फारम (Superadmin बाहेक)
  */
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/site-license-renewal.php';
 
 if (!isAdminLoggedIn()) {
     header('Location: ' . ADMIN_URL . 'index.php');
@@ -13,6 +14,79 @@ if (!empty($_SESSION['is_superadmin'])) {
     exit;
 }
 
+if (function_exists('site_license_expired') && !site_license_expired()) {
+    header('Location: ' . ADMIN_URL . 'dashboard.php');
+    exit;
+}
+
+$blockedRenewalError = '';
+$blockedRenewalSent = isset($_GET['renewal_sent']) && (string) $_GET['renewal_sent'] === '1';
+
+$dbBlocked = null;
+$blockedPendingRow = null;
+try {
+    $dbBlocked = getDB();
+    ensureSiteLicenseRenewalNoticesTable($dbBlocked);
+    if (site_license_renewal_pending_count($dbBlocked) > 0) {
+        $blockedPendingRow = $dbBlocked->query("SELECT * FROM site_license_renewal_notices WHERE status = 'pending' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+} catch (Throwable $e) {
+    $dbBlocked = null;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['action'] ?? '') === 'submit_renewal_notice_blocked') {
+    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
+        $blockedRenewalError = 'सुरक्षा जाँच असफल। पृष्ठ refresh गरी पुन: प्रयास गर्नुहोस्।';
+    } elseif ($dbBlocked === null) {
+        $blockedRenewalError = 'डेटाबेस जडान हुन सकेन।';
+    } elseif (!checkRateLimit('site_license_blocked_renewal', 20, 3600)) {
+        $blockedRenewalError = 'धेरै पटक पठाइयो। केही समय पछि प्रयास गर्नुहोस्।';
+    } else {
+        $gateway = trim((string) ($_POST['gateway'] ?? ''));
+        $txn = trim((string) ($_POST['txn_reference'] ?? ''));
+        $note = trim((string) ($_POST['renewal_note'] ?? ''));
+        $submitter = trim((string) ($_POST['submitter_name'] ?? ''));
+        if ($submitter === '') {
+            $submitter = trim((string) ($_SESSION['admin_name'] ?? $_SESSION['admin_username'] ?? ''));
+        }
+        $aid = (int) ($_SESSION['admin_id'] ?? 0);
+        $apply = site_license_renewal_apply_office_notice($dbBlocked, $gateway, $txn, $note, $submitter, $aid > 0 ? $aid : null);
+        if (!$apply['ok']) {
+            $blockedRenewalError = $apply['error'] ?? 'त्रुटि।';
+        } else {
+            $newId = (int) ($apply['id'] ?? 0);
+            $amtStored = trim((string) getSetting('site_license_renewal_amount', ''));
+            site_license_renewal_notify_vendor($dbBlocked, [
+                'id' => $newId,
+                'gateway' => $gateway,
+                'txn_reference' => $txn,
+                'amount_reported' => $amtStored,
+                'note' => $note,
+                'submitted_by_username' => $submitter,
+            ]);
+            header('Location: ' . ADMIN_URL . 'site-license-blocked.php?renewal_sent=1');
+            exit;
+        }
+    }
+}
+
+try {
+    if ($dbBlocked !== null) {
+        if (site_license_renewal_pending_count($dbBlocked) > 0) {
+            $blockedPendingRow = $dbBlocked->query("SELECT * FROM site_license_renewal_notices WHERE status = 'pending' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC) ?: null;
+        } else {
+            $blockedPendingRow = null;
+        }
+    }
+} catch (Throwable $e) {
+    /* ignore */
+}
+
+$blockedPayAmount = trim((string) getSetting('site_license_renewal_amount', ''));
+$blockedKhalti = site_license_pay_id_or_default((string) getSetting('site_license_khalti_id', ''));
+$blockedEsewa = site_license_pay_id_or_default((string) getSetting('site_license_esewa_id', ''));
+$blockedSubmitterDefault = trim((string) ($_SESSION['admin_name'] ?? $_SESSION['admin_username'] ?? ''));
+
 $site = function_exists('getSetting') ? getSetting('site_name', 'सहकारी') : 'सहकारी';
 $siteH = htmlspecialchars($site, ENT_QUOTES, 'UTF-8');
 $untilBs = function_exists('site_license_until_bs') ? site_license_until_bs() : '';
@@ -21,6 +95,7 @@ $untilAd = function_exists('site_license_until_ad') ? site_license_until_ad() : 
 $untilBsH = htmlspecialchars($untilBs, ENT_QUOTES, 'UTF-8');
 $untilBsNpH = htmlspecialchars($untilBsNp, ENT_QUOTES, 'UTF-8');
 $untilAdH = htmlspecialchars($untilAd, ENT_QUOTES, 'UTF-8');
+$showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
 ?>
 <!DOCTYPE html>
 <html lang="ne">
@@ -35,7 +110,6 @@ $untilAdH = htmlspecialchars($untilAd, ENT_QUOTES, 'UTF-8');
         :root {
             --coop-900: #14532d;
             --coop-700: #15803d;
-            --coop-600: #16a34a;
             --ink: #0f172a;
             --muted: #64748b;
             --line: #e2e8f0;
@@ -53,7 +127,7 @@ $untilAdH = htmlspecialchars($untilAd, ENT_QUOTES, 'UTF-8');
             justify-content: center;
             padding: clamp(16px, 4vw, 32px);
         }
-        .shell { width: 100%; max-width: 520px; }
+        .shell { width: 100%; max-width: 540px; }
         .card-main {
             border-radius: 20px;
             border: 1px solid var(--line);
@@ -114,6 +188,35 @@ $untilAdH = htmlspecialchars($untilAd, ENT_QUOTES, 'UTF-8');
             font-size: 0.9rem;
         }
         .dates-box .lbl { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 0.2rem; }
+        .vendor-note {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            font-size: 0.82rem;
+            line-height: 1.55;
+            color: #1e3a5f;
+        }
+        .pay-box {
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+        .pay-box code { color: #be185d; font-weight: 600; }
+        .amt-locked {
+            background: #f3f4f6;
+            border: 2px dashed #9ca3af;
+            border-radius: 10px;
+            padding: 0.65rem 0.85rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
         .steps {
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
@@ -136,11 +239,16 @@ $untilAdH = htmlspecialchars($untilAd, ENT_QUOTES, 'UTF-8');
         <div class="card-head">
             <div class="ico-wrap"><i class="fas fa-calendar-xmark" aria-hidden="true"></i></div>
             <h1>साइट सेवा म्याद सकियो</h1>
-            <p class="sub"><strong><?php echo $siteH; ?></strong> — Admin panel साधारण प्रयोगकर्ताका लागि बन्द छ।</p>
+            <p class="sub"><strong><?php echo $siteH; ?></strong> — साधारण Admin को प्यानल अस्थायी बन्द छ। तल नवीकरण वा भुक्तानी सूचना गर्नुहोस्।</p>
         </div>
         <div class="card-body-inner text-center">
             <div class="pill-row">
                 <span class="pill"><i class="fas fa-circle-exclamation me-1"></i>म्याद सकियो · Expired</span>
+            </div>
+
+            <div class="vendor-note">
+                <strong>विक्रेता / प्राविधिक:</strong> लाइसेन्स नवीकरण वा प्राविधिक सहयोगका लागि <strong>विक्रेता / प्राविधिक टोली</strong> लाई सम्पर्क गर्नुहोस्।
+                वैकल्पिक: <strong>Pay Now</strong> गरी तलको फारमबाट <strong>भुक्तानी सूचना</strong> पठाउनुहोस् — Superadmin ले «साइट म्याद» मा हेरी <strong>नयाँ मिति</strong> सेभ गर्छन्।
             </div>
 
             <?php if ($untilBs !== ''): ?>
@@ -153,12 +261,77 @@ $untilAdH = htmlspecialchars($untilAd, ENT_QUOTES, 'UTF-8');
             </div>
             <?php endif; ?>
 
+            <?php if ($blockedRenewalError !== ''): ?>
+            <div class="alert alert-danger text-start small py-2 mb-3"><?php echo htmlspecialchars($blockedRenewalError, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endif; ?>
+
+            <?php if ($blockedRenewalSent): ?>
+            <div class="alert alert-success text-start small py-3 mb-3">
+                <strong><i class="fas fa-check-circle me-1"></i>भुक्तानी सूचना पठाइयो।</strong>
+                Superadmin ले «साइट म्याद» मा पेन्डिङ हेरी मिति सेभ गर्छन्। प्रतीक्षा वा विक्रेता सम्पर्क गर्नुहोस्।
+            </div>
+            <?php elseif ($blockedPendingRow !== null): ?>
+            <div class="alert alert-warning text-start small py-3 mb-3">
+                <div class="fw-bold mb-2"><i class="fas fa-hourglass-half me-1"></i>भुक्तानी सूचना पेन्डिङ</div>
+                <ul class="mb-0 ps-3">
+                    <li>गेटवेइ: <strong><?php echo htmlspecialchars((string) $blockedPendingRow['gateway'], ENT_QUOTES, 'UTF-8'); ?></strong></li>
+                    <li>Txn / Ref: <strong><?php echo htmlspecialchars((string) $blockedPendingRow['txn_reference'], ENT_QUOTES, 'UTF-8'); ?></strong></li>
+                    <?php if (trim((string) $blockedPendingRow['amount_reported']) !== ''): ?>
+                    <li>रकम (सेटिङ): <strong><?php echo htmlspecialchars((string) $blockedPendingRow['amount_reported'], ENT_QUOTES, 'UTF-8'); ?></strong></li>
+                    <?php endif; ?>
+                </ul>
+                <div class="mt-2 text-muted">Superadmin ले मिति सेभ नगर्दासम्म पर्खनुहोस्। दोहोरो भुक्तानी नगर्नुहोस्।</div>
+            </div>
+            <?php elseif ($showPayForm): ?>
+            <div class="pay-box">
+                <div class="fw-bold mb-2 text-success"><i class="fas fa-mobile-screen-button me-1"></i>Pay Now — आफ्नो wallet बाट पठाउनुहोस्</div>
+                <p class="small text-secondary mb-2">तलका नम्बर <strong>विक्रेता खाता</strong> हुन्। आफ्नो Khalti वा eSewa बाट Send/Transfer गर्नुहोस्।</p>
+                <?php if ($blockedPayAmount !== ''): ?>
+                <p class="mb-1 small"><strong>रकम (Superadmin ले तोकेको — बदल्न मिल्दैन):</strong></p>
+                <div class="amt-locked mb-2 text-start"><?php echo htmlspecialchars($blockedPayAmount, ENT_QUOTES, 'UTF-8'); ?></div>
+                <?php else: ?>
+                <p class="small text-warning mb-2">रकम अझै सेट भएको छैन। Superadmin सम्पर्क गर्नुहोस्।</p>
+                <?php endif; ?>
+                <?php if ($blockedKhalti !== ''): ?>
+                <p class="mb-1 small"><strong>Khalti:</strong> <code><?php echo htmlspecialchars($blockedKhalti, ENT_QUOTES, 'UTF-8'); ?></code></p>
+                <?php endif; ?>
+                <?php if ($blockedEsewa !== ''): ?>
+                <p class="mb-0 small"><strong>eSewa:</strong> <code><?php echo htmlspecialchars($blockedEsewa, ENT_QUOTES, 'UTF-8'); ?></code></p>
+                <?php endif; ?>
+            </div>
+
+            <form method="post" class="text-start mb-3">
+                <input type="hidden" name="action" value="submit_renewal_notice_blocked">
+                <?php echo csrfField(); ?>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold">पठाउने <span class="text-danger">*</span></label>
+                    <input type="text" name="submitter_name" class="form-control form-control-sm" required minlength="2" maxlength="120" value="<?php echo htmlspecialchars($blockedSubmitterDefault, ENT_QUOTES, 'UTF-8'); ?>" placeholder="कार्यालय / नाम">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold">गेटवेइ</label>
+                    <select name="gateway" class="form-select form-select-sm" required>
+                        <option value="khalti">Khalti</option>
+                        <option value="esewa" selected>eSewa</option>
+                        <option value="other">अन्य</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold">कारोबार नम्बर / Ref <span class="text-danger">*</span></label>
+                    <input type="text" name="txn_reference" class="form-control form-control-sm" required minlength="3" maxlength="180" placeholder="wallet ref" autocomplete="off">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold">टिप्पणी</label>
+                    <textarea name="renewal_note" class="form-control form-control-sm" rows="2" maxlength="2000" placeholder="ऐच्छिक"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-100"><i class="fas fa-paper-plane me-1"></i>भुक्तानी सूचना पठाउनुहोस्</button>
+            </form>
+            <?php endif; ?>
+
             <div class="steps">
-                <div class="fw-semibold text-success mb-2 small"><i class="fas fa-list-check me-1"></i>के गर्ने?</div>
-                <ol>
-                    <li><strong>भुक्तानी सूचना:</strong> कार्यालय Admin ले <strong><code>/admin/</code></strong> लग इन URL खोलेर (लग इन नगरीकन) Pay Now + फारमबाट पठाउन सक्छन्।</li>
-                    <li><strong>Superadmin</strong> ले मात्र Admin → <strong>साइट म्याद</strong> खोल्छन् — त्यहाँ पेन्डिङ सूचना र <strong>नयाँ मिति सेभ</strong> हुन्छ।</li>
-                    <li>वैकल्पिक: लाइसेन्स वा प्राविधिक मद्दतका लागि <strong>विक्रेता / सहयोग टोली</strong> सम्पर्क।</li>
+                <div class="fw-semibold text-success mb-2 small"><i class="fas fa-list-check me-1"></i>संक्षेप</div>
+                <ol class="mb-0">
+                    <li><strong>Superadmin बाहेक</strong> तपाईं यहाँ हुनुहुन्छ — माथि Pay Now + सूचना।</li>
+                    <li><strong>Superadmin</strong> ले «साइट म्याद» मा पेन्डिङ र <strong>मिति सेभ</strong> गर्छन्।</li>
                 </ol>
             </div>
 

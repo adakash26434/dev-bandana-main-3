@@ -138,7 +138,7 @@ if ($flash = getFlash()):
                     </p>
                     <div class="alert alert-secondary border py-2 small mb-3 mb-md-4">
                         <strong class="d-block mb-1"><i class="fas fa-list-ol me-1"></i>नवीकरण क्रम</strong>
-                        <span class="text-muted">①</span> <strong>कार्यालय/सहकारी Admin</strong> ले <strong><code>/admin/</code> लग इन पृष्ठ</strong> मा Khalti/eSewa बाट भुक्तानी गरी <strong>भुक्तानी सूचना</strong> (ref) पठाउँछन् — लग इन आवश्यक छैन।
+                        <span class="text-muted">①</span> <strong>कार्यालय Admin</strong> (Superadmin बाहेक) ले <strong><code>/admin/</code></strong> वा <strong>म्याद सकियो</strong> रोक पृष्ठमा Pay Now गरी <strong>भुक्तानी सूचना</strong> पठाउँछन् — रकम Superadmin सेटिङ मात्र।
                         <span class="text-muted">②</span> <strong>Superadmin</strong> ले <strong>यही «साइट म्याद»</strong> मा पेन्डिङ सूचना देख्छन्।
                         <span class="text-muted">③</span> Superadmin ले तल <strong>म्याद सेभ</strong> गरी नयाँ बि.सं. राख्छन्।
                     </div>
@@ -174,8 +174,8 @@ if ($flash = getFlash()):
                         </div>
                     <?php elseif ($expired && !$pendingRow): ?>
                         <div class="alert alert-info border py-3 mb-0">
-                            <div class="fw-semibold mb-1"><i class="fas fa-building me-1"></i>भुक्तानी सूचना अहिले यहाँ छैन</div>
-                            <p class="small mb-0">कार्यालय/सहकारी Admin ले <strong>Admin लग इन URL</strong> (<code><?php echo htmlspecialchars(rtrim(ADMIN_URL, '/') . '/', ENT_QUOTES, 'UTF-8'); ?></code>) खोलेर <strong>Pay Now</strong> अनुसार तिरी <strong>भुक्तानी सूचना</strong> पठाउँछन्। Superadmin ले त्यहाँबाट आएको सूचना <strong>यही पेन्डिङ</strong> खण्डमा देख्नुहुनेछ — अनि तल मिति सेभ गर्नुहोस्।</p>
+                            <div class="fw-semibold mb-1"><i class="fas fa-building me-1"></i>भुक्तानी सूचना कार्यालयबाट</div>
+                            <p class="small mb-0">कार्यालय Admin ले <strong><code>/admin/</code></strong> (लग इन नगरीकन) वा लग इन भएपछि रोकिएको <strong>म्याद सकियो</strong> पृष्ठबाट <strong>Pay Now + भुक्तानी सूचना</strong> पठाउँछन्। रकम सधैं यहाँ सेट गरेको मात्र (बदल्न मिल्दैन)। Superadmin ले <strong>पेन्डिङ</strong> यहीँ देख्छन् — अनि तल मिति सेभ गर्नुहोस्।</p>
                         </div>
                     <?php endif; ?>
 

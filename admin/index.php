@@ -60,37 +60,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['action'] ?? '') =
     } else {
         try {
             $db = getDB();
-            ensureSiteLicenseRenewalNoticesTable($db);
-            if (site_license_renewal_pending_count($db) > 0) {
-                $error = 'पहिले नै भुक्तानी सूचना पेन्डिङ छ। दोहोरो नपठाउनुहोस्। Superadmin वा विक्रेता सम्पर्क गर्नुहोस्।';
+            $gateway = trim((string) ($_POST['gateway'] ?? ''));
+            $txn = trim((string) ($_POST['txn_reference'] ?? ''));
+            $note = trim((string) ($_POST['renewal_note'] ?? ''));
+            $submitter = trim((string) ($_POST['submitter_name'] ?? ''));
+            $apply = site_license_renewal_apply_office_notice($db, $gateway, $txn, $note, $submitter, null);
+            if (!$apply['ok']) {
+                $error = $apply['error'] ?? 'त्रुटि।';
             } else {
-                $gateway = trim((string) ($_POST['gateway'] ?? ''));
-                $txn = trim((string) ($_POST['txn_reference'] ?? ''));
-                $amt = trim((string) ($_POST['amount_reported'] ?? ''));
-                $note = trim((string) ($_POST['renewal_note'] ?? ''));
-                $submitter = trim((string) ($_POST['submitter_name'] ?? ''));
-                $allowedGw = ['khalti', 'esewa', 'other'];
-                if (!in_array($gateway, $allowedGw, true)) {
-                    $error = 'गेटवेइ छान्नुहोस्।';
-                } elseif (mb_strlen($txn) < 3) {
-                    $error = 'कारोबार नम्बर / Ref कम्तिमा ३ अक्षर हुनुपर्छ।';
-                } elseif (mb_strlen($submitter) < 2) {
-                    $error = 'पठाउने (कार्यालय/नाम) कम्तिमा २ अक्षर लेख्नुहोस्।';
-                } else {
-                    $st = $db->prepare("INSERT INTO site_license_renewal_notices (status, gateway, txn_reference, amount_reported, note, submitted_by_admin_id, submitted_by_username) VALUES ('pending',?,?,?,?,NULL,?)");
-                    $st->execute([$gateway, $txn, $amt, $note, $submitter]);
-                    $newId = (int) $db->lastInsertId();
-                    site_license_renewal_notify_vendor($db, [
-                        'id' => $newId,
-                        'gateway' => $gateway,
-                        'txn_reference' => $txn,
-                        'amount_reported' => $amt,
-                        'note' => $note,
-                        'submitted_by_username' => $submitter,
-                    ]);
-                    header('Location: ' . ADMIN_URL . 'index.php?renewal_sent=1');
-                    exit;
-                }
+                $newId = (int) ($apply['id'] ?? 0);
+                $amtStored = trim((string) getSetting('site_license_renewal_amount', ''));
+                site_license_renewal_notify_vendor($db, [
+                    'id' => $newId,
+                    'gateway' => $gateway,
+                    'txn_reference' => $txn,
+                    'amount_reported' => $amtStored,
+                    'note' => $note,
+                    'submitted_by_username' => $submitter,
+                ]);
+                header('Location: ' . ADMIN_URL . 'index.php?renewal_sent=1');
+                exit;
             }
         } catch (Throwable $e) {
             error_log('[admin-login-renewal-notice] ' . $e->getMessage());
@@ -621,6 +610,16 @@ if ($licExpiredLogin && function_exists('site_license_pay_id_or_default') && fun
             gap: 8px;
         }
         .license-renew-form .lr-submit:hover { filter: brightness(1.05); }
+        .license-renew-form .lr-amt-display {
+            padding: 9px 11px;
+            background: #f3f4f6;
+            border: 1.5px dashed #9ca3af;
+            border-radius: 8px;
+            font-size: .88rem;
+            font-weight: 700;
+            color: #111827;
+        }
+        .license-renew-form .lr-amt-hint { font-size: .68rem; color: #6b7280; margin-top: 4px; font-weight: 500; }
         @media (max-width:480px) {
             .auth-card { border-radius: 16px; }
             .card-header { padding: 24px 20px 18px; }
@@ -697,8 +696,8 @@ if ($licExpiredLogin && function_exists('site_license_pay_id_or_default') && fun
                     <input type="text" name="txn_reference" id="renew_txn" required minlength="3" maxlength="180" placeholder="wallet मा देखिएको ref" autocomplete="off">
                 </div>
                 <div class="lr-fld">
-                    <label for="renew_amt">रकम (पठाएको)</label>
-                    <input type="text" name="amount_reported" id="renew_amt" maxlength="40" placeholder="ऐच्छिक" value="<?php echo htmlspecialchars($loginRenewAmount, ENT_QUOTES, 'UTF-8'); ?>">
+                    <span class="lr-amt-hint" style="display:block;margin-bottom:4px;">रकम (Superadmin ले «साइट म्याद» मा तोकेको — पठाउँदा बदल्न मिल्दैन)</span>
+                    <div class="lr-amt-display" id="renew_amt_display"><?php echo $loginRenewAmount !== '' ? htmlspecialchars($loginRenewAmount, ENT_QUOTES, 'UTF-8') : '— (अझै सेट भएको छैन — Superadmin सम्पर्क)'; ?></div>
                 </div>
                 <div class="lr-fld">
                     <label for="renew_note">टिप्पणी</label>
