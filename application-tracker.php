@@ -1589,7 +1589,8 @@ if (searchTypeEl) {
 
 /* ── HERO SECTION ── */
 .tracker-hero-section {
-    background: linear-gradient(135deg, #0f3d1f 0%, var(--primary-color) 40%, #2eb554 100%);
+    /* Brand tokens — admin Settings / design-tokens.css सँग मेल */
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 42%, var(--primary-light) 100%);
     padding: 60px 0 50px;
     position: relative;
     overflow: hidden;
@@ -1599,7 +1600,7 @@ if (searchTypeEl) {
     inset: 0;
     background-image:
         radial-gradient(circle at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(46,181,84,0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(var(--primary-rgb), 0.14) 0%, transparent 40%),
         radial-gradient(circle at 60% 80%, rgba(255,255,255,0.03) 0%, transparent 35%);
     pointer-events: none;
 }
@@ -1634,7 +1635,7 @@ if (searchTypeEl) {
     position: absolute;
     inset: -8px;
     border-radius: 50%;
-    border: 2px solid rgba(46,181,84,0.4);
+    border: 2px solid rgba(var(--primary-rgb), 0.38);
     animation: tracker-ping 2s ease-out infinite;
 }
 @keyframes tracker-ping {
@@ -1729,12 +1730,12 @@ if (searchTypeEl) {
     box-shadow: 0 10px 40px rgba(var(--primary-rgb,26,95,42),0.14) !important;
 }
 .tracker-search-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #2eb554 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     padding: 22px 28px;
     display: flex;
     align-items: center;
     gap: 16px;
-    color: #fff;
+    color: var(--text-on-primary, #fff);
 }
 .tracker-search-header-icon {
     width: 52px;
@@ -1768,8 +1769,8 @@ if (searchTypeEl) {
     padding: 13px 16px;
 }
 .btn-tracker-search {
-    background: linear-gradient(135deg, var(--primary-color), #2eb554);
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--text-on-primary, #fff);
     border: none;
     border-radius: 12px;
     font-weight: 700;
@@ -1778,8 +1779,8 @@ if (searchTypeEl) {
     transition: all 0.25s;
 }
 .btn-tracker-search:hover {
-    background: linear-gradient(135deg, #0f3d1f, var(--primary-color));
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    color: var(--text-on-primary, #fff);
     transform: translateY(-1px);
     box-shadow: 0 7px 20px rgba(var(--primary-rgb,26,95,42),0.4);
 }
@@ -1947,8 +1948,8 @@ if (searchTypeEl) {
     transition: all 0.3s ease;
 }
 .timeline-step.active .step-icon {
-    background: linear-gradient(135deg, var(--primary-color), #2eb554);
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--text-on-primary, #fff);
     box-shadow: 0 3px 12px rgba(var(--primary-rgb,26,95,42),0.35);
 }
 .timeline-step.active.success .step-icon {

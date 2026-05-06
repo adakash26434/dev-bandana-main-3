@@ -202,7 +202,8 @@ if (count($allCycles) > 1):
 </ul>
 
 <div class="row g-3">
-    <div class="col-lg-5 <?php echo $panel === 'positions' ? '' : 'd-none'; ?>">
+    <?php /* पहिले col-lg-5 + लुकेको col-lg-7 = आधा चौडाइ मात्र देखिन्थ्यो; सक्रिय ट्याब पूर्ण चौडाइ */ ?>
+    <div class="col-12 <?php echo $panel === 'positions' ? '' : 'd-none'; ?>">
         <div class="card admin-table-card mb-3">
             <div class="card-header"><h6 class="mb-0"><i class="fas fa-briefcase me-2"></i><?php echo $editPos ? 'पद सम्पादन' : 'नयाँ पद थप्नुहोस्'; ?></h6></div>
             <div class="card-body">
@@ -317,7 +318,7 @@ if (count($allCycles) > 1):
         </div>
     </div>
 
-    <div class="col-lg-7 <?php echo $panel === 'candidates' ? '' : 'd-none'; ?>">
+    <div class="col-12 <?php echo $panel === 'candidates' ? '' : 'd-none'; ?>">
         <div class="card admin-table-card mb-3">
             <div class="card-header"><h6 class="mb-0"><i class="fas fa-user-plus me-2"></i><?php echo $editCand ? 'उम्मेदवार सम्पादन' : 'नयाँ उम्मेदवार थप्नुहोस्'; ?></h6></div>
             <div class="card-body">

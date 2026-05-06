@@ -35,6 +35,13 @@ $_s = $__normalizeHex($_sRaw, '#c0392b');
 $_h = $__normalizeHex($_hRaw, $_s);
 $_f = $__normalizeHex($_fRaw, $_p);
 
+/* rgba(var(--primary-rgb), α) — ट्र्याकर/श्याडो सँग मेल */
+$_pHex = ltrim($_p, '#');
+$_primaryRgb = '26, 95, 42';
+if (strlen($_pHex) === 6) {
+    $_primaryRgb = hexdec(substr($_pHex, 0, 2)) . ', ' . hexdec(substr($_pHex, 2, 2)) . ', ' . hexdec(substr($_pHex, 4, 2));
+}
+
 /* HEX color लाई dark/light shift गर्ने helper (clamped) */
 $__shift = function ($hex, $amt = 36) {
     $hex = ltrim((string)$hex, '#');
@@ -89,6 +96,7 @@ $_onFooter    = $__bestText($_f);
     --primary-color:   <?= htmlspecialchars($_p,  ENT_QUOTES) ?>;
     --primary-dark:    <?= htmlspecialchars($_pd, ENT_QUOTES) ?>;
     --primary-light:   <?= htmlspecialchars($_pl, ENT_QUOTES) ?>;
+    --primary-rgb:     <?= $_primaryRgb ?>;
     --secondary-color: <?= htmlspecialchars($_s,  ENT_QUOTES) ?>;
     --secondary-dark:  <?= htmlspecialchars($_sd, ENT_QUOTES) ?>;
     --header-color:    <?= htmlspecialchars($_h,  ENT_QUOTES) ?>;

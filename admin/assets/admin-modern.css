@@ -3485,3 +3485,143 @@ aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
         color: #111827 !important;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Admin मोबाइल/ट्याब्लेट: मुख्य क्षेत्र पूर्ण चौडाइ, फ्लेक्स ओभरफ्लो रोक
+   (v9-mobile-fix सँग मिल्दो; रेल साइडबार नियम यहाँ लाग्दैन)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 991.98px) {
+    .admin-wrapper {
+        max-width: 100%;
+    }
+
+    .admin-wrapper .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+    }
+
+    /* उप-ट्याब / पिल्स — टच लक्ष्य (~44px), सानो स्क्रिनमा र्याप */
+    .main-content ul.nav.admin-inner-tabstrip .nav-link {
+        min-height: 44px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem 0.85rem !important;
+    }
+
+    .main-content ul.nav.nav-pills.admin-inner-tabstrip {
+        gap: 6px !important;
+        padding: 10px 10px !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Desktop + mouse: सानो आइकन रेल — hover मा पूरा लेबल (ठूलो main)
+   coarse pointer (धेरै ट्याब्लेट): यो ब्लक छैन — पूर्ण चौडाइ साइडबार
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 992px) and (hover: hover) and (pointer: fine) {
+    :root {
+        --sidebar-rail-width: 72px;
+    }
+
+    .admin-wrapper .main-content {
+        margin-left: var(--sidebar-rail-width) !important;
+        transition: margin-left 0.22s ease;
+    }
+
+    aside.sidebar#sidebar,
+    aside.sidebar {
+        width: var(--sidebar-rail-width) !important;
+        transition: width 0.22s ease, box-shadow 0.2s ease !important;
+        overflow-x: hidden !important;
+    }
+
+    aside.sidebar#sidebar:hover,
+    aside.sidebar:hover {
+        width: var(--sidebar-width, 260px) !important;
+        box-shadow: 8px 0 28px rgba(15, 23, 42, 0.1) !important;
+        z-index: 1050 !important;
+    }
+
+    /* बन्द: लेबल, तीर, बैज, सबमेनु */
+    .sidebar:not(:hover) .sidebar-link-label,
+    .sidebar:not(:hover) .nav-group-label,
+    .sidebar:not(:hover) .nav-arrow,
+    .sidebar:not(:hover) .sa-mini-badge,
+    .sidebar:not(:hover) .nav-group-header .group-badge,
+    .sidebar:not(:hover) .sidebar-nav > ul > li > a > .group-badge,
+    .sidebar:not(:hover) .sidebar-nav > ul > li > a > span:not(.nav-icon-wrap):not(.badge):not(.group-badge),
+    .sidebar:not(:hover) .nav-submenu a > span:not(.nav-icon-wrap):not(.badge),
+    .sidebar:not(:hover) .nav-submenu a > .badge {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
+    .sidebar:not(:hover) .nav-submenu {
+        max-height: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        transform: translateY(-4px) !important;
+    }
+
+    .sidebar:not(:hover) .sidebar-nav > ul > li > a,
+    .sidebar:not(:hover) .sidebar-nav .nav-group-header {
+        justify-content: center !important;
+        gap: 0 !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+
+    .sidebar:not(:hover) .sidebar-link-flex {
+        justify-content: center !important;
+    }
+
+    .sidebar:not(:hover) .sidebar-header .sidebar-brand {
+        justify-content: center !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+
+    .sidebar:not(:hover) .sidebar-brand-logo {
+        max-width: 44px !important;
+        max-height: 40px !important;
+        margin: 0 auto !important;
+    }
+
+    .sidebar:not(:hover) .sidebar-user-meta,
+    .sidebar:not(:hover) .sidebar-strip-logout {
+        display: none !important;
+    }
+
+    .sidebar:not(:hover) .sidebar-user-strip {
+        justify-content: center !important;
+        padding: 10px 4px !important;
+    }
+
+    .sidebar .sidebar-nav > ul > li > a,
+    .sidebar .sidebar-nav .nav-group-header {
+        position: relative;
+    }
+}
+
+@media (min-width: 992px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+    .admin-wrapper .main-content,
+    aside.sidebar#sidebar,
+    aside.sidebar {
+        transition: none !important;
+    }
+}

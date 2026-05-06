@@ -290,21 +290,36 @@ echo adminPageHeader(
       <?php echo $totalRecords; ?> records
     </span>
   </div>
+  <?php if (!empty($profiles)): ?>
+  <ul class="nav nav-pills admin-inner-tabstrip flex-wrap gap-2 px-3 py-2 mx-3 mt-2 mb-0" role="tablist" id="ipViewTabs">
+    <li class="nav-item" role="presentation">
+      <button type="button" class="nav-link py-2 active ip-view-tab-btn" data-ip-view="main" id="ipViewMainBtn" aria-selected="true">
+        <i class="fas fa-id-card me-1"></i>मुख्य जानकारी
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button type="button" class="nav-link py-2 ip-view-tab-btn" data-ip-view="finance" id="ipViewFinBtn" aria-selected="false">
+        <i class="fas fa-coins me-1"></i>वित्तीय रकम
+      </button>
+    </li>
+  </ul>
+  <?php endif; ?>
+  <div class="ip-profile-table-wrap px-0" id="ipTableWrap" data-ip-view="main">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0" id="ipTable">
       <thead>
         <tr>
-          <th>आ.व.</th>
-          <th>मिति (बि.सं.)</th>
-          <th>मिति (A.D.)</th>
-          <th>सदस्य</th>
-          <th>शेयर पूँजी</th>
-          <th>बचत</th>
-          <th>ऋण</th>
-          <th>कुल सम्पत्ति</th>
-          <th>NPA %</th>
-          <th>स्थिति</th>
-          <th style="min-width:120px;">कार्य</th>
+          <th class="ip-col ip-col-shared">आ.व.</th>
+          <th class="ip-col ip-col-main">मिति (बि.सं.)</th>
+          <th class="ip-col ip-col-main">मिति (A.D.)</th>
+          <th class="ip-col ip-col-main">सदस्य</th>
+          <th class="ip-col ip-col-fin">शेयर पूँजी</th>
+          <th class="ip-col ip-col-fin">बचत</th>
+          <th class="ip-col ip-col-fin">ऋण</th>
+          <th class="ip-col ip-col-shared">कुल सम्पत्ति</th>
+          <th class="ip-col ip-col-shared">NPA %</th>
+          <th class="ip-col ip-col-shared">स्थिति</th>
+          <th class="ip-col ip-col-shared" style="min-width:120px;">कार्य</th>
         </tr>
       </thead>
       <tbody>
@@ -326,47 +341,47 @@ echo adminPageHeader(
         <tr class="ip-data-row"
             data-fy="<?php echo strtolower(htmlspecialchars($p['fiscal_year'], ENT_QUOTES)); ?>"
             data-status="<?php echo $p['is_active'] ? 'active' : 'inactive'; ?>">
-          <td>
+          <td class="ip-col ip-col-shared">
             <strong class="text-primary"><?php echo htmlspecialchars($p['fiscal_year']); ?></strong>
           </td>
-          <td>
+          <td class="ip-col ip-col-main">
             <?php if (!empty($p['report_date_bs'])): ?>
             <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25">
               <i class="fas fa-calendar-days me-1"></i><?php echo htmlspecialchars($p['report_date_bs']); ?>
             </span>
             <?php else: ?><span class="text-muted small">—</span><?php endif; ?>
           </td>
-          <td>
+          <td class="ip-col ip-col-main">
             <?php echo !empty($p['report_date_ad'])
               ? '<small class="text-muted">' . date('d M Y', strtotime($p['report_date_ad'])) . '</small>'
               : '<span class="text-muted small">—</span>'; ?>
           </td>
-          <td><?php echo number_format((int)$p['total_members']); ?></td>
-          <td class="admin-amount">
+          <td class="ip-col ip-col-main"><?php echo number_format((int)$p['total_members']); ?></td>
+          <td class="ip-col ip-col-fin admin-amount">
             <?php echo shortAmt((float)$p['share_capital']); ?>
             <?php if ($p['share_capital_percent']): ?>
             <br><small class="admin-amount-sub">(<?php echo $p['share_capital_percent']; ?>%)</small>
             <?php endif; ?>
           </td>
-          <td class="admin-amount">
+          <td class="ip-col ip-col-fin admin-amount">
             <?php echo shortAmt((float)$p['deposit']); ?>
             <?php if ($p['deposit_percent']): ?>
             <br><small class="admin-amount-sub">(<?php echo $p['deposit_percent']; ?>%)</small>
             <?php endif; ?>
           </td>
-          <td class="admin-amount">
+          <td class="ip-col ip-col-fin admin-amount">
             <?php echo shortAmt((float)$p['loan']); ?>
             <?php if ($p['loan_percent']): ?>
             <br><small class="admin-amount-sub">(<?php echo $p['loan_percent']; ?>%)</small>
             <?php endif; ?>
           </td>
-          <td class="admin-amount"><?php echo shortAmt((float)$p['total_assets']); ?></td>
-          <td>
+          <td class="ip-col ip-col-shared admin-amount"><?php echo shortAmt((float)$p['total_assets']); ?></td>
+          <td class="ip-col ip-col-shared">
             <?php $npa = (float)$p['npa_percent']; ?>
             <span class="badge <?php echo npaClass($npa); ?>"><?php echo $npa; ?>%</span>
           </td>
-          <td><?php echo adminToggleBtn((int)$p['id'], $p['is_active'], $csrf); ?></td>
-          <td>
+          <td class="ip-col ip-col-shared"><?php echo adminToggleBtn((int)$p['id'], $p['is_active'], $csrf); ?></td>
+          <td class="ip-col ip-col-shared">
             <div class="d-flex gap-1">
               <?php echo adminEditBtn('', $selfUrl . '?action=edit&id=' . $p['id']); ?>
               <?php echo adminDeleteBtn((int)$p['id'], $csrf, $p['fiscal_year'] . ' को record हटाउने?'); ?>
@@ -378,6 +393,7 @@ echo adminPageHeader(
       </tbody>
     </table>
   </div>
+  </div><!-- /.ip-profile-table-wrap -->
 </div>
 
 <?php /* ═══════════════════════════════════════════════════════
@@ -639,6 +655,11 @@ elseif (!$tableExists): ?>
 </div><!-- /container-fluid -->
 
 <style>
+/* सूची ट्याब: मुख्य vs वित्तीय स्तम्भ — एउटै तालिका, कम भीड */
+.ip-profile-table-wrap[data-ip-view="main"] .ip-col-fin,
+.ip-profile-table-wrap[data-ip-view="finance"] .ip-col-main {
+  display: none !important;
+}
 #ipTable { font-size: .84rem; }
 #ipTable thead th {
   padding: 10px 10px;
@@ -744,6 +765,36 @@ elseif (!$tableExists): ?>
             if (searchInput) { searchInput.focus(); searchInput.select(); }
         }
     });
+})();
+
+/* सूची: मुख्य / वित्तीय ट्याब — तालिकाको data-ip-view बदल्छ */
+(function () {
+    var wrap = document.getElementById('ipTableWrap');
+    var btns = document.querySelectorAll('.ip-view-tab-btn');
+    if (!wrap || !btns.length) return;
+
+    function setView(v) {
+        wrap.setAttribute('data-ip-view', v);
+        btns.forEach(function (b) {
+            var on = b.getAttribute('data-ip-view') === v;
+            b.classList.toggle('active', on);
+            b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        try { localStorage.setItem('ipListView', v); } catch (e) {}
+    }
+
+    btns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var v = btn.getAttribute('data-ip-view');
+            if (v) setView(v);
+        });
+    });
+
+    try {
+        if (localStorage.getItem('ipListView') === 'finance') {
+            setView('finance');
+        }
+    } catch (e) {}
 })();
 
 /* Global clear — called from no-results button too */
