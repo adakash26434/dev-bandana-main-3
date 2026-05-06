@@ -258,13 +258,22 @@ $cardSelectSql = "NULL AS card_no_db, NULL AS card_cvv";
 $cardJoinSql = "";
 if ($hasMemberIdCards) {
     $cardSelectSql = "c.card_no AS card_no_db, c.cvv AS card_cvv";
+    $memberIdColumnExists = false;
+    try {
+        $memberIdColumnExists = function_exists('safeColumnExists') ? safeColumnExists('members', 'member_id') : false;
+    } catch (Throwable $e) {
+        $memberIdColumnExists = false;
+    }
+    $memberIdCondition = $memberIdColumnExists
+        ? " OR member_id COLLATE utf8mb4_unicode_ci = m.member_id COLLATE utf8mb4_unicode_ci"
+        : "";
     $cardJoinSql = "LEFT JOIN member_id_cards c
          ON c.id = (
               SELECT id FROM member_id_cards
                WHERE (
                     member_id COLLATE utf8mb4_unicode_ci = CAST(m.id AS CHAR) COLLATE utf8mb4_unicode_ci
                     OR member_id COLLATE utf8mb4_unicode_ci = m.sadasyata_number COLLATE utf8mb4_unicode_ci
-                    OR member_id COLLATE utf8mb4_unicode_ci = m.member_id COLLATE utf8mb4_unicode_ci
+                    {$memberIdCondition}
                )
                ORDER BY id DESC LIMIT 1
           )";
