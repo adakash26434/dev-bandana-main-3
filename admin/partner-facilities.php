@@ -70,15 +70,21 @@ $filtered = $typeFilter
     ? array_filter($facilities, fn($f) => $f['facility_type'] === $typeFilter)
     : $facilities;
 
+$pfPart = adminPartitionRowsByIsActive($facilities);
+$facilitiesLive = $pfPart['live'];
+$facilitiesArch = $pfPart['archived'];
+
 ?>
 
 <?php echo adminPageHeader(
     'साझेदार सुविधा व्यवस्थापन',
     'fa-handshake',
     'सदस्यहरूले पाउने छुट तथा सुविधाहरू — साझेदार संस्थाको सूची',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25">
-        <i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($facilities) . ' रेकर्ड
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2">
+        <i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($facilities) . '
     </span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($facilitiesLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($facilitiesArch) . '</span>'
 ); ?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
@@ -86,9 +92,9 @@ $filtered = $typeFilter
 <!-- ── Tabs ── -->
 <ul class="nav nav-tabs admin-nav-tabs mb-0" id="pfTabs">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pf-list" id="pf-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pf-list" id="pf-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>सुविधा सूची
-            <span class="badge bg-success ms-1"><?php echo count($facilities); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($facilitiesLive); ?> / <?php echo count($facilities); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -108,7 +114,7 @@ $filtered = $typeFilter
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 flex-wrap">
                 <div class="input-group input-group-sm pf-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" class="form-control border-start-0 admin-table-search"
+                    <input type="text" class="form-control border-start-0 pf-list-search"
                            placeholder="संस्था, स्थान, विवरण खोज्नुहोस्..." autocomplete="off">
                 </div>
                 <select class="form-select form-select-sm pf-type-filter" id="pfTypeFilter">
@@ -123,8 +129,11 @@ $filtered = $typeFilter
             </div>
 
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" id="pfTable">
+                    <?php echo adminListSubtabPills('pf-sub', count($facilitiesLive), count($facilitiesArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="pf-sub-live" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 pf-data-table">
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-3" width="50">क्र.स.</th>
@@ -142,12 +151,17 @@ $filtered = $typeFilter
                             <tr><td colspan="8" class="text-center py-5 text-muted">
                                 <i class="fas fa-handshake fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै साझेदार सुविधा थपिएको छैन।<br>
-                                <button class="btn btn-sm btn-success mt-2" onclick="document.getElementById('pf-form-btn').click()">
+                                <button type="button" class="btn btn-sm btn-success mt-2" onclick="document.getElementById('pf-form-btn').click()">
                                     <i class="fas fa-plus me-1"></i>पहिलो सुविधा थप्नुहोस्
                                 </button>
                             </td></tr>
+                            <?php elseif (empty($facilitiesLive)): ?>
+                            <tr><td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय सुविधा छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php $sn = 1; foreach ($facilities as $f): ?>
+                            <?php $sn = 1; foreach ($facilitiesLive as $f): ?>
                             <tr data-type="<?php echo htmlspecialchars($f['facility_type']); ?>">
                                 <td class="ps-3 text-muted fw-semibold"><?php echo $sn++; ?></td>
                                 <td>
@@ -204,7 +218,90 @@ $filtered = $typeFilter
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="pf-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 pf-data-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3" width="50">क्र.स.</th>
+                                <th>साझेदार संस्था</th>
+                                <th>स्थान</th>
+                                <th>सुविधा प्रकार</th>
+                                <th width="100" class="text-center">छुट (%)</th>
+                                <th>विवरण</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="130" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($facilitiesArch)): ?>
+                            <tr><td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै सुविधा छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php $sn = 1; foreach ($facilitiesArch as $f): ?>
+                            <tr data-type="<?php echo htmlspecialchars($f['facility_type']); ?>">
+                                <td class="ps-3 text-muted fw-semibold"><?php echo $sn++; ?></td>
+                                <td>
+                                    <div class="fw-semibold text-dark"><?php echo htmlspecialchars($f['partner_name']); ?></div>
+                                </td>
+                                <td>
+                                    <span class="text-muted"><i class="fas fa-location-dot me-1 text-success pf-location-icon"></i>
+                                    <?php echo htmlspecialchars($f['location'] ?: '—'); ?></span>
+                                </td>
+                                <td>
+                                    <?php if ($f['facility_type']): ?>
+                                    <span class="badge pf-type-badge">
+                                        <?php echo htmlspecialchars($f['facility_type']); ?>
+                                    </span>
+                                    <?php else: echo '—'; endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <?php if ($f['discount_percent'] > 0): ?>
+                                    <span class="badge bg-warning text-dark fw-bold pf-discount-badge">
+                                        <?php echo number_format($f['discount_percent'], 0); ?>%
+                                    </span>
+                                    <?php else: echo '<span class="text-muted">—</span>'; endif; ?>
+                                </td>
+                                <td><span class="text-muted"><?php echo htmlspecialchars(mb_substr($f['description'] ?? '', 0, 60)); ?><?php echo mb_strlen($f['description'] ?? '') > 60 ? '…' : ''; ?></span></td>
+                                <td class="text-center">
+                                    <span class="badge bg-<?php echo $f['is_active'] ? 'success' : 'secondary'; ?>">
+                                        <?php echo $f['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-pf"
+                                            data-id="<?php echo $f['id']; ?>"
+                                            data-name="<?php echo htmlspecialchars($f['partner_name'], ENT_QUOTES); ?>"
+                                            data-location="<?php echo htmlspecialchars($f['location'], ENT_QUOTES); ?>"
+                                            data-type="<?php echo htmlspecialchars($f['facility_type'], ENT_QUOTES); ?>"
+                                            data-discount="<?php echo $f['discount_percent']; ?>"
+                                            data-desc="<?php echo htmlspecialchars($f['description'] ?? '', ENT_QUOTES); ?>"
+                                            data-order="<?php echo $f['display_order']; ?>"
+                                            data-active="<?php echo $f['is_active']; ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" class="svc-inline-form"
+                                          onsubmit="return confirm('के तपाईं यो सुविधा मेटाउन निश्चित हुनुहुन्छ?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $f['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -305,27 +402,37 @@ $filtered = $typeFilter
 </div><!-- /tab-content -->
 
 <script>
-/* ── Client-side search + type filter ── */
-const pfRows    = Array.from(document.querySelectorAll('#pfTable tbody tr[data-type]'));
-const searchInp = document.querySelector('.admin-table-search');
+/* ── Client-side search + type filter (खुला उप-ट्याबको पङ्क्ति मात्र) ── */
+function pfActiveRows() {
+    var pane = document.querySelector('#pf-list .admin-table-subtab-content .tab-pane.active');
+    if (!pane) return [];
+    return Array.from(pane.querySelectorAll('tbody tr[data-type]'));
+}
+const searchInp = document.querySelector('#pf-list .pf-list-search');
 const typeSelEl = document.getElementById('pfTypeFilter');
-const cntEl     = document.querySelector('.search-count');
+const cntEl     = document.querySelector('#pf-list .search-count');
 
 function pfFilter() {
-    const q   = (searchInp?.value || '').toLowerCase();
-    const typ = typeSelEl?.value || '';
+    const q   = (searchInp && searchInp.value || '').toLowerCase();
+    const typ = typeSelEl && typeSelEl.value || '';
     let vis = 0;
-    pfRows.forEach(r => {
+    let total = 0;
+    pfActiveRows().forEach(function (r) {
+        total++;
         const txt  = r.textContent.toLowerCase();
         const rtyp = r.dataset.type || '';
         const show = txt.includes(q) && (!typ || rtyp === typ);
         r.style.display = show ? '' : 'none';
         if (show) vis++;
     });
-    if (cntEl) cntEl.textContent = vis + ' रेकर्ड';
+    if (cntEl) cntEl.textContent = vis + ' / ' + total;
 }
-searchInp?.addEventListener('input', pfFilter);
-typeSelEl?.addEventListener('change', pfFilter);
+if (searchInp) searchInp.addEventListener('input', pfFilter);
+if (typeSelEl) typeSelEl.addEventListener('change', pfFilter);
+document.addEventListener('shown.bs.tab', function (e) {
+    var t = e.target && e.target.getAttribute('data-bs-target');
+    if (t === '#pf-sub-live' || t === '#pf-sub-arch') pfFilter();
+});
 pfFilter();
 
 /* ── Edit button → fill form ── */

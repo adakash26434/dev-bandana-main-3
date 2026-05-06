@@ -83,68 +83,40 @@ try {
     }
 } catch (Exception $e) { $careers = []; }
 
-$flash = getFlash();
-?>
+/** सूची उप-ट्याब: सक्रिय = is_active र म्याद नसकेको (उही strtotime तर्क जस्तो पङ्क्तिमा) */
+function career_admin_is_live(array $c): bool
+{
+    if (empty($c['is_active'])) {
+        return false;
+    }
+    $d = trim((string)($c['deadline'] ?? ''));
+    if ($d === '') {
+        return true;
+    }
+    $ts = strtotime($d);
+    if ($ts === false) {
+        return true;
+    }
+    return $ts >= time();
+}
 
-<?php echo adminPageHeader(
-    'रोजगारी व्यवस्थापन',
-    'fa-briefcase',
-    'खाली पदहरू र रोजगारी सूचनाहरू।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($careers) . ' पदहरू</span>'
-); ?>
+$careersLive = [];
+$careersArchived = [];
+foreach ($careers as $c) {
+    if (career_admin_is_live($c)) {
+        $careersLive[] = $c;
+    } else {
+        $careersArchived[] = $c;
+    }
+}
 
-<?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
-
-<ul class="nav nav-tabs admin-nav-tabs mb-0">
-    <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#career-list" id="career-list-btn">
-            <i class="fas fa-list me-2"></i>रोजगारी सूची
-            <span class="badge bg-success ms-1"><?php echo count($careers); ?></span>
-        </button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#career-form" id="career-form-btn">
-            <i class="fas fa-plus-circle me-2"></i><span id="careerFormTabLabel">नयाँ थप्नुहोस्</span>
-        </button>
-    </li>
-</ul>
-
-<div class="tab-content">
-
-    <!-- ══ TAB 1: सूची ══ -->
-    <div class="tab-pane fade show active" id="career-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-
-            <!-- खोज बक्स — client-side filter -->
-            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3" style="flex-wrap:wrap">
-                <div class="input-group input-group-sm" style="max-width:300px">
-                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" class="form-control border-start-0 admin-table-search" placeholder="नाम, विवरण अनुसार खोज्नुहोस्..." autocomplete="off">
-                </div>
-                <small class="text-muted search-count"></small>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th class="ps-3">पद / शीर्षक</th>
-                                <th class="text-center" width="110">विभाग</th>
-                                <th class="text-center" width="80">रिक्त</th>
-                                <th class="text-center" width="110">म्याद</th>
-                                <th class="text-center" width="90">आवेदन</th>
-                                <th class="text-center" width="90">स्थिति</th>
-                                <th class="text-center" width="140">कार्य</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($careers)): ?>
-                            <tr><td colspan="7" class="text-center py-5 text-muted">
-                                <i class="fas fa-briefcase fa-3x mb-2 d-block opacity-25"></i>
-                                कुनै रोजगारी छैन।
-                            </td></tr>
-                            <?php endif; ?>
-                            <?php foreach ($careers as $c): ?>
+/**
+ * @param array<int,array<string,mixed>> $list
+ */
+function careers_admin_render_rows(array $list): void
+{
+    foreach ($list as $c) {
+        ?>
                             <tr>
                                 <td class="ps-3">
                                     <div class="fw-semibold"><?php echo htmlspecialchars($c['title_np'] ?: $c['title']); ?></div>
@@ -196,9 +168,122 @@ $flash = getFlash();
                                     </form>
                                 </td>
                             </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+        <?php
+    }
+}
+
+$flash = getFlash();
+?>
+
+<?php echo adminPageHeader(
+    'रोजगारी व्यवस्थापन',
+    'fa-briefcase',
+    'खाली पदहरू र रोजगारी सूचनाहरू।',
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($careers) . ' पद</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($careersLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($careersArchived) . '</span>'
+); ?>
+
+<?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
+
+<ul class="nav nav-tabs admin-nav-tabs mb-0">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#career-list" id="career-list-btn" title="सक्रिय पद / जम्मा पद">
+            <i class="fas fa-list me-2"></i>रोजगारी सूची
+            <span class="badge bg-success ms-1"><?php echo count($careersLive); ?> / <?php echo count($careers); ?></span>
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#career-form" id="career-form-btn">
+            <i class="fas fa-plus-circle me-2"></i><span id="careerFormTabLabel">नयाँ थप्नुहोस्</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+    <!-- ══ TAB 1: सूची ══ -->
+    <div class="tab-pane fade show active" id="career-list">
+        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+
+            <!-- खोज बक्स — client-side filter -->
+            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3" style="flex-wrap:wrap">
+                <div class="input-group input-group-sm" style="max-width:300px">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 career-list-search" placeholder="नाम, विवरण अनुसार खोज्नुहोस्..." autocomplete="off" aria-label="रोजगारी खोज">
+                </div>
+                <small class="text-muted search-count"></small>
+            </div>
+            <ul class="nav nav-pills admin-inner-tabstrip flex-wrap gap-2 px-3 py-2 mx-3 mt-2 mb-2" id="career-subtabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active py-2" id="career-sub-live-btn" data-bs-toggle="tab" data-bs-target="#careers-sub-live" type="button" role="tab" aria-controls="careers-sub-live" aria-selected="true">
+                        <i class="fas fa-bolt me-1"></i>सक्रिय पद
+                        <span class="badge bg-success ms-1"><?php echo count($careersLive); ?></span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-2" id="career-sub-arch-btn" data-bs-toggle="tab" data-bs-target="#careers-sub-arch" type="button" role="tab" aria-controls="careers-sub-arch" aria-selected="false">
+                        <i class="fas fa-archive me-1"></i>अभिलेख
+                        <span class="badge bg-secondary ms-1"><?php echo count($careersArchived); ?></span>
+                    </button>
+                </li>
+            </ul>
+            <p class="px-3 pt-2 mb-0 small text-muted"><i class="fas fa-info-circle me-1"></i>अभिलेखमा म्याद सकिएका वा निष्क्रिय पदहरू देखिन्छन्।</p>
+            <div class="tab-content card-body p-0" id="career-subtabs-content">
+                <div class="tab-pane fade show active" id="careers-sub-live" role="tabpanel" aria-labelledby="career-sub-live-btn">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 career-sub-table">
+                            <thead>
+                                <tr>
+                                    <th class="ps-3">पद / शीर्षक</th>
+                                    <th class="text-center" width="110">विभाग</th>
+                                    <th class="text-center" width="80">रिक्त</th>
+                                    <th class="text-center" width="110">म्याद</th>
+                                    <th class="text-center" width="90">आवेदन</th>
+                                    <th class="text-center" width="90">स्थिति</th>
+                                    <th class="text-center" width="140">कार्य</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($careersLive) && empty($careers)): ?>
+                                <tr><td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fas fa-briefcase fa-3x mb-2 d-block opacity-25"></i>
+                                    कुनै रोजगारी छैन।
+                                </td></tr>
+                                <?php elseif (empty($careersLive)): ?>
+                                <tr><td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                    हाल सक्रिय पद छैन। अभिलेख हेर्नुहोस्।
+                                </td></tr>
+                                <?php else: careers_admin_render_rows($careersLive); endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="careers-sub-arch" role="tabpanel" aria-labelledby="career-sub-arch-btn">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 career-sub-table">
+                            <thead>
+                                <tr>
+                                    <th class="ps-3">पद / शीर्षक</th>
+                                    <th class="text-center" width="110">विभाग</th>
+                                    <th class="text-center" width="80">रिक्त</th>
+                                    <th class="text-center" width="110">म्याद</th>
+                                    <th class="text-center" width="90">आवेदन</th>
+                                    <th class="text-center" width="90">स्थिति</th>
+                                    <th class="text-center" width="140">कार्य</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($careersArchived)): ?>
+                                <tr><td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                    अभिलेखमा कुनै पद छैन।
+                                </td></tr>
+                                <?php else: careers_admin_render_rows($careersArchived); endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -353,6 +438,50 @@ document.addEventListener('DOMContentLoaded', function () {
         var el = document.getElementById(id);
         if (el) el.addEventListener('click', function() { clearForm(); switchToList(); });
     });
+
+    /* उप-ट्याब: खोज केवल खुला टेबलको पङ्क्तिमा लागू */
+    (function () {
+        var inp = document.querySelector('#career-list .career-list-search');
+        var subContent = document.getElementById('career-subtabs-content');
+        if (!inp || !subContent) return;
+        var wrap = inp.closest('.admin-search-wrap');
+        var countEl = wrap ? wrap.querySelector('.search-count') : null;
+        function activeTbody() {
+            var pane = subContent.querySelector('.tab-pane.active');
+            return pane ? pane.querySelector('tbody') : null;
+        }
+        function runCareerListSearch() {
+            var val = inp.value.toLowerCase().trim();
+            var tbody = activeTbody();
+            if (!tbody) return;
+            var rows = tbody.querySelectorAll('tr');
+            var shown = 0;
+            rows.forEach(function (row) {
+                var cells = row.querySelectorAll('td');
+                var isPlaceholder = cells.length === 1 && cells[0].getAttribute('colspan');
+                if (isPlaceholder) {
+                    row.style.display = val ? 'none' : '';
+                    return;
+                }
+                var match = !val || row.textContent.toLowerCase().includes(val);
+                row.style.display = match ? '' : 'none';
+                if (match) shown++;
+            });
+            if (countEl) {
+                var total = 0;
+                rows.forEach(function (row) {
+                    var cells = row.querySelectorAll('td');
+                    if (!(cells.length === 1 && cells[0].getAttribute('colspan'))) total++;
+                });
+                countEl.textContent = shown + ' / ' + total;
+            }
+        }
+        inp.addEventListener('input', runCareerListSearch);
+        document.querySelectorAll('#career-subtabs [data-bs-toggle="tab"]').forEach(function (btn) {
+            btn.addEventListener('shown.bs.tab', runCareerListSearch);
+        });
+        runCareerListSearch();
+    })();
 
     document.querySelectorAll('.btn-edit-career').forEach(function (btn) {
         btn.addEventListener('click', function () {

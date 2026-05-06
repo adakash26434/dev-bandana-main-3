@@ -11774,6 +11774,19 @@ input[readonly].nepali-datepicker:hover,
     padding: 1px 5px;
 }
 
+/* उप-मेनु संख्या चिन्ह — header-v2.css सँग मेल (टप बारको बिज्ञापन ब्याज जस्तै) */
+.main-nav .dropdown li > a .pfl-badge.pfl-badge--submenu {
+    background: var(--accent-color, #f39c12);
+    color: #fff;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
 /* ==============================================
    DATE SELECTION COMPONENT
    ============================================== */

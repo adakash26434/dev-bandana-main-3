@@ -81,6 +81,10 @@ try {
 
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+
+$awPart = adminPartitionRowsByIsActive($awards);
+$awardsLive = $awPart['live'];
+$awardsArch = $awPart['archived'];
 ?>
 
 <?php
@@ -89,6 +93,8 @@ echo adminPageHeader(
     'fa-trophy',
     'संस्थाले प्राप्त गरेका पुरस्कार र सम्मानहरू।',
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($awards) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($awardsLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($awardsArch) . '</span>'
 );
 if ($flash = getFlash()):
 ?>
@@ -99,9 +105,9 @@ if ($flash = getFlash()):
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#aw-list" id="aw-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#aw-list" id="aw-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>पुरस्कार सूची
-            <span class="badge bg-success ms-1"><?php echo count($awards); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($awardsLive); ?> / <?php echo count($awards); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -126,7 +132,10 @@ if ($flash = getFlash()):
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                    <?php echo adminListSubtabPills('aw-sub', count($awardsLive), count($awardsArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="aw-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
@@ -144,8 +153,13 @@ if ($flash = getFlash()):
                                 <i class="fas fa-trophy fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै पुरस्कार छैन।
                             </td></tr>
+                            <?php elseif (empty($awardsLive)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय पुरस्कार छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($awards as $a): ?>
+                            <?php foreach ($awardsLive as $a): ?>
                             <tr>
                                 <td class="ps-3">
                                     <?php if (!empty($a['image'])): ?>
@@ -188,7 +202,74 @@ if ($flash = getFlash()):
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="aw-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3" width="70">फोटो</th>
+                                <th>पुरस्कारको नाम</th>
+                                <th>प्रदान गर्ने</th>
+                                <th width="100" class="text-center">मिति</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($awardsArch)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै पुरस्कार छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($awardsArch as $a): ?>
+                            <tr>
+                                <td class="ps-3">
+                                    <?php if (!empty($a['image'])): ?>
+                                    <img src="../<?php echo htmlspecialchars($a['image']); ?>" class="news-thumb-img">
+                                    <?php else: ?>
+                                    <div class="news-thumb-placeholder"><i class="fas fa-trophy text-success fa-lg"></i></div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($a['title_np'] ?: $a['title']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($a['title']); ?></small>
+                                </td>
+                                <td><?php echo htmlspecialchars($a['awarded_by_np'] ?: $a['awarded_by']); ?></td>
+                                <td class="text-center"><small><?php echo $a['award_date'] ? date('Y', strtotime($a['award_date'])) : '—'; ?></small></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $a['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $a['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-aw"
+                                            data-id="<?php echo $a['id']; ?>"
+                                            data-title="<?php echo htmlspecialchars($a['title'], ENT_QUOTES); ?>"
+                                            data-title-np="<?php echo htmlspecialchars($a['title_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-awarded-by="<?php echo htmlspecialchars($a['awarded_by'] ?? '', ENT_QUOTES); ?>"
+                                            data-awarded-by-np="<?php echo htmlspecialchars($a['awarded_by_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-desc="<?php echo htmlspecialchars($a['description'] ?? '', ENT_QUOTES); ?>"
+                                            data-desc-np="<?php echo htmlspecialchars($a['description_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-date="<?php echo htmlspecialchars($a['award_date'] ?? '', ENT_QUOTES); ?>"
+                                            data-order="<?php echo $a['display_order']; ?>"
+                                            data-active="<?php echo $a['is_active']; ?>"
+                                            data-image="<?php echo htmlspecialchars($a['image'] ?? '', ENT_QUOTES); ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो पुरस्कार मेटाउन निश्चित हुनुहुन्छ?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $a['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             </div>
         </div>
     </div>

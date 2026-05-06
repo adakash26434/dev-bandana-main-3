@@ -63,6 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 try { $news = $db->query("SELECT * FROM news ORDER BY created_at DESC")->fetchAll(); }
 catch (Exception $e) { $news = []; }
+$newsPart = adminPartitionRowsByIsActive($news);
+$newsLive = $newsPart['live'];
+$newsArch = $newsPart['archived'];
 ?>
 
 <?php echo adminPageHeader(
@@ -70,6 +73,8 @@ catch (Exception $e) { $news = []; }
     'fa-newspaper',
     'संस्थाका समाचार र गतिविधिहरू।',
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($news) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($newsLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($newsArch) . '</span>'
 );
 ?>
 <?php echo adminHelpTip('यो पृष्ठबाट संस्थाका समाचार र गतिविधि थप्न, सम्पादन गर्न सकिन्छ।', ['समाचार थप्न: "+" बटन थिच्नुहोस्।', 'Photo: JPEG/PNG format, 1MB भन्दा कम राख्नुहोस्।', 'Publish गर्न: form भर्दा "Active" छनोट गर्नुहोस्।']); ?>
@@ -85,9 +90,9 @@ catch (Exception $e) { $news = []; }
 <!-- Tab Navigation -->
 <ul class="nav nav-tabs admin-nav-tabs mb-0" id="newsTabs">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#news-list" id="tab-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#news-list" id="tab-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>समाचार सूची
-            <span class="badge bg-success ms-1"><?php echo count($news); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($newsLive); ?> / <?php echo count($news); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -112,7 +117,6 @@ catch (Exception $e) { $news = []; }
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
                     <form method="POST">
                     <?php echo csrfField(); ?>
                     <input type="hidden" name="action" value="bulk_status">
@@ -120,10 +124,14 @@ catch (Exception $e) { $news = []; }
                         <button type="submit" name="bulk" value="active" class="btn btn-sm btn-outline-success">Bulk Active</button>
                         <button type="submit" name="bulk" value="inactive" class="btn btn-sm btn-outline-secondary">Bulk Inactive</button>
                     </div>
+                    <?php echo adminListSubtabPills('news-sub', count($newsLive), count($newsArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="news-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('.news-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#news-sub-live .news-select').forEach(c=>c.checked=this.checked)"></th>
                                 <th class="ps-3" width="70">छवि</th>
                                 <th>शीर्षक</th>
                                 <th width="120">मिति</th>
@@ -137,8 +145,13 @@ catch (Exception $e) { $news = []; }
                                 <i class="fas fa-newspaper fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै समाचार छैन। माथिको "नयाँ थप्नुहोस्" बटन थिच्नुहोस्।
                             </td></tr>
+                            <?php elseif (empty($newsLive)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय समाचार छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($news as $n): ?>
+                            <?php foreach ($newsLive as $n): ?>
                             <tr>
                                 <td class="text-center"><input type="checkbox" class="news-select" name="selected_ids[]" value="<?php echo (int)$n['id']; ?>"></td>
                                 <td class="ps-3">
@@ -181,8 +194,75 @@ catch (Exception $e) { $news = []; }
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="news-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#news-sub-arch .news-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th class="ps-3" width="70">छवि</th>
+                                <th>शीर्षक</th>
+                                <th width="120">मिति</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($newsArch)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै समाचार छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($newsArch as $n): ?>
+                            <tr>
+                                <td class="text-center"><input type="checkbox" class="news-select" name="selected_ids[]" value="<?php echo (int)$n['id']; ?>"></td>
+                                <td class="ps-3">
+                                    <?php if ($n['image']): ?>
+                                    <img src="../<?php echo htmlspecialchars($n['image']); ?>" class="news-thumb-img">
+                                    <?php else: ?>
+                                    <div class="news-thumb-placeholder"><i class="fas fa-newspaper text-success"></i></div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($n['title_np'] ?: $n['title']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars(mb_substr($n['content_np'] ?: $n['content'] ?: '', 0, 60)); ?>…</small>
+                                </td>
+                                <td><small class="text-muted"><?php echo isset($n['created_at']) ? date('Y-m-d', strtotime($n['created_at'])) : ''; ?></small></td>
+                                <td class="text-center">
+                                    <span class="badge bg-<?php echo $n['is_active'] ? 'success' : 'secondary'; ?>">
+                                        <?php echo $n['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-news"
+                                            data-id="<?php echo $n['id']; ?>"
+                                            data-title="<?php echo htmlspecialchars($n['title'], ENT_QUOTES); ?>"
+                                            data-title-np="<?php echo htmlspecialchars($n['title_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-content="<?php echo htmlspecialchars($n['content'] ?? '', ENT_QUOTES); ?>"
+                                            data-content-np="<?php echo htmlspecialchars($n['content_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-image="<?php echo htmlspecialchars($n['image'] ?? '', ENT_QUOTES); ?>"
+                                            data-active="<?php echo $n['is_active']; ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो समाचार मेटाउन निश्चित हुनुहुन्छ?')">
+    <?php echo csrfField(); ?>
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $n['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
                     </form>
-                </div>
             </div>
         </div>
     </div>

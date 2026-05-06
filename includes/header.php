@@ -113,6 +113,9 @@ try {
     $hasRecentElectionMilestone = false;
 }
 
+require_once __DIR__ . '/nav-menu-badges.php';
+$navMenuBadges = nav_get_public_submenu_badges($db);
+
 /* ── Services dropdown links (admin/services.php बाट) ── */
 $navServiceLinks = [];
 try {
@@ -251,7 +254,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=3">
     <?php @require_once __DIR__ . '/../assets/css/_color-vars.php'; ?>
     <!-- Header v2 — Pokhara Finance Style (Testing) -->
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/header-v2.css?v=23">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/header-v2.css?v=24">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/v9-mobile-fix.css?v=9.8">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/site-banner-logo.css?v=3">
 
@@ -541,13 +544,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                     <a href="<?php echo SITE_URL; ?>career.php">
                         <i class="fas fa-briefcase"></i>
                         <?php echo isEnglish() ? 'Career' : 'बिज्ञापन'; ?>
-                        <?php
-                        try {
-                            $db = getDB();
-                            $cCount = $db->query("SELECT COUNT(*) FROM careers WHERE is_active=1 AND deadline>=CURDATE()")->fetchColumn();
-                            if ($cCount > 0) echo '<span class="pfl-badge">' . $cCount . '</span>';
-                        } catch (Exception $e) {}
-                        ?>
+                        <?php echo nav_submenu_count_badge_html($navMenuBadges['career_open']); ?>
                     </a>
                 </li>
                 <li>
@@ -847,7 +844,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                         <a href="javascript:void(0);"><?php echo isEnglish() ? 'More' : 'थप'; ?> <i class="fas fa-chevron-down"></i></a>
                         <ul class="dropdown">
                             <li><a href="<?php echo SITE_URL; ?>news.php"><i class="fas fa-newspaper"></i> <?php echo isEnglish() ? 'News & Activities' : 'समाचार'; ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>career.php"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Career' : 'बिज्ञापन'; ?></a></li>
+                            <li><a href="<?php echo SITE_URL; ?>career.php"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Career' : 'बिज्ञापन'; ?><?php echo nav_submenu_count_badge_html($navMenuBadges['career_open']); ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>reports.php"><i class="fas fa-chart-line"></i> <?php echo isEnglish() ? 'Reports & Publications' : 'प्रतिवेदन'; ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>downloads.php"><i class="fas fa-download"></i> <?php echo isEnglish() ? 'Downloads' : 'डाउनलोड'; ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>service-centers.php"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Branches' : 'शाखाहरू'; ?></a></li>
@@ -1108,17 +1105,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                                 <a href="javascript:void(0);"><?php echo isEnglish() ? 'More' : 'थप'; ?> <i class="fas fa-chevron-down"></i></a>
                                 <ul class="dropdown">
                                     <li><a href="<?php echo SITE_URL; ?>news.php"><i class="fas fa-newspaper"></i> <?php echo isEnglish() ? 'News & Activities' : 'समाचार'; ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>career.php"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Career' : 'बिज्ञापन'; ?><?php
-                                        // Check if there are recent careers (within 30 days) - safe query
-                                        try {
-                                            $db = getDB();
-                                            $careerCheck = $db->query("SELECT COUNT(*) as cnt FROM careers WHERE is_active = 1 AND deadline >= CURDATE() AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-                                            if ($careerCheck) {
-                                                $newCareers = $careerCheck->fetch()['cnt'] ?? 0;
-                                                if ($newCareers > 0) echo '<span class="nav-new-badge">' . (isEnglish() ? 'New' : 'नयाँ') . '</span>';
-                                            }
-                                        } catch (Exception $e) { /* Table may not exist */ }
-                                    ?></a></li>
+                                    <li><a href="<?php echo SITE_URL; ?>career.php"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Career' : 'बिज्ञापन'; ?><?php echo nav_submenu_count_badge_html($navMenuBadges['career_open']); ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>reports.php"><i class="fas fa-chart-line"></i> <?php echo isEnglish() ? 'Reports & Publications' : 'प्रतिवेदन तथा प्रकाशनहरू'; ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>downloads.php"><i class="fas fa-download"></i> <?php echo isEnglish() ? 'Downloads' : 'डाउनलोड'; ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>service-centers.php"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Branches' : 'शाखाहरू'; ?></a></li>

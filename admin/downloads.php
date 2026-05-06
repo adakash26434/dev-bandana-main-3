@@ -67,6 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 try { $downloads = $db->query("SELECT * FROM downloads ORDER BY created_at DESC LIMIT 500")->fetchAll(); }
 catch (Exception $e) { $downloads = []; }
 
+$dlPart = adminPartitionRowsByIsActive($downloads);
+$downloadsLive = $dlPart['live'];
+$downloadsArch = $dlPart['archived'];
+
 $catIcons = ['forms'=>'fas fa-file-alt','policies'=>'fas fa-shield-alt','circulars'=>'fas fa-bullhorn','general'=>'fas fa-file'];
 $flash = getFlash();
 ?>
@@ -75,7 +79,9 @@ $flash = getFlash();
     'डाउनलोड व्यवस्थापन',
     'fa-file-arrow-down',
     'Forms, PDFs, र अन्य डाउनलोड सामग्रीहरू।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($downloads) . ' फाइलहरू</span>'
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($downloads) . ' फाइल</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($downloadsLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($downloadsArch) . '</span>'
 );
 ?>
 <?php echo adminHelpTip('यो पृष्ठबाट डाउनलोड गर्न मिल्ने फाइलहरू (forms, reports, etc.) थप्न र हटाउन सकिन्छ।', ['PDF/Word file थप्न: "+" बटन थिच्नुहोस्।', 'File size: 5MB भन्दा कम राख्नुहोस्।', 'Category छनोट: सही category मा राख्नुहोस् ताकि visitors सजिलै भेट्टाउन सकून्।']); ?>
@@ -84,9 +90,9 @@ $flash = getFlash();
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dl-list" id="dl-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dl-list" id="dl-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>डाउनलोड सूची
-            <span class="badge bg-success ms-1"><?php echo count($downloads); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($downloadsLive); ?> / <?php echo count($downloads); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -111,7 +117,6 @@ $flash = getFlash();
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
                     <form method="POST">
                     <?php echo csrfField(); ?>
                     <div class="px-3 py-2 border-bottom bg-light d-flex justify-content-end gap-2">
@@ -119,10 +124,14 @@ $flash = getFlash();
                         <button type="submit" name="bulk" value="active" class="btn btn-sm btn-outline-success">Bulk Active</button>
                         <button type="submit" name="bulk" value="inactive" class="btn btn-sm btn-outline-secondary">Bulk Inactive</button>
                     </div>
+                    <?php echo adminListSubtabPills('dl-sub', count($downloadsLive), count($downloadsArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="dl-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('.dl-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#dl-sub-live .dl-select').forEach(c=>c.checked=this.checked)"></th>
                                 <th class="ps-3">शीर्षक</th>
                                 <th width="120" class="text-center">वर्ग</th>
                                 <th width="90" class="text-center">फाइल</th>
@@ -132,12 +141,17 @@ $flash = getFlash();
                         </thead>
                         <tbody>
                             <?php if (empty($downloads)): ?>
-                            <tr><td colspan="5" class="text-center py-5 text-muted">
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
                                 <i class="fas fa-download fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै डाउनलोड छैन।
                             </td></tr>
+                            <?php elseif (empty($downloadsLive)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय फाइल छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($downloads as $d): ?>
+                            <?php foreach ($downloadsLive as $d): ?>
                             <tr>
                                 <td class="text-center"><input type="checkbox" class="dl-select" name="selected_ids[]" value="<?php echo (int)$d['id']; ?>"></td>
                                 <td class="ps-3">
@@ -180,8 +194,75 @@ $flash = getFlash();
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="dl-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#dl-sub-arch .dl-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th class="ps-3">शीर्षक</th>
+                                <th width="120" class="text-center">वर्ग</th>
+                                <th width="90" class="text-center">फाइल</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($downloadsArch)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै फाइल छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($downloadsArch as $d): ?>
+                            <tr>
+                                <td class="text-center"><input type="checkbox" class="dl-select" name="selected_ids[]" value="<?php echo (int)$d['id']; ?>"></td>
+                                <td class="ps-3">
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($d['title_np'] ?: $d['title']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($d['title']); ?></small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-info text-white">
+                                        <i class="<?php echo $catIcons[$d['category']] ?? 'fas fa-file'; ?> me-1"></i>
+                                        <?php echo ucfirst($d['category']); ?>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <?php if (!empty($d['file_path'])): ?>
+                                    <a href="../<?php echo htmlspecialchars($d['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="हेर्नुहोस्">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <?php else: ?><span class="text-muted">—</span><?php endif; ?>
+                                </td>
+                                <td class="text-center"><span class="badge bg-<?php echo $d['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $d['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-dl"
+                                            data-id="<?php echo $d['id']; ?>"
+                                            data-title="<?php echo htmlspecialchars($d['title'], ENT_QUOTES); ?>"
+                                            data-title-np="<?php echo htmlspecialchars($d['title_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-category="<?php echo htmlspecialchars($d['category'], ENT_QUOTES); ?>"
+                                            data-file="<?php echo htmlspecialchars($d['file_path'] ?? '', ENT_QUOTES); ?>"
+                                            data-active="<?php echo $d['is_active']; ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो फाइल मेटाउन निश्चित हुनुहुन्छ?')">
+    <?php echo csrfField(); ?>
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $d['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
                     </form>
-                </div>
             </div>
         </div>
     </div>

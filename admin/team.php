@@ -155,6 +155,10 @@ if ($teamListSection === 'governance') {
     $team = $stTeam->fetchAll();
 }
 
+$tmPart = adminPartitionRowsByIsActive($team);
+$teamLive = $tmPart['live'];
+$teamArch = $tmPart['archived'];
+
 /* फारम dropdown: यो पृष्ठ अनुसार मात्र वर्ग देखाउने */
 $catsForm = [];
 if ($teamListSection === 'governance') {
@@ -180,7 +184,9 @@ $teamHeaderIcon = $teamListSection === 'karmachari' ? 'fa-user-tie' : 'fa-buildi
 $teamHeaderSub = $teamListSection === 'karmachari'
     ? 'व्यवस्थापन र कर्मचारी मात्र यहाँ सूचीबद्ध। सञ्चालक समिति वा अन्य समिति: मेनु «सञ्चालक / समिति»। RTI/गुनासो अधिकारी स्विच यहीँ वा «तोकाइ» पृष्ठ।'
     : 'सञ्चालक समिति (board) र समिति/उपसमिति (समिति प्रकार) मात्र। कर्मचारी/व्यवस्थापन: मेनु «कर्मचारी / व्यवस्थापन»। RTI/गुनासो अधिकारी यहीँका स्विच वा «तोकाइ» पृष्ठ।';
-$teamHeaderActions = '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($team) . ' सदस्यहरू</span>';
+$teamHeaderActions = '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($team) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($teamLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 me-2"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($teamArch) . '</span>';
 if ($teamListSection === 'karmachari') {
     $teamHeaderActions .= '<a href="team.php" class="btn btn-sm btn-outline-secondary ms-1 mb-1"><i class="fas fa-building-columns me-1"></i>सञ्चालक / समिति</a>';
 } else {
@@ -195,9 +201,9 @@ echo adminPageHeader($teamHeaderTitle, $teamHeaderIcon, $teamHeaderSub, $teamHea
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0" data-team-section="<?php echo htmlspecialchars($teamListSection, ENT_QUOTES, 'UTF-8'); ?>">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#team-list" id="team-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#team-list" id="team-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>सदस्य सूची
-            <span class="badge bg-success ms-1"><?php echo count($team); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($teamLive); ?> / <?php echo count($team); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -222,7 +228,10 @@ echo adminPageHeader($teamHeaderTitle, $teamHeaderIcon, $teamHeaderSub, $teamHea
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                    <?php echo adminListSubtabPills('team-sub', count($teamLive), count($teamArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="team-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
@@ -242,8 +251,13 @@ echo adminPageHeader($teamHeaderTitle, $teamHeaderIcon, $teamHeaderSub, $teamHea
                                 <i class="fas fa-users fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै सदस्य छैन।
                             </td></tr>
+                            <?php elseif (empty($teamLive)): ?>
+                            <tr><td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय सदस्य छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($team as $m): ?>
+                            <?php foreach ($teamLive as $m): ?>
                             <tr>
                                 <td class="ps-3">
                                     <?php if (!empty($m['photo'])): ?>
@@ -301,7 +315,91 @@ echo adminPageHeader($teamHeaderTitle, $teamHeaderIcon, $teamHeaderSub, $teamHea
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="team-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3" width="70">फोटो</th>
+                                <th>नाम</th>
+                                <th>पद</th>
+                                <th width="110">सम्पर्क</th>
+                                <th width="110" class="text-center">वर्ग</th>
+                                <th width="120" class="text-center">विशेष भूमिका</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($teamArch)): ?>
+                            <tr><td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै सदस्य छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($teamArch as $m): ?>
+                            <tr>
+                                <td class="ps-3">
+                                    <?php if (!empty($m['photo'])): ?>
+                                    <img src="<?php echo SITE_URL . htmlspecialchars($m['photo']); ?>" class="tm-avatar-photo">
+                                    <?php else: ?>
+                                    <div class="tm-avatar-fallback"><i class="fas fa-user text-success"></i></div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($m['name']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($m['name_en'] ?? ''); ?></small>
+                                </td>
+                                <td>
+                                    <div><?php echo htmlspecialchars($m['position_np'] ?: $m['position']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($m['position_en'] ?? ''); ?></small>
+                                </td>
+                                <td>
+                                    <?php if (!empty($m['phone'])): ?><small><i class="fas fa-phone me-1 text-success"></i><?php echo htmlspecialchars($m['phone']); ?></small><br><?php endif; ?>
+                                    <?php if (!empty($m['email'])): ?><small><i class="fas fa-envelope me-1 text-success"></i><?php echo htmlspecialchars($m['email']); ?></small><?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge tm-cat-badge"
+                                          data-badge-color="<?php echo htmlspecialchars($catColors[$m['category']] ?? '#6c757d', ENT_QUOTES); ?>">
+                                        <?php echo $cats[$m['category']] ?? $m['category']; ?>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <?php if ($m['is_information_officer']): ?><span class="badge bg-info-subtle text-info border mb-1 d-block">सूचना अधिकारी</span><?php endif; ?>
+                                    <?php if ($m['is_grievance_officer']): ?><span class="badge bg-danger-subtle text-danger border d-block">गुनासो अधिकारी</span><?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <form method="POST" class="svc-inline-form">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="toggle">
+                                        <input type="hidden" name="id" value="<?php echo $m['id']; ?>">
+                                        <button class="badge bg-<?php echo $m['is_active'] ? 'success' : 'secondary'; ?> border-0 tm-status-toggle-btn">
+                                            <?php echo $m['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-member"
+                                            data-member='<?php echo htmlspecialchars(json_encode($m, JSON_UNESCAPED_UNICODE), ENT_QUOTES); ?>'
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो सदस्य मेटाउन निश्चित हुनुहुन्छ?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $m['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -332,7 +430,12 @@ echo adminPageHeader($teamHeaderTitle, $teamHeaderIcon, $teamHeaderSub, $teamHea
                             <label class="form-label fw-semibold text-success">Name (English)</label>
                             <input type="text" name="name_en" id="tmf_name_en" class="form-control admin-fancy-input" placeholder="Full name in English">
                         </div>
-                        <?php ensureDesignationsTable(getDB()); $__teamDesigs = fetchDesignations(getDB(), ['staff','committee']); ?>
+                        <?php
+                        ensureDesignationsTable(getDB());
+                        /* पद मास्टर: कर्मचारी पृष्ठ = staff मात्र; सञ्चालक/समिति = committee मात्र */
+                        $__desigCats = ($teamListSection === 'karmachari') ? ['staff'] : ['committee'];
+                        $__teamDesigs = fetchDesignations(getDB(), $__desigCats);
+                        ?>
                         <div class="col-md-12">
                             <label class="form-label fw-semibold text-success">पद (मास्टरबाट)</label>
                             <select name="__pos_pick" id="tmf_pos_pick" class="form-select admin-fancy-input" onchange="(function(sel){var o=sel.options[sel.selectedIndex];document.getElementById('tmf_pos_np').value=o.dataset.np||'';document.getElementById('tmf_pos_en').value=o.dataset.en||'';document.getElementById('tmf_pos').value=o.dataset.np||'';})(this)">
@@ -343,7 +446,13 @@ echo adminPageHeader($teamHeaderTitle, $teamHeaderIcon, $teamHeaderSub, $teamHea
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <div class="small text-muted mt-1">नयाँ पद <a href="designations.php" target="_blank">पद मास्टर</a> मा थप्नुहोस्।</div>
+                            <div class="small text-muted mt-1">
+                                <?php if ($teamListSection === 'karmachari'): ?>
+                                    यहाँ <strong>कर्मचारी</strong> श्रेणीका पद मात्र देखिन्छन्। नयाँ पद <a href="designations.php" target="_blank">पद मास्टर</a> मा <em>श्रेणी: कर्मचारी</em> राखेर थप्नुहोस्।
+                                <?php else: ?>
+                                    यहाँ <strong>समिति</strong> श्रेणीका पद मात्र देखिन्छन्। नयाँ पद <a href="designations.php" target="_blank">पद मास्टर</a> मा <em>श्रेणी: समिति</em> राखेर थप्नुहोस्।
+                                <?php endif; ?>
+                            </div>
                         </div>
                         <input type="hidden" name="position_np" id="tmf_pos_np">
                         <input type="hidden" name="position_en" id="tmf_pos_en">

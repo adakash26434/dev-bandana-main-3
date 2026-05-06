@@ -53,6 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 try { $centers = $db->query("SELECT * FROM service_centers ORDER BY display_order, name")->fetchAll(); }
 catch (Exception $e) { $centers = []; }
 
+$scPart = adminPartitionRowsByIsActive($centers);
+$centersLive = $scPart['live'];
+$centersArch = $scPart['archived'];
+
 $provinces = ['1'=>'प्रदेश नं. १','2'=>'मधेश','3'=>'बागमती','4'=>'गण्डकी','5'=>'लुम्बिनी','6'=>'कर्णाली','7'=>'सुदूरपश्चिम'];
 ?>
 
@@ -60,7 +64,9 @@ $provinces = ['1'=>'प्रदेश नं. १','2'=>'मधेश','3'=>'�
     'शाखा व्यवस्थापन',
     'fa-map-marker-alt',
     'संस्थाका कार्यालय तथा शाखाहरू।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($centers) . ' शाखाहरू</span>'
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($centers) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($centersLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($centersArch) . '</span>'
 ); ?>
 
 <?php $flash = getFlash(); if ($flash): ?>
@@ -73,9 +79,9 @@ $provinces = ['1'=>'प्रदेश नं. १','2'=>'मधेश','3'=>'�
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sc-list" id="sc-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sc-list" id="sc-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>शाखा सूची
-            <span class="badge bg-success ms-1"><?php echo count($centers); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($centersLive); ?> / <?php echo count($centers); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -100,7 +106,10 @@ $provinces = ['1'=>'प्रदेश नं. १','2'=>'मधेश','3'=>'�
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                    <?php echo adminListSubtabPills('sc-sub', count($centersLive), count($centersArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="sc-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
@@ -118,8 +127,13 @@ $provinces = ['1'=>'प्रदेश नं. १','2'=>'मधेश','3'=>'�
                                 <i class="fas fa-map-marker-alt fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै शाखा छैन। माथिको "नयाँ थप्नुहोस्" बटन थिच्नुहोस्।
                             </td></tr>
+                            <?php elseif (empty($centersLive)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय शाखा छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($centers as $c): ?>
+                            <?php foreach ($centersLive as $c): ?>
                             <tr>
                                 <td class="ps-3">
                                     <div class="fw-semibold">
@@ -160,7 +174,72 @@ $provinces = ['1'=>'प्रदेश नं. १','2'=>'मधेश','3'=>'�
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="sc-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">शाखाको नाम</th>
+                                <th>ठेगाना</th>
+                                <th width="130">फोन</th>
+                                <th width="110" class="text-center">प्रदेश</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($centersArch)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै शाखा छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($centersArch as $c): ?>
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-semibold">
+                                        <?php echo htmlspecialchars($c['name_np'] ?: $c['name']); ?>
+                                        <?php if ($c['is_main_branch']): ?><span class="badge bg-primary ms-1">मुख्य</span><?php endif; ?>
+                                    </div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($c['name']); ?></small>
+                                </td>
+                                <td><?php echo htmlspecialchars($c['address']); ?></td>
+                                <td><?php echo htmlspecialchars($c['phone']); ?></td>
+                                <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $provinces[$c['province']] ?? $c['province']; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $c['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $c['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-sc"
+                                            data-id="<?php echo $c['id']; ?>"
+                                            data-name="<?php echo htmlspecialchars($c['name'], ENT_QUOTES); ?>"
+                                            data-name-np="<?php echo htmlspecialchars($c['name_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-address="<?php echo htmlspecialchars($c['address'] ?? '', ENT_QUOTES); ?>"
+                                            data-phone="<?php echo htmlspecialchars($c['phone'] ?? '', ENT_QUOTES); ?>"
+                                            data-email="<?php echo htmlspecialchars($c['email'] ?? '', ENT_QUOTES); ?>"
+                                            data-province="<?php echo htmlspecialchars($c['province'] ?? '', ENT_QUOTES); ?>"
+                                            data-hours="<?php echo htmlspecialchars($c['opening_hours'] ?? '', ENT_QUOTES); ?>"
+                                            data-map="<?php echo htmlspecialchars($c['map_url'] ?? '', ENT_QUOTES); ?>"
+                                            data-order="<?php echo $c['display_order']; ?>"
+                                            data-main="<?php echo $c['is_main_branch']; ?>"
+                                            data-active="<?php echo $c['is_active']; ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो शाखा मेटाउन निश्चित हुनुहुन्छ?')">
+    <?php echo csrfField(); ?>
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $c['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             </div>
         </div>
     </div>

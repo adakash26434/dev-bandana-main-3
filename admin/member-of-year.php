@@ -112,6 +112,10 @@ $pageTitle   = 'वर्षको सदस्य Spotlight';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 
+$motPart = adminPartitionRowsByIsActive($records);
+$recordsLive = $motPart['live'];
+$recordsArch = $motPart['archived'];
+
 $flash = getFlash();
 ?>
 
@@ -119,7 +123,9 @@ $flash = getFlash();
     'Member of the Year Spotlight',
     'fa-star',
     'वर्षको उत्कृष्ट सदस्य — Spotlight Records।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($records) . ' Spotlights</span>'
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($records) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-eye me-1"></i>देखिने: ' . count($recordsLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>लुकेका: ' . count($recordsArch) . '</span>'
 ); ?>
 
 <?php if (!empty($errors)): ?>
@@ -134,9 +140,9 @@ $flash = getFlash();
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#mot-list" id="mot-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#mot-list" id="mot-list-btn" title="देखिने / जम्मा">
             <i class="fas fa-list me-2"></i>Spotlight Records
-            <span class="badge bg-success ms-1"><?php echo count($records); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($recordsLive); ?> / <?php echo count($records); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -161,7 +167,10 @@ $flash = getFlash();
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                    <?php echo adminListSubtabPills('mot-sub', count($recordsLive), count($recordsArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="mot-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
@@ -178,8 +187,13 @@ $flash = getFlash();
                                 <i class="fas fa-trophy fa-3x mb-2 d-block" style="opacity:.15;color:#f59e0b;"></i>
                                 अझै कुनै spotlight छैन।
                             </td></tr>
+                            <?php elseif (empty($recordsLive)): ?>
+                            <tr><td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                Homepage मा देखिने record छैन। लुकेका हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($records as $r):
+                            <?php foreach ($recordsLive as $r):
                                 $isCurrentYear = ($r['spotlight_year'] === $defaultYear);
                                 $hasPhoto = $r['photo'] && file_exists(ROOT_PATH . $r['photo']);
                             ?>
@@ -231,7 +245,82 @@ $flash = getFlash();
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="mot-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3" width="65">Photo</th>
+                                <th>सदस्यको नाम</th>
+                                <th width="90" class="text-center">वर्ष</th>
+                                <th width="130" class="text-center">Homepage</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($recordsArch)): ?>
+                            <tr><td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                लुकेका record छैनन्।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($recordsArch as $r):
+                                $isCurrentYear = ($r['spotlight_year'] === $defaultYear);
+                                $hasPhoto = $r['photo'] && file_exists(ROOT_PATH . $r['photo']);
+                            ?>
+                            <tr class="<?php echo $isCurrentYear ? 'table-warning' : ''; ?>">
+                                <td class="ps-3">
+                                    <?php if ($hasPhoto): ?>
+                                    <img src="<?php echo SITE_URL . htmlspecialchars($r['photo']); ?>" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #f59e0b;">
+                                    <?php else: ?>
+                                    <div style="width:48px;height:48px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user text-warning"></i></div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($r['member_name']); ?></div>
+                                    <?php if ($r['member_name_en']): ?><small class="text-muted"><?php echo htmlspecialchars($r['member_name_en']); ?></small><?php endif; ?>
+                                    <?php if ($r['achievement']): ?><div><span class="badge bg-success bg-opacity-10 text-success"><?php echo htmlspecialchars(mb_substr($r['achievement'], 0, 40)); ?></span></div><?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge <?php echo $isCurrentYear ? 'bg-warning text-dark' : 'bg-secondary'; ?> fs-6 px-3">
+                                        <?php echo htmlspecialchars($r['spotlight_year']); ?>
+                                    </span>
+                                    <?php if ($isCurrentYear): ?><div><small class="text-warning fw-semibold"><i class="fas fa-star me-1"></i>यो वर्ष</small></div><?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <form method="POST" style="display:inline">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="toggle">
+                                        <input type="hidden" name="id" value="<?php echo $r['id']; ?>">
+                                        <input type="hidden" name="is_active" value="<?php echo $r['is_active'] ? '0' : '1'; ?>">
+                                        <button class="btn btn-sm <?php echo $r['is_active'] ? 'btn-success' : 'btn-outline-secondary'; ?>">
+                                            <i class="fas fa-<?php echo $r['is_active'] ? 'eye' : 'eye-slash'; ?> me-1"></i>
+                                            <?php echo $r['is_active'] ? 'Active' : 'Hidden'; ?>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-mot"
+                                            data-member='<?php echo htmlspecialchars(json_encode($r, JSON_UNESCAPED_UNICODE), ENT_QUOTES); ?>'
+                                            title="सम्पादन">
+                                        <i class="fas fa-pen"></i> सम्पादन
+                                    </button>
+                                    <form method="POST" style="display:inline" onsubmit="return confirm('यो record हटाउने? Photo पनि delete हुन्छ।')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $r['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             </div>
         </div>
     </div>

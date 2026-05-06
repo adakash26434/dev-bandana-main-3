@@ -73,6 +73,10 @@ try {
 
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+
+$faqPart = adminPartitionRowsByIsActive($faqs);
+$faqsLive = $faqPart['live'];
+$faqsArch = $faqPart['archived'];
 ?>
 
 <?php echo adminPageHeader(
@@ -80,6 +84,8 @@ require_once 'includes/admin-ui.php';
     'fa-circle-question',
     'सदस्यहरूको सामान्य प्रश्न र उत्तरहरू।',
     '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($faqs) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($faqsLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($faqsArch) . '</span>'
 );
 ?>
 <?php echo adminHelpTip('यो पृष्ठबाट Frequently Asked Questions (FAQ) थप्न र अपडेट गर्न सकिन्छ।', ['FAQ थप्न: "+" बटन थिच्नुहोस्।', 'नेपाली र अंग्रेजी दुवैमा लेख्नुहोस् ताकि सबैलाई बुझिओस्।', 'Display Order: सानो number = पहिला देखिन्छ।']); ?>
@@ -88,9 +94,9 @@ require_once 'includes/admin-ui.php';
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#faq-list" id="faq-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#faq-list" id="faq-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>प्रश्नोत्तर सूची
-            <span class="badge bg-success ms-1"><?php echo count($faqs); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($faqsLive); ?> / <?php echo count($faqs); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -115,7 +121,6 @@ require_once 'includes/admin-ui.php';
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
                     <form method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                         <input type="hidden" name="action" value="bulk_status">
@@ -123,10 +128,14 @@ require_once 'includes/admin-ui.php';
                             <button type="submit" name="bulk" value="active" class="btn btn-sm btn-outline-success">Bulk Active</button>
                             <button type="submit" name="bulk" value="inactive" class="btn btn-sm btn-outline-secondary">Bulk Inactive</button>
                         </div>
+                    <?php echo adminListSubtabPills('faq-sub', count($faqsLive), count($faqsArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="faq-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('.faq-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#faq-sub-live .faq-select').forEach(c=>c.checked=this.checked)"></th>
                                 <th class="ps-3" width="40">#</th>
                                 <th>प्रश्न</th>
                                 <th width="110" class="text-center">वर्ग</th>
@@ -136,12 +145,17 @@ require_once 'includes/admin-ui.php';
                         </thead>
                         <tbody>
                             <?php if (empty($faqs)): ?>
-                            <tr><td colspan="5" class="text-center py-5 text-muted">
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
                                 <i class="fas fa-question-circle fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै प्रश्नोत्तर छैन।
                             </td></tr>
+                            <?php elseif (empty($faqsLive)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय प्रश्नोत्तर छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($faqs as $i => $f): ?>
+                            <?php foreach ($faqsLive as $i => $f): ?>
                             <tr>
                                 <td class="text-center"><input type="checkbox" class="faq-select" name="selected_ids[]" value="<?php echo (int)$f['id']; ?>"></td>
                                 <td class="ps-3 text-muted"><?php echo $i+1; ?></td>
@@ -175,8 +189,66 @@ require_once 'includes/admin-ui.php';
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="faq-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#faq-sub-arch .faq-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th class="ps-3" width="40">#</th>
+                                <th>प्रश्न</th>
+                                <th width="110" class="text-center">वर्ग</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($faqsArch)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै प्रश्नोत्तर छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($faqsArch as $i => $f): ?>
+                            <tr>
+                                <td class="text-center"><input type="checkbox" class="faq-select" name="selected_ids[]" value="<?php echo (int)$f['id']; ?>"></td>
+                                <td class="ps-3 text-muted"><?php echo $i+1; ?></td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($f['question_np'] ?: $f['question']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars(mb_substr($f['answer_np'] ?: $f['answer'], 0, 60)); ?>…</small>
+                                </td>
+                                <td class="text-center"><span class="badge bg-info text-white"><?php echo htmlspecialchars($f['category']); ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $f['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $f['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-faq"
+                                            data-id="<?php echo $f['id']; ?>"
+                                            data-question="<?php echo htmlspecialchars($f['question_np'] ?: $f['question'], ENT_QUOTES); ?>"
+                                            data-answer="<?php echo htmlspecialchars($f['answer_np'] ?: $f['answer'], ENT_QUOTES); ?>"
+                                            data-question-en="<?php echo htmlspecialchars($f['question'], ENT_QUOTES); ?>"
+                                            data-answer-en="<?php echo htmlspecialchars($f['answer'], ENT_QUOTES); ?>"
+                                            data-category="<?php echo htmlspecialchars($f['category'], ENT_QUOTES); ?>"
+                                            data-order="<?php echo $f['display_order']; ?>"
+                                            data-active="<?php echo $f['is_active']; ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो मेटाउन निश्चित हुनुहुन्छ?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $f['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
                     </form>
-                </div>
             </div>
         </div>
     </div>

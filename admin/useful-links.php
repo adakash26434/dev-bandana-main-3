@@ -62,22 +62,28 @@ try {
 
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+
+$lnkPart = adminPartitionRowsByIsActive($links);
+$linksLive = $lnkPart['live'];
+$linksArch = $lnkPart['archived'];
 ?>
 
 <?php echo adminPageHeader(
     'उपयोगी लिंकहरू',
     'fa-link',
     'महत्त्वपूर्ण बाह्य लिंकहरू — NRB, सरकारी निकाय, अन्य।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($links) . ' लिंकहरू</span>'
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($links) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($linksLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($linksArch) . '</span>'
 ); ?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#link-list" id="link-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#link-list" id="link-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>लिंक सूची
-            <span class="badge bg-success ms-1"><?php echo count($links); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($linksLive); ?> / <?php echo count($links); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -102,7 +108,10 @@ require_once 'includes/admin-ui.php';
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                    <?php echo adminListSubtabPills('link-sub', count($linksLive), count($linksArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="link-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
@@ -121,8 +130,13 @@ require_once 'includes/admin-ui.php';
                                 <i class="fas fa-link fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै लिंक छैन।
                             </td></tr>
+                            <?php elseif (empty($linksLive)): ?>
+                            <tr><td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय लिंक छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($links as $l): ?>
+                            <?php foreach ($linksLive as $l): ?>
                             <tr>
                                 <td class="ps-3"><i class="<?php echo htmlspecialchars($l['icon']); ?> fa-lg svc-icon-mark"></i></td>
                                 <td>
@@ -158,7 +172,68 @@ require_once 'includes/admin-ui.php';
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="link-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3" width="50">आइकन</th>
+                                <th>शीर्षक</th>
+                                <th>URL</th>
+                                <th width="70" class="text-center">क्रम</th>
+                                <th width="90" class="text-center">खोल्ने</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($linksArch)): ?>
+                            <tr><td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै लिंक छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($linksArch as $l): ?>
+                            <tr>
+                                <td class="ps-3"><i class="<?php echo htmlspecialchars($l['icon']); ?> fa-lg svc-icon-mark"></i></td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($l['title_np'] ?: $l['title']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($l['title']); ?></small>
+                                </td>
+                                <td><a href="<?php echo htmlspecialchars($l['url']); ?>" target="_blank" class="text-truncate d-inline-block ul-link-clamp"><?php echo htmlspecialchars($l['url']); ?></a></td>
+                                <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $l['display_order']; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $l['is_popup'] ? 'warning text-dark' : 'secondary'; ?>"><?php echo $l['is_popup'] ? 'पप-अप' : 'नयाँ ट्याब'; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $l['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $l['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-link"
+                                            data-id="<?php echo $l['id']; ?>"
+                                            data-title="<?php echo htmlspecialchars($l['title'], ENT_QUOTES); ?>"
+                                            data-title-np="<?php echo htmlspecialchars($l['title_np'] ?? '', ENT_QUOTES); ?>"
+                                            data-url="<?php echo htmlspecialchars($l['url'], ENT_QUOTES); ?>"
+                                            data-icon="<?php echo htmlspecialchars($l['icon'], ENT_QUOTES); ?>"
+                                            data-desc="<?php echo htmlspecialchars($l['description'] ?? '', ENT_QUOTES); ?>"
+                                            data-order="<?php echo $l['display_order']; ?>"
+                                            data-popup="<?php echo $l['is_popup']; ?>"
+                                            data-active="<?php echo $l['is_active']; ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो लिंक मेटाउन निश्चित हुनुहुन्छ?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $l['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             </div>
         </div>
     </div>

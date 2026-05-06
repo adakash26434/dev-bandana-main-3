@@ -216,26 +216,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($bidResults) $allResults = array_merge($allResults, $bidResults);
             } catch (Exception $e) {}
 
-            // भेटघाट बुकिङ खोज्ने
+            // भेटघाट बुकिङ खोज्ने — APT-YYYYMMDD-XXXXXX (tracking_id) + legacy APT-###### / numeric id
             try {
                 if ($searchType === 'tracking_id') {
-                    $apptId = 0;
-                    if (preg_match('/APT-?(\d+)/i', $searchValue, $matches)) {
-                        $apptId = (int) $matches[1];
-                    } elseif (ctype_digit(trim($searchValue))) {
-                        $apptId = (int) trim($searchValue);
+                    $rawSv = trim($searchValue);
+                    $stmt = $db->prepare(
+                        "SELECT *, 'appointment' as app_type FROM appointments
+                         WHERE UPPER(TRIM(COALESCE(tracking_id,''))) = UPPER(?)
+                         LIMIT 10"
+                    );
+                    $stmt->execute([$rawSv]);
+                    $apptResults = $stmt->fetchAll();
+                    if (empty($apptResults)) {
+                        $apptId = 0;
+                        // Legacy: एउटै हाइफन पछि अङ्क मात्र (जस्तै APT-000655) — दुई हाइफन भएको APT-20260505-ABC123 बाट अङ्क निकाल्दैन
+                        if (preg_match('/^APT-(\d{1,12})$/i', $rawSv, $m)) {
+                            $apptId = (int) $m[1];
+                        } elseif (ctype_digit($rawSv)) {
+                            $apptId = (int) $rawSv;
+                        }
+                        if ($apptId > 0) {
+                            $stmt = $db->prepare("SELECT *, 'appointment' as app_type FROM appointments WHERE id = ?");
+                            $stmt->execute([$apptId]);
+                            $apptResults = $stmt->fetchAll();
+                        }
                     }
-                    $stmt = $db->prepare("SELECT *, 'appointment' as app_type FROM appointments WHERE id = ?");
-                    $stmt->execute([$apptId > 0 ? $apptId : 0]);
                 } elseif ($searchType === 'phone') {
                     $stmt = $db->prepare("SELECT *, 'appointment' as app_type FROM appointments WHERE phone = ? ORDER BY created_at DESC");
                     $stmt->execute([$searchValue]);
+                    $apptResults = $stmt->fetchAll();
                 } else {
                     $stmt = $db->prepare("SELECT *, 'appointment' as app_type FROM appointments WHERE email = ? ORDER BY created_at DESC");
                     $stmt->execute([$searchValue]);
+                    $apptResults = $stmt->fetchAll();
                 }
-                $apptResults = $stmt->fetchAll();
-                if ($apptResults) $allResults = array_merge($allResults, $apptResults);
+                if (!empty($apptResults)) {
+                    $allResults = array_merge($allResults, $apptResults);
+                }
             } catch (Exception $e) {}
 
             /* सदस्य सर्वेक्षण खोज्ने — FBK-YYYY-XXXXXX format को tracking_id बाट खोज्छु */
@@ -309,8 +326,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 /* खोजिएको आवेदन नभेटिएमा — helpful message */
                 if ($searchType === 'tracking_id') {
                     $error = isEnglish()
-                        ? 'No application found with this Tracking ID. Please check the ID and try again.'
-                        : 'यो Tracking ID मा कुनै आवेदन भेटिएन। कृपया ID सही छ भनी जाँच गर्नुहोस्।<br><small class="text-muted">उदाहरण format: JOB-20240101-XXXX, DSR-XXXX-XXXXXX, GRV-123</small>';
+                        ? 'No application found with this Tracking ID. Please check the ID and try again.<br><small class="text-muted">Examples: JOB-20240101-XXXX, APT-20260505-XXXXXX, DSR-XXXX-XXXXXX, GRV-123</small>'
+                        : 'यो Tracking ID मा कुनै आवेदन भेटिएन। कृपया ID सही छ भनी जाँच गर्नुहोस्।<br><small class="text-muted">उदाहरण: JOB-20240101-XXXX, APT-20260505-XXXXXX, DSR-XXXX-XXXXXX, GRV-123</small>';
                 } elseif ($searchType === 'phone') {
                     $error = isEnglish()
                         ? 'No application found with this phone number. Please check the number.'
@@ -591,7 +608,7 @@ function getAppTypeLabel($type) {
                                            placeholder="<?php echo isEnglish() ? 'e.g.: JOB-20240101-XXXX' : 'जस्तै: JOB-20240101-XXXX'; ?>"
                                            value="<?php echo htmlspecialchars($_POST['search_value'] ?? ''); ?>">
                                     <small class="text-muted">
-                                        <span id="hintTrackingId"><?php echo isEnglish() ? 'e.g.: JOB-20240101-XXXX, FBK-2082-XXXXXX, WLF-XXXX-XXXXXX' : 'जस्तै: JOB-20240101-XXXX, FBK-2082-XXXXXX, WLF-XXXX-XXXXXX'; ?></span>
+                                        <span id="hintTrackingId"><?php echo isEnglish() ? 'e.g.: JOB-20240101-XXXX, APT-20260505-XXXXXX, FBK-2082-XXXXXX, WLF-XXXX-XXXXXX' : 'जस्तै: JOB-20240101-XXXX, APT-20260505-XXXXXX, FBK-2082-XXXXXX, WLF-XXXX-XXXXXX'; ?></span>
                                     </small>
                                 </div>
 
@@ -857,7 +874,7 @@ function getAppTypeLabel($type) {
                                         <?php elseif ($app['app_type'] === 'auction_bid'): ?>
                                         <span class="rcp-chip"><i class="fas fa-hashtag"></i>BID-<?php echo $app['id']; ?></span>
                                         <?php elseif ($app['app_type'] === 'appointment'): ?>
-                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i>APT-<?php echo $app['id']; ?></span>
+                                        <span class="rcp-chip"><i class="fas fa-hashtag"></i><?php echo htmlspecialchars($app['tracking_id'] ?? ('APT-' . str_pad((string) ($app['id'] ?? 0), 6, '0', STR_PAD_LEFT))); ?></span>
                                         <?php elseif ($app['app_type'] === 'feedback'): ?>
                                         <span class="rcp-chip"><i class="fas fa-hashtag"></i>FBK-<?php echo $app['id']; ?></span>
                                         <?php endif; ?>
@@ -1410,7 +1427,7 @@ function getAppTypeLabel($type) {
                                 </div>
                                 <div>
                                     <h6 class="mb-1"><?php echo isEnglish() ? 'Tracking ID' : 'ट्र्याकिङ ID'; ?></h6>
-                                    <p class="mb-0 text-muted small"><?php echo isEnglish() ? 'JOB-XXXX, GRV-123, WLF-XXXX, DSR-XXXX' : 'JOB-XXXX, GRV-123, WLF-XXXX, DSR-XXXX'; ?></p>
+                                    <p class="mb-0 text-muted small"><?php echo isEnglish() ? 'JOB-XXXX, APT-YYYYMMDD-XXXXXX, GRV-123, WLF-XXXX, DSR-XXXX' : 'JOB-XXXX, APT-YYYYMMDD-XXXXXX, GRV-123, WLF-XXXX, DSR-XXXX'; ?></p>
                                 </div>
                             </div>
                         </div>
@@ -1465,7 +1482,7 @@ function updateSearchHint() {
         } else if (val === 'email') {
             searchValue.placeholder = '<?php echo isEnglish() ? "e.g.: akashpame@gmail.com" : "जस्तै: akashpame@gmail.com"; ?>';
         } else {
-            searchValue.placeholder = '<?php echo isEnglish() ? "e.g.: JOB-20240101-XXXX, WLF-XXXX-XXXXXX" : "जस्तै: JOB-20240101-XXXX, WLF-XXXX-XXXXXX"; ?>';
+            searchValue.placeholder = '<?php echo isEnglish() ? "e.g.: JOB-20240101-XXXX, APT-20260505-XXXXXX" : "जस्तै: JOB-20240101-XXXX, APT-20260505-XXXXXX"; ?>';
         }
     }
 }

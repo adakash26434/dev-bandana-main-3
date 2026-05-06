@@ -101,13 +101,19 @@ catch (Exception $e) { $sliders = []; }
 
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+
+$slPart = adminPartitionRowsByIsActive($sliders);
+$slidersLive = $slPart['live'];
+$slidersArch = $slPart['archived'];
 ?>
 
 <?php echo adminPageHeader(
     'स्लाइडर व्यवस्थापन',
     'fa-images',
     'Homepage slider — Images 1920×600px, landscape format recommended.',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($sliders) . ' स्लाइडरहरू</span>'
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($sliders) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($slidersLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($slidersArch) . '</span>'
 );
 ?>
 <?php echo adminHelpTip('यो पृष्ठबाट Homepage को Slider/Banner Images व्यवस्थापन गर्न सकिन्छ।', ['नयाँ Slider थप्न: "+" बटन थिच्नुहोस्।', 'Image size: 1920×600 pixels उपयुक्त छ।', 'Order मिलाउन: Display Order number बदल्नुहोस् (सानो number = पहिला देखिन्छ)।']); ?>
@@ -121,9 +127,9 @@ require_once 'includes/admin-ui.php';
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sl-list" id="sl-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sl-list" id="sl-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>स्लाइडर सूची
-            <span class="badge bg-success ms-1"><?php echo count($sliders); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($slidersLive); ?> / <?php echo count($sliders); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -148,7 +154,10 @@ require_once 'includes/admin-ui.php';
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                    <?php echo adminListSubtabPills('sl-sub', count($slidersLive), count($slidersArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="sl-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
@@ -166,8 +175,13 @@ require_once 'includes/admin-ui.php';
                                 <i class="fas fa-images fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै स्लाइडर छैन। माथिको "नयाँ थप्नुहोस्" बटन थिच्नुहोस्।
                             </td></tr>
+                            <?php elseif (empty($slidersLive)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय स्लाइडर छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($sliders as $sl): ?>
+                            <?php foreach ($slidersLive as $sl): ?>
                             <tr>
                                 <td class="ps-3">
                                     <?php if (!empty($sl['image'])): ?>
@@ -207,7 +221,71 @@ require_once 'includes/admin-ui.php';
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="sl-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3" width="130">पूर्वावलोकन</th>
+                                <th>शीर्षक / उपशीर्षक</th>
+                                <th width="150">बटन</th>
+                                <th width="70" class="text-center">क्रम</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($slidersArch)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै स्लाइडर छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($slidersArch as $sl): ?>
+                            <tr>
+                                <td class="ps-3">
+                                    <?php if (!empty($sl['image'])): ?>
+                                    <img src="../<?php echo htmlspecialchars($sl['image']); ?>" style="width:110px;height:40px;object-fit:cover;border-radius:8px;border:2px solid #e0f0e8;">
+                                    <?php else: ?>
+                                    <div style="width:110px;height:40px;background:rgba(26,95,42,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-image text-muted"></i></div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($sl['title']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars(mb_substr($sl['subtitle'] ?? '', 0, 50)); ?></small>
+                                </td>
+                                <td><small><?php echo htmlspecialchars($sl['button_text'] ?? '—'); ?></small></td>
+                                <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $sl['display_order']; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $sl['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $sl['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-1 btn-edit-sl"
+                                            data-id="<?php echo $sl['id']; ?>"
+                                            data-title="<?php echo htmlspecialchars($sl['title'] ?? '', ENT_QUOTES); ?>"
+                                            data-subtitle="<?php echo htmlspecialchars($sl['subtitle'] ?? '', ENT_QUOTES); ?>"
+                                            data-btn-text="<?php echo htmlspecialchars($sl['button_text'] ?? '', ENT_QUOTES); ?>"
+                                            data-btn-url="<?php echo htmlspecialchars($sl['button_url'] ?? '', ENT_QUOTES); ?>"
+                                            data-order="<?php echo $sl['display_order']; ?>"
+                                            data-active="<?php echo $sl['is_active']; ?>"
+                                            data-image="<?php echo htmlspecialchars($sl['image'] ?? '', ENT_QUOTES); ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो स्लाइडर मेटाउन निश्चित हुनुहुन्छ?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $sl['id']; ?>">
+                                        <button class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             </div>
         </div>
     </div>

@@ -364,17 +364,19 @@ if ($vmPhotoSrc !== '' && strpos($vmPhotoSrc, 'http') !== 0) {
 </div>
 
 <div class="card border-0 shadow-sm mb-3">
-    <div class="card-header bg-white py-2">
-        <div class="btn-group btn-group-sm w-100" role="group" aria-label="Member detail tabs">
-            <button type="button" class="btn btn-success active" id="btnTabMember">
+    <div class="card-header bg-white py-2 border-0">
+        <div class="admin-inner-tabstrip-tray">
+        <div class="d-flex flex-wrap gap-2 w-100" role="group" aria-label="Member detail tabs">
+            <button type="button" class="btn btn-sm btn-success active" id="btnTabMember">
                 <i class="fas fa-id-card me-1"></i>Member Information
             </button>
-            <button type="button" class="btn btn-outline-success" id="btnTabNotif">
+            <button type="button" class="btn btn-sm btn-outline-success" id="btnTabNotif">
                 <i class="fas fa-bell me-1"></i>Notification
             </button>
-            <button type="button" class="btn btn-outline-success" id="btnTabPartner">
+            <button type="button" class="btn btn-sm btn-outline-success" id="btnTabPartner">
                 <i class="fas fa-handshake me-1"></i>साझेदार संस्था
             </button>
+        </div>
         </div>
     </div>
 </div>

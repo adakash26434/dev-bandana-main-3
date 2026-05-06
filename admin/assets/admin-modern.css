@@ -2081,6 +2081,82 @@ form.kyc-form .row > [class*="col-"],
     border-color: rgba(255,255,255,0.28) !important;
 }
 
+/* भित्रको उप-ट्याब — हरियो ट्रे + सेतो सक्रिय (Member Online Portal / सूची उप-ट्याब) */
+.main-content ul.nav.nav-pills.admin-inner-tabstrip {
+    background: linear-gradient(135deg, var(--primary-color, #1a5f2a), #145a32) !important;
+    border-radius: 10px !important;
+    border: none !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-item {
+    margin: 0;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link {
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    padding: 0.42rem 0.9rem !important;
+    opacity: 1 !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link.active,
+.main-content ul.nav.admin-inner-tabstrip .show > .nav-link {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-color: transparent !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link .badge {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link.active .badge.bg-success,
+.main-content ul.nav.admin-inner-tabstrip .show > .nav-link .badge.bg-success {
+    background: #22c55e !important;
+    color: #ffffff !important;
+    border-color: #16a34a !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link.active .badge.bg-secondary,
+.main-content ul.nav.admin-inner-tabstrip .show > .nav-link .badge.bg-secondary {
+    background: #64748b !important;
+    color: #ffffff !important;
+    border-color: #475569 !important;
+}
+
+.main-content .admin-inner-tabstrip-tray {
+    background: linear-gradient(135deg, var(--primary-color, #1a5f2a), #145a32);
+    border-radius: 10px;
+    padding: 6px 8px;
+}
+.main-content .admin-inner-tabstrip-tray .btn {
+    font-weight: 600;
+    font-size: 0.82rem;
+    border-radius: 8px !important;
+}
+.main-content .admin-inner-tabstrip-tray .btn.btn-outline-success {
+    color: rgba(255, 255, 255, 0.95) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+}
+.main-content .admin-inner-tabstrip-tray .btn.btn-outline-success:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+}
+.main-content .admin-inner-tabstrip-tray .btn.btn-success.active {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border: 1px solid #ffffff !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
 /* ─────────────────────────────────────────────────────────────
    28. Strong minimal mode (global)
    Remove remaining green-heavy visuals across admin
@@ -2471,6 +2547,46 @@ form.kyc-form .row > [class*="col-"],
     min-height: 96px !important;
 }
 
+/* Settings: file input माथि लागेको ठूलो min-height हटाउने */
+.settings-page-compact .form-control[type="file"] {
+    min-height: auto !important;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.35 !important;
+}
+
+/* Admin: फाइल अपलोड एकरूप, बटन/पङ्क्ति अनावश्यक ठूलो नहोस् */
+.admin-wrapper .form-control[type="file"] {
+    font-size: 0.875rem;
+    line-height: 1.35;
+    padding: 0.4rem 0.65rem;
+}
+
+/* मिडिया छैन भन्ने सानो पट्टी (हेडर हिमाल आदि) — पूरै कार्ड भरिने ठूलो बाकस होइन */
+.admin-media-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 3rem;
+    max-height: 3.75rem;
+    padding: 0.45rem 0.85rem;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.admin-media-placeholder i {
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
 /* Pravidh pages: consistent compact visual style */
 body.admin-page-run-migration .card,
 body.admin-page-backup-restore .card,
@@ -2499,6 +2615,68 @@ body.admin-page-site-license .card-header {
     background: linear-gradient(90deg, #166534 0%, #16a34a 100%) !important;
     color: #ffffff !important;
     border-bottom: 0 !important;
+}
+
+/* White pill tabs inside these headers: `card-header * { color: inherit }` ले सेतो टेक्स्ट सेतो पिलमा लुक्छ — hover मात्र देखिने */
+body.admin-page-run-migration .card-header .nav-tabs .nav-link,
+body.admin-page-run-migration .card-header .admin-nav-tabs .nav-link,
+body.admin-page-backup-restore .card-header .nav-tabs .nav-link,
+body.admin-page-backup-restore .card-header .admin-nav-tabs .nav-link,
+body.admin-page-update-checklist .card-header .nav-tabs .nav-link,
+body.admin-page-update-checklist .card-header .admin-nav-tabs .nav-link,
+body.admin-page-site-health .card-header .nav-tabs .nav-link,
+body.admin-page-site-health .card-header .admin-nav-tabs .nav-link,
+body.admin-page-system-info .card-header .nav-tabs .nav-link,
+body.admin-page-system-info .card-header .admin-nav-tabs .nav-link,
+body.admin-page-db-setup .card-header .nav-tabs .nav-link,
+body.admin-page-db-setup .card-header .admin-nav-tabs .nav-link,
+body.admin-page-error-log .card-header .nav-tabs .nav-link,
+body.admin-page-error-log .card-header .admin-nav-tabs .nav-link,
+body.admin-page-help-guide .card-header .nav-tabs .nav-link,
+body.admin-page-help-guide .card-header .admin-nav-tabs .nav-link,
+body.admin-page-site-license .card-header .nav-tabs .nav-link,
+body.admin-page-site-license .card-header .admin-nav-tabs .nav-link {
+    color: #374151 !important;
+}
+body.admin-page-run-migration .card-header .nav-tabs .nav-link:hover,
+body.admin-page-run-migration .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-backup-restore .card-header .nav-tabs .nav-link:hover,
+body.admin-page-backup-restore .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-update-checklist .card-header .nav-tabs .nav-link:hover,
+body.admin-page-update-checklist .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-site-health .card-header .nav-tabs .nav-link:hover,
+body.admin-page-site-health .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-system-info .card-header .nav-tabs .nav-link:hover,
+body.admin-page-system-info .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-db-setup .card-header .nav-tabs .nav-link:hover,
+body.admin-page-db-setup .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-error-log .card-header .nav-tabs .nav-link:hover,
+body.admin-page-error-log .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-help-guide .card-header .nav-tabs .nav-link:hover,
+body.admin-page-help-guide .card-header .admin-nav-tabs .nav-link:hover,
+body.admin-page-site-license .card-header .nav-tabs .nav-link:hover,
+body.admin-page-site-license .card-header .admin-nav-tabs .nav-link:hover {
+    color: #14532d !important;
+}
+body.admin-page-run-migration .card-header .nav-tabs .nav-link.active,
+body.admin-page-run-migration .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-backup-restore .card-header .nav-tabs .nav-link.active,
+body.admin-page-backup-restore .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-update-checklist .card-header .nav-tabs .nav-link.active,
+body.admin-page-update-checklist .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-site-health .card-header .nav-tabs .nav-link.active,
+body.admin-page-site-health .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-system-info .card-header .nav-tabs .nav-link.active,
+body.admin-page-system-info .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-db-setup .card-header .nav-tabs .nav-link.active,
+body.admin-page-db-setup .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-error-log .card-header .nav-tabs .nav-link.active,
+body.admin-page-error-log .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-help-guide .card-header .nav-tabs .nav-link.active,
+body.admin-page-help-guide .card-header .admin-nav-tabs .nav-link.active,
+body.admin-page-site-license .card-header .nav-tabs .nav-link.active,
+body.admin-page-site-license .card-header .admin-nav-tabs .nav-link.active {
+    color: #14532d !important;
 }
 
 body.admin-page-update-checklist .checklist-item {

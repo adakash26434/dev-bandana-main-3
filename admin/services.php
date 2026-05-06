@@ -69,22 +69,28 @@ try {
 
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+
+$svcPart = adminPartitionRowsByIsActive($services);
+$servicesLive = $svcPart['live'];
+$servicesArch = $svcPart['archived'];
 ?>
 
 <?php echo adminPageHeader(
     'सेवा व्यवस्थापन',
     'fa-concierge-bell',
     'संस्थाले प्रदान गर्ने सेवाहरू व्यवस्थापन।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($services) . ' सेवाहरू</span>'
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($services) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($servicesLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($servicesArch) . '</span>'
 ); ?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#svc-list" id="svc-list-btn">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#svc-list" id="svc-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>सेवा सूची
-            <span class="badge bg-success ms-1"><?php echo count($services); ?></span>
+            <span class="badge bg-success ms-1"><?php echo count($servicesLive); ?> / <?php echo count($services); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -109,7 +115,6 @@ require_once 'includes/admin-ui.php';
                 <small class="text-muted search-count"></small>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
                     <form method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                         <input type="hidden" name="action" value="bulk_status">
@@ -117,10 +122,14 @@ require_once 'includes/admin-ui.php';
                             <button type="submit" name="bulk" value="active" class="btn btn-sm btn-outline-success">Bulk Active</button>
                             <button type="submit" name="bulk" value="inactive" class="btn btn-sm btn-outline-secondary">Bulk Inactive</button>
                         </div>
+                    <?php echo adminListSubtabPills('svc-sub', count($servicesLive), count($servicesArch)); ?>
+                    <div class="tab-content admin-table-subtab-content">
+                    <div class="tab-pane fade show active" id="svc-sub-live" role="tabpanel">
+                    <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('.svc-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#svc-sub-live .svc-select').forEach(c=>c.checked=this.checked)"></th>
                                 <th class="ps-3" width="60">आइकन</th>
                                 <th>शीर्षक</th>
                                 <th>विवरण</th>
@@ -135,8 +144,13 @@ require_once 'includes/admin-ui.php';
                                 <i class="fas fa-concierge-bell fa-3x mb-2 d-block opacity-25"></i>
                                 कुनै सेवा छैन।
                             </td></tr>
+                            <?php elseif (empty($servicesLive)): ?>
+                            <tr><td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
+                                सक्रिय सेवा छैन। अभिलेख हेर्नुहोस्।
+                            </td></tr>
                             <?php endif; ?>
-                            <?php foreach ($services as $s): ?>
+                            <?php foreach ($servicesLive as $s): ?>
                             <tr>
                                 <td class="text-center"><input type="checkbox" class="svc-select" name="selected_ids[]" value="<?php echo (int)$s['id']; ?>"></td>
                                 <td class="ps-3">
@@ -174,8 +188,71 @@ require_once 'includes/admin-ui.php';
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="svc-sub-arch" role="tabpanel">
+                    <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#svc-sub-arch .svc-select').forEach(c=>c.checked=this.checked)"></th>
+                                <th class="ps-3" width="60">आइकन</th>
+                                <th>शीर्षक</th>
+                                <th>विवरण</th>
+                                <th width="70" class="text-center">क्रम</th>
+                                <th width="90" class="text-center">स्थिति</th>
+                                <th width="140" class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($servicesArch)): ?>
+                            <tr><td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
+                                अभिलेखमा कुनै सेवा छैन।
+                            </td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($servicesArch as $s): ?>
+                            <tr>
+                                <td class="text-center"><input type="checkbox" class="svc-select" name="selected_ids[]" value="<?php echo (int)$s['id']; ?>"></td>
+                                <td class="ps-3">
+                                    <div class="admin-icon-cell">
+                                        <i class="<?php echo htmlspecialchars($s['icon']); ?> svc-icon-mark"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($s['title_np'] ?: $s['title']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($s['title_en'] ?? $s['title']); ?></small>
+                                </td>
+                                <td><span class="text-muted"><?php echo htmlspecialchars(mb_substr($s['description_np'] ?: ($s['description'] ?? ''), 0, 60)); ?>…</span></td>
+                                <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $s['display_order']; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-primary me-1 btn-edit-svc"
+                                            data-id="<?php echo $s['id']; ?>"
+                                            data-title="<?php echo htmlspecialchars($s['title_np'] ?: $s['title'], ENT_QUOTES); ?>"
+                                            data-title-en="<?php echo htmlspecialchars($s['title_en'] ?? '', ENT_QUOTES); ?>"
+                                            data-description="<?php echo htmlspecialchars($s['description_np'] ?: ($s['description'] ?? ''), ENT_QUOTES); ?>"
+                                            data-icon="<?php echo htmlspecialchars($s['icon'], ENT_QUOTES); ?>"
+                                            data-order="<?php echo $s['display_order']; ?>"
+                                            data-active="<?php echo $s['is_active']; ?>"
+                                            title="सम्पादन">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो सेवा मेटाउन निश्चित हुनुहुन्छ?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $s['id']; ?>">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    </div>
                     </form>
-                </div>
             </div>
         </div>
     </div>

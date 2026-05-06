@@ -250,7 +250,7 @@ set_exception_handler(function (\Throwable $ex) {
 
     <!-- Admin CSS -->
     <link rel="stylesheet" href="assets/admin.css?v=9.7">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=5.3">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=5.6">
     <link rel="stylesheet" href="../assets/css/v9-mobile-fix.css?v=9.7">
     <link rel="stylesheet" href="../assets/css/site-banner-logo.css?v=1">
 
@@ -458,6 +458,19 @@ set_exception_handler(function (\Throwable $ex) {
       .admin-page-title {
           overflow-wrap: break-word;
           word-break: break-word;
+      }
+
+      /* Primary form actions — सानो, दायाँ पङ्क्ति (पूरै चौडाइको ठूलो बटन हटाउन) */
+      .admin-form-actions {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.5rem;
+          justify-content: flex-end;
+      }
+      .admin-form-actions .btn {
+          width: auto;
+          max-width: 100%;
       }
     </style>
 </head>
@@ -1201,24 +1214,62 @@ set_exception_handler(function (\Throwable $ex) {
     })();
 
     // ── Global Client-side Table Search ──
-    // सबै .admin-table-search input ले नजिकको <tbody> rows filter गर्छ
-    document.addEventListener('input', function (e) {
-        var input = e.target;
-        if (!input.classList.contains('admin-table-search')) return;
+    // Card भित्र .admin-table-subtab-content भए खुला उप-ट्याबको tbody मात्र
+    function adminRunTableSearch(input) {
+        if (!input || !input.classList.contains('admin-table-search')) return;
         var val = input.value.toLowerCase().trim();
-        /* table खोज्नुहोस् — input को नजिकको card / tab-pane मा */
-        var container = input.closest('.tab-pane') || input.closest('.card') || input.closest('[id$="-list"]') || document;
-        var tbody = container ? container.querySelector('tbody') : document.querySelector('tbody');
+        var card = input.closest('.card');
+        var subContent = card ? card.querySelector('.admin-table-subtab-content') : null;
+        var tbody;
+        if (subContent) {
+            var pane = subContent.querySelector('.tab-pane.active');
+            tbody = pane ? pane.querySelector('tbody') : null;
+        } else {
+            var container = input.closest('.tab-pane') || input.closest('.card') || input.closest('[id$="-list"]') || document;
+            tbody = container ? container.querySelector('tbody') : null;
+        }
         if (!tbody) return;
         var rows = tbody.querySelectorAll('tr');
         var shown = 0;
+        var total = 0;
         rows.forEach(function (row) {
+            var cells = row.querySelectorAll('td');
+            var isPlaceholder = cells.length === 1 && cells[0].getAttribute('colspan');
+            if (isPlaceholder) {
+                row.style.display = val ? 'none' : '';
+                return;
+            }
+            total++;
             var match = !val || row.textContent.toLowerCase().includes(val);
             row.style.display = match ? '' : 'none';
             if (match) shown++;
         });
-        /* Count badge अपडेट */
         var badge = input.closest('.admin-search-wrap') ? input.closest('.admin-search-wrap').querySelector('.search-count') : null;
-        if (badge) badge.textContent = shown + ' / ' + rows.length;
+        if (badge) badge.textContent = shown + ' / ' + total;
+    }
+    document.addEventListener('input', function (e) {
+        if (e.target.classList && e.target.classList.contains('admin-table-search')) {
+            adminRunTableSearch(e.target);
+        }
     });
+    document.addEventListener('shown.bs.tab', function (e) {
+        var t = e.target;
+        if (!t || t.getAttribute('data-bs-toggle') !== 'tab') return;
+        var sel = t.getAttribute('data-bs-target');
+        if (!sel) return;
+        var panel = document.querySelector(sel);
+        if (!panel || !panel.closest('.admin-table-subtab-content')) return;
+        var c = t.closest('.card');
+        if (!c) return;
+        var inp = c.querySelector('.admin-table-search');
+        if (inp) adminRunTableSearch(inp);
+    });
+    function adminInitAllTableSearches() {
+        document.querySelectorAll('.admin-table-search').forEach(adminRunTableSearch);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', adminInitAllTableSearches);
+    } else {
+        adminInitAllTableSearches();
+    }
     </script>

@@ -645,9 +645,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                 </div>
             </div>
             <div class="card stg-save-card">
-                <div class="card-body">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-save"></i> सेटिङ्स सेभ गर्नुहोस्
+                <div class="card-body py-3 admin-form-actions">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-1"></i> सेटिङ्स सेभ गर्नुहोस्
                     </button>
                 </div>
             </div>
@@ -693,14 +693,15 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                 <div class="card-body text-center">
                     <?php if (!empty($settings['himal_bg'])): ?>
                         <img src="../<?php echo htmlspecialchars($settings['himal_bg']); ?>"
-                             alt="Himal Background" class="img-fluid mb-2 rounded"
-                             style="max-height:150px; width:100%; object-fit:cover;">
+                             alt="Himal Background" class="img-fluid mb-2 rounded border"
+                             style="max-height:100px; width:100%; max-width:520px; object-fit:cover;">
                         <div class="mb-2">
                             <small class="text-success"><i class="fas fa-check-circle"></i> फोटो अपलोड भएको छ</small>
                         </div>
                     <?php else: ?>
-                        <div class="mb-2 p-3 rounded" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light)); min-height:110px; display:flex;align-items:center;justify-content:center;">
-                            <small class="text-white opacity-75"><i class="fas fa-mountain me-1"></i> हिमाल फोटो छैन — gradient देखिन्छ</small>
+                        <div class="admin-media-placeholder" role="status">
+                            <i class="fas fa-mountain"></i>
+                            <span>हिमाल फोटो छैन — साइटमा gradient देखिन्छ</span>
                         </div>
                     <?php endif; ?>
                     <div class="mb-0">
@@ -818,9 +819,9 @@ if (!in_array($panel, ['general', 'branding'], true)) {
 
             <!-- Save Button -->
             <div class="card stg-save-card">
-                <div class="card-body">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-save"></i> सेटिङ्स सेभ गर्नुहोस्
+                <div class="card-body py-3 admin-form-actions">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-1"></i> सेटिङ्स सेभ गर्नुहोस्
                     </button>
                 </div>
             </div>

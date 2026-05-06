@@ -161,6 +161,19 @@ $rows = $db->query(
     .cred-page-title { font-size: 1.28rem; }
     .cred-page-sub { font-size: 0.86rem; }
 }
+/* खाली अवस्था: शीर्षकभन्दा ठूलो नदेखियोस् (अरू admin सूची जस्तै) */
+.cred-empty-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #4b5563 !important;
+}
+.cred-empty-hint {
+    font-size: 0.875rem;
+    color: #6b7280 !important;
+    max-width: 26rem;
+    margin-left: auto;
+    margin-right: auto;
+}
 </style>
 
 <div class="admin-content">
@@ -184,10 +197,19 @@ $rows = $db->query(
     <?php endif; ?>
 
     <?php if (!$rows): ?>
-        <div class="card-coop" style="text-align:center;padding:60px 20px;">
-            <i class="fas fa-key" style="font-size:48px;color:var(--text-muted);"></i>
-            <h3 style="margin-top:16px;color:var(--text-secondary);">कुनै credential थपिएको छैन</h3>
-            <p style="color:var(--text-muted);">माथि "नयाँ Credential" button क्लिक गर्नुहोस्।</p>
+        <div class="card border-0 shadow-sm">
+            <div class="text-center text-muted py-5 px-3 cred-empty-state">
+                <i class="fas fa-key fa-2x mb-3 d-block opacity-25" aria-hidden="true"></i>
+                <div class="fw-semibold text-secondary cred-empty-title mb-2">कुनै credential थपिएको छैन</div>
+                <p class="small mb-0 cred-empty-hint">माथि वा तलको बटनबाट नयाँ credential थप्नुहोस्।</p>
+                <?php if (is_admin_or_above()): ?>
+                <div class="mt-4">
+                    <button type="button" class="btn-coop" onclick="openCredModal()">
+                        <i class="fas fa-plus me-1"></i>नयाँ Credential
+                    </button>
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
     <?php else: ?>
     <div class="cred-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;">

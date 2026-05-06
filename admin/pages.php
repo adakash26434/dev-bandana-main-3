@@ -461,6 +461,9 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
     } catch (Exception $e) {
         $dynamicPages = [];
     }
+    $dpPart = adminPartitionRowsByIsActive($dynamicPages);
+    $dynamicPagesLive = $dpPart['live'];
+    $dynamicPagesArch = $dpPart['archived'];
     echo adminPageHeader(
         'पृष्ठ व्यवस्थापन', 'fa-file-alt',
         'गतिशील र स्थिर पृष्ठहरू (About/FAQ सेक्सनहरू) व्यवस्थापन',
@@ -544,15 +547,19 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="पृष्ठ खोज्नुहोस्..." autocomplete="off">
                 </div>
+                <small class="text-muted search-count"></small>
                 <div class="ms-auto d-flex gap-2">
                     <button type="submit" name="bulk_action" value="activate" class="btn btn-sm btn-outline-success">Bulk Active</button>
                     <button type="submit" name="bulk_action" value="deactivate" class="btn btn-sm btn-outline-secondary">Bulk Inactive</button>
                 </div>
             </div>
+            <?php echo adminListSubtabPills('pg-sub', count($dynamicPagesLive), count($dynamicPagesArch)); ?>
+            <div class="tab-content admin-table-subtab-content">
+            <div class="tab-pane fade show active" id="pg-sub-live" role="tabpanel">
             <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th width="4%"><input type="checkbox" onclick="document.querySelectorAll('.pg-select').forEach(c=>c.checked=this.checked)"></th>
+                            <th width="4%"><input type="checkbox" onclick="document.querySelectorAll('#pg-sub-live .pg-select').forEach(c=>c.checked=this.checked)"></th>
                             <th width="5%">#</th>
                             <th width="15%">Slug</th>
                             <th width="25%">शीर्षक (नेपाली)</th>
@@ -563,7 +570,10 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($dynamicPages as $i => $pg): ?>
+                        <?php if (empty($dynamicPagesLive) && !empty($dynamicPages)): ?>
+                        <tr><td colspan="8" class="text-center py-4 text-muted">यो फिल्टर अन्तर्गत सक्रिय पृष्ठ छैन। अभिलेख हेर्नुहोस् वा माथि «स्थिति» बदल्नुहोस्।</td></tr>
+                        <?php endif; ?>
+                        <?php foreach ($dynamicPagesLive as $i => $pg): ?>
                         <tr>
                             <td><input type="checkbox" class="pg-select" name="selected_ids[]" value="<?php echo (int)$pg['id']; ?>"></td>
                             <td><?php echo $i + 1; ?></td>
@@ -617,6 +627,81 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+            <div class="tab-pane fade" id="pg-sub-arch" role="tabpanel">
+            <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="4%"><input type="checkbox" onclick="document.querySelectorAll('#pg-sub-arch .pg-select').forEach(c=>c.checked=this.checked)"></th>
+                            <th width="5%">#</th>
+                            <th width="15%">Slug</th>
+                            <th width="25%">शीर्षक (नेपाली)</th>
+                            <th width="20%">Title (English)</th>
+                            <th width="10%">मेनु</th>
+                            <th width="10%">स्थिति</th>
+                            <th width="15%">कार्य</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($dynamicPagesArch)): ?>
+                        <tr><td colspan="8" class="text-center py-4 text-muted">अभिलेखमा (निष्क्रिय) पृष्ठ छैन।</td></tr>
+                        <?php endif; ?>
+                        <?php foreach ($dynamicPagesArch as $i => $pg): ?>
+                        <tr>
+                            <td><input type="checkbox" class="pg-select" name="selected_ids[]" value="<?php echo (int)$pg['id']; ?>"></td>
+                            <td><?php echo $i + 1; ?></td>
+                            <td>
+                                <a href="<?php echo SITE_URL; ?>page.php?slug=<?php echo $pg['slug']; ?>" target="_blank" class="text-decoration-none">
+                                    <code><?php echo $pg['slug']; ?></code>
+                                    <i class="fas fa-external-link-alt fa-xs ms-1"></i>
+                                </a>
+                            </td>
+                            <td><?php echo htmlspecialchars($pg['title_np'] ?: $pg['title']); ?></td>
+                            <td><?php echo htmlspecialchars($pg['title_en'] ?: '-'); ?></td>
+                            <td>
+                                <?php if ($pg['show_in_menu']): ?>
+                                <?php
+                                $menuPos = (string)($pg['menu_position'] ?? '');
+                                $menuLabelMap = [
+                                    'about' => 'हाम्रो बारेमा',
+                                    'services' => 'सेवाहरू',
+                                    'more' => 'थप',
+                                    'footer' => 'फुटर',
+                                ];
+                                $menuLabel = $menuLabelMap[$menuPos] ?? $menuPos;
+                                ?>
+                                <span class="badge bg-info"><?php echo htmlspecialchars($menuLabel); ?></span>
+                                <?php else: ?>
+                                <span class="text-muted">-</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($pg['is_active']): ?>
+                                <span class="badge bg-success">सक्रिय</span>
+                                <?php else: ?>
+                                <span class="badge bg-secondary">निष्क्रिय</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <a href="pages.php?action=edit&id=<?php echo $pg['id']; ?>" class="btn btn-sm btn-primary" title="सम्पादन">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <?php $isProtectedPolicy = in_array(($pg['slug'] ?? ''), ['privacy-policy','terms-of-service','cookie-policy'], true); ?>
+                                <form method="POST" class="svc-inline-form" onsubmit="return confirm('यो पृष्ठ मेटाउने हो?')">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="<?php echo (int)$pg['id']; ?>">
+                                    <?php echo csrfField(); ?>
+                                    <button type="submit" class="btn btn-danger btn-sm" title="<?php echo $isProtectedPolicy ? 'यो policy page हटाउन मिल्दैन' : 'मेटाउनुहोस्'; ?>" <?php echo $isProtectedPolicy ? 'disabled' : ''; ?>>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            </div>
                 </form>
             </div>
             <?php endif; ?>

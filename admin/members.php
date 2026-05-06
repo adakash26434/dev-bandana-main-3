@@ -6,6 +6,7 @@
 $pageTitle   = 'Member Portal व्यवस्थापन';
 $currentPage = 'members';
 require_once 'includes/admin-header.php';
+require_once 'includes/admin-ui.php';
 require_once '../includes/member-auth.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
 /* RBAC: staff hercha matra; mutate admin+ matra */
@@ -83,6 +84,11 @@ $page   = max(1, (int)($_GET['page'] ?? 1));
 $limit  = 20;
 $offset = ($page - 1) * $limit;
 
+$memSub = isset($_GET['mem_sub']) ? (string) $_GET['mem_sub'] : 'live';
+if (!in_array($memSub, ['live', 'arch'], true)) {
+    $memSub = 'live';
+}
+
 $where = '1=1'; $params = [];
 if ($search) {
     $where .= " AND (name LIKE ? OR email LIKE ? OR phone LIKE ? OR member_card_no LIKE ?)";
@@ -94,6 +100,19 @@ if ($kycFilter === 'linked') {
     $where .= " AND (kyc_application_id IS NULL OR kyc_application_id = 0)";
 }
 
+$whereBase = $where;
+$paramsBase = $params;
+
+$cntLiveSt = $db->prepare("SELECT COUNT(*) FROM members WHERE $whereBase AND is_active = 1");
+$cntLiveSt->execute($paramsBase);
+$countLiveMembers = (int) $cntLiveSt->fetchColumn();
+
+$cntArchSt = $db->prepare("SELECT COUNT(*) FROM members WHERE $whereBase AND is_active = 0");
+$cntArchSt->execute($paramsBase);
+$countArchMembers = (int) $cntArchSt->fetchColumn();
+
+$where .= $memSub === 'live' ? ' AND is_active = 1' : ' AND is_active = 0';
+
 $total = $db->prepare("SELECT COUNT(*) FROM members WHERE $where");
 $total->execute($params);
 $totalCount = (int)$total->fetchColumn();
@@ -101,6 +120,11 @@ $totalCount = (int)$total->fetchColumn();
 $members = $db->prepare("SELECT * FROM members WHERE $where ORDER BY created_at DESC LIMIT $limit OFFSET $offset");
 $members->execute($params);
 $members = $members->fetchAll(PDO::FETCH_ASSOC);
+
+$memPreserveQ = array_filter([
+    'search' => $search !== '' ? $search : null,
+    'kyc' => $kycFilter !== 'all' ? $kycFilter : null,
+], static fn ($v) => $v !== null && $v !== '');
 
 $totalPages = max(1, ceil($totalCount / $limit));
 
@@ -162,8 +186,8 @@ try {
                 <h5 class="fw-bold mb-1"><?php echo htmlspecialchars($viewMember['name']); ?></h5>
                 <div class="text-muted small"><?php echo htmlspecialchars($viewMember['member_card_no'] ?? ''); ?></div>
                 <div class="mt-2">
-                    <?php if ($viewMember['google_id']): ?><span class="badge mem-badge-google"><i class="fab fa-google me-1"></i>Google</span><?php endif; ?>
-                    <?php if ($viewMember['facebook_id']): ?><span class="badge mem-badge-facebook"><i class="fab fa-facebook me-1"></i>Facebook</span><?php endif; ?>
+                    <?php if ($viewMember['google_id']): ?><span class="badge mem-badge-google"><i class="fa-brands fa-google me-1"></i>Google</span><?php endif; ?>
+                    <?php if ($viewMember['facebook_id']): ?><span class="badge mem-badge-facebook"><i class="fa-brands fa-facebook-f me-1"></i>Facebook</span><?php endif; ?>
                     <?php if ($viewMember['password_hash']): ?><span class="badge bg-success">Email</span><?php endif; ?>
                 </div>
             </div>
@@ -385,13 +409,13 @@ try {
         ['icon'=>'fa-clock','color'=>'warning','val'=>$stats['pending'] ?? 0,'label'=>'प्रतीक्षामा'],
         ['icon'=>'fa-rotate','color'=>'info','val'=>$stats['renewal'] ?? 0,'label'=>'Renewal Pending'],
         ['icon'=>'fa-link','color'=>'dark','val'=>$stats['kyc_linked'] ?? 0,'label'=>'KYC Linked'],
-        ['icon'=>'fab fa-google','color'=>'danger','val'=>$stats['google'],'label'=>'Google Login'],
-        ['icon'=>'fab fa-facebook','color'=>'primary','val'=>$stats['facebook'],'label'=>'Facebook Login'],
+        ['icon'=>'fa-brands fa-google','color'=>'danger','val'=>$stats['google'],'label'=>'Google Login'],
+        ['icon'=>'fa-brands fa-facebook-f','color'=>'primary','val'=>$stats['facebook'],'label'=>'Facebook Login'],
     ];
     foreach ($statItems as $s): ?>
     <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm text-center py-3 stat-uniform-card">
-            <i class="<?php echo $s['icon']; ?> fa-2x text-<?php echo $s['color']; ?> mb-2"></i>
+            <i class="<?php echo $s['icon']; ?> fa-2x text-<?php echo $s['color']; ?> mb-2" aria-hidden="true"></i>
             <div class="stat-value"><?php echo $s['val']; ?></div>
             <div class="stat-label"><?php echo $s['label']; ?></div>
         </div>
@@ -399,32 +423,44 @@ try {
     <?php endforeach; ?>
 </div>
 
-<!-- Search + Table -->
-<div class="card border-0 shadow-sm">
-    <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
-        <h5 class="mb-0 fw-bold text-success"><i class="fas fa-users me-2"></i>Member Portal सदस्यहरू</h5>
-        <form class="d-flex gap-2" method="GET">
-            <select name="kyc" class="form-select form-select-sm mem-filter-kyc">
+<!-- Search + Table — अरू admin सूची जस्तै -->
+<div class="card admin-table-card svc-flat-top-card border-0 shadow-sm">
+    <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 flex-wrap">
+        <form class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" method="get" action="members.php">
+            <input type="hidden" name="mem_sub" value="<?php echo htmlspecialchars($memSub, ENT_QUOTES, 'UTF-8'); ?>">
+            <div class="input-group input-group-sm mem-search-group" style="max-width:min(100%, 320px)">
+                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" name="search" class="form-control border-start-0 mem-filter-search" placeholder="नाम / इमेल / फोन खोज्नुहोस्…"
+                       value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>" autocomplete="off">
+            </div>
+            <select name="kyc" class="form-select form-select-sm mem-filter-kyc" title="KYC फिल्टर">
                 <option value="all" <?php echo $kycFilter==='all' ? 'selected' : ''; ?>>KYC: सबै</option>
                 <option value="linked" <?php echo $kycFilter==='linked' ? 'selected' : ''; ?>>KYC Linked</option>
                 <option value="unlinked" <?php echo $kycFilter==='unlinked' ? 'selected' : ''; ?>>KYC Unlinked</option>
             </select>
-            <input type="text" name="search" class="form-control form-control-sm mem-filter-search" placeholder="नाम / इमेल / फोन खोज्नुहोस्…"
-                   value="<?php echo htmlspecialchars($search); ?>">
-            <button class="btn btn-success btn-sm"><i class="fas fa-search"></i></button>
-            <?php if ($search || $kycFilter !== 'all'): ?><a href="members.php" class="btn btn-outline-secondary btn-sm">Clear</a><?php endif; ?>
+            <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-search me-1"></i>खोज</button>
+            <?php if ($search !== '' || $kycFilter !== 'all'): ?>
+                <a href="members.php<?php echo $memSub === 'arch' ? '?mem_sub=arch' : ''; ?>" class="btn btn-sm btn-outline-secondary">Clear</a>
+            <?php endif; ?>
         </form>
+        <small class="text-muted">
+            <?php echo $memSub === 'live' ? 'सक्रिय सदस्य' : 'अभिलेख (निष्क्रिय)'; ?>
+            <?php if ($totalCount > 0): ?>
+                · <?php echo $offset + 1; ?>–<?php echo $offset + count($members); ?> / <?php echo $totalCount; ?>
+            <?php else: ?> · 0 / 0<?php endif; ?>
+        </small>
     </div>
     <div class="card-body p-0">
+        <?php echo adminListSubtabQueryLinks('mem-sub', $countLiveMembers, $countArchMembers, 'mem_sub', $memSub, 'members.php', $memPreserveQ); ?>
         <?php if (empty($members)): ?>
-        <div class="text-center text-muted py-5">
+        <div class="text-center text-muted py-5 px-3">
             <i class="fas fa-user-slash fa-3x mb-3 opacity-25"></i>
-            <div><?php echo $search ? "'{$search}' फेला परेन।" : 'अहिलेसम्म कुनै Member दर्ता भएको छैन।'; ?></div>
-            <small class="text-muted mt-1 d-block">Member Portal मा Register गरेपछि यहाँ देखिन्छ।</small>
+            <div><?php echo $search !== '' ? "'" . htmlspecialchars($search, ENT_QUOTES, 'UTF-8') . "' फेला परेन।" : ($memSub === 'arch' ? 'अभिलेखमा कुनै सदस्य छैन।' : 'अहिलेसम्म कुनै सक्रिय Member छैन।'); ?></div>
+            <small class="text-muted mt-1 d-block">Member Portal मा Register गरेपछि यहाँ देखिन्छ। अर्को उप-ट्याब वा फिल्टर हेर्नुहोस्।</small>
         </div>
         <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover align-middle mb-0">
                 <thead class="table-light"><tr>
                     <th>#</th><th>Member</th><th>सदस्यता नं</th><th>Contact</th><th>Card No.</th>
                     <th>Login विधि</th><th>दर्ता</th><th>अवस्था</th><th>Action</th>
@@ -459,8 +495,8 @@ try {
                     <td class="small"><?php echo htmlspecialchars($m['phone'] ?? '—'); ?></td>
                     <td><code class="small"><?php echo htmlspecialchars($m['member_card_no'] ?? ''); ?></code></td>
                     <td>
-                        <?php if ($m['google_id']): ?><span class="badge mem-badge-google mem-login-pill"><i class="fab fa-google me-1"></i>G</span><?php endif; ?>
-                        <?php if ($m['facebook_id']): ?><span class="badge mem-badge-facebook mem-login-pill"><i class="fab fa-facebook me-1"></i>FB</span><?php endif; ?>
+                        <?php if ($m['google_id']): ?><span class="badge mem-badge-google mem-login-pill"><i class="fa-brands fa-google me-1"></i>G</span><?php endif; ?>
+                        <?php if ($m['facebook_id']): ?><span class="badge mem-badge-facebook mem-login-pill"><i class="fa-brands fa-facebook-f me-1"></i>FB</span><?php endif; ?>
                         <?php if ($m['password_hash']): ?><span class="badge bg-success mem-login-pill">Email</span><?php endif; ?>
                     </td>
                     <td class="small text-muted"><?php echo formatNepaliDate($m['created_at']); ?></td>
@@ -500,7 +536,12 @@ try {
             <nav><ul class="pagination pagination-sm mb-0">
                 <?php for ($pg = 1; $pg <= $totalPages; $pg++): ?>
                 <li class="page-item <?php echo $pg === $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo $pg; ?>&search=<?php echo urlencode($search); ?>&kyc=<?php echo urlencode($kycFilter); ?>"><?php echo $pg; ?></a>
+                    <a class="page-link" href="<?php echo htmlspecialchars('members.php?' . http_build_query(array_filter([
+                        'page' => $pg,
+                        'search' => $search !== '' ? $search : null,
+                        'kyc' => $kycFilter !== 'all' ? $kycFilter : null,
+                        'mem_sub' => $memSub !== 'live' ? $memSub : null,
+                    ], static fn ($v) => $v !== null && $v !== '')), ENT_QUOTES, 'UTF-8'); ?>"><?php echo $pg; ?></a>
                 </li>
                 <?php endfor; ?>
             </ul></nav>
