@@ -179,7 +179,7 @@ $pageGroups = [
     'aavedan'=> ['kyc','kyc-risk-reviews','loans','account-apps','digital-service-requests','auctions','auction-bids','vendor-enlistment'],
     'program' => ['programs','program-attendance','program-attendance-verify'],
     'nirvachan' => ['election-information','election-posts','election-candidates','election-results'],
-    'sampark'=> ['messages','feedbacks','grievances','appointments','welfare-claims','help-center','members'],
+    'sampark'=> ['messages','feedbacks','grievances','appointments','welfare-claims','help-center','members','member-activities'],
     'memportal'=> ['member-online-portal'],
     'sanstha'=> ['service-centers','institutional-profile','notification-settings','notification-templates','member-of-year','about-settings','satisfaction-settings','settings'],
     'prawidhi'=> ['system-info','run-migration','backup-restore','update-checklist','site-health','db-setup','site-license'],
@@ -816,6 +816,12 @@ set_exception_handler(function (\Throwable $ex) {
                                 <a href="members.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-user-check nav-icon-accent nav-icon-primary"></i></span>
                                     <span>Member Portal</span>
+                                </a>
+                            </li>
+                            <li class="<?php echo $currentPage=='member-activities' ? 'active' : ''; ?>">
+                                <a href="member-activities.php">
+                                    <span class="nav-icon-wrap"><i class="fas fa-magnifying-glass-chart nav-icon-accent nav-icon-amber"></i></span>
+                                    <span>Member Activities Search</span>
                                 </a>
                             </li>
                         </ul>

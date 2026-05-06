@@ -4,6 +4,8 @@ $footerText = getSetting('footer_text', '© 2024 आकाश सहकारी
 $aboutShort = getSetting('about_short', 'आकाश बचत तथा ऋण सहकारी संस्था लि. एक अग्रणी वित्तीय संस्था हो।');
 $developerName = getSetting('developer_name', 'Tanka Adhikari');
 $developerUrl = getSetting('developer_url', 'https://www.tankaadhikari.com.np/');
+$supportedName = trim((string)getSetting('supported_name', ''));
+$supportedUrl = trim((string)getSetting('supported_url', ''));
 $whatsappNumber = getSetting('whatsapp_number', '');
 $workingHours = getSetting('working_hours', 'आइतबार - शुक्रबार: बिहान १०:०० - साँझ ५:००');
 
@@ -196,6 +198,17 @@ try {
                         <span><?php echo number_format($todayVisitors); ?></span>
                     </div>
                 </div>
+
+                <?php if ($supportedName !== ''): ?>
+                <p class="developer" style="font-size:.78rem; opacity:.9; margin-bottom:2px;">
+                    Supported By
+                    <?php if ($supportedUrl !== ''): ?>
+                    <a href="<?php echo htmlspecialchars($supportedUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener"><?php echo htmlspecialchars($supportedName, ENT_QUOTES, 'UTF-8'); ?></a>
+                    <?php else: ?>
+                    <span><?php echo htmlspecialchars($supportedName, ENT_QUOTES, 'UTF-8'); ?></span>
+                    <?php endif; ?>
+                </p>
+                <?php endif; ?>
 
                 <p class="developer">
                     Developed with <i class="fas fa-heart" style="color: #e74c3c; font-size: 12px;"></i> by

@@ -599,6 +599,8 @@ $chairmanPhoto = getSetting('chairman_photo', '');
 $ceoMessage = getSetting('ceo_message_np', '');
 $ceoName = getSetting('ceo_name', 'प्रमुख कार्यकारी अधिकृत');
 $ceoPhoto = getSetting('ceo_photo', '');
+$ceoDesignationNp = trim((string)getSetting('ceo_designation_np', 'प्रमुख कार्यकारी अधिकृत'));
+$ceoDesignationEn = trim((string)getSetting('ceo_designation_en', 'Chief Executive Officer'));
 
 // Get Information Officer and Grievance Officer
 $informationOfficer = $grievanceOfficer = null;
@@ -662,7 +664,7 @@ if ($db instanceof PDO) {
                     </div>
                     <div class="profile-info">
                         <h4><?php echo $ceoName; ?></h4>
-                        <span class="profile-position"><?php echo isEnglish() ? 'CEO' : 'प्रमुख कार्यकारी अधिकृत'; ?></span>
+                        <span class="profile-position"><?php echo isEnglish() ? $ceoDesignationEn : $ceoDesignationNp; ?></span>
                         <p class="profile-message"><?php echo truncateText(strip_tags($ceoMessage), 120); ?></p>
                     </div>
                     <a href="about.php#ceo-message" class="profile-btn">

@@ -32,6 +32,21 @@ foreach ([$aboutImageSetting, $aboutImageDefault] as $_abPath) {
     }
 }
 $hasAboutImage = $aboutResolved !== '';
+$aboutIntroSetting = trim((string)getSetting('about_intro_image', ''));
+$aboutVisual = '';
+if ($aboutIntroSetting !== '' && is_readable(ROOT_PATH . ltrim($aboutIntroSetting, '/'))) {
+    $aboutVisual = ltrim($aboutIntroSetting, '/');
+}
+if ($aboutVisual === '') {
+    $aboutVisual = $aboutResolved;
+}
+if ($aboutVisual === '') {
+    $historyFallback = trim((string)getSetting('history_photo', ''));
+    if ($historyFallback !== '' && is_readable(ROOT_PATH . ltrim($historyFallback, '/'))) {
+        $aboutVisual = ltrim($historyFallback, '/');
+    }
+}
+$hasAboutVisual = $aboutVisual !== '';
 
 // Static section titles (admin editable via pages-v2 static sections)
 $visionTitleNp = getSetting('vision_content_title_np', 'हाम्रो दृष्टिकोण');
@@ -58,23 +73,8 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 <!-- About Content -->
 <section class="about-section section-padding" id="about">
     <div class="container">
-        <div class="row align-items-start justify-content-center">
-            <?php if ($hasAboutImage): ?>
-            <div class="col-lg-6 mb-4" data-aos="fade-right">
-                <div class="about-image-box">
-                    <img src="<?php echo SITE_URL . htmlspecialchars($aboutResolved, ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo (int) filemtime(ROOT_PATH . $aboutResolved); ?>"
-                         alt="<?php echo isEnglish() ? 'About Us' : 'हाम्रो बारेमा'; ?>"
-                         class="img-fluid rounded-4"
-                         loading="lazy"
-                         decoding="async">
-                    <div class="about-year-badge">
-                        <span class="year"><?php echo getSetting('established_year', '२०७५'); ?></span>
-                        <span class="text"><?php echo isEnglish() ? 'Est.' : 'स्थापना'; ?></span>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
-            <div class="<?php echo $hasAboutImage ? 'col-lg-6' : 'col-lg-10 col-xl-9'; ?> mb-4" data-aos="fade-left">
+        <div class="row align-items-start justify-content-center g-4">
+            <div class="<?php echo $hasAboutVisual ? 'col-lg-7' : 'col-lg-10 col-xl-9'; ?> mb-2" data-aos="fade-right">
                 <div class="about-content-box">
                     <div style="margin-bottom:4px;">
                         <span class="section-tag"><i class="fas fa-building"></i> <?php echo isEnglish() ? 'About Us' : 'हाम्रो बारेमा'; ?></span>
@@ -100,6 +100,24 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
                     <?php endif; ?>
                 </div>
             </div>
+            <?php if ($hasAboutVisual): ?>
+            <div class="col-lg-5 mb-2" data-aos="fade-left">
+                <div class="about-image-box about-image-box-side">
+                    <div class="about-side-badge">
+                        <i class="fas fa-seedling me-1"></i><?php echo isEnglish() ? 'Journey of Trust' : 'विश्वासको यात्रा'; ?>
+                    </div>
+                    <img src="<?php echo SITE_URL . htmlspecialchars($aboutVisual, ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo (int) filemtime(ROOT_PATH . $aboutVisual); ?>"
+                         alt="<?php echo isEnglish() ? 'About Us' : 'हाम्रो बारेमा'; ?>"
+                         class="img-fluid rounded-4"
+                         loading="lazy"
+                         decoding="async">
+                    <div class="about-year-badge">
+                        <span class="year"><?php echo getSetting('established_year', '२०७५'); ?></span>
+                        <span class="text"><?php echo isEnglish() ? 'Est.' : 'स्थापना'; ?></span>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -112,9 +130,30 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(26, 95, 42, 0.15);
 }
+.about-image-box-side {
+    min-height: 100%;
+    background: #f8fafc;
+}
+.about-side-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: rgba(22, 101, 52, 0.9);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
 
 .about-image-box img {
     width: 100%;
+    max-height: 540px;
+    object-fit: cover;
     transition: transform 0.5s ease;
 }
 
@@ -197,8 +236,8 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 <!-- History Section - Eye Catching Design -->
 <section class="history-section-v2 section-padding" id="history">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+        <div class="row align-items-start g-4">
+            <div class="col-lg-5 mb-2" data-aos="fade-right">
                 <?php
                 /*
                  * Issue #14 FIX:
@@ -247,7 +286,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
                 </div>
                 <?php endif; ?>
             </div>
-            <div class="col-lg-6" data-aos="fade-left">
+            <div class="col-lg-7" data-aos="fade-left">
                 <div class="history-content-v2">
                     <div style="margin-bottom:4px;">
                         <span class="section-tag"><i class="fas fa-history"></i> <?php echo isEnglish() ? 'Our Journey' : 'हाम्रो यात्रा'; ?></span>
@@ -360,7 +399,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.3;
+    opacity: 1;
 }
 
 .history-overlay {
@@ -651,6 +690,8 @@ $chairmanPhoto = getSetting('chairman_photo', '');
 $ceoMessage = getSetting('ceo_message_np', '');
 $ceoName = getSetting('ceo_name', 'प्रमुख कार्यकारी अधिकृत');
 $ceoPhoto = getSetting('ceo_photo', '');
+$ceoDesignationNp = trim((string)getSetting('ceo_designation_np', 'प्रमुख कार्यकारी अधिकृत'));
+$ceoDesignationEn = trim((string)getSetting('ceo_designation_en', 'Chief Executive Officer'));
 ?>
 <?php if ($chairmanMessage || $ceoMessage): ?>
 <section class="leadership-messages-about section-padding bg-light" id="chairman">
@@ -661,7 +702,7 @@ $ceoPhoto = getSetting('ceo_photo', '');
             </div>
             <h2><?php echo isEnglish() ? 'Messages from Leadership' : 'नेतृत्वबाट सन्देश'; ?></h2>
             <div class="section-divider"></div>
-            <p><?php echo isEnglish() ? 'Words from our Chairman and CEO' : 'हाम्रो अध्यक्ष र प्रमुख कार्यकारी अधिकृतका शब्दहरू'; ?></p>
+            <p><?php echo isEnglish() ? ('Words from our Chairman and ' . $ceoDesignationEn) : ('हाम्रो अध्यक्ष र ' . $ceoDesignationNp . 'का शब्दहरू'); ?></p>
         </div>
 
         <?php if ($chairmanMessage): ?>
@@ -706,7 +747,7 @@ $ceoPhoto = getSetting('ceo_photo', '');
                         <?php endif; ?>
                     </div>
                     <h4 class="mt-3"><?php echo $ceoName; ?></h4>
-                    <span class="leader-position"><?php echo isEnglish() ? 'Chief Executive Officer' : 'प्रमुख कार्यकारी अधिकृत'; ?></span>
+                    <span class="leader-position"><?php echo isEnglish() ? $ceoDesignationEn : $ceoDesignationNp; ?></span>
                 </div>
                 <div class="col-lg-9 col-md-8">
                     <div class="message-content-full">

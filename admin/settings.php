@@ -17,7 +17,7 @@ checkCSRF();
 
         // Update text settings
         /* site_version थपियो — admin ले version number अपडेट गर्न सक्छ */
-        $textSettings = ['site_name', 'site_name_en', 'site_slogan', 'site_slogan_en', 'meta_description', 'meta_description_en', 'meta_keywords', 'phone', 'mobile', 'email', 'address', 'facebook_url', 'youtube_url', 'twitter_url', 'instagram_url', 'whatsapp_number', 'about_short', 'hero_title', 'hero_subtitle', 'footer_text', 'internet_banking_url', 'play_store_url', 'app_store_url', 'developer_name', 'developer_url', 'google_map_url', 'working_hours', 'saturday_hours', 'primary_color', 'secondary_color', 'header_color', 'footer_color', 'topbar_color', 'chairman_name', 'ceo_name', 'site_version', 'site_launch_date', 'google_client_id', 'google_client_secret', 'facebook_app_id', 'facebook_app_secret', 'twofa_admin_required', 'twofa_member_required'];
+        $textSettings = ['site_name', 'site_name_en', 'site_slogan', 'site_slogan_en', 'meta_description', 'meta_description_en', 'meta_keywords', 'phone', 'mobile', 'email', 'address', 'facebook_url', 'youtube_url', 'twitter_url', 'instagram_url', 'whatsapp_number', 'about_short', 'hero_title', 'hero_subtitle', 'footer_text', 'internet_banking_url', 'play_store_url', 'app_store_url', 'developer_name', 'developer_url', 'supported_name', 'supported_url', 'google_map_url', 'working_hours', 'saturday_hours', 'primary_color', 'secondary_color', 'header_color', 'footer_color', 'topbar_color', 'chairman_name', 'ceo_name', 'ceo_designation_np', 'ceo_designation_en', 'site_version', 'site_launch_date', 'google_client_id', 'google_client_secret', 'facebook_app_id', 'facebook_app_secret', 'twofa_admin_required', 'twofa_member_required'];
 
         /* Color inputs सुरक्षित/valid hex मा मात्र save गर्ने:
            invalid value ले UI text invisible/unstyled बनाउने risk कम हुन्छ। */
@@ -36,7 +36,7 @@ checkCSRF();
                 if (in_array($key, ['twofa_admin_required','twofa_member_required'], true) && empty($_SESSION['is_superadmin'])) {
                     continue;
                 }
-                if (in_array($key, ['footer_text', 'developer_name', 'developer_url'], true) && !$canEditFooterDev) {
+                if (in_array($key, ['footer_text', 'developer_name', 'developer_url', 'supported_name', 'supported_url'], true) && !$canEditFooterDev) {
                     continue;
                 }
                 $value = $_POST[$key];
@@ -131,6 +131,32 @@ checkCSRF();
                 }
             } else {
                 $uploadErrors[] = 'About page image upload: ' . ($upload['message'] ?? 'Unknown error');
+            }
+        }
+
+        // Handle about intro right image upload
+        if (isset($_FILES['about_intro_image']) && $_FILES['about_intro_image']['error'] === UPLOAD_ERR_OK) {
+            $upload = uploadFile($_FILES['about_intro_image'], 'pages');
+            if ($upload['success']) {
+                $result = updateSetting('about_intro_image', $upload['path']);
+                if (!$result) {
+                    $uploadErrors[] = 'About intro image save गर्न सकिएन';
+                }
+            } else {
+                $uploadErrors[] = 'About intro image upload: ' . ($upload['message'] ?? 'Unknown error');
+            }
+        }
+
+        // Handle history photo upload (about history section)
+        if (isset($_FILES['history_photo']) && $_FILES['history_photo']['error'] === UPLOAD_ERR_OK) {
+            $upload = uploadFile($_FILES['history_photo'], 'pages');
+            if ($upload['success']) {
+                $result = updateSetting('history_photo', $upload['path']);
+                if (!$result) {
+                    $uploadErrors[] = 'History photo save गर्न सकिएन';
+                }
+            } else {
+                $uploadErrors[] = 'History photo upload: ' . ($upload['message'] ?? 'Unknown error');
             }
         }
 
@@ -327,22 +353,6 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                         <textarea name="meta_keywords" class="form-control" rows="2" maxlength="500"
                                   placeholder="सहकारी, बचत, ऋण, नेपाल"><?php echo htmlspecialchars($settings['meta_keywords'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">डिफल्ट share छवि (Open Graph / Facebook)</label>
-                        <?php if (!empty($settings['seo_og_image'])): ?>
-                        <div class="mb-2">
-                            <img src="../<?php echo htmlspecialchars($settings['seo_og_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="OG" style="max-width:100%;max-height:120px;border-radius:8px;border:1px solid #dee2e6;">
-                        </div>
-                        <?php endif; ?>
-                        <input type="file" name="seo_og_image" class="form-control" accept="image/jpeg,image/png,image/webp">
-                        <small class="text-muted d-block mt-1">सिफारिस ~1200×630 px। खाली भए लोगो प्रयोग हुन्छ।</small>
-                        <?php if (!empty($settings['seo_og_image'])): ?>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" name="clear_seo_og_image" value="1" id="clear_seo_og_image">
-                            <label class="form-check-label" for="clear_seo_og_image">Share छवि हटाउनुहोस् (लोगोमा फर्कनु)</label>
-                        </div>
-                        <?php endif; ?>
-                    </div>
                 </div>
             </div>
 
@@ -506,16 +516,6 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     </div>
                     <?php endif; ?>
 
-                    <div class="mb-3">
-                        <label class="form-label">Mobile App Photo</label>
-                        <?php if (isset($settings['mobile_app_photo']) && $settings['mobile_app_photo']): ?>
-                        <div class="mb-2">
-                            <img src="../<?php echo $settings['mobile_app_photo']; ?>" alt="Mobile App" class="img-thumbnail" style="max-height: 120px;">
-                        </div>
-                        <?php endif; ?>
-                        <input type="file" name="mobile_app_photo" class="form-control" accept="image/*">
-                        <small class="text-muted">मोबाइल एप सेक्सनमा देखिने फोटो (अनुशंसित: 400x600px)</small>
-                    </div>
                 </div>
             </div>
 
@@ -534,15 +534,6 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                                        value="<?php echo $settings['chairman_name'] ?? ''; ?>"
                                        placeholder="अध्यक्षको पूरा नाम">
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">अध्यक्षको फोटो</label>
-                                <?php if (isset($settings['chairman_photo']) && $settings['chairman_photo']): ?>
-                                <div class="mb-2">
-                                    <img src="../<?php echo $settings['chairman_photo']; ?>" alt="Chairman" class="img-thumbnail" style="max-height: 80px;">
-                                </div>
-                                <?php endif; ?>
-                                <input type="file" name="chairman_photo" class="form-control" accept="image/*">
-                            </div>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-success mb-3"><i class="fas fa-user"></i> प्रमुख कार्यकारी अधिकृत</h6>
@@ -552,20 +543,29 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                                        value="<?php echo $settings['ceo_name'] ?? ''; ?>"
                                        placeholder="CEO को पूरा नाम">
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">CEO को फोटो</label>
-                                <?php if (isset($settings['ceo_photo']) && $settings['ceo_photo']): ?>
-                                <div class="mb-2">
-                                    <img src="../<?php echo $settings['ceo_photo']; ?>" alt="CEO" class="img-thumbnail" style="max-height: 80px;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">कार्यकारी पदनाम (नेपाली)</label>
+                                        <input type="text" name="ceo_designation_np" class="form-control"
+                                               value="<?php echo $settings['ceo_designation_np'] ?? 'प्रमुख कार्यकारी अधिकृत'; ?>"
+                                               placeholder="उदा: व्यवस्थापक / प्रमुख कार्यकारी अधिकृत">
+                                    </div>
                                 </div>
-                                <?php endif; ?>
-                                <input type="file" name="ceo_photo" class="form-control" accept="image/*">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Executive Designation (English)</label>
+                                        <input type="text" name="ceo_designation_en" class="form-control"
+                                               value="<?php echo $settings['ceo_designation_en'] ?? 'Chief Executive Officer'; ?>"
+                                               placeholder="e.g. Manager / Chief Executive Officer">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="alert alert-info mt-3 mb-0">
                         <i class="fas fa-info-circle"></i>
-                        सन्देशहरू <a href="pages.php" class="alert-link">पृष्ठ व्यवस्थापन</a> मा "अध्यक्षको सन्देश" र "प्रमुख कार्यकारी अधिकृतको सन्देश" मा सम्पादन गर्नुहोस्।
+                        सन्देशहरू <a href="pages.php" class="alert-link">पृष्ठ व्यवस्थापन</a> मा सम्पादन गर्नुहोस्। फोटोहरू "Branding / Media Manager" मा एकै ठाउँबाट अपलोड गर्न सकिन्छ।
                     </div>
                 </div>
             </div>
@@ -601,6 +601,24 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                                 <label class="form-label">Developed By URL</label>
                                 <input type="url" name="developer_url" class="form-control"
                                        value="<?php echo $settings['developer_url'] ?? 'https://www.tankaadhikari.com.np/'; ?>"
+                                       <?php echo $canEditFooterDev ? '' : 'readonly'; ?>>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Supported By (Name)</label>
+                                <input type="text" name="supported_name" class="form-control"
+                                       value="<?php echo $settings['supported_name'] ?? ''; ?>"
+                                       <?php echo $canEditFooterDev ? '' : 'readonly'; ?>>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Supported By URL</label>
+                                <input type="url" name="supported_url" class="form-control"
+                                       value="<?php echo $settings['supported_url'] ?? ''; ?>"
                                        <?php echo $canEditFooterDev ? '' : 'readonly'; ?>>
                             </div>
                         </div>
@@ -669,64 +687,71 @@ if (!in_array($panel, ['general', 'branding'], true)) {
         <div class="row">
         <div class="col-lg-12">
             <!-- Sidebar -->
-            <!-- Logo -->
-            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="branding" data-stg-group="media" data-stg-order="1">
-                <div class="card-header stg-section-header">
-                    <h5 class="stg-section-title"><i class="fas fa-image"></i> लोगो</h5>
-                </div>
-                <div class="card-body text-center">
-                    <?php if (isset($settings['logo']) && $settings['logo']): ?>
-                        <img src="../<?php echo $settings['logo']; ?>" alt="Logo" class="img-fluid mb-3" style="max-height: 100px;">
-                    <?php endif; ?>
-                    <div class="mb-3">
-                        <input type="file" name="logo" class="form-control" accept="image/*">
-                        <small class="text-muted">PNG/JPG/SVG (सिफारिस: 1200x460 वा बढी, Max 10MB)</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Himal Background Photo -->
-            <div class="card mb-4 stg-section-card stg-accent-card stg-filter-card" data-stg-panel="branding" data-stg-group="media" data-stg-order="2">
+            <!-- Media Manager -->
+            <div class="card mb-4 stg-section-card stg-accent-card stg-filter-card" data-stg-panel="branding" data-stg-group="media" data-stg-order="1">
                 <div class="card-header stg-section-header stg-soft-green-header">
-                    <h5 class="mb-0 stg-section-title"><i class="fas fa-mountain me-2"></i>हेडर हिमाल फोटो</h5>
+                    <h5 class="mb-0 stg-section-title"><i class="fas fa-images me-2"></i>Media Manager (सबै fixed फोटो)</h5>
                 </div>
-                <div class="card-body text-center">
-                    <?php if (!empty($settings['himal_bg'])): ?>
-                        <img src="../<?php echo htmlspecialchars($settings['himal_bg']); ?>"
-                             alt="Himal Background" class="img-fluid mb-2 rounded border"
-                             style="max-height:100px; width:100%; max-width:520px; object-fit:cover;">
-                        <div class="mb-2">
-                            <small class="text-success"><i class="fas fa-check-circle"></i> फोटो अपलोड भएको छ</small>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Site Logo</label>
+                            <?php if (!empty($settings['logo'])): ?><img src="../<?php echo htmlspecialchars($settings['logo'], ENT_QUOTES, 'UTF-8'); ?>" alt="Logo" class="img-fluid mb-2 border rounded" style="max-height:100px;"><?php endif; ?>
+                            <input type="file" name="logo" class="form-control" accept="image/*">
+                            <small class="text-muted">अनुशंसित: 1200x460+</small>
                         </div>
-                    <?php else: ?>
-                        <div class="admin-media-placeholder" role="status">
-                            <i class="fas fa-mountain"></i>
-                            <span>हिमाल फोटो छैन — साइटमा gradient देखिन्छ</span>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Header Himal Photo</label>
+                            <?php if (!empty($settings['himal_bg'])): ?><img src="../<?php echo htmlspecialchars($settings['himal_bg'], ENT_QUOTES, 'UTF-8'); ?>" alt="Himal" class="img-fluid mb-2 border rounded" style="max-height:100px;"><?php endif; ?>
+                            <input type="file" name="himal_bg" class="form-control" accept="image/*">
+                            <small class="text-muted">अनुशंसित: 1400x200</small>
                         </div>
-                    <?php endif; ?>
-                    <div class="mb-0">
-                        <input type="file" name="himal_bg" class="form-control" accept="image/*">
-                        <small class="text-muted mt-1 d-block">
-                            <i class="fas fa-info-circle"></i>
-                            Header को हरियो background मा देखिने हिमाल/पहाड फोटो।<br>
-                            <strong>अनुशंसित:</strong> 1400×200px landscape (JPG/PNG, Max 10MB)
-                        </small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- About Page Image -->
-            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="branding" data-stg-group="media" data-stg-order="3">
-                <div class="card-header stg-section-header">
-                    <h5 class="stg-section-title"><i class="fas fa-info-circle"></i> हाम्रो बारेमा पृष्ठको फोटो</h5>
-                </div>
-                <div class="card-body text-center">
-                    <?php if (isset($settings['about_page_image']) && $settings['about_page_image']): ?>
-                        <img src="../<?php echo $settings['about_page_image']; ?>" alt="About Page" class="img-fluid mb-3" style="max-height: 120px;">
-                    <?php endif; ?>
-                    <div class="mb-3">
-                        <input type="file" name="about_page_image" class="form-control" accept="image/*">
-                        <small class="text-muted">"हाम्रो बारेमा" पृष्ठमा देखिने फोटो (अनुशंसित: 600x400px)</small>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">About Page Image</label>
+                            <?php if (!empty($settings['about_page_image'])): ?><img src="../<?php echo htmlspecialchars($settings['about_page_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="About" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <input type="file" name="about_page_image" class="form-control" accept="image/*">
+                            <small class="text-muted">अनुशंसित: 600x400</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">About Intro Right Image</label>
+                            <?php if (!empty($settings['about_intro_image'])): ?><img src="../<?php echo htmlspecialchars($settings['about_intro_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="About Intro" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <input type="file" name="about_intro_image" class="form-control" accept="image/*">
+                            <small class="text-muted">अनुशंसित: 700x900</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">History Section Photo</label>
+                            <?php if (!empty($settings['history_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['history_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="History" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <input type="file" name="history_photo" class="form-control" accept="image/*">
+                            <small class="text-muted">"हाम्रो इतिहास" section फोटो</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mobile App Photo</label>
+                            <?php if (!empty($settings['mobile_app_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['mobile_app_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="App" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <input type="file" name="mobile_app_photo" class="form-control" accept="image/*">
+                            <small class="text-muted">अनुशंसित: 400x600</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Chairman Photo</label>
+                            <?php if (!empty($settings['chairman_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['chairman_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="Chairman" class="img-fluid mb-2 border rounded" style="max-height:90px;"><?php endif; ?>
+                            <input type="file" name="chairman_photo" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">CEO / Executive Photo</label>
+                            <?php if (!empty($settings['ceo_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['ceo_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="CEO" class="img-fluid mb-2 border rounded" style="max-height:90px;"><?php endif; ?>
+                            <input type="file" name="ceo_photo" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Default Share Image (SEO OG)</label>
+                            <?php if (!empty($settings['seo_og_image'])): ?><img src="../<?php echo htmlspecialchars($settings['seo_og_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="OG" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <input type="file" name="seo_og_image" class="form-control" accept="image/jpeg,image/png,image/webp">
+                            <small class="text-muted d-block mt-1">अनुशंसित: 1200x630</small>
+                            <?php if (!empty($settings['seo_og_image'])): ?>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="clear_seo_og_image" value="1" id="clear_seo_og_image">
+                                <label class="form-check-label" for="clear_seo_og_image">Share image हटाउनुहोस्</label>
+                            </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
