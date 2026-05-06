@@ -47,9 +47,57 @@ if (isAdminLoggedIn()) {
 
 $error = '';
 /** साधारण admin — म्याद सकिएको बेला लग इन रोकिँदा (Superadmin बाहेक) */
-$msgSiteLicenseExpiredLogin = 'साइट सेवा म्याद सकियो। सहकारीका साधारण Admin ले यो बेला लग इन गर्न मिल्दैन। नवीकरण/तिराई: लग इन पृष्ठमै देखिएको नम्बर वा Superadmin/विक्रेता सम्पर्क गर्नुहोस्। नयाँ मिति सिस्टममा Superadmin ले राख्छन्।';
+$msgSiteLicenseExpiredLogin = 'साइट सेवा म्याद सकियो। सहकारीका साधारण Admin ले यो बेला लग इन गर्न मिल्दैन। नवीकरण/तिराई: तलको Pay Now वा विक्रेता सम्पर्क। नयाँ मिति Superadmin ले «साइट म्याद» मा राख्छन्।';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['action'] ?? '') === 'submit_renewal_notice_login') {
+    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
+        $error = 'सुरक्षा जाँच असफल। पृष्ठ refresh गरी पुन: प्रयास गर्नुहोस्।';
+    } elseif (!function_exists('site_license_expired') || !site_license_expired()) {
+        header('Location: ' . ADMIN_URL . 'index.php');
+        exit;
+    } elseif (!checkRateLimit('admin_login_renewal_notice', 15, 3600)) {
+        $error = 'धेरै पटक भुक्तानी सूचना पठाइयो। केही समय पछि प्रयास गर्नुहोस्।';
+    } else {
+        try {
+            $db = getDB();
+            ensureSiteLicenseRenewalNoticesTable($db);
+            if (site_license_renewal_pending_count($db) > 0) {
+                $error = 'पहिले नै भुक्तानी सूचना पेन्डिङ छ। दोहोरो नपठाउनुहोस्। Superadmin वा विक्रेता सम्पर्क गर्नुहोस्।';
+            } else {
+                $gateway = trim((string) ($_POST['gateway'] ?? ''));
+                $txn = trim((string) ($_POST['txn_reference'] ?? ''));
+                $amt = trim((string) ($_POST['amount_reported'] ?? ''));
+                $note = trim((string) ($_POST['renewal_note'] ?? ''));
+                $submitter = trim((string) ($_POST['submitter_name'] ?? ''));
+                $allowedGw = ['khalti', 'esewa', 'other'];
+                if (!in_array($gateway, $allowedGw, true)) {
+                    $error = 'गेटवेइ छान्नुहोस्।';
+                } elseif (mb_strlen($txn) < 3) {
+                    $error = 'कारोबार नम्बर / Ref कम्तिमा ३ अक्षर हुनुपर्छ।';
+                } elseif (mb_strlen($submitter) < 2) {
+                    $error = 'पठाउने (कार्यालय/नाम) कम्तिमा २ अक्षर लेख्नुहोस्।';
+                } else {
+                    $st = $db->prepare("INSERT INTO site_license_renewal_notices (status, gateway, txn_reference, amount_reported, note, submitted_by_admin_id, submitted_by_username) VALUES ('pending',?,?,?,?,NULL,?)");
+                    $st->execute([$gateway, $txn, $amt, $note, $submitter]);
+                    $newId = (int) $db->lastInsertId();
+                    site_license_renewal_notify_vendor($db, [
+                        'id' => $newId,
+                        'gateway' => $gateway,
+                        'txn_reference' => $txn,
+                        'amount_reported' => $amt,
+                        'note' => $note,
+                        'submitted_by_username' => $submitter,
+                    ]);
+                    header('Location: ' . ADMIN_URL . 'index.php?renewal_sent=1');
+                    exit;
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('[admin-login-renewal-notice] ' . $e->getMessage());
+            $error = 'सर्भर त्रुटि। पछि प्रयास गर्नुहोस् वा विक्रेता सम्पर्क गर्नुहोस्।';
+        }
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['do_admin_2fa'])) {
         if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
             $error = 'Security error.';
@@ -315,6 +363,7 @@ $logoPath = function_exists('getSetting')
 $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . ltrim($logoPath,'/')) : '';
 
 $licExpiredLogin = function_exists('site_license_expired') && site_license_expired();
+$renewalNoticeSent = $licExpiredLogin && isset($_GET['renewal_sent']) && (string) $_GET['renewal_sent'] === '1';
 $loginRenewKhalti = '';
 $loginRenewEsewa = '';
 $loginRenewAmount = '';
@@ -514,6 +563,64 @@ if ($licExpiredLogin && function_exists('site_license_pay_id_or_default') && fun
             font-size: .76rem;
             color: #15803d;
         }
+        .license-renew-vendor {
+            font-size: .76rem;
+            line-height: 1.55;
+            color: #334155;
+            background: rgba(255,255,255,.75);
+            border: 1px solid rgba(22,101,52,.2);
+            border-radius: 10px;
+            padding: 10px 11px;
+            margin-bottom: 12px;
+        }
+        .license-renew-success {
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+            border-radius: 10px;
+            padding: 11px 12px;
+            margin-bottom: 12px;
+            font-size: .78rem;
+            line-height: 1.5;
+        }
+        .license-renew-form .lr-fld { margin-bottom: 10px; }
+        .license-renew-form label {
+            display: block;
+            font-size: .7rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .license-renew-form input,
+        .license-renew-form select,
+        .license-renew-form textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: .85rem;
+            font-family: inherit;
+            background: #fff;
+        }
+        .license-renew-form textarea { min-height: 56px; resize: vertical; }
+        .license-renew-form .lr-submit {
+            margin-top: 6px;
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: .88rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .license-renew-form .lr-submit:hover { filter: brightness(1.05); }
         @media (max-width:480px) {
             .auth-card { border-radius: 16px; }
             .card-header { padding: 24px 20px 18px; }
@@ -546,10 +653,14 @@ if ($licExpiredLogin && function_exists('site_license_pay_id_or_default') && fun
 
         <?php if ($licExpiredLogin && !is_array($admin2faPending)): ?>
         <div class="license-renew-on-login">
-            <h4><i class="fas fa-hand-holding-dollar"></i> नवीकरण — सहकारी Admin का लागि</h4>
+            <h4><i class="fas fa-building"></i> लाइसेन्स नवीकरण — कार्यालय Admin</h4>
+            <div class="license-renew-vendor">
+                <strong>विक्रेता / प्राविधिक:</strong> लाइसेन्स नवीकरण वा प्राविधिक सहयोगका लागि कृपया <strong>विक्रेता / प्राविधिक टोली</strong> लाई सम्पर्क गर्नुहोस्।
+                वैकल्पिक: तल <strong>Pay Now</strong> गरी भुक्तानी गरेपछि <strong>भुक्तानी सूचना</strong> फारम पठाउनुहोस् — Superadmin ले «साइट म्याद» मा सूचना देखेर <strong>नयाँ मिति</strong> सेभ गर्छन्।
+            </div>
             <p class="mb-2" style="font-size:.78rem;opacity:.95;">
-                <strong>साइट सेवा म्याद सकियो।</strong> सहकारीका <strong>साधारण Admin</strong> ले यो बेला यहाँबाट लग इन गर्न <strong>मिल्दैन</strong>।
-                नवीकरणका लागि आफ्नो Khalti वा eSewa बाट <strong>तलको नम्बरमा</strong> (विक्रेता खाता) रकम पठाउनुहोस् र <strong>Superadmin</strong> लाई कारोबार ref बताउनुहोस् — <strong>सिस्टममा नयाँ मिति Superadmin ले भित्र गई राख्छन्</strong> (तिर्ने र मिति फरक काम)।
+                <strong>साइट सेवा म्याद सकियो।</strong> सहकारीका <strong>कार्यालय/साधारण Admin</strong> ले यो बेला लग इन गर्न मिल्दैन।
+                आफ्नो Khalti वा eSewa बाट <strong>तलको नम्बरमा</strong> (विक्रेता खाता) रकम पठाउनुहोस्, अनि तलको फारमबाट ref सहित <strong>भुक्तानी सूचना पठाउनुहोस्</strong>।
             </p>
             <?php if ($loginRenewAmount !== ''): ?>
                 <div class="pay-row"><strong>रकम (सन्दर्भ):</strong> <?php echo htmlspecialchars($loginRenewAmount, ENT_QUOTES, 'UTF-8'); ?></div>
@@ -560,8 +671,44 @@ if ($licExpiredLogin && function_exists('site_license_pay_id_or_default') && fun
             <?php if ($loginRenewEsewa !== ''): ?>
                 <div class="pay-row"><strong>eSewa मा पठाउने:</strong> <code><?php echo htmlspecialchars($loginRenewEsewa, ENT_QUOTES, 'UTF-8'); ?></code></div>
             <?php endif; ?>
+            <?php if ($renewalNoticeSent): ?>
+            <div class="license-renew-success">
+                <strong><i class="fas fa-check-circle me-1"></i>भुक्तानी सूचना पठाइयो।</strong>
+                Superadmin ले Admin → «साइट म्याद» मा पेन्डिङ सूचना हेरी <strong>नयाँ मिति</strong> सेभ गर्छन्। प्रतीक्षा गर्नुहोस् वा विक्रेता सम्पर्क गर्नुहोस्।
+            </div>
+            <?php else: ?>
+            <form method="post" class="license-renew-form" action="">
+                <input type="hidden" name="action" value="submit_renewal_notice_login">
+                <?php echo csrfField(); ?>
+                <div class="lr-fld">
+                    <label for="submitter_name">पठाउने <span class="text-danger">*</span> (कार्यालय / नाम)</label>
+                    <input type="text" name="submitter_name" id="submitter_name" required maxlength="120" placeholder="उदा. कार्यालय प्रमुख, लेखा" autocomplete="name">
+                </div>
+                <div class="lr-fld">
+                    <label for="renew_gw">गेटवेइ <span class="text-danger">*</span></label>
+                    <select name="gateway" id="renew_gw" required>
+                        <option value="khalti">Khalti</option>
+                        <option value="esewa" selected>eSewa</option>
+                        <option value="other">अन्य</option>
+                    </select>
+                </div>
+                <div class="lr-fld">
+                    <label for="renew_txn">कारोबार नम्बर / Ref <span class="text-danger">*</span></label>
+                    <input type="text" name="txn_reference" id="renew_txn" required minlength="3" maxlength="180" placeholder="wallet मा देखिएको ref" autocomplete="off">
+                </div>
+                <div class="lr-fld">
+                    <label for="renew_amt">रकम (पठाएको)</label>
+                    <input type="text" name="amount_reported" id="renew_amt" maxlength="40" placeholder="ऐच्छिक" value="<?php echo htmlspecialchars($loginRenewAmount, ENT_QUOTES, 'UTF-8'); ?>">
+                </div>
+                <div class="lr-fld">
+                    <label for="renew_note">टिप्पणी</label>
+                    <textarea name="renewal_note" id="renew_note" maxlength="2000" placeholder="ऐच्छिक"></textarea>
+                </div>
+                <button type="submit" class="lr-submit"><i class="fas fa-paper-plane"></i> भुक्तानी सूचना पठाउनुहोस्</button>
+            </form>
+            <?php endif; ?>
             <div class="sub">
-                <i class="fas fa-user-shield me-1"></i><strong>Superadmin</strong> हुनुहुन्छ भने यो तिराइ बाकस तपाईंका लागि होइन — सिधै लग इन गरी «साइट म्याद» मा मिति/भुक्तानी व्यवस्थापन गर्नुहोस् (म्याद सकिए पनि लग इन मिल्छ)।
+                <i class="fas fa-user-shield me-1"></i><strong>Superadmin</strong> हुनुहुन्छ भने सिधै लग इन गर्नुहोस् — «साइट म्याद» मा <strong>पेन्डिङ सूचना</strong> र <strong>मिति सेभ</strong> हुन्छ (यो फारम कार्यालयका लागि हो)।
             </div>
         </div>
         <?php endif; ?>

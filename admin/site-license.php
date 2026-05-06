@@ -39,45 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('site-license.php');
     }
 
-    if ($action === 'submit_renewal_notice') {
-        if (!site_license_expired()) {
-            setFlash('error', 'म्याद नसकेको बेला यो फारम आवश्यक छैन।');
-            redirect('site-license.php');
-        }
-        if (site_license_renewal_pending_count($db) > 0) {
-            setFlash('warning', 'पहिले नै भुक्तानी सूचना पेन्डिङ छ। सक्रिय गर्न विक्रेतालाई सम्पर्क गर्नुहोस्। दोहोरो भुक्तानी नगर्नुहोस्।');
-            redirect('site-license.php');
-        }
-        $gateway = trim((string) ($_POST['gateway'] ?? ''));
-        $txn = trim((string) ($_POST['txn_reference'] ?? ''));
-        $amt = trim((string) ($_POST['amount_reported'] ?? ''));
-        $note = trim((string) ($_POST['renewal_note'] ?? ''));
-        $allowedGw = ['khalti', 'esewa', 'other'];
-        if (!in_array($gateway, $allowedGw, true)) {
-            setFlash('error', 'गेटवेइ छान्नुहोस्।');
-            redirect('site-license.php');
-        }
-        if (mb_strlen($txn) < 3) {
-            setFlash('error', 'कारोबार नम्बर / Ref कम्तिमा ३ अक्षर हुनुपर्छ।');
-            redirect('site-license.php');
-        }
-        $aid = (int) ($_SESSION['admin_id'] ?? 0);
-        $auser = trim((string) ($_SESSION['admin_name'] ?? ($_SESSION['admin_username'] ?? '')));
-        $st = $db->prepare('INSERT INTO site_license_renewal_notices (status, gateway, txn_reference, amount_reported, note, submitted_by_admin_id, submitted_by_username) VALUES (\'pending\',?,?,?,?,?,?)');
-        $st->execute([$gateway, $txn, $amt, $note, $aid > 0 ? $aid : null, $auser !== '' ? $auser : null]);
-        $newId = (int) $db->lastInsertId();
-        site_license_renewal_notify_vendor($db, [
-            'id' => $newId,
-            'gateway' => $gateway,
-            'txn_reference' => $txn,
-            'amount_reported' => $amt,
-            'note' => $note,
-            'submitted_by_username' => $auser,
-        ]);
-        setFlash('success', 'भुक्तानी सूचना पठाइयो। अब यही Superadmin ले तलको क्यालेन्डरबाट नयाँ मिति सेभ गर्नुहोस् (विक्रेता सम्पर्क भए पनि अन्तिम मिति यहीँ राखिन्छ)।');
-        redirect('site-license.php');
-    }
-
     if ($action === 'save_license_date') {
         $raw = trim((string) ($_POST['valid_until_bs'] ?? ''));
         if ($raw === '') {
@@ -176,10 +137,10 @@ if ($flash = getFlash()):
                         <strong>सजिलो नियम:</strong> तल <strong>बि.सं.</strong> क्यालेन्डरबाट छान्नुहोस्। अन्तिम दिनसम्म साइट चल्छ; त्यसपछि <strong>Expired</strong> — सार्वजनिक र साधारण admin बन्द; Superadmin मात्र यहाँ।
                     </p>
                     <div class="alert alert-secondary border py-2 small mb-3 mb-md-4">
-                        <strong class="d-block mb-1"><i class="fas fa-list-ol me-1"></i>नवीकरण क्रम (Superadmin मात्र)</strong>
-                        <span class="text-muted">①</span> म्याद सकेपछि तल <strong>Pay Now</strong> अनुसार wallet बाट भुक्तानी →
-                        <span class="text-muted">②</span> सोही पृष्ठको फारमबाट <strong>कारोबार ref</strong> पठाउनुहोस् →
-                        <span class="text-muted">③</span> तलको <strong>म्याद सेभ</strong> बाट नयाँ अन्तिम दिन (बि.सं.) राख्नुहोस्। अरू Admin लाई यो पृष्ठ र Pay Now देखिँदैन।
+                        <strong class="d-block mb-1"><i class="fas fa-list-ol me-1"></i>नवीकरण क्रम</strong>
+                        <span class="text-muted">①</span> <strong>कार्यालय/सहकारी Admin</strong> ले <strong><code>/admin/</code> लग इन पृष्ठ</strong> मा Khalti/eSewa बाट भुक्तानी गरी <strong>भुक्तानी सूचना</strong> (ref) पठाउँछन् — लग इन आवश्यक छैन।
+                        <span class="text-muted">②</span> <strong>Superadmin</strong> ले <strong>यही «साइट म्याद»</strong> मा पेन्डिङ सूचना देख्छन्।
+                        <span class="text-muted">③</span> Superadmin ले तल <strong>म्याद सेभ</strong> गरी नयाँ बि.सं. राख्छन्।
                     </div>
 
                     <?php if ($untilBs === ''): ?>
@@ -187,7 +148,7 @@ if ($flash = getFlash()):
                     <?php elseif ($expired): ?>
                         <div class="alert alert-danger py-3 mb-3">
                             <div class="fw-bold mb-1"><span class="badge bg-danger me-1">म्याद सकियो</span> <span class="badge bg-dark">Expired</span></div>
-                            <div class="small">सार्वजनिक पृष्ठ र साधारण admin बन्द। Superadmin: तल भुक्तानी + ref, अनि मिति सेभ। विक्रेता सम्पर्क वैकल्पिक।</div>
+                            <div class="small">सार्वजनिक पृष्ठ र साधारण admin बन्द। कार्यालय Admin ले <code>/admin/</code> बाट भुक्तानी सूचना पठाउँछन्; Superadmin ले यहाँ मिति सेभ गर्छन्।</div>
                         </div>
                     <?php else: ?>
                         <div class="alert alert-success py-2 small mb-3"><strong>अवस्था:</strong> वैध (Valid)</div>
@@ -212,49 +173,10 @@ if ($flash = getFlash()):
                             </form>
                         </div>
                     <?php elseif ($expired && !$pendingRow): ?>
-                        <div class="border rounded p-3 bg-light mb-3">
-                            <h6 class="fw-bold mb-2"><i class="fas fa-mobile-screen-button me-1 text-success"></i>Pay Now <span class="badge bg-dark ms-1">Superadmin मात्र</span> — आफ्नो wallet बाट पठाउनुहोस्</h6>
-                            <p class="small text-secondary mb-3 mb-md-2">तलका नम्बर <strong>विक्रेता/लाइसेन्स खाता</strong> हुन्। तपाईं <strong>आफ्नो</strong> Khalti वा eSewa खोलेर Send/Transfer गर्नुहोस् — ग्राहकको नम्बर यहाँ राख्नु पर्दैन।</p>
-                            <?php if ($renewalAmount !== ''): ?>
-                                <p class="mb-1"><strong>तिर्नुपर्ने रकम (सन्दर्भ):</strong> <?php echo htmlspecialchars($renewalAmount, ENT_QUOTES, 'UTF-8'); ?></p>
-                            <?php endif; ?>
-                            <?php if ($khaltiId !== ''): ?>
-                                <p class="mb-1"><strong>Khalti मा पठाउने नम्बर:</strong> <code><?php echo htmlspecialchars($khaltiId, ENT_QUOTES, 'UTF-8'); ?></code></p>
-                            <?php endif; ?>
-                            <?php if ($esewaId !== ''): ?>
-                                <p class="mb-1"><strong>eSewa मा पठाउने नम्बर:</strong> <code><?php echo htmlspecialchars($esewaId, ENT_QUOTES, 'UTF-8'); ?></code></p>
-                            <?php endif; ?>
-                            <?php if ($khaltiId === '' && $esewaId === ''): ?>
-                                <p class="text-muted small mb-0">माथि Khalti/eSewa ID सेभ गर्नुहोस्।</p>
-                            <?php endif; ?>
+                        <div class="alert alert-info border py-3 mb-0">
+                            <div class="fw-semibold mb-1"><i class="fas fa-building me-1"></i>भुक्तानी सूचना अहिले यहाँ छैन</div>
+                            <p class="small mb-0">कार्यालय/सहकारी Admin ले <strong>Admin लग इन URL</strong> (<code><?php echo htmlspecialchars(rtrim(ADMIN_URL, '/') . '/', ENT_QUOTES, 'UTF-8'); ?></code>) खोलेर <strong>Pay Now</strong> अनुसार तिरी <strong>भुक्तानी सूचना</strong> पठाउँछन्। Superadmin ले त्यहाँबाट आएको सूचना <strong>यही पेन्डिङ</strong> खण्डमा देख्नुहुनेछ — अनि तल मिति सेभ गर्नुहोस्।</p>
                         </div>
-                        <form method="post" class="row g-3 mb-0">
-                            <input type="hidden" name="action" value="submit_renewal_notice">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">गेटवेइ</label>
-                                <select name="gateway" class="form-select" required>
-                                    <option value="khalti">Khalti</option>
-                                    <option value="esewa">eSewa</option>
-                                    <option value="other">अन्य</option>
-                                </select>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label fw-semibold">कारोबार नम्बर / Ref <span class="text-danger">*</span></label>
-                                <input type="text" name="txn_reference" class="form-control" required placeholder="wallet मा देखिएको ref">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">रकम (आफ्नो wallet बाट पठाएको)</label>
-                                <input type="text" name="amount_reported" class="form-control" placeholder="ऐच्छिक" value="<?php echo htmlspecialchars($renewalAmount, ENT_QUOTES, 'UTF-8'); ?>">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">टिप्पणी</label>
-                                <textarea name="renewal_note" class="form-control" rows="2" placeholder="ऐच्छिक"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane me-1"></i>भुक्तानी सूचना पठाउनुहोस्</button>
-                            </div>
-                        </form>
                     <?php endif; ?>
 
                     <?php if ($untilBs !== ''): ?>

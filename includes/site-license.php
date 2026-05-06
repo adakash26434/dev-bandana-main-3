@@ -206,7 +206,7 @@ CSS;
             . '<p class="svc-expired-desc">यो सन्देश साइट सेवा अवधि समाप्त भएपछि देखाइन्छ। नवीकरण पछि सेवा पुनः सामान्य हुन्छ।</p>'
             . $datesBlock
             . '<p class="svc-expired-foot">लाइसेन्स नवीकरण वा प्राविधिक सहयोगका लागि कृपया <strong>विक्रेता / प्राविधिक टोली</strong> लाई सम्पर्क गर्नुहोस्।</p>'
-            . '<p class="svc-expired-hint">नवीकरण: संस्थाको <strong>Superadmin</strong> ले मात्र Admin को <strong>«साइट म्याद»</strong> मा भुक्तानी विवरण पठाएर अन्तिम मिति सेभ गर्न सक्छन् — अरू खातामा यो विकल्प हुँदैन।</p>'
+            . '<p class="svc-expired-hint">नवीकरण: कार्यालय प्रतिनिधिले <strong>Admin लग इन URL</strong> (<code>/admin/</code>) मा भुक्तानी सूचना पठाउन सक्छन्; <strong>Superadmin</strong> ले «साइट म्याद» मा मिति सेभ गर्छन्।</p>'
             . '</div></div></main></body></html>';
         exit;
     }

@@ -156,7 +156,8 @@ $untilAdH = htmlspecialchars($untilAd, ENT_QUOTES, 'UTF-8');
             <div class="steps">
                 <div class="fw-semibold text-success mb-2 small"><i class="fas fa-list-check me-1"></i>के गर्ने?</div>
                 <ol>
-                    <li><strong>Superadmin</strong> लाई भन्नुहोस्: उहाँले मात्र Admin → <strong>साइट म्याद</strong> खोल्न सक्नुहुन्छ — त्यहाँ भुक्तानी / ref र <strong>नयाँ मिति</strong> राखिन्छ। साधारण Admin लाई त्यो पृष्ठ देखिँदैन।</li>
+                    <li><strong>भुक्तानी सूचना:</strong> कार्यालय Admin ले <strong><code>/admin/</code></strong> लग इन URL खोलेर (लग इन नगरीकन) Pay Now + फारमबाट पठाउन सक्छन्।</li>
+                    <li><strong>Superadmin</strong> ले मात्र Admin → <strong>साइट म्याद</strong> खोल्छन् — त्यहाँ पेन्डिङ सूचना र <strong>नयाँ मिति सेभ</strong> हुन्छ।</li>
                     <li>वैकल्पिक: लाइसेन्स वा प्राविधिक मद्दतका लागि <strong>विक्रेता / सहयोग टोली</strong> सम्पर्क।</li>
                 </ol>
             </div>

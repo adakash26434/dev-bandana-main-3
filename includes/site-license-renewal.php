@@ -83,7 +83,7 @@ if (!function_exists('site_license_renewal_notify_vendor')) {
         $id = (int) ($notice['id'] ?? 0);
 
         $body = '<p><strong>साइट:</strong> ' . htmlspecialchars($site, ENT_QUOTES, 'UTF-8') . '</p>'
-            . '<p><strong>Superadmin:</strong> ' . $user . '</p>'
+            . '<p><strong>पठाउने (कार्यालय/नाम):</strong> ' . $user . '</p>'
             . '<p><strong>गेटवे:</strong> ' . $gw . '</p>'
             . '<p><strong>Txn / Ref:</strong> ' . $txn . '</p>'
             . '<p><strong>रकम (रिपोर्ट):</strong> ' . $amt . '</p>'
