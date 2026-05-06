@@ -126,25 +126,88 @@ if (!function_exists('site_license_public_guard')) {
             http_response_code(503);
             header('Content-Type: text/html; charset=UTF-8');
         }
-        $svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="2" stroke="#d97706" stroke-width="1.5"/><path d="M8 2.5v4M16 2.5v4M3.5 9.5h17" stroke="#d97706" stroke-width="1.5" stroke-linecap="round"/><path d="M9 15l6-6M15 15l-6-6" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+        $baseUrl = defined('SITE_URL') ? (string) SITE_URL : '/';
+        $baseUrlH = htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8');
+        $svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 2v3M16 2v3M3.5 9.09h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="3.5" y="4.5" width="17" height="16" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 15.5l5-5M14.5 15.5l-5-5" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/></svg>';
+
+        ob_start();
+        if (defined('ROOT_PATH') && is_file(ROOT_PATH . 'assets/css/_color-vars.php')) {
+            require ROOT_PATH . 'assets/css/_color-vars.php';
+        }
+        $brandDynamicStyle = ob_get_clean();
+
+        $datesBlock = '';
+        if ($bs !== '') {
+            $datesBlock = '<div class="svc-expired-status"><span class="svc-expired-pill">स्थिति · म्याद सकियो · Expired</span></div>'
+                . '<dl class="svc-expired-dates">'
+                . '<div class="svc-expired-date-row"><dt>अन्तिम वैध दिन — बि.सं.</dt><dd>'
+                . htmlspecialchars($bsNp !== '' ? $bsNp : $bs, ENT_QUOTES, 'UTF-8')
+                . ' <span class="svc-expired-date-code">(' . htmlspecialchars($bs, ENT_QUOTES, 'UTF-8') . ')</span></dd></div>'
+                . ($ad !== '' ? '<div class="svc-expired-date-row"><dt>अन्तिम वैध दिन — ई.सं. / AD</dt><dd>' . htmlspecialchars($ad, ENT_QUOTES, 'UTF-8') . '</dd></div>' : '')
+                . '</dl>';
+        } else {
+            $datesBlock = '<div class="svc-expired-status"><span class="svc-expired-pill">स्थिति · म्याद सकियो · Expired</span></div>';
+        }
+
+        $layoutCss = <<<'CSS'
+<style id="svc-expired-layout">
+*,*::before,*::after{box-sizing:border-box}
+.svc-expired-page{margin:0;min-height:100dvh;font-family:var(--font-primary,'Mukta','Noto Sans Devanagari',system-ui,sans-serif);color:var(--text-primary);-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;padding:clamp(1.25rem,5vw,2.5rem);position:relative}
+.svc-expired-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 85% 55% at 50% -15%,rgba(var(--primary-rgb),0.12),transparent 58%),radial-gradient(ellipse 50% 45% at 100% 0%,rgba(var(--primary-rgb),0.05),transparent 42%),linear-gradient(165deg,var(--bg-soft,#f5faf6) 0%,var(--bg-page,#f8faf9) 45%,#f8fafc 100%)}
+.svc-expired-shell{position:relative;z-index:1;width:100%;max-width:32rem}
+.svc-expired-card{background:var(--bg-card,#fff);border-radius:var(--radius-xl,24px);border:1px solid var(--border-color,#e5e7eb);box-shadow:0 1px 2px rgba(15,23,42,.04),0 24px 48px -12px rgba(var(--primary-rgb),0.14),0 0 0 1px rgba(255,255,255,.6) inset;overflow:hidden}
+.svc-expired-card__accent{height:4px;background:linear-gradient(90deg,var(--primary-color),var(--primary-light,var(--primary-color)))}
+.svc-expired-head{text-align:center;padding:clamp(1.35rem,4vw,1.85rem) clamp(1.35rem,4vw,1.75rem) 1rem}
+.svc-expired-icon{display:inline-flex;align-items:center;justify-content:center;width:4.25rem;height:4.25rem;border-radius:50%;color:var(--color-warning,#d97706);background:rgba(var(--primary-rgb),0.08);border:1px solid rgba(var(--primary-rgb),0.12);margin-bottom:1rem}
+.svc-expired-eyebrow{margin:0 0 .35rem;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted,#6b7280)}
+.svc-expired-head h1{margin:0;font-size:clamp(1.35rem,4.2vw,1.6rem);font-weight:800;letter-spacing:-.03em;line-height:1.25;color:var(--text-primary)}
+.svc-expired-site{margin:.65rem 0 0;font-size:.95rem;line-height:1.55;color:var(--text-secondary,#4a5a4f)}
+.svc-expired-site strong{font-weight:700;color:var(--text-primary)}
+.svc-expired-body{padding:0 clamp(1.35rem,4vw,1.75rem) clamp(1.5rem,4vw,1.85rem)}
+.svc-expired-desc{margin:0 0 1.15rem;text-align:center;font-size:.92rem;line-height:1.65;color:var(--text-secondary,#4a5a4f)}
+.svc-expired-status{display:flex;justify-content:center;margin-bottom:1rem}
+.svc-expired-pill{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:600;padding:.4rem .85rem;border-radius:999px;background:linear-gradient(180deg,#fffbeb,#fef3c7);color:#92400e;border:1px solid rgba(251,191,36,.45);box-shadow:0 1px 2px rgba(146,64,14,.06)}
+.svc-expired-dates{margin:0 0 1.25rem;padding:0;background:var(--bg-soft,#f5faf6);border:1px solid var(--border-color,#e5e7eb);border-radius:var(--radius-lg,16px);overflow:hidden}
+.svc-expired-date-row{padding:.85rem 1.1rem}
+.svc-expired-date-row+.svc-expired-date-row{border-top:1px solid var(--border-soft,#f0f0f0)}
+.svc-expired-dates dt{margin:0 0 .35rem;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted,#6b7280)}
+.svc-expired-dates dd{margin:0;font-size:1.05rem;font-weight:700;color:var(--text-primary);line-height:1.35}
+.svc-expired-date-code{font-weight:500;font-size:.88rem;color:var(--text-muted)}
+.svc-expired-foot{margin:0;text-align:center;font-size:.88rem;line-height:1.65;color:var(--text-muted)}
+.svc-expired-foot strong{color:var(--text-secondary);font-weight:600}
+.svc-expired-hint{margin:.85rem 0 0;padding:.85rem 1rem;text-align:center;font-size:.8rem;line-height:1.55;color:var(--text-secondary);background:rgba(var(--primary-rgb),0.06);border-radius:var(--radius-md,10px);border:1px solid rgba(var(--primary-rgb),0.1)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+CSS;
+
         echo '<!DOCTYPE html><html lang="ne"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             . '<meta name="robots" content="noindex,nofollow">'
             . '<title>सेवा अस्थायी उपलब्ध छैन</title>'
-            . '<style>:root{--p:#166534;--p2:#15803d;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--card:#fff;--amber:#d97706;--amberbg:#fffbeb;}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari","Mukta",sans-serif;background:linear-gradient(165deg,#ecfdf5 0%,#f0fdf4 28%,#f8fafc 72%);color:var(--ink);display:flex;align-items:center;justify-content:center;padding:clamp(16px,4vw,32px);}'
-            . '.wrap{width:100%;max-width:540px}.card{background:var(--card);border-radius:20px;box-shadow:0 4px 6px -1px rgba(15,23,42,.06),0 20px 50px -12px rgba(22,101,52,.12);border:1px solid var(--line);overflow:hidden}'
-            . '.top{background:linear-gradient(135deg,#166534 0%,#15803d 100%);color:#fff;padding:22px 24px 20px;text-align:center}.top h1{margin:0;font-size:clamp(1.15rem,3.5vw,1.35rem);font-weight:700;letter-spacing:-.02em;line-height:1.35}'
-            . '.top p{margin:10px 0 0;opacity:.92;font-size:.9rem;line-height:1.55}.ico{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;background:var(--amberbg);border:1px solid #fde68a;margin:0 auto 14px;box-shadow:0 2px 8px rgba(217,119,6,.15)}'
-            . '.bd{padding:22px 24px 26px}.lead{margin:0 0 18px;text-align:center;font-size:.95rem;line-height:1.65;color:#334155}.status{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin-bottom:18px}'
-            . '.pill{font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}.dates{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:20px}'
-            . '.dates dt{margin:0 0 4px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.dates dd{margin:0 0 14px;font-size:.95rem;color:var(--ink);font-weight:600}.dates dd:last-child{margin-bottom:0}'
-            . '.dates .sub{font-weight:500;color:var(--muted);font-size:.85rem}.foot{margin:0;text-align:center;font-size:.85rem;line-height:1.65;color:var(--muted)}.foot strong{color:#475569}</style></head><body>'
-            . '<div class="wrap"><div class="card"><div class="top"><div class="ico">' . $svgIcon . '</div><h1>सेवा म्याद सकियो</h1><p><strong style="font-weight:700">' . $siteH . '</strong> को वेबसाइट सेवा हाल अस्थायी रूपमा उपलब्ध छैन।</p></div><div class="bd">'
-            . '<p class="lead">यो सन्देश साइट सेवा अवधि समाप्त भएपछि देखाइन्छ। नवीकरण पछि सेवा पुनः सामान्य हुन्छ।</p>'
-            . ($bs !== '' ? '<div class="status"><span class="pill">स्थिति / Status: म्याद सकियो · Expired</span></div>'
-                . '<dl class="dates"><dt>अन्तिम वैध दिन — बि.सं.</dt><dd>' . htmlspecialchars($bsNp !== '' ? $bsNp : $bs, ENT_QUOTES, 'UTF-8') . ' <span class="sub">(' . htmlspecialchars($bs, ENT_QUOTES, 'UTF-8') . ')</span></dd>'
-                . ($ad !== '' ? '<dt>अन्तिम वैध दिन — ई.सं. / AD</dt><dd>' . htmlspecialchars($ad, ENT_QUOTES, 'UTF-8') . '</dd>' : '')
-                . '</dl>' : '<div class="status"><span class="pill">स्थिति / Status: म्याद सकियो · Expired</span></div>')
-            . '<p class="foot">लाइसेन्स नवीकरण वा प्राविधिक सहयोगका लागि कृपया <strong>विक्रेता / प्राविधिक टोली</strong> लाई सम्पर्क गर्नुहोस्।</p></div></div></div></body></html>';
+            . '<link rel="preconnect" href="https://fonts.googleapis.com">'
+            . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+            . '<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">'
+            . '<link rel="stylesheet" href="' . $baseUrlH . 'assets/css/design-tokens.css?v=9.7">'
+            . '<link rel="stylesheet" href="' . $baseUrlH . 'assets/css/universal.css?v=4">'
+            . $brandDynamicStyle
+            . $layoutCss
+            . '</head><body class="svc-expired-page">'
+            . '<div class="svc-expired-bg" aria-hidden="true"></div>'
+            . '<main class="svc-expired-shell">'
+            . '<div class="svc-expired-card">'
+            . '<div class="svc-expired-card__accent" aria-hidden="true"></div>'
+            . '<div class="svc-expired-head">'
+            . '<div class="svc-expired-icon">' . $svgIcon . '</div>'
+            . '<p class="svc-expired-eyebrow">सेवा स्थिति · Service status</p>'
+            . '<h1>सेवा म्याद सकियो</h1>'
+            . '<p class="svc-expired-site"><strong>' . $siteH . '</strong> को वेबसाइट सेवा हाल अस्थायी रूपमा उपलब्ध छैन।</p>'
+            . '</div>'
+            . '<div class="svc-expired-body">'
+            . '<p class="svc-expired-desc">यो सन्देश साइट सेवा अवधि समाप्त भएपछि देखाइन्छ। नवीकरण पछि सेवा पुनः सामान्य हुन्छ।</p>'
+            . $datesBlock
+            . '<p class="svc-expired-foot">लाइसेन्स नवीकरण वा प्राविधिक सहयोगका लागि कृपया <strong>विक्रेता / प्राविधिक टोली</strong> लाई सम्पर्क गर्नुहोस्।</p>'
+            . '<p class="svc-expired-hint">नवीकरण: संस्थाको <strong>Superadmin</strong> ले मात्र Admin को <strong>«साइट म्याद»</strong> मा भुक्तानी विवरण पठाएर अन्तिम मिति सेभ गर्न सक्छन् — अरू खातामा यो विकल्प हुँदैन।</p>'
+            . '</div></div></main></body></html>';
         exit;
     }
 }

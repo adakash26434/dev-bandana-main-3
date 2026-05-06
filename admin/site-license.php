@@ -1,6 +1,6 @@
 <?php
 /**
- * Superadmin: साइट सेवा म्याद + सरल भुक्तानी सूचना (Khalti/eSewa manual)
+ * Superadmin मात्र: साइट म्याद + Pay Now / भुक्तानी ref + अन्तिम मिति सेभ (अरू admin लाई पहुँच छैन)
  */
 $pageTitle  = 'साइट म्याद';
 $currentPage = 'site-license';
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'note' => $note,
             'submitted_by_username' => $auser,
         ]);
-        setFlash('success', 'भुक्तानी सूचना पठाइयो। विक्रेता wallet जाँच गरी म्याद बढाउँछन् — प्रतीक्षा गर्नुहोस्। इमेल सेट नभए सिधै सम्पर्क गर्नुहोस्।');
+        setFlash('success', 'भुक्तानी सूचना पठाइयो। अब यही Superadmin ले तलको क्यालेन्डरबाट नयाँ मिति सेभ गर्नुहोस् (विक्रेता सम्पर्क भए पनि अन्तिम मिति यहीँ राखिन्छ)।');
         redirect('site-license.php');
     }
 
@@ -122,7 +122,7 @@ if ($pendingCount > 0) {
     }
 }
 
-echo adminPageHeader('साइट म्याद (लाइसेन्स)', 'fa-calendar-check', 'Superadmin मात्र — अन्तिम वैध दिन सेट गर्नुहोस्', '');
+echo adminPageHeader('साइट म्याद (लाइसेन्स)', 'fa-calendar-check', 'Superadmin मात्र — भुक्तानी / Pay Now / मिति यहीँ', '');
 if ($flash = getFlash()):
 ?>
 <div class="alert alert-<?php echo $flash['type']==='success'?'success':($flash['type']==='warning'?'warning':'danger'); ?> alert-dismissible fade show mb-3"><i class="fas fa-<?php echo $flash['type']==='success'?'check-circle':($flash['type']==='warning'?'exclamation-triangle':'exclamation-circle'); ?> me-2"></i><?php echo htmlspecialchars($flash['message'], ENT_QUOTES, 'UTF-8'); ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
@@ -175,13 +175,19 @@ if ($flash = getFlash()):
                     <p class="text-muted small mb-3">
                         <strong>सजिलो नियम:</strong> तल <strong>बि.सं.</strong> क्यालेन्डरबाट छान्नुहोस्। अन्तिम दिनसम्म साइट चल्छ; त्यसपछि <strong>Expired</strong> — सार्वजनिक र साधारण admin बन्द; Superadmin मात्र यहाँ।
                     </p>
+                    <div class="alert alert-secondary border py-2 small mb-3 mb-md-4">
+                        <strong class="d-block mb-1"><i class="fas fa-list-ol me-1"></i>नवीकरण क्रम (Superadmin मात्र)</strong>
+                        <span class="text-muted">①</span> म्याद सकेपछि तल <strong>Pay Now</strong> अनुसार wallet बाट भुक्तानी →
+                        <span class="text-muted">②</span> सोही पृष्ठको फारमबाट <strong>कारोबार ref</strong> पठाउनुहोस् →
+                        <span class="text-muted">③</span> तलको <strong>म्याद सेभ</strong> बाट नयाँ अन्तिम दिन (बि.सं.) राख्नुहोस्। अरू Admin लाई यो पृष्ठ र Pay Now देखिँदैन।
+                    </div>
 
                     <?php if ($untilBs === ''): ?>
                         <div class="alert alert-info py-2 small mb-3"><strong>अवस्था:</strong> म्याद बन्द — साइट सधैं चल्छ।</div>
                     <?php elseif ($expired): ?>
                         <div class="alert alert-danger py-3 mb-3">
                             <div class="fw-bold mb-1"><span class="badge bg-danger me-1">म्याद सकियो</span> <span class="badge bg-dark">Expired</span></div>
-                            <div class="small">सार्वजनिक पृष्ठ र साधारण admin बन्द। नवीकरण: तल भुक्तानी सूचना पठाउनुहोस् वा विक्रेता सम्पर्क गर्नुहोस्।</div>
+                            <div class="small">सार्वजनिक पृष्ठ र साधारण admin बन्द। Superadmin: तल भुक्तानी + ref, अनि मिति सेभ। विक्रेता सम्पर्क वैकल्पिक।</div>
                         </div>
                     <?php else: ?>
                         <div class="alert alert-success py-2 small mb-3"><strong>अवस्था:</strong> वैध (Valid)</div>
@@ -190,7 +196,7 @@ if ($flash = getFlash()):
                     <?php if ($expired && $pendingRow): ?>
                         <div class="alert alert-warning border-warning">
                             <div class="fw-bold mb-2"><i class="fas fa-hourglass-half me-1"></i>भुक्तानी सूचना पेन्डिङ</div>
-                            <div class="small mb-2">विक्रेता wallet जाँच गरी म्याद बढाउँछन्। <strong>दोहोरो भुक्तानी नगर्नुहोस्।</strong></div>
+                            <div class="small mb-2">भुक्तानी पुष्टि भइसकेपछि <strong>यही Superadmin</strong> ले तल <strong>म्याद सेभ</strong> गरी नयाँ मिति राख्नुहोस्। विक्रेता इमेल सूचना मात्र सहायक हो। <strong>दोहोरो भुक्तानी नगर्नुहोस्।</strong></div>
                             <ul class="small mb-3 ps-3">
                                 <li>गेटवेइ: <strong><?php echo htmlspecialchars((string)$pendingRow['gateway'], ENT_QUOTES, 'UTF-8'); ?></strong></li>
                                 <li>Txn / Ref: <strong><?php echo htmlspecialchars((string)$pendingRow['txn_reference'], ENT_QUOTES, 'UTF-8'); ?></strong></li>
@@ -207,7 +213,7 @@ if ($flash = getFlash()):
                         </div>
                     <?php elseif ($expired && !$pendingRow): ?>
                         <div class="border rounded p-3 bg-light mb-3">
-                            <h6 class="fw-bold mb-2"><i class="fas fa-mobile-screen-button me-1 text-success"></i>Pay Now — आफ्नो wallet बाट पठाउनुहोस्</h6>
+                            <h6 class="fw-bold mb-2"><i class="fas fa-mobile-screen-button me-1 text-success"></i>Pay Now <span class="badge bg-dark ms-1">Superadmin मात्र</span> — आफ्नो wallet बाट पठाउनुहोस्</h6>
                             <p class="small text-secondary mb-3 mb-md-2">तलका नम्बर <strong>विक्रेता/लाइसेन्स खाता</strong> हुन्। तपाईं <strong>आफ्नो</strong> Khalti वा eSewa खोलेर Send/Transfer गर्नुहोस् — ग्राहकको नम्बर यहाँ राख्नु पर्दैन।</p>
                             <?php if ($renewalAmount !== ''): ?>
                                 <p class="mb-1"><strong>तिर्नुपर्ने रकम (सन्दर्भ):</strong> <?php echo htmlspecialchars($renewalAmount, ENT_QUOTES, 'UTF-8'); ?></p>
@@ -269,7 +275,7 @@ if ($flash = getFlash()):
                                class="form-control form-control-lg mb-2 nepali-datepicker" autocomplete="off"
                                placeholder="YYYY-MM-DD"
                                value="<?php echo htmlspecialchars($untilBs, ENT_QUOTES, 'UTF-8'); ?>">
-                        <div class="form-text mb-3">खाली छोडेर सेभ = म्याद जाँच बन्द। नयाँ मिति सेभ गर्दा पेन्डिङ भुक्तानी सूचना स्वतः सफा हुन्छ।</div>
+                        <div class="form-text mb-3">खाली छोडेर सेभ = म्याद जाँच बन्द। नयाँ मिति सेभ = साइट पुनः चालु; पेन्डिङ भुक्तानी सूचना स्वतः सफा हुन्छ। यो कदम <strong>Superadmin</strong> ले नै गर्छ।</div>
 
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>म्याद सेभ गर्नुहोस्</button>
                     </form>

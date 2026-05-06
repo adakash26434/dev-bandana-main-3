@@ -33,6 +33,7 @@ if (!isAdminLoggedIn()) {
 
 $__licPage = basename($_SERVER['PHP_SELF'] ?? '');
 $__licExempt = in_array($__licPage, ['index.php', 'logout.php', 'site-license.php', 'site-license-blocked.php', 'db-setup.php'], true);
+/* म्याद सकिए पनि Superadmin लाई कुनै redirect छैन — मिति/नवीकरण भित्रै गर्न पाउनुपर्छ। साधारण admin मात्र blocked। */
 if (!$__licExempt && function_exists('site_license_expired') && site_license_expired() && empty($_SESSION['is_superadmin'])) {
     header('Location: ' . ADMIN_URL . 'site-license-blocked.php');
     exit;

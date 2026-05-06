@@ -15,6 +15,7 @@
  */
 
 require_once '../includes/config.php';
+require_once '../includes/site-license-renewal.php';
 require_once '../includes/superadmin-config.php';
 require_once '../includes/totp-2fa.php';
 
@@ -45,6 +46,8 @@ if (isAdminLoggedIn()) {
 }
 
 $error = '';
+/** साधारण admin — म्याद सकिएको बेला लग इन रोकिँदा (Superadmin बाहेक) */
+$msgSiteLicenseExpiredLogin = 'साइट सेवा म्याद सकियो। सहकारीका साधारण Admin ले यो बेला लग इन गर्न मिल्दैन। नवीकरण/तिराई: लग इन पृष्ठमै देखिएको नम्बर वा Superadmin/विक्रेता सम्पर्क गर्नुहोस्। नयाँ मिति सिस्टममा Superadmin ले राख्छन्।';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['do_admin_2fa'])) {
@@ -97,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if ($ok) {
                             if (function_exists('site_license_login_blocked_for_user') && site_license_login_blocked_for_user($user)) {
                                 unset($_SESSION['admin_2fa_pending']);
-                                $error = 'साइट सेवा म्याद सकियो। Superadmin ले मात्र नयाँ मिति राख्न सक्छन्। कृपया विक्रेता वा Superadmin लाई सम्पर्क गर्नुहोस्।';
+                                $error = $msgSiteLicenseExpiredLogin;
                             } else {
                                 unset($_SESSION['admin_2fa_pending']);
                                 session_regenerate_id(true);
@@ -240,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     if (function_exists('site_license_login_blocked_for_user') && site_license_login_blocked_for_user($user)) {
-                        $error = 'साइट सेवा म्याद सकियो। Superadmin ले मात्र नयाँ मिति राख्न सक्छन्। कृपया विक्रेता वा Superadmin लाई सम्पर्क गर्नुहोस्।';
+                        $error = $msgSiteLicenseExpiredLogin;
                         if (function_exists('recordLoginAttempt')) {
                             recordLoginAttempt($username, $ip);
                         }
@@ -310,6 +313,16 @@ $logoPath = function_exists('getSetting')
     ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
     : 'assets/images/logo.png';
 $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . ltrim($logoPath,'/')) : '';
+
+$licExpiredLogin = function_exists('site_license_expired') && site_license_expired();
+$loginRenewKhalti = '';
+$loginRenewEsewa = '';
+$loginRenewAmount = '';
+if ($licExpiredLogin && function_exists('site_license_pay_id_or_default') && function_exists('getSetting')) {
+    $loginRenewKhalti = site_license_pay_id_or_default((string) getSetting('site_license_khalti_id', ''));
+    $loginRenewEsewa = site_license_pay_id_or_default((string) getSetting('site_license_esewa_id', ''));
+    $loginRenewAmount = trim((string) getSetting('site_license_renewal_amount', ''));
+}
 ?>
 <!DOCTYPE html>
 <html lang="ne">
@@ -465,6 +478,42 @@ $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . l
             color: #9a3412;
             margin-top: 14px;
         }
+        .license-renew-on-login {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border: 1px solid #86efac;
+            border-radius: 12px;
+            padding: 14px 14px 12px;
+            margin-bottom: 16px;
+            font-size: .8rem;
+            line-height: 1.55;
+            color: #14532d;
+        }
+        .license-renew-on-login h4 {
+            margin: 0 0 8px;
+            font-size: .88rem;
+            font-weight: 800;
+            color: #166534;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .license-renew-on-login .pay-row {
+            margin: 4px 0;
+            word-break: break-all;
+        }
+        .license-renew-on-login code {
+            background: rgba(255,255,255,.85);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: .85em;
+        }
+        .license-renew-on-login .sub {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(22,101,52,.25);
+            font-size: .76rem;
+            color: #15803d;
+        }
         @media (max-width:480px) {
             .auth-card { border-radius: 16px; }
             .card-header { padding: 24px 20px 18px; }
@@ -494,6 +543,28 @@ $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . l
     <div class="card-body">
         <div class="card-title"><?php echo is_array($admin2faPending) ? '2FA Verify' : 'लग इन'; ?></div>
         <div class="card-sub"><?php echo is_array($admin2faPending) ? 'Google Authenticator code verify गर्नुहोस्।' : 'आफ्नो username र password प्रविष्ट गर्नुहोस्।'; ?></div>
+
+        <?php if ($licExpiredLogin && !is_array($admin2faPending)): ?>
+        <div class="license-renew-on-login">
+            <h4><i class="fas fa-hand-holding-dollar"></i> नवीकरण — सहकारी Admin का लागि</h4>
+            <p class="mb-2" style="font-size:.78rem;opacity:.95;">
+                <strong>साइट सेवा म्याद सकियो।</strong> सहकारीका <strong>साधारण Admin</strong> ले यो बेला यहाँबाट लग इन गर्न <strong>मिल्दैन</strong>।
+                नवीकरणका लागि आफ्नो Khalti वा eSewa बाट <strong>तलको नम्बरमा</strong> (विक्रेता खाता) रकम पठाउनुहोस् र <strong>Superadmin</strong> लाई कारोबार ref बताउनुहोस् — <strong>सिस्टममा नयाँ मिति Superadmin ले भित्र गई राख्छन्</strong> (तिर्ने र मिति फरक काम)।
+            </p>
+            <?php if ($loginRenewAmount !== ''): ?>
+                <div class="pay-row"><strong>रकम (सन्दर्भ):</strong> <?php echo htmlspecialchars($loginRenewAmount, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endif; ?>
+            <?php if ($loginRenewKhalti !== ''): ?>
+                <div class="pay-row"><strong>Khalti मा पठाउने:</strong> <code><?php echo htmlspecialchars($loginRenewKhalti, ENT_QUOTES, 'UTF-8'); ?></code></div>
+            <?php endif; ?>
+            <?php if ($loginRenewEsewa !== ''): ?>
+                <div class="pay-row"><strong>eSewa मा पठाउने:</strong> <code><?php echo htmlspecialchars($loginRenewEsewa, ENT_QUOTES, 'UTF-8'); ?></code></div>
+            <?php endif; ?>
+            <div class="sub">
+                <i class="fas fa-user-shield me-1"></i><strong>Superadmin</strong> हुनुहुन्छ भने यो तिराइ बाकस तपाईंका लागि होइन — सिधै लग इन गरी «साइट म्याद» मा मिति/भुक्तानी व्यवस्थापन गर्नुहोस् (म्याद सकिए पनि लग इन मिल्छ)।
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if ($error): ?>
             <div class="alert-error">
