@@ -62,13 +62,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string)($_POST['action'] ?? '') ==
     if ($titleNp === '') {
         $titleNp = (string)($staticPages[$pageKey]['title'] ?? '');
     }
+    $titleEn = clean_text($_POST['title_en'] ?? '');
+    if ($titleEn === '') {
+        $titleEn = (string)($staticPages[$pageKey]['title_en'] ?? '');
+    }
     $contentNp = $_POST['content_np'] ?? '';
     $contentEn = $_POST['content_en'] ?? '';
     try {
         $okNp = updateSetting($pageKey . '_np', $contentNp);
         $okEn = updateSetting($pageKey . '_en', $contentEn);
         $okTitle = updateSetting($pageKey . '_title_np', $titleNp);
-        if ($okNp && $okEn && $okTitle) {
+        $okTitleEn = updateSetting($pageKey . '_title_en', $titleEn);
+        if ($okNp && $okEn && $okTitle && $okTitleEn) {
             setFlash('success', 'सेक्सन सफलतापूर्वक अपडेट भयो।');
         } else {
             setFlash('error', 'सेभ गर्दा समस्या आयो। फेरि प्रयास गर्नुहोस्।');
@@ -178,27 +183,12 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect('pages-v2.php?tab=dynamic');
 }
 
-// Fetch dynamic pages (with filters)
-$fStatus = (string) ($_GET['f_status'] ?? '');
-if ($fStatus !== '' && !in_array($fStatus, ['active', 'inactive'], true)) $fStatus = '';
-$fMenu = (string) ($_GET['f_menu'] ?? '');
-if ($fMenu !== '' && !in_array($fMenu, ['about', 'services', 'more', 'footer', 'none'], true)) $fMenu = '';
-
+// Fetch dynamic pages
 $dynamicPages = [];
 try {
-    $where = ['1=1'];
-    $params = [];
-    if ($fStatus === 'active') { $where[] = 'is_active = 1'; }
-    if ($fStatus === 'inactive') { $where[] = 'is_active = 0'; }
-    if (in_array($fMenu, ['about','services','more','footer'], true)) {
-        $where[] = 'show_in_menu = 1 AND menu_position = ?';
-        $params[] = $fMenu;
-    } elseif ($fMenu === 'none') {
-        $where[] = 'show_in_menu = 0';
-    }
-    $sql = "SELECT * FROM pages WHERE " . implode(' AND ', $where) . " ORDER BY menu_position, menu_order, id";
+    $sql = "SELECT * FROM pages ORDER BY menu_position, menu_order, id";
     $st = $db->prepare($sql);
-    $st->execute($params);
+    $st->execute();
     $dynamicPages = $st->fetchAll(PDO::FETCH_ASSOC);
 } catch (Throwable $e) {
     $dynamicPages = [];
@@ -226,9 +216,10 @@ if (!array_key_exists($editStaticKey, $staticPages)) $editStaticKey = '';
 $staticPagesResolved = [];
 foreach ($staticPages as $key => $info) {
     $customTitleNp = trim((string)getSetting($key . '_title_np', ''));
+    $customTitleEn = trim((string)getSetting($key . '_title_en', ''));
     $staticPagesResolved[$key] = [
         'title' => $customTitleNp !== '' ? $customTitleNp : (string)$info['title'],
-        'title_en' => (string)$info['title_en'],
+        'title_en' => $customTitleEn !== '' ? $customTitleEn : (string)$info['title_en'],
     ];
 }
 $staticNp = $editStaticKey !== '' ? getSetting($editStaticKey . '_np', '') : '';
@@ -269,42 +260,6 @@ if ($flash) echo adminAlert($flash['type'], $flash['message']);
                         <div class="tab-pane fade <?php echo ($tab === 'dynamic' && $action !== 'edit' && $panel !== 'form') ? 'show active' : ''; ?>" id="pgv2-dyn-list" role="tabpanel">
                             <div class="card admin-table-card svc-flat-top-card">
                                 <div class="card-body p-0">
-                                    <?php if ($fStatus !== '' || $fMenu !== ''): ?>
-                                    <div class="alert alert-warning border-0 rounded-0 mb-0 py-2 px-3 small">
-                                        <i class="fas fa-filter me-1"></i>
-                                        फिल्टर लागू छ — अहिले सबै पृष्ठ होइन, छनोट भएका पृष्ठ मात्र देखिएका छन्।
-                                        <a href="pages-v2.php?tab=dynamic" class="alert-link ms-1">Reset</a>
-                                    </div>
-                                    <?php endif; ?>
-
-                                    <form method="GET" class="px-3 py-2 border-bottom bg-light d-flex gap-2 align-items-end flex-wrap">
-                                        <input type="hidden" name="tab" value="dynamic">
-                                        <div>
-                                            <label class="form-label form-label-sm mb-1 small">स्थिति</label>
-                                            <select name="f_status" class="form-select form-select-sm">
-                                                <option value="">सबै</option>
-                                                <option value="active" <?php echo $fStatus==='active'?'selected':''; ?>>सक्रिय</option>
-                                                <option value="inactive" <?php echo $fStatus==='inactive'?'selected':''; ?>>निष्क्रिय</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="form-label form-label-sm mb-1 small">मेनु</label>
-                                            <select name="f_menu" class="form-select form-select-sm">
-                                                <option value="">सबै</option>
-                                                <option value="about" <?php echo $fMenu==='about'?'selected':''; ?>>हाम्रो बारेमा</option>
-                                                <option value="services" <?php echo $fMenu==='services'?'selected':''; ?>>सेवाहरू</option>
-                                                <option value="more" <?php echo $fMenu==='more'?'selected':''; ?>>थप</option>
-                                                <option value="footer" <?php echo $fMenu==='footer'?'selected':''; ?>>फुटर</option>
-                                                <option value="none" <?php echo $fMenu==='none'?'selected':''; ?>>मेनुमा छैन</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter me-1"></i>Filter</button>
-                                            <a href="pages-v2.php?tab=dynamic" class="btn btn-sm btn-outline-secondary">Reset</a>
-                                            <a href="pages-v2.php?tab=dynamic&f_menu=footer" class="btn btn-sm btn-outline-info"><i class="fas fa-shield-halved me-1"></i>Policy</a>
-                                        </div>
-                                    </form>
-
                                     <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3">
                                         <div class="input-group input-group-sm svc-search-group">
                                             <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
@@ -589,6 +544,10 @@ if ($flash) echo adminAlert($flash['type'], $flash['message']);
                                             <label class="form-label fw-semibold">सेक्सन नाम (नेपाली)</label>
                                             <input type="text" name="title_np" class="form-control" required value="<?php echo htmlspecialchars($staticPagesResolved[$editStaticKey]['title'], ENT_QUOTES, 'UTF-8'); ?>">
                                             <div class="form-text">यो नाम सूचीमा देखिने शीर्षक हो।</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Section Name (English)</label>
+                                            <input type="text" name="title_en" class="form-control" value="<?php echo htmlspecialchars($staticPagesResolved[$editStaticKey]['title_en'], ENT_QUOTES, 'UTF-8'); ?>">
                                         </div>
 
                                         <ul class="nav nav-tabs admin-nav-tabs mb-2" role="tablist">
