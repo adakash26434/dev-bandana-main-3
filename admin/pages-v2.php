@@ -227,29 +227,16 @@ $staticNp = $editStaticKey !== '' ? getSetting($editStaticKey . '_np', '') : '';
 $staticEn = $editStaticKey !== '' ? getSetting($editStaticKey . '_en', '') : '';
 
 $flash = getFlash();
-echo adminPageHeader('पृष्ठ व्यवस्थापन', 'fa-file-alt', 'गतिशील/स्थिर पृष्ठहरू — सूची + फर्म', '');
+$headerSubtitle = $tab === 'static'
+    ? 'स्थिर विषयवस्तु — सूची + फर्म'
+    : 'गतिशील पृष्ठहरू — सूची + फर्म';
+echo adminPageHeader('पृष्ठ व्यवस्थापन', 'fa-file-alt', $headerSubtitle, '');
 if ($flash) echo adminAlert($flash['type'], $flash['message']);
 ?>
 
 <div class="container-fluid py-3">
     <div class="row justify-content-center">
         <div class="col-12 col-xxl-11">
-
-            <!-- Top tabs: Dynamic vs Static -->
-            <ul class="nav nav-tabs admin-nav-tabs mb-0" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link <?php echo $tab === 'dynamic' ? 'active' : ''; ?>"
-                            data-bs-toggle="tab" data-bs-target="#pgv2-dynamic" type="button" role="tab">
-                        <i class="fas fa-file-alt me-2"></i>गतिशील पृष्ठहरू
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link <?php echo $tab === 'static' ? 'active' : ''; ?>"
-                            data-bs-toggle="tab" data-bs-target="#pgv2-static" type="button" role="tab">
-                        <i class="fas fa-cog me-2"></i>स्थिर विषयवस्तु (About Sections)
-                    </button>
-                </li>
-            </ul>
 
             <div class="tab-content">
                 <!-- ===== Dynamic ===== -->
