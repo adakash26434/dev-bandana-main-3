@@ -118,6 +118,24 @@ try {
     $pastCommittees = [];
     $boardMembers = [];
 }
+
+/* Section heading context: "Management Team" छानिएको बेला generic "समिति सदस्य" नदेखियोस् */
+$isManagementView = false;
+if (!$showPast && !empty($currentCommittees) && count($currentCommittees) === 1) {
+    $onlyType = $currentCommittees[0]['type'] ?? [];
+    $typeText = mb_strtolower(trim((string)(($onlyType['name_np'] ?? '') . ' ' . ($onlyType['name'] ?? ''))));
+    $isManagementView = (mb_strpos($typeText, 'व्यवस्थापन') !== false || mb_strpos($typeText, 'management') !== false);
+}
+
+$currentBadgeTitle = $isManagementView
+    ? (isEnglish() ? 'Current Management Team' : 'हालका व्यवस्थापन समूह')
+    : (isEnglish() ? 'Current Committees' : 'हालका समितिहरू');
+$currentHeroTitle = $isManagementView
+    ? (isEnglish() ? 'Current Management Team Members' : 'हालका व्यवस्थापन समूह सदस्यहरू')
+    : (isEnglish() ? 'Current Committee Members' : 'हालका समिति सदस्यहरू');
+$currentHeroDesc = $isManagementView
+    ? (isEnglish() ? 'Our current management team serving the cooperative' : 'हाम्रो सहकारीलाई सेवा गरिरहेका हालका व्यवस्थापन समूह सदस्यहरू')
+    : (isEnglish() ? 'Our current committee members serving the cooperative' : 'हाम्रो सहकारीलाई सेवा गरिरहेका हालका समिति सदस्यहरू');
 ?>
 
 <!-- Page Banner -->
@@ -172,11 +190,11 @@ try {
     <div class="container">
 <div class="section-header text-center mb-4" data-aos="fade-up">
 <div class="section-badge-wrap">
-<span class="section-badge"><i class="fas fa-users"></i> <?php echo isEnglish() ? 'Current Committees' : 'हालका समितिहरू'; ?></span>
+<span class="section-badge"><i class="fas fa-users"></i> <?php echo $currentBadgeTitle; ?></span>
 </div>
-<h2><?php echo isEnglish() ? 'Current Committee Members' : 'हालका समिति सदस्यहरू'; ?></h2>
+<h2><?php echo $currentHeroTitle; ?></h2>
 <div class="section-divider"></div>
-<p><?php echo isEnglish() ? 'Our current committee members serving the cooperative' : 'हाम्रो सहकारीलाई सेवा गरिरहेका हालका समिति सदस्यहरू'; ?></p>
+<p><?php echo $currentHeroDesc; ?></p>
 </div>
 
         <?php foreach ($currentCommittees as $committee): ?>

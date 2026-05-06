@@ -110,9 +110,18 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
 
 /* Main wrapper — fixed position, दाया side */
 .satisfaction-widget {
+    --sw-accent-1: var(--secondary-color, #ec4899);
+    --sw-accent-2: color-mix(in srgb, var(--sw-accent-1) 78%, #5b0b34);
+    --sw-accent-soft: color-mix(in srgb, var(--sw-accent-1) 20%, #ffffff);
+    --sw-accent-border: color-mix(in srgb, var(--sw-accent-1) 34%, #ffffff);
+    --sw-accent-dark: color-mix(in srgb, var(--sw-accent-1) 68%, #111827);
+}
+
+/* Main wrapper — fixed position, दाया side */
+.satisfaction-widget {
     position: fixed;
     right: 0;
-    top: 50%;                   /* JS ले drag position override गर्छ */
+    top: 42%;                   /* JS ले drag position override गर्छ */
     transform: translateY(-50%);
     z-index: 10001;             /* WhatsApp (9998) र अन्य सबै floating buttons भन्दा माथि */
     display: flex;
@@ -124,22 +133,22 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
 
 /* Drag handle — widget को top मा grip dots */
 .satisfaction-drag-handle {
-    width: 32px;
+    width: 34px;
     height: 18px;
-    background: rgba(233, 30, 99, 0.18);
-    border-radius: 6px 0 0 0;
+    background: var(--sw-accent-soft);
+    border-radius: 10px 0 0 0;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: ns-resize;          /* माथि-तल drag cursor */
     user-select: none;
     -webkit-user-select: none;
-    color: #c2185b;
+    color: var(--sw-accent-dark);
     font-size: 0.9rem;
     line-height: 1;
     transition: background 0.2s;
-    border-left: 1px solid rgba(194,24,91,0.2);
-    border-top: 1px solid rgba(194,24,91,0.2);
+    border-left: 1px solid var(--sw-accent-border);
+    border-top: 1px solid var(--sw-accent-border);
 }
 
 .satisfaction-drag-handle:hover {
@@ -151,25 +160,25 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
     display: flex;
     align-items: center;
     gap: 0;
-    background: linear-gradient(135deg, #e91e63, #c2185b);
+    background: linear-gradient(135deg, var(--sw-accent-1), var(--sw-accent-2));
     color: #fff;
     border: none;
-    border-radius: 8px 0 0 8px; /* left side rounded */
-    padding: 12px 14px 12px 12px;
+    border-radius: 12px 0 0 12px; /* left side rounded */
+    padding: 11px 14px 11px 11px;
     cursor: pointer;
-    box-shadow: -3px 3px 14px rgba(0,0,0,0.25);
+    box-shadow: -6px 8px 22px color-mix(in srgb, var(--sw-accent-1) 36%, transparent);
     transition: max-width 0.3s ease, padding 0.3s ease, background 0.2s ease;
     overflow: hidden;
-    max-width: 48px;
+    max-width: 50px;
     position: relative;
 }
 
 /* Hover र active दुवैमा label देखिन्छ */
 .satisfaction-toggle:hover,
 .satisfaction-toggle.active {
-    max-width: 160px;
-    padding: 12px 16px 12px 12px;
-    background: linear-gradient(135deg, #c2185b, #880e4f);
+    max-width: 170px;
+    padding: 11px 16px 11px 11px;
+    background: linear-gradient(135deg, var(--sw-accent-2), var(--sw-accent-dark));
 }
 
 .satisfaction-toggle i.fa-smile {
@@ -207,6 +216,7 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
     box-shadow: 0 8px 30px rgba(0,0,0,0.22);
     min-width: 230px;
     max-width: 280px;
+    max-height: min(62vh, 420px);
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
@@ -226,7 +236,7 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
 
 /* Popup header */
 .satisfaction-popup-header {
-    background: linear-gradient(135deg, #e91e63, #c2185b);
+    background: linear-gradient(135deg, var(--sw-accent-1), var(--sw-accent-2));
     color: #fff;
     padding: 10px 14px;
     font-size: 0.85rem;
@@ -263,12 +273,21 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 11px 14px;
+    padding: 12px 14px;
     color: #333;
     text-decoration: none;
     font-size: 0.875rem;
     border-bottom: 1px solid #f0f0f0;
     transition: background 0.18s ease;
+}
+.satisfaction-links-popup .satisfaction-link-item {
+    overflow-wrap: anywhere;
+}
+.satisfaction-links-popup .satisfaction-link-item .small {
+    margin-left: auto;
+}
+.satisfaction-links-popup.active {
+    overflow-y: auto;
 }
 
 .satisfaction-link-item:last-child {
@@ -276,13 +295,13 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
 }
 
 .satisfaction-link-item:hover {
-    background: #fce4ec;
-    color: #c2185b;
+    background: color-mix(in srgb, var(--sw-accent-1) 12%, #ffffff);
+    color: var(--sw-accent-dark);
     text-decoration: none;
 }
 
 .satisfaction-link-item i:first-child {
-    color: #e91e63;
+    color: var(--sw-accent-1);
     font-size: 0.9rem;
     width: 18px;
     flex-shrink: 0;
@@ -307,6 +326,7 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
         right: 44px;
         min-width: 200px;
         max-width: 240px;
+        max-height: min(56vh, 330px);
     }
 
     /* Mobile मा link items थोरै ठूलो — touch target */
@@ -348,7 +368,8 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
     if (!toggle || !popup || !widget) return;
 
     /* ── Stored position (session across page navigation) ── */
-    var STORAGE_KEY = 'sw_top_pct';  /* viewport percentage */
+    var STORAGE_KEY = 'sw_top_pct_v2';  /* viewport percentage */
+    var SAFE_BOTTOM_GAP = 132;         /* WhatsApp/other widgets भन्दा माथि */
 
     /* ─────────────────────────────────
        POPUP OPEN/CLOSE
@@ -363,7 +384,8 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
         var idealTop = rect.top + (rect.height / 2) - (popH / 2);
 
         /* Viewport clamp — माथि र तल बाट 8px gap */
-        var clampedTop = Math.max(8, Math.min(idealTop, vh - popH - 8));
+        var maxTop = Math.max(8, vh - popH - SAFE_BOTTOM_GAP);
+        var clampedTop = Math.max(8, Math.min(idealTop, maxTop));
 
         popup.style.top = clampedTop + 'px';
     }
@@ -437,7 +459,7 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
         var wh  = widget.offsetHeight || 70;
         var vh  = window.innerHeight;
         var min = 8;
-        var max = vh - wh - 8;
+        var max = vh - wh - SAFE_BOTTOM_GAP;
         var clamped = Math.max(min, Math.min(topPx, max));
 
         /* fixed top set गर्नुहोस् — transform हटाउनुहोस् */
@@ -518,6 +540,9 @@ if (!$satisfactionEnabled || empty($satisfactionLinks)) {
                 requestAnimationFrame(function() {
                     widget.style.transition = '';
                 });
+            } else {
+                /* पहिलो पटक: center भन्दा अलि माथि default */
+                applyTop(window.innerHeight * 0.42);
             }
         } catch(e) {}
     })();

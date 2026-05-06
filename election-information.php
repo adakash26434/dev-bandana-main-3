@@ -304,12 +304,21 @@ $cintro = $cycle ? (isEnglish() ? (trim((string)($cycle['intro_en'] ?? '')) ?: t
                         <?php foreach ($others as $oc): ?>
                             <li class="col-md-6">
                                 <a href="<?php echo SITE_URL; ?>election-information.php?cycle=<?php echo (int)$oc['id']; ?>" class="d-block p-3 border rounded text-decoration-none text-dark h-100 election-arch-link">
-                                    <strong><?php echo htmlspecialchars(isEnglish()
-                                        ? (trim((string)($oc['title_en'] ?? '')) ?: trim((string)($oc['title_np'] ?? '')))
-                                        : (trim((string)($oc['title_np'] ?? '')) ?: trim((string)($oc['title_en'] ?? '')))); ?></strong>
-                                    <?php if (!empty($oc['period_label'])): ?>
-                                        <span class="d-block small text-muted"><?php echo htmlspecialchars((string)$oc['period_label']); ?></span>
-                                    <?php endif; ?>
+                                    <div class="election-arch-head">
+                                        <strong class="election-arch-title">
+                                            <?php echo htmlspecialchars(isEnglish()
+                                                ? (trim((string)($oc['title_en'] ?? '')) ?: trim((string)($oc['title_np'] ?? '')))
+                                                : (trim((string)($oc['title_np'] ?? '')) ?: trim((string)($oc['title_en'] ?? '')))); ?>
+                                        </strong>
+                                        <?php if (!empty($oc['period_label'])): ?>
+                                            <span class="election-arch-tenure">
+                                                <i class="fas fa-calendar-alt me-1"></i><?php echo isEnglish() ? 'Tenure: ' : 'कार्यकाल: '; ?><?php echo htmlspecialchars((string)$oc['period_label']); ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <span class="d-block small text-muted mt-1">
+                                        <i class="fas fa-user-tie me-1"></i><?php echo isEnglish() ? 'View candidate details' : 'उम्मेदवार विवरण हेर्नुहोस्'; ?>
+                                    </span>
                                 </a>
                             </li>
                         <?php endforeach; ?>
@@ -322,9 +331,13 @@ $cintro = $cycle ? (isEnglish() ? (trim((string)($cycle['intro_en'] ?? '')) ?: t
 
 <style>
 .election-arch-link:hover { border-color: var(--primary-color) !important; background: rgba(26,95,42,0.04); }
+.election-arch-head { display:flex; align-items:flex-start; justify-content:space-between; gap:.5rem; flex-wrap:wrap; }
+.election-arch-title { color: var(--text-color, #1f2937); }
+.election-arch-tenure { background: var(--primary-color); color:#fff; border-radius:999px; padding:.22rem .58rem; font-size:.72rem; font-weight:600; white-space:nowrap; }
 .election-samiti-tabs .nav-link { color: var(--primary-color); font-weight:600; border:1px solid rgba(26,95,42,.2); margin:0 .25rem; }
 .election-samiti-tabs .nav-link.active { background: var(--primary-color); color:#fff; }
 .election-pos-title { font-weight:700; color: var(--primary-color); border-left:4px solid var(--primary-color); padding-left:.6rem; }
+@media (max-width: 575px) { .election-arch-tenure { width:100%; text-align:left; } }
 </style>
 
 <?php require_once 'includes/footer.php'; ?>

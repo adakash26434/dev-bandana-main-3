@@ -160,6 +160,9 @@ require __DIR__ . '/includes/chrome.php';
 .vote-photo-empty{height:180px;display:flex;align-items:center;justify-content:center;background:#f3f4f6;border-radius:8px;color:#9ca3af;}
 .tally-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-top:6px;}
 .tally-bar > div{height:100%;background:linear-gradient(90deg,var(--primary-color),var(--primary-light));}
+.vote-cycle-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.65rem;flex-wrap:wrap;}
+.vote-cycle-tenure{background:var(--primary-color);color:#fff;border-radius:999px;padding:.26rem .62rem;font-size:.74rem;font-weight:700;white-space:nowrap;}
+@media (max-width:575px){.vote-cycle-tenure{width:100%;text-align:left;}}
 </style>
 <main class="mp-main py-4">
 <div class="mp-container mp-container-medium">
@@ -177,8 +180,12 @@ require __DIR__ . '/includes/chrome.php';
     <?php else: ?>
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
-                <h2 class="h5 mb-1"><?php echo htmlspecialchars($cycle['title_np']); ?></h2>
-                <?php if (!empty($cycle['period_label'])): ?><div class="text-muted small"><?php echo htmlspecialchars($cycle['period_label']); ?></div><?php endif; ?>
+                <div class="vote-cycle-head">
+                    <h2 class="h5 mb-1"><?php echo htmlspecialchars($cycle['title_np']); ?></h2>
+                    <?php if (!empty($cycle['period_label'])): ?>
+                        <span class="vote-cycle-tenure"><i class="fas fa-calendar-alt me-1"></i>कार्यकाल: <?php echo htmlspecialchars((string)$cycle['period_label']); ?></span>
+                    <?php endif; ?>
+                </div>
                 <?php if (!empty($cycle['vote_start_at'])): ?>
                     <div class="small mt-1"><i class="fas fa-clock me-1"></i><?php echo htmlspecialchars((string)$cycle['vote_start_at']); ?> देखि <?php echo htmlspecialchars((string)$cycle['vote_end_at']); ?> सम्म (नेपाल समय)</div>
                 <?php endif; ?>
