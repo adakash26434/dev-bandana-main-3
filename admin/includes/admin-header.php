@@ -173,7 +173,7 @@ if (!$mustChangeExempt && $db instanceof PDO && (int) ($_SESSION['admin_id'] ?? 
 
 // Determine which group the current page belongs to (for auto-open)
 $pageGroups = [
-    'samgri' => ['notices','designations','news','sliders','gallery','services','interest-rates','pages','downloads','faqs','useful-links','awards','reports','app-features','why-choose','partner-facilities'],
+    'samgri' => ['notices','designations','news','sliders','gallery','services','interest-rates','pages','about-manage','downloads','faqs','useful-links','awards','reports','app-features','why-choose','partner-facilities'],
     'toli'   => ['team','team-karmachari','committees','info-officer','grievance-officer'],
     'rojgar' => ['careers','job-applications'],
     'aavedan'=> ['kyc','kyc-risk-reviews','loans','account-apps','digital-service-requests','auctions','auction-bids','vendor-enlistment'],
@@ -550,6 +550,9 @@ set_exception_handler(function (\Throwable $ex) {
                             </li>
                             <li class="<?php echo ($currentPage === 'pages' && (($_GET['tab'] ?? '') !== 'dynamic')) ? 'active' : ''; ?>">
                                 <a href="pages.php"><span class="nav-icon-wrap"><i class="fas fa-file-lines"></i></span><span>पृष्ठहरू</span></a>
+                            </li>
+                            <li class="<?php echo $currentPage=='about-manage' ? 'active' : ''; ?>">
+                                <a href="about-manage.php"><span class="nav-icon-wrap"><i class="fas fa-circle-info"></i></span><span>हाम्रो बारेमा (सम्पादन)</span></a>
                             </li>
                             <li class="<?php echo ($currentPage === 'pages' && (($_GET['tab'] ?? '') === 'dynamic')) ? 'active' : ''; ?>">
                                 <!-- Policy pages direct shortcut:

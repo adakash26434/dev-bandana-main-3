@@ -233,7 +233,7 @@ $hasAboutImage = $aboutResolved !== '';
                         <div class="history-icon-ring"></div>
                         <div style="text-align:center;color:#ccc;padding:20px;">
                             <i class="fas fa-camera fa-2x mb-2 d-block" style="opacity:0.4;"></i>
-                            <small style="opacity:0.5;font-size:0.8rem;">Admin Panel → About Settings बाट photo थप्नुहोस्</small>
+                            <small style="opacity:0.5;font-size:0.8rem;">फोटो उपलब्ध छैन — कृपया फोटो थप्नुहोस्</small>
                         </div>
                     </div>
                 </div>
