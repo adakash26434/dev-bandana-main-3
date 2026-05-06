@@ -560,7 +560,30 @@ if ($flash) echo adminAlert($flash['type'], $flash['message']);
                                 </div>
                                 <div class="card-body p-4">
                                     <?php if ($editStaticKey === ''): ?>
-                                        <div class="alert alert-info">सूचीबाट एउटा सेक्सन छान्नुहोस्।</div>
+                                        <div class="alert alert-info mb-3">
+                                            सूचीबाट Edit थिच्नुहोस्, वा यहाँबाट सेक्सन छानेर सम्पादन खोल्नुहोस्।
+                                        </div>
+                                        <form method="GET" class="row g-3 align-items-end">
+                                            <input type="hidden" name="tab" value="static">
+                                            <input type="hidden" name="action" value="edit_static">
+                                            <input type="hidden" name="panel" value="form">
+                                            <div class="col-md-8">
+                                                <label class="form-label fw-semibold">सेक्सन छान्नुहोस्</label>
+                                                <select name="page" class="form-select" required>
+                                                    <option value="" selected disabled>— सेक्सन छान्नुहोस् —</option>
+                                                    <?php foreach ($staticPages as $key => $info): ?>
+                                                        <option value="<?php echo htmlspecialchars((string)$key, ENT_QUOTES, 'UTF-8'); ?>">
+                                                            <?php echo htmlspecialchars((string)$info['title'], ENT_QUOTES, 'UTF-8'); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-primary w-100">
+                                                    <i class="fas fa-pen-to-square me-2"></i>सम्पादन खोल्नुहोस्
+                                                </button>
+                                            </div>
+                                        </form>
                                     <?php else: ?>
                                     <form method="POST" action="">
                                         <?php echo csrfField(); ?>

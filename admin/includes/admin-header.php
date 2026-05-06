@@ -173,7 +173,7 @@ if (!$mustChangeExempt && $db instanceof PDO && (int) ($_SESSION['admin_id'] ?? 
 
 // Determine which group the current page belongs to (for auto-open)
 $pageGroups = [
-    'samgri' => ['notices','designations','news','sliders','gallery','services','interest-rates','pages','pages-v2','about-manage','downloads','faqs','useful-links','awards','reports','app-features','why-choose','partner-facilities'],
+    'samgri' => ['notices','designations','news','sliders','gallery','services','interest-rates','pages','pages-v2','downloads','faqs','useful-links','awards','reports','app-features','why-choose','partner-facilities'],
     'toli'   => ['team','team-karmachari','committees','info-officer','grievance-officer'],
     'rojgar' => ['careers','job-applications'],
     'aavedan'=> ['kyc','kyc-risk-reviews','loans','account-apps','digital-service-requests','auctions','auction-bids','vendor-enlistment'],
@@ -548,21 +548,16 @@ set_exception_handler(function (\Throwable $ex) {
                             <li class="<?php echo $currentPage=='interest-rates' ? 'active' : ''; ?>">
                                 <a href="interest-rates.php"><span class="nav-icon-wrap"><i class="fas fa-percent"></i></span><span>ब्याज दर</span></a>
                             </li>
-                            <li class="<?php echo ($currentPage === 'pages-v2' && (($_GET['tab'] ?? 'dynamic') === 'dynamic') && (($_GET['action'] ?? '') !== 'edit')) ? 'active' : ''; ?>">
-                                <a href="pages-v2.php?tab=dynamic"><span class="nav-icon-wrap"><i class="fas fa-table-list"></i></span><span>पृष्ठहरू (सूची)</span></a>
+                            <li class="<?php echo ($currentPage === 'pages-v2' && (($_GET['tab'] ?? 'dynamic') === 'dynamic')) ? 'active' : ''; ?>">
+                                <a href="pages-v2.php?tab=dynamic">
+                                    <span class="nav-icon-wrap"><i class="fas fa-file-lines"></i></span>
+                                    <span>गतिशील पृष्ठ</span>
+                                </a>
                             </li>
-                            <li class="<?php echo ($currentPage === 'pages-v2' && (($_GET['action'] ?? '') === 'edit')) ? 'active' : ''; ?>">
-                                <a href="pages-v2.php?tab=dynamic&action=edit&panel=form"><span class="nav-icon-wrap"><i class="fas fa-plus"></i></span><span>गतिशील पृष्ठ थप्नुहोस्</span></a>
-                            </li>
-                            <li class="<?php echo $currentPage=='about-manage' ? 'active' : ''; ?>">
-                                <a href="about-manage.php"><span class="nav-icon-wrap"><i class="fas fa-circle-info"></i></span><span>हाम्रो बारेमा (सम्पादन)</span></a>
-                            </li>
-                            <li class="<?php echo ($currentPage === 'pages-v2' && (($_GET['tab'] ?? '') === 'dynamic')) ? 'active' : ''; ?>">
-                                <!-- Policy pages direct shortcut:
-                                     गोपनीयता नीति / सेवाका सर्तहरू / कुकी नीति -->
-                                <a href="pages-v2.php?tab=dynamic&f_menu=footer">
-                                    <span class="nav-icon-wrap"><i class="fas fa-shield-halved"></i></span>
-                                    <span>नीति पृष्ठहरू (फिल्टर)</span>
+                            <li class="<?php echo ($currentPage === 'pages-v2' && (($_GET['tab'] ?? '') === 'static')) ? 'active' : ''; ?>">
+                                <a href="pages-v2.php?tab=static">
+                                    <span class="nav-icon-wrap"><i class="fas fa-layer-group"></i></span>
+                                    <span>स्थिर पृष्ठ</span>
                                 </a>
                             </li>
                             <li class="<?php echo $currentPage=='downloads' ? 'active' : ''; ?>">
