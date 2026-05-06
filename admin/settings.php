@@ -304,33 +304,7 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <h5 class="stg-section-title"><i class="fas fa-search"></i> SEO (Google / सामाजिक साझेदारी)</h5>
                 </div>
                 <div class="card-body">
-                    <h6 class="text-success fw-bold mb-3"><i class="fas fa-globe me-2"></i>साइट जानकारी</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Website Name</label>
-                                <input type="text" name="site_name" class="form-control"
-                                       value="<?php echo $settings['site_name'] ?? ''; ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Website Name (EN)</label>
-                                <input type="text" name="site_name_en" class="form-control"
-                                       value="<?php echo $settings['site_name_en'] ?? ''; ?>">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Slogan</label>
-                        <input type="text" name="site_slogan" class="form-control"
-                               value="<?php echo htmlspecialchars($settings['site_slogan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Slogan (EN)</label>
-                        <input type="text" name="site_slogan_en" class="form-control"
-                               value="<?php echo htmlspecialchars($settings['site_slogan_en'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
+                    <h6 class="text-success fw-bold mb-3"><i class="fas fa-bullseye me-2"></i>Search / Share Content</h6>
                     <div class="mb-3">
                         <label class="form-label">संक्षिप्त परिचय</label>
                         <textarea name="about_short" class="form-control" rows="3"><?php echo $settings['about_short'] ?? ''; ?></textarea>
@@ -519,6 +493,8 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                 </div>
             </div>
 
+            <div class="row">
+            <div class="col-xl-6">
             <!-- Leadership Section -->
             <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="leadership" data-stg-order="1">
                 <div class="card-header stg-section-header">
@@ -565,11 +541,13 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     </div>
                     <div class="alert alert-info mt-3 mb-0">
                         <i class="fas fa-info-circle"></i>
-                        सन्देशहरू <a href="pages.php" class="alert-link">पृष्ठ व्यवस्थापन</a> मा सम्पादन गर्नुहोस्। फोटोहरू "Branding / Media Manager" मा एकै ठाउँबाट अपलोड गर्न सकिन्छ।
+                        सन्देशहरू <a href="pages-v2.php" class="alert-link">पृष्ठ व्यवस्थापन</a> मा सम्पादन गर्नुहोस्। फोटोहरू "Branding / Media Manager" मा एकै ठाउँबाट अपलोड गर्न सकिन्छ।
                     </div>
                 </div>
             </div>
+            </div>
 
+            <div class="col-xl-6">
             <!-- Footer -->
             <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="leadership" data-stg-order="2">
                 <div class="card-header stg-section-header">
@@ -625,11 +603,13 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     </div>
                 </div>
             </div>
+            </div>
+            </div>
 
-            <!-- Google Map -->
-            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="4">
+            <!-- Office Info -->
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="3">
                 <div class="card-header stg-section-header">
-                    <h5 class="stg-section-title"><i class="fas fa-map-marker-alt"></i> Google Map</h5>
+                    <h5 class="stg-section-title"><i class="fas fa-building"></i> Office Info (Map + कार्य समय)</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -639,26 +619,23 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                                placeholder="https://www.google.com/maps/embed?pb=...">
                         <small class="text-muted">Google Maps बाट Embed URL copy गर्नुहोस्</small>
                     </div>
-                </div>
-            </div>
-
-            <!-- Working Hours -->
-            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="3">
-                <div class="card-header stg-section-header">
-                    <h5 class="stg-section-title"><i class="fas fa-clock"></i> कार्य समय</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">आइत–शुक्रबार समय <small class="text-muted">(Sunday–Friday)</small></label>
-                        <input type="text" name="working_hours" class="form-control"
-                               placeholder="बिहान १०:०० - साँझ ५:००"
-                               value="<?php echo $settings['working_hours'] ?? 'बिहान १०:०० - साँझ ५:००'; ?>">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">शनिबार समय <small class="text-muted">(Saturday)</small></label>
-                        <input type="text" name="saturday_hours" class="form-control"
-                               placeholder="बिहान १०:०० - दिउँसो १:००"
-                               value="<?php echo $settings['saturday_hours'] ?? 'बिहान १०:०० - दिउँसो १:००'; ?>">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">आइत–शुक्रबार समय <small class="text-muted">(Sunday–Friday)</small></label>
+                                <input type="text" name="working_hours" class="form-control"
+                                       placeholder="बिहान १०:०० - साँझ ५:००"
+                                       value="<?php echo $settings['working_hours'] ?? 'बिहान १०:०० - साँझ ५:००'; ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">शनिबार समय <small class="text-muted">(Saturday)</small></label>
+                                <input type="text" name="saturday_hours" class="form-control"
+                                       placeholder="बिहान १०:०० - दिउँसो १:००"
+                                       value="<?php echo $settings['saturday_hours'] ?? 'बिहान १०:०० - दिउँसो १:००'; ?>">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -679,7 +656,7 @@ if (!in_array($panel, ['general', 'branding'], true)) {
             लोगो, header image, about image, theme colors र version जस्ता branding/media सम्बन्धी सेटिङ्स यही tab मा छन्।
         </div>
         <div class="stg-subtabs mb-3" data-stg-panel="branding">
-            <button type="button" class="stg-subtab-btn active" data-stg-group="media"><i class="fas fa-images me-1"></i> Logo / Media</button>
+            <button type="button" class="stg-subtab-btn active" data-stg-group="media"><i class="fas fa-images me-1"></i> Media Manager</button>
             <button type="button" class="stg-subtab-btn" data-stg-group="colors"><i class="fas fa-palette me-1"></i> Theme Colors</button>
             <button type="button" class="stg-subtab-btn" data-stg-group="version"><i class="fas fa-code-branch me-1"></i> Version</button>
             <button type="button" class="stg-subtab-btn" data-stg-group="all"><i class="fas fa-table-cells-large me-1"></i> सबै देखाउनुहोस्</button>

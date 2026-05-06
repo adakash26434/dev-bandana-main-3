@@ -935,8 +935,8 @@ set_exception_handler(function (\Throwable $ex) {
                                 </a>
                             </li>
                             <!-- v5: In-app User Manual / Help & Guide (non-developer friendly) -->
-                            <li class="<?php echo $currentPage=='help-guide' ? 'active' : ''; ?>">
-                                <a href="help-guide.php">
+                            <li class="<?php echo ($currentPage=='help-guide' || $currentPage=='help-center') ? 'active' : ''; ?>">
+                                <a href="help-center.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-book-open nav-icon-accent nav-icon-green"></i></span>
                                     <span>📖 सहायता / Help</span>
                                 </a>

@@ -150,6 +150,7 @@ if ($action === 'add' || $action === 'edit') {
         'fa-headset',
         'च्याटबट FAQ प्रश्नहरू — थप्नुहोस्, सम्पादन गर्नुहोस् र व्यवस्थापन गर्नुहोस्।',
         '<a href="?action=add" class="btn btn-primary"><i class="fas fa-plus me-1"></i>नयाँ प्रश्न थप्नुहोस्</a>'
+        . ' <a href="help-guide.php" class="btn btn-outline-success"><i class="fas fa-book-open me-1"></i>Quick Guide</a>'
         . ' ' . adminStatLink('?is_active=0', 'warning', 'निष्क्रिय', $inactiveCount)
         . ' ' . adminStatLink('help-center.php', 'secondary', 'जम्मा', $totalCount)
     );
