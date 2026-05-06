@@ -523,7 +523,7 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
             <div class="d-flex gap-2">
                 <!-- Policy pages मा सीधा पुग्ने shortcut -->
                 <a href="pages.php?tab=dynamic&f_menu=footer" class="btn btn-outline-info btn-sm">
-                    <i class="fas fa-shield-halved me-1"></i>नीति पृष्ठहरू
+                    <i class="fas fa-shield-halved me-1"></i>नीति पृष्ठहरू (फिल्टर)
                 </a>
                 <a href="pages.php?action=edit" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus"></i> नयाँ पृष्ठ
@@ -531,6 +531,13 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
             </div>
         </div>
         <div class="card-body p-0">
+            <?php if ($fStatus !== '' || $fMenu !== ''): ?>
+            <div class="alert alert-warning border-0 rounded-0 mb-0 py-2 px-3 small">
+                <i class="fas fa-filter me-1"></i>
+                फिल्टर लागू छ — अहिले सबै पृष्ठ होइन, छनोट भएका पृष्ठ मात्र देखिएका छन्।
+                <a href="pages.php?tab=dynamic" class="alert-link ms-1">सबै देखाउनुहोस् (Reset)</a>
+            </div>
+            <?php endif; ?>
             <form method="GET" class="px-3 py-2 border-bottom bg-light d-flex gap-2 align-items-end flex-wrap">
                 <input type="hidden" name="tab" value="dynamic">
                 <div>

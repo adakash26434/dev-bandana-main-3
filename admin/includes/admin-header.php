@@ -559,7 +559,7 @@ set_exception_handler(function (\Throwable $ex) {
                                      गोपनीयता नीति / सेवाका सर्तहरू / कुकी नीति -->
                                 <a href="pages.php?tab=dynamic&f_menu=footer">
                                     <span class="nav-icon-wrap"><i class="fas fa-shield-halved"></i></span>
-                                    <span>नीति पृष्ठहरू</span>
+                                    <span>नीति पृष्ठहरू (फिल्टर)</span>
                                 </a>
                             </li>
                             <li class="<?php echo $currentPage=='downloads' ? 'active' : ''; ?>">
