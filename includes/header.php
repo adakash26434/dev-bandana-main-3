@@ -805,7 +805,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                             <li><a href="<?php echo SITE_URL; ?>about.php#vision"><i class="fas fa-eye"></i> <?php echo htmlspecialchars(isEnglish() ? $visionMissionMenuEn : $visionMissionMenuNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>about.php#values"><i class="fas fa-heart"></i> <?php echo htmlspecialchars(isEnglish() ? $valuesMenuLabelEn : $valuesMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>about.php#chairman"><i class="fas fa-user-tie"></i> <?php echo htmlspecialchars(isEnglish() ? $chairmanMenuLabelEn : $chairmanMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>about.php#ceo"><i class="fas fa-user"></i> <?php echo htmlspecialchars(isEnglish() ? $ceoMenuLabelEn : $ceoMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                            <li><a href="<?php echo SITE_URL; ?>about.php#ceo-message"><i class="fas fa-user"></i> <?php echo htmlspecialchars(isEnglish() ? $ceoMenuLabelEn : $ceoMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>institutional-profile.php"><i class="fas fa-building-columns text-success me-1"></i> <?php echo isEnglish() ? 'Institutional Profile' : 'संस्थागत प्रोफाइल'; ?></a></li>
                         </ul>
                     </li>
@@ -1023,7 +1023,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                                     <li><a href="<?php echo SITE_URL; ?>about.php#vision"><i class="fas fa-eye"></i> <?php echo htmlspecialchars(isEnglish() ? $visionMissionMenuEn : $visionMissionMenuNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>about.php#values"><i class="fas fa-heart"></i> <?php echo htmlspecialchars(isEnglish() ? $valuesMenuLabelEn : $valuesMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>about.php#chairman"><i class="fas fa-user-tie"></i> <?php echo htmlspecialchars(isEnglish() ? $chairmanMenuLabelEn : $chairmanMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>about.php#ceo"><i class="fas fa-user"></i> <?php echo htmlspecialchars(isEnglish() ? $ceoMenuLabelEn : $ceoMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                                    <li><a href="<?php echo SITE_URL; ?>about.php#ceo-message"><i class="fas fa-user"></i> <?php echo htmlspecialchars(isEnglish() ? $ceoMenuLabelEn : $ceoMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>institutional-profile.php"><i class="fas fa-building-columns text-success me-1"></i> <?php echo isEnglish() ? 'Institutional Profile' : 'संस्थागत प्रोफाइल'; ?></a></li>
                                     <?php
                                     // Fetch dynamic pages that should show in about menu

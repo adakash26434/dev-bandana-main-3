@@ -762,40 +762,42 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <h5 class="stg-section-title"><i class="fas fa-palette"></i> Theme Color</h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Primary Color</label>
-                        <input type="color" name="primary_color" class="form-control form-control-color w-100"
-                               value="<?php echo $settings['primary_color'] ?? 'var(--primary-color)'; ?>"
-                               style="height: 50px;">
-                        <small class="text-muted">Website को main color चयन गर्नुहोस्</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Footer Color</label>
-                        <input type="color" name="footer_color" class="form-control form-control-color w-100"
-                               value="<?php echo $settings['footer_color'] ?? 'var(--primary-color)'; ?>"
-                               style="height: 50px;">
-                        <small class="text-muted">Footer को background color चयन गर्नुहोस्</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Secondary Color</label>
-                        <input type="color" name="secondary_color" class="form-control form-control-color w-100"
-                               value="<?php echo $settings['secondary_color'] ?? ($settings['topbar_color'] ?? '#c0392b'); ?>"
-                               style="height: 50px;">
-                        <small class="text-muted">Accent / secondary theme color चयन गर्नुहोस्</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Header Color</label>
-                        <input type="color" name="header_color" class="form-control form-control-color w-100"
-                               value="<?php echo $settings['header_color'] ?? ($settings['topbar_color'] ?? '#c0392b'); ?>"
-                               style="height: 50px;">
-                        <small class="text-muted">Top utility/header strip को रंग चयन गर्नुहोस्</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Top Bar Color <span class="badge bg-danger ms-1">Red Strip</span></label>
-                        <input type="color" name="topbar_color" class="form-control form-control-color w-100"
-                               value="<?php echo $settings['topbar_color'] ?? '#c0392b'; ?>"
-                               style="height: 50px;">
-                        <small class="text-muted">Header माथिको रातो पट्टीको रंग चयन गर्नुहोस् (Auction Portal, Downloads आदि भएको bar)</small>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Primary Color</label>
+                            <input type="color" name="primary_color" class="form-control form-control-color w-100"
+                                   value="<?php echo $settings['primary_color'] ?? 'var(--primary-color)'; ?>"
+                                   style="height: 50px;">
+                            <small class="text-muted">Main color</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Footer Color</label>
+                            <input type="color" name="footer_color" class="form-control form-control-color w-100"
+                                   value="<?php echo $settings['footer_color'] ?? 'var(--primary-color)'; ?>"
+                                   style="height: 50px;">
+                            <small class="text-muted">Footer bg</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Secondary Color</label>
+                            <input type="color" name="secondary_color" class="form-control form-control-color w-100"
+                                   value="<?php echo $settings['secondary_color'] ?? ($settings['topbar_color'] ?? '#c0392b'); ?>"
+                                   style="height: 50px;">
+                            <small class="text-muted">Accent color</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Header Color</label>
+                            <input type="color" name="header_color" class="form-control form-control-color w-100"
+                                   value="<?php echo $settings['header_color'] ?? ($settings['topbar_color'] ?? '#c0392b'); ?>"
+                                   style="height: 50px;">
+                            <small class="text-muted">Top utility/header strip</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Top Bar Color <span class="badge bg-danger ms-1">Red Strip</span></label>
+                            <input type="color" name="topbar_color" class="form-control form-control-color w-100"
+                                   value="<?php echo $settings['topbar_color'] ?? '#c0392b'; ?>"
+                                   style="height: 50px;">
+                            <small class="text-muted">Header माथिको रातो पट्टी</small>
+                        </div>
                     </div>
                 </div>
             </div>
