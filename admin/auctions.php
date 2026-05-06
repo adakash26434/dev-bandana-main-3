@@ -378,7 +378,7 @@ if ($action === 'edit' || $action === 'add') {
                     <!-- Main Photo -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold"><i class="fas fa-image text-primary me-1"></i>मुख्य फोटो</label>
-                        <input type="file" name="image" class="form-control" accept="image
+                        <input type="file" name="image" id="mainImgInput" class="form-control" accept="image/*,.webp,.png,.jpg,.jpeg">
 document.getElementById('mainImgInput').addEventListener('change', function () {
     var file = this.files[0];
     if (!file) return;

@@ -113,15 +113,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Generate tracking ID
                 $trackingId = 'WLF-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
 
-                // Claim type labels in Nepali
-                $claimTypeNp = match($claim_type) {
+                // Claim type labels in Nepali (PHP 7 compatible)
+                $claimTypeMapNp = [
                     'maternity' => 'सुत्केरी सुविधा',
                     'death' => 'मृत्यु सुविधा',
                     'insurance' => 'बीमा दाबी',
                     'medical' => 'उपचार खर्च',
                     'other' => 'अन्य सुविधा',
-                    default => 'अन्य'
-                };
+                ];
+                $claimTypeNp = $claimTypeMapNp[$claim_type] ?? 'अन्य';
 
                 // Handle document uploads
                 $documents = '';
@@ -315,24 +315,29 @@ $claimTypes = [
                         <?php if ($trackingResult): ?>
                         <div class="tracking-result mt-3">
                             <div class="result-header">
-                                <span class="badge bg-<?php echo match($trackingResult['status']) {
+                                <?php
+                                $status = (string)($trackingResult['status'] ?? '');
+                                $statusBgMap = [
                                     'pending' => 'warning',
                                     'under_review' => 'info',
                                     'approved' => 'success',
                                     'rejected' => 'danger',
                                     'paid' => 'primary',
                                     'completed' => 'success',
-                                    default => 'secondary'
-                                }; ?>">
-                                    <?php echo match($trackingResult['status']) {
-                                        'pending' => isEnglish() ? 'Pending' : 'पेन्डिङ',
-                                        'under_review' => isEnglish() ? 'Under Review' : 'समीक्षाधीन',
-                                        'approved' => isEnglish() ? 'Approved' : 'स्वीकृत',
-                                        'rejected' => isEnglish() ? 'Rejected' : 'अस्वीकृत',
-                                        'paid' => isEnglish() ? 'Paid' : 'भुक्तान भयो',
-                                        'completed' => isEnglish() ? 'Completed' : 'सम्पन्न',
-                                        default => $trackingResult['status']
-                                    }; ?>
+                                ];
+                                $statusLabelMap = [
+                                    'pending' => isEnglish() ? 'Pending' : 'पेन्डिङ',
+                                    'under_review' => isEnglish() ? 'Under Review' : 'समीक्षाधीन',
+                                    'approved' => isEnglish() ? 'Approved' : 'स्वीकृत',
+                                    'rejected' => isEnglish() ? 'Rejected' : 'अस्वीकृत',
+                                    'paid' => isEnglish() ? 'Paid' : 'भुक्तान भयो',
+                                    'completed' => isEnglish() ? 'Completed' : 'सम्पन्न',
+                                ];
+                                $statusBg = $statusBgMap[$status] ?? 'secondary';
+                                $statusLabel = $statusLabelMap[$status] ?? $status;
+                                ?>
+                                <span class="badge bg-<?php echo $statusBg; ?>">
+                                    <?php echo $statusLabel; ?>
                                 </span>
                             </div>
                             <table class="table table-sm mt-2">
@@ -528,7 +533,7 @@ $claimTypes = [
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Death Certificate' : 'मृत्यु प्रमाणपत्र'; ?></label>
-                                    <input type="file" name="death_certificate" class="form-control" accept="image
+                                    <input type="file" name="death_certificate" class="form-control" accept="image/*,.pdf">
 .claim-types-sidebar {
     background: #fff;
     border-radius: 15px;

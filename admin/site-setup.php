@@ -124,14 +124,8 @@ try {
 
     <!-- ── Flash ── -->
     <?php $flash = getFlash(); if ($flash): ?>
-    <div class="alert alert-<?php
-        echo match($flash['type']) {
-            'success' => 'success',
-            'info'    => 'info',
-            'warning' => 'warning',
-            default   => 'danger'
-        };
-    ?> alert-dismissible fade show mb-4">
+    <?php $flashTypeClass = in_array(($flash['type'] ?? ''), ['success', 'info', 'warning'], true) ? $flash['type'] : 'danger'; ?>
+    <div class="alert alert-<?php echo $flashTypeClass; ?> alert-dismissible fade show mb-4">
         <i class="fas fa-<?php echo $flash['type'] === 'success' ? 'check-circle' : ($flash['type'] === 'info' ? 'info-circle' : ($flash['type'] === 'warning' ? 'exclamation-triangle' : 'exclamation-circle')); ?> me-2"></i>
         <?php echo htmlspecialchars($flash['message']); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

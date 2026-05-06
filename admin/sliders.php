@@ -27,16 +27,16 @@ if (!function_exists('sliderUploadErrorText')) {
     function sliderUploadErrorText(int $code): string {
         $iniUpload = (string) ini_get('upload_max_filesize');
         $iniPost = (string) ini_get('post_max_size');
-        return match ($code) {
-            UPLOAD_ERR_INI_SIZE => 'फाइल साइज server PHP limit भन्दा ठूलो छ। (upload_max_filesize=' . ($iniUpload ?: 'unknown') . ', post_max_size=' . ($iniPost ?: 'unknown') . ')',
-            UPLOAD_ERR_FORM_SIZE => 'Form को MAX_FILE_SIZE limit नाघ्यो। Form/JS limit जाँच्नुहोस्।',
-            UPLOAD_ERR_PARTIAL => 'फाइल पूरा अपलोड भएन। पुनः प्रयास गर्नुहोस्।',
-            UPLOAD_ERR_NO_FILE => 'स्लाइडरका लागि छवि आवश्यक छ।',
-            UPLOAD_ERR_NO_TMP_DIR => 'सर्भर temporary folder (tmp) उपलब्ध छैन। Hosting support सँग जाँच्नुहोस्।',
-            UPLOAD_ERR_CANT_WRITE => 'सर्भरले फाइल लेख्न सकेन (permission समस्या)।',
-            UPLOAD_ERR_EXTENSION => 'Server extension ले upload रोकेको छ।',
-            default => 'छवि अपलोड गर्दा अज्ञात त्रुटि भयो। (code: ' . $code . ')',
-        };
+        if ($code === UPLOAD_ERR_INI_SIZE) {
+            return 'फाइल साइज server PHP limit भन्दा ठूलो छ। (upload_max_filesize=' . ($iniUpload ?: 'unknown') . ', post_max_size=' . ($iniPost ?: 'unknown') . ')';
+        }
+        if ($code === UPLOAD_ERR_FORM_SIZE) return 'Form को MAX_FILE_SIZE limit नाघ्यो। Form/JS limit जाँच्नुहोस्।';
+        if ($code === UPLOAD_ERR_PARTIAL) return 'फाइल पूरा अपलोड भएन। पुनः प्रयास गर्नुहोस्।';
+        if ($code === UPLOAD_ERR_NO_FILE) return 'स्लाइडरका लागि छवि आवश्यक छ।';
+        if ($code === UPLOAD_ERR_NO_TMP_DIR) return 'सर्भर temporary folder (tmp) उपलब्ध छैन। Hosting support सँग जाँच्नुहोस्।';
+        if ($code === UPLOAD_ERR_CANT_WRITE) return 'सर्भरले फाइल लेख्न सकेन (permission समस्या)।';
+        if ($code === UPLOAD_ERR_EXTENSION) return 'Server extension ले upload रोकेको छ।';
+        return 'छवि अपलोड गर्दा अज्ञात त्रुटि भयो। (code: ' . $code . ')';
     }
 }
 

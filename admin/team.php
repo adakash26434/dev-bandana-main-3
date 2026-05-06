@@ -1,4 +1,11 @@
 <?php
+if (!defined('TEAM_ADMIN_SECTION')) {
+    define('TEAM_ADMIN_SECTION', 'governance');
+}
+$teamListSection = TEAM_ADMIN_SECTION;
+if (!in_array($teamListSection, ['governance', 'karmachari'], true)) {
+    $teamListSection = 'governance';
+}
 require_once __DIR__ . '/../includes/election-tables.php';
 /**
  * टिम सदस्य व्यवस्थापन — Team Members Management
@@ -11,11 +18,11 @@ require_once __DIR__ . '/../includes/election-tables.php';
    - ensure-admin-tables
    - global exception handler
    सबै loaded हुन्छ, त्यसैले यो file लाई stable बनाउँछ। */
+$pageTitle = $teamListSection === 'karmachari' ? 'कर्मचारी / व्यवस्थापन' : 'सञ्चालक / समिति';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 if (empty($csrfToken)) $csrfToken = generateCSRFToken();
 
-$pageTitle = 'टिम व्यवस्थापन';
 $success = '';
 $error   = '';
 
@@ -115,39 +122,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $db   = getDB();
-$team = $db->query("SELECT * FROM team_members ORDER BY category, display_order, id DESC")->fetchAll();
 
 /* Default 3 categories (backward-compatible) */
 $cats = ['board' => 'सञ्चालक समिति', 'management' => 'व्यवस्थापन', 'staff' => 'कर्मचारी'];
 $catColors = ['board' => 'var(--primary-color)', 'management' => '#0c7dbf', 'staff' => '#6c757d'];
 
-/* नयाँ: committees.php बाट thapieka समितिहरू पनि dropdown मा देखाउने
-   slug pattern: 'cmt_<id>' — DB मा committee_type_id reference राख्न सकिन्छ */
+$extraTypes = [];
 try {
     $extraTypes = $db->query("SELECT id, name_np, name FROM committee_types WHERE is_active = 1 ORDER BY display_order, id")->fetchAll();
     foreach ($extraTypes as $ct) {
         $slug = 'cmt_' . (int)$ct['id'];
         if (!isset($cats[$slug])) {
             $cats[$slug] = $ct['name_np'] ?: $ct['name'];
-            $catColors[$slug] = '#7e57c2'; /* भिन्न रंग — committee bata aayeko */
+            $catColors[$slug] = '#7e57c2';
         }
     }
-} catch (\Throwable $e) { /* committee_types table छैन भने skip — default 3 use हुन्छ */ }
+} catch (\Throwable $e) { /* committee_types छैन */ }
+
+/* सूची: governance = board + समिति (cmt_*), karmachari = व्यवस्थापन + कर्मचारी */
+if ($teamListSection === 'governance') {
+    $govCategoryList = ['board'];
+    foreach ($extraTypes as $ct) {
+        $govCategoryList[] = 'cmt_' . (int)$ct['id'];
+    }
+    $ph = implode(',', array_fill(0, count($govCategoryList), '?'));
+    $stTeam = $db->prepare("SELECT * FROM team_members WHERE category IN ($ph) ORDER BY category, display_order, id DESC");
+    $stTeam->execute($govCategoryList);
+    $team = $stTeam->fetchAll();
+} else {
+    $stTeam = $db->prepare("SELECT * FROM team_members WHERE category IN ('management','staff') ORDER BY category, display_order, id DESC");
+    $stTeam->execute();
+    $team = $stTeam->fetchAll();
+}
+
+/* फारम dropdown: यो पृष्ठ अनुसार मात्र वर्ग देखाउने */
+$catsForm = [];
+if ($teamListSection === 'governance') {
+    $catsForm['board'] = $cats['board'];
+    foreach ($extraTypes as $ct) {
+        $slug = 'cmt_' . (int)$ct['id'];
+        if (isset($cats[$slug])) {
+            $catsForm[$slug] = $cats[$slug];
+        }
+    }
+} else {
+    $catsForm['management'] = $cats['management'];
+    $catsForm['staff'] = $cats['staff'];
+}
 
 ?>
 
-<?php echo adminPageHeader(
-    'टिम व्यवस्थापन',
-    'fa-users',
-    'कार्यकारी तथा कर्मचारी टोली — थप्नुहोस्, सम्पादन गर्नुहोस्। RTI सूचना अधिकारी / गुनासो अधिकारी यहीँका स्विच वा टोली मेनुका «तोकाइ» पृष्ठबाट एकै डेटामा सेट हुन्छ (दोहोरो सूची होइन)।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($team) . ' सदस्यहरू</span>'
-        . '<a href="info-officer.php" class="btn btn-sm btn-outline-primary ms-1 mb-1"><i class="fas fa-user-shield me-1"></i>RTI तोकाइ</a>'
-        . '<a href="grievance-officer.php" class="btn btn-sm btn-outline-secondary ms-1 mb-1"><i class="fas fa-user-tie me-1"></i>गुनासो तोकाइ</a>'
-); ?>
+<?php
+$teamHeaderTitle = $teamListSection === 'karmachari'
+    ? 'कर्मचारी / व्यवस्थापन'
+    : 'सञ्चालक र समिति';
+$teamHeaderIcon = $teamListSection === 'karmachari' ? 'fa-user-tie' : 'fa-building-columns';
+$teamHeaderSub = $teamListSection === 'karmachari'
+    ? 'व्यवस्थापन र कर्मचारी मात्र यहाँ सूचीबद्ध। सञ्चालक समिति वा अन्य समिति: मेनु «सञ्चालक / समिति»। RTI/गुनासो अधिकारी स्विच यहीँ वा «तोकाइ» पृष्ठ।'
+    : 'सञ्चालक समिति (board) र समिति/उपसमिति (समिति प्रकार) मात्र। कर्मचारी/व्यवस्थापन: मेनु «कर्मचारी / व्यवस्थापन»। RTI/गुनासो अधिकारी यहीँका स्विच वा «तोकाइ» पृष्ठ।';
+$teamHeaderActions = '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($team) . ' सदस्यहरू</span>';
+if ($teamListSection === 'karmachari') {
+    $teamHeaderActions .= '<a href="team.php" class="btn btn-sm btn-outline-secondary ms-1 mb-1"><i class="fas fa-building-columns me-1"></i>सञ्चालक / समिति</a>';
+} else {
+    $teamHeaderActions .= '<a href="team-karmachari.php" class="btn btn-sm btn-outline-secondary ms-1 mb-1"><i class="fas fa-user-tie me-1"></i>कर्मचारी / व्यवस्थापन</a>';
+}
+$teamHeaderActions .= '<a href="info-officer.php" class="btn btn-sm btn-outline-primary ms-1 mb-1"><i class="fas fa-user-shield me-1"></i>RTI तोकाइ</a>'
+    . '<a href="grievance-officer.php" class="btn btn-sm btn-outline-secondary ms-1 mb-1"><i class="fas fa-user-tie me-1"></i>गुनासो तोकाइ</a>';
+echo adminPageHeader($teamHeaderTitle, $teamHeaderIcon, $teamHeaderSub, $teamHeaderActions);
+?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
 
-<ul class="nav nav-tabs admin-nav-tabs mb-0">
+<ul class="nav nav-tabs admin-nav-tabs mb-0" data-team-section="<?php echo htmlspecialchars($teamListSection, ENT_QUOTES, 'UTF-8'); ?>">
     <li class="nav-item">
         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#team-list" id="team-list-btn">
             <i class="fas fa-list me-2"></i>सदस्य सूची
@@ -313,8 +359,10 @@ try {
                         <div class="col-md-2">
                             <label class="form-label fw-semibold text-success">वर्ग</label>
                             <select name="category" id="tmf_cat" class="form-select admin-fancy-input">
-                                <?php foreach ($cats as $_slug => $_lbl): ?>
-                                    <option value="<?php echo htmlspecialchars($_slug); ?>" <?php echo $_slug === 'staff' ? 'selected' : ''; ?>><?php echo htmlspecialchars($_lbl); ?></option>
+                                <?php
+                                $_defCat = $teamListSection === 'karmachari' ? 'management' : 'board';
+                                foreach ($catsForm as $_slug => $_lbl): ?>
+                                    <option value="<?php echo htmlspecialchars($_slug); ?>" <?php echo $_slug === $_defCat ? 'selected' : ''; ?>><?php echo htmlspecialchars($_lbl); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -371,6 +419,10 @@ try {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
+    var tabsNav = document.querySelector('.admin-nav-tabs[data-team-section]');
+    var teamSection = (tabsNav && tabsNav.getAttribute('data-team-section')) ? tabsNav.getAttribute('data-team-section') : 'governance';
+    var defaultCategory = teamSection === 'karmachari' ? 'management' : 'board';
+
     var listBtn = document.getElementById('team-list-btn');
     var formBtn = document.getElementById('team-form-btn');
 
@@ -395,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (catSel) {
             var found = false;
             for (var i=0; i<catSel.options.length; i++) {
-                if (catSel.options[i].value === 'staff') { catSel.selectedIndex = i; found = true; break; }
+                if (catSel.options[i].value === defaultCategory) { catSel.selectedIndex = i; found = true; break; }
             }
             if (!found) catSel.selectedIndex = 0;
         }

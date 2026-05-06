@@ -568,7 +568,7 @@ require_once 'includes/header.php';
                                 <small class="text-muted">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
                             </label>
                             <input type="file" name="attachment" class="form-control"
-                                   accept="image
+                                   accept="image/*,.pdf,.doc,.docx">
 .ds-service-card {
     display: flex;
     align-items: center;

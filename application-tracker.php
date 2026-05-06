@@ -372,102 +372,84 @@ if (!empty($verificationOk) && !empty($needsVerify) && in_array(($_POST['search_
 }
 
 function getStatusBadgeClass($status) {
-    return match($status) {
-        'pending' => 'bg-warning text-dark',
-        'shortlisted', 'in_progress', 'reviewed', 'under_review', 'processing' => 'bg-info text-white',
-        'interviewed', 'confirmed' => 'bg-secondary text-white',
-        'selected', 'approved', 'accepted', 'resolved', 'completed', 'disbursed', 'paid' => 'bg-success text-white',
-        'rejected', 'closed', 'cancelled' => 'bg-danger text-white',
-        default => 'bg-secondary text-white'
-    };
+    if ($status === 'pending') return 'bg-warning text-dark';
+    if (in_array($status, ['shortlisted', 'in_progress', 'reviewed', 'under_review', 'processing'], true)) return 'bg-info text-white';
+    if (in_array($status, ['interviewed', 'confirmed'], true)) return 'bg-secondary text-white';
+    if (in_array($status, ['selected', 'approved', 'accepted', 'resolved', 'completed', 'disbursed', 'paid'], true)) return 'bg-success text-white';
+    if (in_array($status, ['rejected', 'closed', 'cancelled'], true)) return 'bg-danger text-white';
+    return 'bg-secondary text-white';
 }
 
 function getStatusText($status, $type = 'job') {
-    if ($type === 'grievance') {
-        return match($status) {
+    $statusTextByType = [
+        'grievance' => [
             'pending' => 'समीक्षाधीन / Pending',
             'in_progress' => 'कार्यान्वयनमा / In Progress',
             'resolved' => 'समाधान भयो / Resolved',
             'closed' => 'बन्द गरियो / Closed',
-            default => $status
-        };
-    }
-    if ($type === 'loan') {
-        return match($status) {
+        ],
+        'loan' => [
             'pending' => 'पेन्डिङ / Pending',
             'processing' => 'प्रक्रियामा / Processing',
             'approved' => 'स्वीकृत / Approved',
             'rejected' => 'अस्वीकृत / Rejected',
             'disbursed' => 'वितरण भयो / Disbursed',
-            default => $status
-        };
-    }
-    if ($type === 'kyc' || $type === 'account') {
-        return match($status) {
+        ],
+        'kyc' => [
             'pending' => 'समीक्षाधीन / Pending',
             'approved' => 'स्वीकृत / Approved',
             'rejected' => 'अस्वीकृत / Rejected',
-            default => $status
-        };
-    }
-    if ($type === 'auction_bid') {
-        return match($status) {
+        ],
+        'account' => [
+            'pending' => 'समीक्षाधीन / Pending',
+            'approved' => 'स्वीकृत / Approved',
+            'rejected' => 'अस्वीकृत / Rejected',
+        ],
+        'auction_bid' => [
             'pending' => 'समीक्षाधीन / Pending',
             'accepted' => 'स्वीकृत / Accepted',
             'rejected' => 'अस्वीकृत / Rejected',
-            default => $status
-        };
-    }
-    if ($type === 'appointment') {
-        return match($status) {
+        ],
+        'appointment' => [
             'pending' => 'पेन्डिङ / Pending',
             'confirmed' => 'पुष्टि भयो / Confirmed',
             'completed' => 'सम्पन्न / Completed',
             'cancelled' => 'रद्द गरियो / Cancelled',
-            default => $status
-        };
-    }
-    if ($type === 'feedback') {
-        return match($status) {
+        ],
+        'feedback' => [
             'pending' => 'समीक्षाधीन / Pending',
             'reviewed' => 'समीक्षा भयो / Reviewed',
             'resolved' => 'समाधान भयो / Resolved',
-            default => $status
-        };
-    }
-    if ($type === 'welfare_claim') {
-        return match($status) {
+        ],
+        'welfare_claim' => [
             'pending' => 'पेन्डिङ / Pending',
             'under_review' => 'समीक्षाधीन / Under Review',
             'approved' => 'स्वीकृत / Approved',
             'rejected' => 'अस्वीकृत / Rejected',
             'paid' => 'भुक्तान भयो / Paid',
             'completed' => 'सम्पन्न / Completed',
-            default => $status
-        };
-    }
-    if ($type === 'digital_service') {
-        return match($status) {
+        ],
+        'digital_service' => [
             'pending' => 'पेन्डिङ / Pending',
             'processing' => 'प्रक्रियामा / Processing',
             'approved' => 'स्वीकृत / Approved',
             'rejected' => 'अस्वीकृत / Rejected',
             'completed' => 'सम्पन्न / Completed',
-            default => $status
-        };
-    }
-    return match($status) {
-        'pending' => 'पेन्डिङ / Pending',
-        'shortlisted' => 'छनोट भयो / Shortlisted',
-        'interviewed' => 'अन्तर्वार्ता भयो / Interviewed',
-        'selected' => 'चयन भयो / Selected',
-        'rejected' => 'अस्वीकृत / Rejected',
-        default => $status
-    };
+        ],
+        '__default' => [
+            'pending' => 'पेन्डिङ / Pending',
+            'shortlisted' => 'छनोट भयो / Shortlisted',
+            'interviewed' => 'अन्तर्वार्ता भयो / Interviewed',
+            'selected' => 'चयन भयो / Selected',
+            'rejected' => 'अस्वीकृत / Rejected',
+        ],
+    ];
+    $map = $statusTextByType[$type] ?? $statusTextByType['__default'];
+    return $map[$status] ?? $status;
 }
 
 function getAppTypeLabel($type) {
-    return match($type) {
+    $typeMap = [
         'job' => ['icon' => 'fa-briefcase', 'label' => 'रोजगारी आवेदन', 'label_en' => 'Job Application', 'color' => 'primary'],
         'loan' => ['icon' => 'fa-hand-holding-usd', 'label' => 'ऋण आवेदन', 'label_en' => 'Loan Application', 'color' => 'success'],
         'account' => ['icon' => 'fa-user-plus', 'label' => 'खाता खोल्ने आवेदन', 'label_en' => 'Account Application', 'color' => 'info'],
@@ -479,8 +461,8 @@ function getAppTypeLabel($type) {
         'welfare_claim' => ['icon' => 'fa-hand-holding-heart', 'label' => 'कल्याण दाबी', 'label_en' => 'Welfare Claim', 'color' => 'pink'],
         'digital_service' => ['icon' => 'fa-mobile-alt', 'label' => 'डिजिटल सेवा अनुरोध', 'label_en' => 'Digital Service Request', 'color' => 'info'],
         'vendor' => ['icon' => 'fa-store', 'label' => 'सप्लायर दर्ता', 'label_en' => 'Vendor Enlistment', 'color' => 'warning'],
-        default => ['icon' => 'fa-file-alt', 'label' => 'आवेदन', 'label_en' => 'Application', 'color' => 'dark']
-    };
+    ];
+    return $typeMap[$type] ?? ['icon' => 'fa-file-alt', 'label' => 'आवेदन', 'label_en' => 'Application', 'color' => 'dark'];
 }
 ?>
 

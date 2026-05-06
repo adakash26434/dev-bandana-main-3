@@ -19,7 +19,7 @@ require_once 'includes/admin-header.php';
 if (!isset($pdo) && isset($db)) { $pdo = $db; }
 if (!isset($pdo) && function_exists('getDB')) { $pdo = getDB(); }
 
-/* ── Stats — gracefully fall back to 0 if any table missing ── */
+/* ── Stats — one round-trip when possible; per-table fallback if schema partial ── */
 $stats = [
     'members'   => 0,
     'pending'   => 0, // KYC pending
@@ -31,15 +31,46 @@ $stats = [
     'programAttend' => 0, // program attendance total
     'programUnique' => 0, // unique members attended
 ];
-try { $stats['members']  = (int)$pdo->query("SELECT COUNT(*) FROM members WHERE approval_status='approved'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['pending']  = (int)$pdo->query("SELECT COUNT(*) FROM kyc_applications WHERE status IN ('pending','incomplete')")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['kycDue']   = (int)$pdo->query("SELECT COUNT(*) FROM kyc_applications WHERE status='approved' AND risk_review_status='due_review'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['loans']    = (int)$pdo->query("SELECT COUNT(*) FROM loan_applications WHERE status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['notices']  = (int)$pdo->query("SELECT COUNT(*) FROM notices WHERE is_active = 1")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['requests'] = (int)$pdo->query("SELECT COUNT(*) FROM members WHERE approval_status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['pwResets'] = (int)$pdo->query("SELECT COUNT(*) FROM member_password_reset_requests WHERE status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['programAttend'] = (int)$pdo->query("SELECT COUNT(*) FROM member_program_attendance")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
-try { $stats['programUnique'] = (int)$pdo->query("SELECT COUNT(DISTINCT member_id) FROM member_program_attendance")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+$statsBatchOk = false;
+try {
+    $row = $pdo->query(
+        "SELECT
+            (SELECT COUNT(*) FROM members WHERE approval_status='approved') AS members,
+            (SELECT COUNT(*) FROM kyc_applications WHERE status IN ('pending','incomplete')) AS pending,
+            (SELECT COUNT(*) FROM kyc_applications WHERE status='approved' AND risk_review_status='due_review') AS kycDue,
+            (SELECT COUNT(*) FROM loan_applications WHERE status='pending') AS loans,
+            (SELECT COUNT(*) FROM notices WHERE is_active = 1) AS notices,
+            (SELECT COUNT(*) FROM members WHERE approval_status='pending') AS requests,
+            (SELECT COUNT(*) FROM member_password_reset_requests WHERE status='pending') AS pwResets,
+            (SELECT COUNT(*) FROM member_program_attendance) AS programAttend,
+            (SELECT COUNT(DISTINCT member_id) FROM member_program_attendance) AS programUnique"
+    )->fetch(PDO::FETCH_ASSOC);
+    if (is_array($row)) {
+        $stats['members']        = (int)($row['members'] ?? 0);
+        $stats['pending']        = (int)($row['pending'] ?? 0);
+        $stats['kycDue']         = (int)($row['kycDue'] ?? 0);
+        $stats['loans']          = (int)($row['loans'] ?? 0);
+        $stats['notices']        = (int)($row['notices'] ?? 0);
+        $stats['requests']       = (int)($row['requests'] ?? 0);
+        $stats['pwResets']       = (int)($row['pwResets'] ?? 0);
+        $stats['programAttend']  = (int)($row['programAttend'] ?? 0);
+        $stats['programUnique']  = (int)($row['programUnique'] ?? 0);
+        $statsBatchOk = true;
+    }
+} catch (Throwable $e) {
+    error_log('[dashboard stats batch] ' . $e->getMessage());
+}
+if (!$statsBatchOk) {
+    try { $stats['members']  = (int)$pdo->query("SELECT COUNT(*) FROM members WHERE approval_status='approved'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['pending']  = (int)$pdo->query("SELECT COUNT(*) FROM kyc_applications WHERE status IN ('pending','incomplete')")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['kycDue']   = (int)$pdo->query("SELECT COUNT(*) FROM kyc_applications WHERE status='approved' AND risk_review_status='due_review'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['loans']    = (int)$pdo->query("SELECT COUNT(*) FROM loan_applications WHERE status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['notices']  = (int)$pdo->query("SELECT COUNT(*) FROM notices WHERE is_active = 1")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['requests'] = (int)$pdo->query("SELECT COUNT(*) FROM members WHERE approval_status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['pwResets'] = (int)$pdo->query("SELECT COUNT(*) FROM member_password_reset_requests WHERE status='pending'")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['programAttend'] = (int)$pdo->query("SELECT COUNT(*) FROM member_program_attendance")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+    try { $stats['programUnique'] = (int)$pdo->query("SELECT COUNT(DISTINCT member_id) FROM member_program_attendance")->fetchColumn(); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+}
 
 $dashPendingAttendanceReq = 0;
 $dashAttendRecent = [];
@@ -72,9 +103,18 @@ $sadasyaBadge = $stats['requests'] + $stats['pwResets'];
   /* ── Welfare Claims Stats ── */
   $welfarePending=0;$welfareReview=0;$welfareApproved=0;$welfareByType=[];$welfareRecent=[];
   try {
-      $welfarePending  = (int)$pdo->query("SELECT COUNT(*) FROM member_welfare_claims WHERE status='pending'")->fetchColumn();
-      $welfareReview   = (int)$pdo->query("SELECT COUNT(*) FROM member_welfare_claims WHERE status='under_review'")->fetchColumn();
-      $welfareApproved = (int)$pdo->query("SELECT COUNT(*) FROM member_welfare_claims WHERE status='approved'")->fetchColumn();
+      $welfareRow = $pdo->query(
+          "SELECT
+              COALESCE(SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END), 0) AS c_pending,
+              COALESCE(SUM(CASE WHEN status='under_review' THEN 1 ELSE 0 END), 0) AS c_review,
+              COALESCE(SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END), 0) AS c_approved
+           FROM member_welfare_claims"
+      )->fetch(PDO::FETCH_ASSOC);
+      if ($welfareRow) {
+          $welfarePending  = (int)($welfareRow['c_pending'] ?? 0);
+          $welfareReview   = (int)($welfareRow['c_review'] ?? 0);
+          $welfareApproved = (int)($welfareRow['c_approved'] ?? 0);
+      }
       $welfareByType = $pdo->query("SELECT claim_type,COUNT(*) AS total,
           SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) AS pending_count,
           SUM(CASE WHEN status='under_review' THEN 1 ELSE 0 END) AS review_count,
@@ -89,7 +129,7 @@ $sadasyaBadge = $stats['requests'] + $stats['pwResets'];
 
 /* Recent activity */
 $log = [];
-try { $log = $pdo->query("SELECT * FROM admin_activity_log ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
+try { $log = $pdo->query("SELECT action, created_at FROM admin_activity_log ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC); } catch (Throwable $e) { error_log("[dashboard] " . $e->getMessage()); }
 
 /* Smart Credential Manager — fetch credentials (staff+ can view) */
 $creds = [];

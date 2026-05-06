@@ -13,6 +13,33 @@ if (function_exists('ensureCardSecurityColumns')) {
 }
 
 ensureMemberTables();
+$hasMemberIdCards = false;
+try {
+    $hasMemberIdCards = (bool)$db->query("SHOW TABLES LIKE 'member_id_cards'")->fetchColumn();
+    if (!$hasMemberIdCards) {
+        // Lightweight self-heal for production: avoid full ensure-tables overhead.
+        $db->exec("CREATE TABLE IF NOT EXISTS member_id_cards (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            member_id VARCHAR(50) NOT NULL,
+            card_no VARCHAR(40) NOT NULL UNIQUE,
+            verification_code VARCHAR(20) NULL UNIQUE,
+            cvv CHAR(4) NULL,
+            issued_date DATE NOT NULL,
+            expiry_date DATE NULL,
+            status ENUM('active','expired','revoked') DEFAULT 'active',
+            verify_count INT DEFAULT 0,
+            last_verified_at DATETIME NULL,
+            created_by INT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_card_member (member_id),
+            INDEX idx_card_status (status),
+            INDEX idx_card_verify (verification_code)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        $hasMemberIdCards = true;
+    }
+} catch (Throwable $e) {
+    $hasMemberIdCards = false;
+}
 
 /* ── POST Actions ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -56,6 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* Unlock locked card (admin action) */
     if ($action === 'unlock_card' && $memberId) {
+        if (!$hasMemberIdCards) {
+            setFlash('error', 'member_id_cards तालिका उपलब्ध छैन। पहिले schema verify/migration चलाउनुहोस्।');
+            redirect('member-online-portal.php?view=' . $memberId);
+        }
         try {
             $u = $db->prepare("UPDATE member_id_cards
                                   SET status='active',
@@ -136,7 +167,7 @@ if ($viewId) {
                          WHERE m.id=?");
     $st->execute([$viewId]);
     $viewMember = $st->fetch(PDO::FETCH_ASSOC);
-    if ($viewMember) {
+    if ($viewMember && $hasMemberIdCards) {
         try {
             $cs = $db->prepare(
                 "SELECT card_no, verification_code, cvv, issued_date, status, failed_verify_count, unlock_requested, unlock_requested_at
@@ -151,6 +182,8 @@ if ($viewId) {
             ]);
             $viewCard = $cs->fetch(PDO::FETCH_ASSOC) ?: null;
         } catch (Throwable $e) { /* legacy DB */ }
+    }
+    if ($viewMember) {
         try {
             $ps = $db->prepare("SELECT partner_name, service_name, service_taken, service_note, created_at
                                 FROM member_partner_services
@@ -216,28 +249,32 @@ if ($search) {
     $t = "%$search%"; $params = array_merge($params, [$t,$t,$t,$t,$t]);
 }
 
-$totalCount  = (int)$db->prepare("SELECT COUNT(*) FROM members WHERE $where")->execute($params) ? 0 : 0;
 $countStmt = $db->prepare("SELECT COUNT(*) FROM members WHERE $where");
 $countStmt->execute($params);
 $totalCount = (int)$countStmt->fetchColumn();
 $totalPages = max(1, ceil($totalCount / $limit));
 
+$cardSelectSql = "NULL AS card_no_db, NULL AS card_cvv";
+$cardJoinSql = "";
+if ($hasMemberIdCards) {
+    $cardSelectSql = "c.card_no AS card_no_db, c.cvv AS card_cvv";
+    $cardJoinSql = "LEFT JOIN member_id_cards c
+         ON c.id = (
+              SELECT id FROM member_id_cards
+               WHERE (member_id = m.id OR member_id = m.sadasyata_number)
+               ORDER BY id DESC LIMIT 1
+          )";
+}
 $memberStmt = $db->prepare(
     "SELECT m.*,
             COALESCE(NULLIF(k.full_name,''), m.name) AS display_name,
             COALESCE(NULLIF(k.mobile,''), m.phone) AS display_phone,
             COALESCE(NULLIF(k.email,''), m.email) AS display_email,
             COALESCE(NULLIF(k.photo,''), NULLIF(m.avatar_url,'')) AS display_avatar,
-            c.card_no     AS card_no_db,
-            c.cvv         AS card_cvv
+            {$cardSelectSql}
        FROM members m
       LEFT JOIN kyc_applications k ON k.id = m.kyc_application_id
-       LEFT JOIN member_id_cards c
-         ON c.id = (
-              SELECT id FROM member_id_cards
-               WHERE (member_id = m.id OR member_id = m.sadasyata_number)
-               ORDER BY id DESC LIMIT 1
-          )
+      {$cardJoinSql}
       WHERE $where
       ORDER BY m.created_at DESC
       LIMIT $limit OFFSET $offset"

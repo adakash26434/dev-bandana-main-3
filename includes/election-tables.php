@@ -92,6 +92,7 @@ if (!function_exists('ensureElectionVotingTables')) {
             /* पद master (एकपटक बनाएर सबै चक्रमा reuse — committees जस्तै pattern) */
             $db->exec("CREATE TABLE IF NOT EXISTS election_posts (
                 id INT AUTO_INCREMENT PRIMARY KEY,
+                designation_id INT NULL DEFAULT NULL,
                 title_np VARCHAR(160) NOT NULL,
                 title_en VARCHAR(160) NOT NULL DEFAULT '',
                 committee_type_id INT NULL DEFAULT NULL,
@@ -101,8 +102,17 @@ if (!function_exists('ensureElectionVotingTables')) {
                 is_active TINYINT(1) NOT NULL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 INDEX idx_epost_active (is_active, display_order),
-                INDEX idx_epost_ctype (committee_type_id)
+                INDEX idx_epost_ctype (committee_type_id),
+                INDEX idx_epost_designation (designation_id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+            /* Backward compatibility: add designation_id if table already exists */
+            try {
+                $epostCols = $db->query("SHOW COLUMNS FROM election_posts")->fetchAll(PDO::FETCH_COLUMN, 0) ?: [];
+                if (!in_array('designation_id', $epostCols, true)) {
+                    $db->exec("ALTER TABLE election_posts ADD COLUMN designation_id INT NULL DEFAULT NULL AFTER id");
+                }
+            } catch (Throwable $e) { /* ignore */ }
 
             /* पद (positions) — हरेक चक्रको आफ्नै पद list, seats r max_votes सँगै */
             $db->exec("CREATE TABLE IF NOT EXISTS election_positions (

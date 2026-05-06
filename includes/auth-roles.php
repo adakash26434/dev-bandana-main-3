@@ -29,12 +29,17 @@ if (!function_exists('current_admin_role')) {
 
 if (!function_exists('role_level')) {
     function role_level(string $role): int {
-        return match (strtolower($role)) {
-            'superadmin', 'super_admin' => 3,
-            'admin'      => 2,
-            'staff'      => 1,
-            default      => 0,
-        };
+        $r = strtolower($role);
+        if ($r === 'superadmin' || $r === 'super_admin') {
+            return 3;
+        }
+        if ($r === 'admin') {
+            return 2;
+        }
+        if ($r === 'staff') {
+            return 1;
+        }
+        return 0;
     }
 }
 

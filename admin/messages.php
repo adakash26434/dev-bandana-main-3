@@ -157,7 +157,12 @@ if ($action === 'view' && isset($_GET['id'])) {
     /* Query — using safe prepared statements via sqWhere() */
     require_once __DIR__ . '/../includes/safe-query.php';
     $msgSearch = mb_substr(trim((string)($_GET['search'] ?? '')), 0, 200, 'UTF-8');
-    $filters   = match($filter) { 'unread' => ['is_read' => 0], 'read' => ['is_read' => 1], default => [] };
+    $filters = [];
+    if ($filter === 'unread') {
+        $filters = ['is_read' => 0];
+    } elseif ($filter === 'read') {
+        $filters = ['is_read' => 1];
+    }
     $w = sqWhere($filters, ['name','email','subject','message'], $msgSearch);
 
     $messages = [];

@@ -223,24 +223,24 @@ if ($profileKycCapture) {
 require __DIR__ . '/includes/chrome.php';
 
 $kymStatusKey = (string)($kycRow['status'] ?? 'not_submitted');
-$kymStatusClass = match ($kymStatusKey) {
+$kymStatusClassMap = [
     'approved' => 'mem-kym-pill--ok',
     'pending' => 'mem-kym-pill--pending',
     'rejected' => 'mem-kym-pill--bad',
-    default => 'mem-kym-pill--muted',
-};
-$kymStatusLabel = match ($kymStatusKey) {
+];
+$kymStatusLabelMap = [
     'approved' => 'अनुमोदित',
     'pending' => 'प्रक्रियामा',
     'rejected' => 'अस्वीकृत',
-    default => 'दर्ता नभएको',
-};
-$kymStatusIcon = match ($kymStatusKey) {
+];
+$kymStatusIconMap = [
     'approved' => 'fa-circle-check',
     'pending' => 'fa-clock',
     'rejected' => 'fa-circle-xmark',
-    default => 'fa-circle-question',
-};
+];
+$kymStatusClass = $kymStatusClassMap[$kymStatusKey] ?? 'mem-kym-pill--muted';
+$kymStatusLabel = $kymStatusLabelMap[$kymStatusKey] ?? 'दर्ता नभएको';
+$kymStatusIcon = $kymStatusIconMap[$kymStatusKey] ?? 'fa-circle-question';
 $kymDobKr = $kycRow ?? [];
 $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
     ? ((string)$kymDobKr['dob_bs'] . ' (BS)')

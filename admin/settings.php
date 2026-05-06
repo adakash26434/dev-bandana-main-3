@@ -346,12 +346,13 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                 </div>
             </div>
 
-            <!-- Contact Information -->
-            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="1">
+            <!-- Contact + Social Media -->
+            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="2">
                 <div class="card-header stg-section-header">
-                    <h5 class="stg-section-title"><i class="fas fa-phone"></i> सम्पर्क जानकारी</h5>
+                    <h5 class="stg-section-title"><i class="fas fa-address-book"></i> सम्पर्क / सामाजिक सञ्जाल</h5>
                 </div>
                 <div class="card-body">
+                    <h6 class="text-success fw-bold mb-3"><i class="fas fa-phone me-2"></i>सम्पर्क जानकारी</h6>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -368,27 +369,19 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                             </div>
                         </div>
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">इमेल</label>
                         <input type="email" name="email" class="form-control"
                                value="<?php echo $settings['email'] ?? ''; ?>">
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">ठेगाना</label>
                         <input type="text" name="address" class="form-control"
                                value="<?php echo $settings['address'] ?? ''; ?>">
                     </div>
-                </div>
-            </div>
 
-            <!-- Social Media -->
-            <div class="card mb-4 stg-section-card stg-filter-card" data-stg-panel="general" data-stg-group="contact" data-stg-order="2">
-                <div class="card-header stg-section-header">
-                    <h5 class="stg-section-title"><i class="fas fa-share-alt"></i> सामाजिक सञ्जाल</h5>
-                </div>
-                <div class="card-body">
+                    <hr>
+                    <h6 class="text-success fw-bold mb-3"><i class="fas fa-share-alt me-2"></i>सामाजिक सञ्जाल</h6>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">

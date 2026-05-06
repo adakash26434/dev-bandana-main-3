@@ -173,7 +173,7 @@ if (!$mustChangeExempt && $db instanceof PDO && (int) ($_SESSION['admin_id'] ?? 
 // Determine which group the current page belongs to (for auto-open)
 $pageGroups = [
     'samgri' => ['notices','designations','news','sliders','gallery','services','interest-rates','pages','downloads','faqs','useful-links','awards','reports','app-features','why-choose','partner-facilities'],
-    'toli'   => ['team','committees','info-officer','grievance-officer'],
+    'toli'   => ['team','team-karmachari','committees','info-officer','grievance-officer'],
     'rojgar' => ['careers','job-applications'],
     'aavedan'=> ['kyc','kyc-risk-reviews','loans','account-apps','digital-service-requests','auctions','auction-bids','vendor-enlistment'],
     'program' => ['programs','program-attendance','program-attendance-verify'],
@@ -581,7 +581,10 @@ set_exception_handler(function (\Throwable $ex) {
                         </div>
                         <ul class="nav-submenu <?php echo $activeGroup=='toli' ? 'open' : ''; ?>" id="group-toli">
                             <li class="<?php echo $currentPage=='team' ? 'active' : ''; ?>">
-                                <a href="team.php"><span class="nav-icon-wrap"><i class="fas fa-users"></i></span><span>टोली सदस्य</span></a>
+                                <a href="team.php"><span class="nav-icon-wrap"><i class="fas fa-building-columns"></i></span><span>सञ्चालक / समिति</span></a>
+                            </li>
+                            <li class="<?php echo $currentPage=='team-karmachari' ? 'active' : ''; ?>">
+                                <a href="team-karmachari.php"><span class="nav-icon-wrap"><i class="fas fa-user-tie"></i></span><span>कर्मचारी / व्यवस्थापन</span></a>
                             </li>
                             <li class="<?php echo $currentPage=='committees' ? 'active' : ''; ?>">
                                 <a href="committees.php"><span class="nav-icon-wrap"><i class="fas fa-people-group"></i></span><span>समिति/उपसमिति</span></a>

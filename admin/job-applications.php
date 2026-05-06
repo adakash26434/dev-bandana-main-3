@@ -199,16 +199,18 @@ if (isset($_GET['view'])) {
                     <h5 class="mb-0">
                         <i class="fas fa-user"></i>
                         <?php echo htmlspecialchars($viewApplication['full_name']); ?>
-                        <span class="badge bg-<?php
-                            echo match($viewApplication['status']) {
-                                'pending' => 'warning',
-                                'shortlisted' => 'info',
-                                'interviewed' => 'secondary',
-                                'selected' => 'success',
-                                'rejected' => 'danger',
-                                default => 'secondary'
-                            };
-                        ?>">
+                        <?php
+                        $viewStatus = (string)($viewApplication['status'] ?? '');
+                        $statusClassMap = [
+                            'pending' => 'warning',
+                            'shortlisted' => 'info',
+                            'interviewed' => 'secondary',
+                            'selected' => 'success',
+                            'rejected' => 'danger',
+                        ];
+                        $viewStatusClass = $statusClassMap[$viewStatus] ?? 'secondary';
+                        ?>
+                        <span class="badge bg-<?php echo $viewStatusClass; ?>">
                             <?php echo ucfirst($viewApplication['status']); ?>
                         </span>
                     </h5>
@@ -458,16 +460,18 @@ if (isset($_GET['view'])) {
                                     </td>
                                     <td><?php echo formatNepaliDate($app['created_at']); ?></td>
                                     <td>
-                                        <span class="badge bg-<?php
-                                            echo match($app['status']) {
-                                                'pending' => 'warning',
-                                                'shortlisted' => 'info',
-                                                'interviewed' => 'secondary',
-                                                'selected' => 'success',
-                                                'rejected' => 'danger',
-                                                default => 'secondary'
-                                            };
-                                        ?>">
+                                        <?php
+                                        $rowStatus = (string)($app['status'] ?? '');
+                                        $rowStatusMap = [
+                                            'pending' => 'warning',
+                                            'shortlisted' => 'info',
+                                            'interviewed' => 'secondary',
+                                            'selected' => 'success',
+                                            'rejected' => 'danger',
+                                        ];
+                                        $rowStatusClass = $rowStatusMap[$rowStatus] ?? 'secondary';
+                                        ?>
+                                        <span class="badge bg-<?php echo $rowStatusClass; ?>">
                                             <?php echo ucfirst($app['status']); ?>
                                         </span>
                                     </td>

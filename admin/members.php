@@ -104,17 +104,30 @@ $members = $members->fetchAll(PDO::FETCH_ASSOC);
 
 $totalPages = max(1, ceil($totalCount / $limit));
 
-/* Stats */
-$stats = [];
+/* Stats — single scan of members */
+$stats = ['total'=>0,'active'=>0,'pending'=>0,'renewal'=>0,'kyc_linked'=>0,'google'=>0,'facebook'=>0];
 try {
-    $stats['total']    = $db->query("SELECT COUNT(*) FROM members")->fetchColumn();
-    $stats['active']   = $db->query("SELECT COUNT(*) FROM members WHERE is_active=1")->fetchColumn();
-    $stats['pending']  = $db->query("SELECT COUNT(*) FROM members WHERE approval_status='pending'")->fetchColumn();
-    $stats['renewal']  = (int)$db->query("SELECT COUNT(*) FROM members WHERE approval_status='renewal_pending'")->fetchColumn();
-    $stats['kyc_linked'] = (int)$db->query("SELECT COUNT(*) FROM members WHERE kyc_application_id IS NOT NULL")->fetchColumn();
-    $stats['google']   = $db->query("SELECT COUNT(*) FROM members WHERE google_id IS NOT NULL AND google_id!=''")->fetchColumn();
-    $stats['facebook'] = $db->query("SELECT COUNT(*) FROM members WHERE facebook_id IS NOT NULL AND facebook_id!=''")->fetchColumn();
-} catch (Exception $e) { $stats = ['total'=>0,'active'=>0,'pending'=>0,'renewal'=>0,'kyc_linked'=>0,'google'=>0,'facebook'=>0]; }
+    $row = $db->query(
+        "SELECT
+            COUNT(*) AS total,
+            COALESCE(SUM(is_active = 1), 0) AS active,
+            COALESCE(SUM(approval_status = 'pending'), 0) AS pending,
+            COALESCE(SUM(approval_status = 'renewal_pending'), 0) AS renewal,
+            COALESCE(SUM(kyc_application_id IS NOT NULL), 0) AS kyc_linked,
+            COALESCE(SUM(google_id IS NOT NULL AND google_id != ''), 0) AS google,
+            COALESCE(SUM(facebook_id IS NOT NULL AND facebook_id != ''), 0) AS facebook
+         FROM members"
+    )->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $stats['total']      = (int)($row['total'] ?? 0);
+        $stats['active']     = (int)($row['active'] ?? 0);
+        $stats['pending']    = (int)($row['pending'] ?? 0);
+        $stats['renewal']    = (int)($row['renewal'] ?? 0);
+        $stats['kyc_linked'] = (int)($row['kyc_linked'] ?? 0);
+        $stats['google']     = (int)($row['google'] ?? 0);
+        $stats['facebook']   = (int)($row['facebook'] ?? 0);
+    }
+} catch (Exception $e) { /* keep zeros */ }
 ?>
 
 <div class="container-fluid py-3">

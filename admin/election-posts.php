@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/election-tables.php';
 $db = getDB();
 ensureElectionTables($db);
 ensureElectionVotingTables($db);
+ensureDesignationsTable($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     checkCSRF();
@@ -18,22 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if ($action === 'save_post') {
             $pid = (int)($_POST['post_id'] ?? 0);
-            $titleNp = clean_text($_POST['title_np'] ?? '', 160);
-            $titleEn = clean_text($_POST['title_en'] ?? '', 160);
+            $designationId = (int)($_POST['designation_id'] ?? 0);
             $ctid = (int)($_POST['committee_type_id'] ?? 0) ?: null;
             $seats = max(1, (int)($_POST['default_seats'] ?? 1));
             $maxV  = max(1, (int)($_POST['default_max_votes'] ?? 1));
             $ord   = (int)($_POST['display_order'] ?? 0);
             $act   = isset($_POST['is_active']) ? 1 : 0;
-            if ($titleNp === '') {
-                setFlash('error', 'पदको नाम (नेपाली) अनिवार्य।');
+            $desigStmt = $db->prepare("SELECT id, title_np, title_en FROM designations WHERE id=? AND is_active=1 LIMIT 1");
+            $desigStmt->execute([$designationId]);
+            $desig = $desigStmt->fetch(PDO::FETCH_ASSOC) ?: null;
+            if (!$desig) {
+                setFlash('error', 'कृपया पद मास्टरबाट पद छान्नुहोस्।');
             } elseif ($pid > 0) {
-                $db->prepare('UPDATE election_posts SET title_np=?, title_en=?, committee_type_id=?, default_seats=?, default_max_votes=?, display_order=?, is_active=? WHERE id=?')
-                    ->execute([$titleNp, $titleEn, $ctid, $seats, $maxV, $ord, $act, $pid]);
+                $db->prepare('UPDATE election_posts SET designation_id=?, title_np=?, title_en=?, committee_type_id=?, default_seats=?, default_max_votes=?, display_order=?, is_active=? WHERE id=?')
+                    ->execute([(int)$desig['id'], clean_text($desig['title_np'] ?? '', 160), clean_text($desig['title_en'] ?? '', 160), $ctid, $seats, $maxV, $ord, $act, $pid]);
                 setFlash('success', 'पद अपडेट भयो।');
             } else {
-                $db->prepare('INSERT INTO election_posts (title_np, title_en, committee_type_id, default_seats, default_max_votes, display_order, is_active) VALUES (?,?,?,?,?,?,?)')
-                    ->execute([$titleNp, $titleEn, $ctid, $seats, $maxV, $ord, $act]);
+                $db->prepare('INSERT INTO election_posts (designation_id, title_np, title_en, committee_type_id, default_seats, default_max_votes, display_order, is_active) VALUES (?,?,?,?,?,?,?,?)')
+                    ->execute([(int)$desig['id'], clean_text($desig['title_np'] ?? '', 160), clean_text($desig['title_en'] ?? '', 160), $ctid, $seats, $maxV, $ord, $act]);
                 setFlash('success', 'नयाँ पद थपियो।');
             }
             redirect('election-posts.php');
@@ -65,8 +68,13 @@ if (($epid = (int)($_GET['edit'] ?? 0)) > 0) {
     $editPost = $st->fetch(PDO::FETCH_ASSOC) ?: null;
 }
 
-$posts = $db->query('SELECT p.*, ct.name_np AS ctype_name FROM election_posts p LEFT JOIN committee_types ct ON ct.id=p.committee_type_id ORDER BY p.display_order, p.id')->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$posts = $db->query('SELECT p.*, ct.name_np AS ctype_name, d.title_np AS desig_name
+                     FROM election_posts p
+                     LEFT JOIN committee_types ct ON ct.id=p.committee_type_id
+                     LEFT JOIN designations d ON d.id=p.designation_id
+                     ORDER BY p.display_order, p.id')->fetchAll(PDO::FETCH_ASSOC) ?: [];
 $committeeTypes = $db->query('SELECT id, name_np FROM committee_types WHERE is_active=1 ORDER BY display_order, id')->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$designations = fetchDesignations($db, ['committee', 'staff']);
 $panel = (string)($_GET['panel'] ?? 'list');
 if (!in_array($panel, ['list', 'form'], true)) $panel = 'list';
 if ($editPost) $panel = 'form';
@@ -76,7 +84,7 @@ if ($editPost) $panel = 'form';
 echo adminPageHeader(
     'पद व्यवस्थापन (Master)',
     'fa-briefcase',
-    'एकपटक पद बनाएर सबै निर्वाचन चक्रमा select गरी प्रयोग गर्नुहोस्।',
+    'Designation-driven only: पद मास्टरबाट छानेर सबै निर्वाचन चक्रमा प्रयोग गर्नुहोस्।',
     '<a class="btn btn-outline-secondary btn-sm" href="election-information.php"><i class="fas fa-arrow-left me-1"></i>निर्वाचन</a>'
 );
 ?>
@@ -95,13 +103,14 @@ echo adminPageHeader(
             <div class="card-header"><h6 class="mb-0"><i class="fas fa-list me-2"></i>पद सूची (<?php echo count($posts); ?>)</h6></div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0 align-middle">
-                    <thead><tr><th>पद</th><th>समिति</th><th>सिट</th><th>मत</th><th>क्रम</th><th></th></tr></thead>
+                    <thead><tr><th>पद</th><th>Master स्रोत</th><th>समिति</th><th>सिट</th><th>मत</th><th>क्रम</th><th></th></tr></thead>
                     <tbody>
                     <?php foreach ($posts as $p): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($p['title_np']); ?>
                                 <?php if (empty($p['is_active'])): ?><span class="badge bg-secondary ms-1">निष्क्रिय</span><?php endif; ?>
                             </td>
+                            <td class="small text-muted"><?php echo htmlspecialchars($p['desig_name'] ?? '—'); ?></td>
                             <td class="small text-muted"><?php echo htmlspecialchars($p['ctype_name'] ?? '—'); ?></td>
                             <td><?php echo (int)$p['default_seats']; ?></td>
                             <td><?php echo (int)$p['default_max_votes']; ?></td>
@@ -117,7 +126,7 @@ echo adminPageHeader(
                             </td>
                         </tr>
                     <?php endforeach; ?>
-                    <?php if (empty($posts)): ?><tr><td colspan="6" class="text-center text-muted py-3">अझै पद थपिएको छैन।</td></tr><?php endif; ?>
+                    <?php if (empty($posts)): ?><tr><td colspan="7" class="text-center text-muted py-3">अझै पद थपिएको छैन।</td></tr><?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -136,11 +145,17 @@ echo adminPageHeader(
                     <?php echo csrfField(); ?>
                     <input type="hidden" name="action" value="save_post">
                     <input type="hidden" name="post_id" value="<?php echo $editPost ? (int)$editPost['id'] : 0; ?>">
-                    <div class="col-12"><label class="form-label small">पदको नाम (नेपाली) *</label>
-                        <input class="form-control" name="title_np" required value="<?php echo htmlspecialchars($editPost['title_np'] ?? ''); ?>" placeholder="अध्यक्ष, उपाध्यक्ष, सचिव ...">
-                    </div>
-                    <div class="col-12"><label class="form-label small">Title (English)</label>
-                        <input class="form-control" name="title_en" value="<?php echo htmlspecialchars($editPost['title_en'] ?? ''); ?>" placeholder="Chairperson, Vice Chair ...">
+                    <div class="col-12"><label class="form-label small">पद मास्टरबाट पद छान्नुहोस् *</label>
+                        <select class="form-select" name="designation_id" required>
+                            <option value="">— पद छान्नुहोस् —</option>
+                            <?php foreach ($designations as $d): ?>
+                                <?php $dt = trim((string)($d['title_np'] ?? '')); if ($dt === '') continue; ?>
+                                <option value="<?php echo (int)$d['id']; ?>" <?php echo ((int)($editPost['designation_id'] ?? 0) === (int)$d['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($dt); ?><?php if (!empty($d['title_en'])): ?> (<?php echo htmlspecialchars((string)$d['title_en']); ?>)<?php endif; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="small text-muted mt-1">नयाँ पद चाहियो भने <a href="designations.php" target="_blank">पद मास्टर</a> मा थप्नुहोस्।</div>
                     </div>
                     <div class="col-12"><label class="form-label small">समिति</label>
                         <select class="form-select" name="committee_type_id">
