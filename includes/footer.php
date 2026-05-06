@@ -200,7 +200,7 @@ try {
                 </div>
 
                 <?php if ($supportedName !== ''): ?>
-                <p class="developer" style="font-size:.78rem; opacity:.9; margin-bottom:2px;">
+                <p class="developer" style="font-size:.74rem; opacity:.9; margin-bottom:2px;">
                     Supported By
                     <?php if ($supportedUrl !== ''): ?>
                     <a href="<?php echo htmlspecialchars($supportedUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener"><?php echo htmlspecialchars($supportedName, ENT_QUOTES, 'UTF-8'); ?></a>
@@ -210,8 +210,8 @@ try {
                 </p>
                 <?php endif; ?>
 
-                <p class="developer">
-                    Developed with <i class="fas fa-heart" style="color: #e74c3c; font-size: 12px;"></i> by
+                <p class="developer" style="font-size:.74rem; opacity:.9; margin-bottom:0;">
+                    Developed By
                     <a href="<?php echo $developerUrl; ?>" target="_blank" rel="noopener"><?php echo $developerName; ?></a>
                 </p>
             </div>
