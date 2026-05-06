@@ -372,6 +372,8 @@ if (!$licExpiredLogin && isset($_SESSION['admin_license_renewal_prompt'])) {
     unset($_SESSION['admin_license_renewal_prompt']);
 }
 
+$forceShowLogin = !is_array($admin2faPending) && ((string) ($_GET['login'] ?? '') === '1');
+
 $showLicenseRenewalOnLogin = false;
 if ($licExpiredLogin && !is_array($admin2faPending)) {
     $showLicenseRenewalOnLogin = !empty($_SESSION['admin_license_renewal_prompt'])
@@ -379,6 +381,7 @@ if ($licExpiredLogin && !is_array($admin2faPending)) {
         || $renewalNoticeSent
         || ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['action'] ?? '') === 'submit_renewal_notice_login');
 }
+$showLicenseRenewalOnLogin = $showLicenseRenewalOnLogin && !$forceShowLogin;
 ?>
 <!DOCTYPE html>
 <html lang="ne">
@@ -638,6 +641,20 @@ if ($licExpiredLogin && !is_array($admin2faPending)) {
             color: #111827;
         }
         .license-renew-form .lr-amt-hint { font-size: .68rem; color: #6b7280; margin-top: 4px; font-weight: 500; }
+        .mini-login-link {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(22,101,52,.25);
+            background: rgba(255,255,255,.85);
+            color: #14532d;
+            text-decoration: none;
+        }
+        .mini-login-link:hover { filter: brightness(1.04); }
         .license-expired-login-first {
             background: #fffbeb;
             border: 1px solid #fde68a;
@@ -689,13 +706,17 @@ if ($licExpiredLogin && !is_array($admin2faPending)) {
 
         <?php if ($showLicenseRenewalOnLogin): ?>
         <div class="license-renew-on-login" style="margin: 0 0 18px;">
-            <h4><i class="fas fa-building"></i> लाइसेन्स नवीकरण — कार्यालय Admin</h4>
+            <h4>
+                <i class="fas fa-building"></i> लाइसेन्स नवीकरण — कार्यालय Admin
+                <a class="mini-login-link" href="?login=1" title="लग इन पृष्ठमा जानुहोस्" aria-label="लग इन">
+                    <i class="fas fa-lock"></i>
+                </a>
+            </h4>
             <div class="license-renew-vendor">
                 <strong>सूचना:</strong> SSL certificates तथा domain active शुल्क कृपया तुरुन्तै अनलाइनमार्फत भुक्तानी गर्नुहोला, अन्यथा domain स्वतः suspend हुन सक्नेछ।
                 अन्य cloud, maintenance, support तथा license सम्बन्धी लागतको विस्तृत जानकारी तथा भुक्तानी प्रक्रियाका लागि कृपया सम्बन्धित vendor सँग सम्पर्क गर्नुहुन अनुरोध गरिन्छ।
             </div>
             <p class="mb-2" style="font-size:.78rem;opacity:.95;">
-                <strong>साइट सेवा म्याद सकियो।</strong> सहकारीका <strong>कार्यालय/साधारण Admin</strong> ले यो बेला लग इन गर्न मिल्दैन।
                 आफ्नो Khalti वा eSewa बाट <strong>तलको नम्बरमा</strong> (विक्रेता खाता) रकम पठाउनुहोस्, अनि तलको फारमबाट ref सहित <strong>भुक्तानी सूचना पठाउनुहोस्</strong>।
             </p>
             <?php if ($loginRenewAmount !== ''): ?>
