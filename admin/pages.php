@@ -481,6 +481,10 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
     $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['message']);
     ?>
 
+    <div class="container-fluid py-3">
+    <div class="row justify-content-center">
+    <div class="col-12 col-xxl-11">
+
     <div class="alert alert-info border mb-3">
         <div class="fw-semibold mb-1"><i class="fas fa-circle-info me-1"></i>हाम्रो परिचय कहाँ सम्पादन गर्ने?</div>
         <div class="small mb-2">
