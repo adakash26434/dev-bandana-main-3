@@ -501,6 +501,18 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
         </div>
     </div>
 
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <a href="pages.php?tab=dynamic" class="btn btn-sm <?php echo ($tab === 'dynamic' && $action !== 'edit') ? 'btn-success' : 'btn-outline-success'; ?>">
+            <i class="fas fa-table-list me-1"></i>पृष्ठहरू सूची
+        </a>
+        <a href="pages.php?action=edit&tab=dynamic" class="btn btn-sm <?php echo ($tab === 'dynamic' && $action === 'edit') ? 'btn-primary' : 'btn-outline-primary'; ?>">
+            <i class="fas fa-plus me-1"></i>गतिशील पृष्ठ थप्नुहोस्
+        </a>
+        <a href="pages.php?tab=dynamic&f_menu=footer" class="btn btn-sm <?php echo ($tab === 'dynamic' && $fMenu === 'footer') ? 'btn-info' : 'btn-outline-info'; ?>">
+            <i class="fas fa-shield-halved me-1"></i>नीति पृष्ठहरू (फिल्टर)
+        </a>
+    </div>
+
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs admin-nav-tabs mb-4">
         <li class="nav-item">
