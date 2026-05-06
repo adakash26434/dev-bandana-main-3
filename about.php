@@ -32,6 +32,14 @@ foreach ([$aboutImageSetting, $aboutImageDefault] as $_abPath) {
     }
 }
 $hasAboutImage = $aboutResolved !== '';
+
+// Static section titles (admin editable via pages-v2 static sections)
+$visionTitleNp = getSetting('vision_content_title_np', 'हाम्रो दृष्टिकोण');
+$visionTitleEn = getSetting('vision_content_title_en', 'Our Vision');
+$missionTitleNp = getSetting('mission_content_title_np', 'हाम्रो लक्ष्य');
+$missionTitleEn = getSetting('mission_content_title_en', 'Our Mission');
+$valuesTitleNp = getSetting('values_content_title_np', 'हाम्रो मूल मान्यताहरू');
+$valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 ?>
 
 <!-- Page Banner -->
@@ -283,7 +291,7 @@ $hasAboutImage = $aboutResolved !== '';
                         <i class="fas fa-eye"></i>
                     </div>
                     <div class="vision-card-content coop-prose">
-                        <h4><?php echo isEnglish() ? 'Our Vision' : 'हाम्रो दृष्टिकोण'; ?></h4>
+                        <h4><?php echo htmlspecialchars(isEnglish() ? $visionTitleEn : $visionTitleNp, ENT_QUOTES, 'UTF-8'); ?></h4>
                         <?php
                         $visionContent = isEnglish() ? getSetting('vision_content_en', '') : getSetting('vision_content_np', '');
                         if ($visionContent):
@@ -303,7 +311,7 @@ $hasAboutImage = $aboutResolved !== '';
                         <i class="fas fa-bullseye"></i>
                     </div>
                     <div class="vision-card-content coop-prose">
-                        <h4><?php echo isEnglish() ? 'Our Mission' : 'हाम्रो लक्ष्य'; ?></h4>
+                        <h4><?php echo htmlspecialchars(isEnglish() ? $missionTitleEn : $missionTitleNp, ENT_QUOTES, 'UTF-8'); ?></h4>
                         <?php
                         $missionContent = isEnglish() ? getSetting('mission_content_en', '') : getSetting('mission_content_np', '');
                         if ($missionContent):
@@ -722,7 +730,7 @@ $ceoPhoto = getSetting('ceo_photo', '');
             <div class="section-badge-wrap">
                 <span class="section-badge"><i class="fas fa-heart"></i> <?php echo isEnglish() ? 'Values' : 'मूल्यहरू'; ?></span>
             </div>
-            <h2><?php echo isEnglish() ? 'Our Core Values' : 'हाम्रो मूल मान्यताहरू'; ?></h2>
+            <h2><?php echo htmlspecialchars(isEnglish() ? $valuesTitleEn : $valuesTitleNp, ENT_QUOTES, 'UTF-8'); ?></h2>
         </div>
         <div class="row justify-content-center">
             <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="0">

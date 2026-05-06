@@ -35,6 +35,18 @@ $footerColor  = $primaryColor;
 $topbarColor  = $secondaryColor;
 $mobileAppPhoto = getSetting('mobile_app_photo', 'assets/images/mobile-app.png');
 $himalBg = getSetting('himal_bg', '');
+$visionMenuLabelNp = trim((string)getSetting('vision_content_title_np', 'हाम्रो दृष्टिकोण'));
+$visionMenuLabelEn = trim((string)getSetting('vision_content_title_en', 'Our Vision'));
+$missionMenuLabelNp = trim((string)getSetting('mission_content_title_np', 'हाम्रो लक्ष्य'));
+$missionMenuLabelEn = trim((string)getSetting('mission_content_title_en', 'Our Mission'));
+$valuesMenuLabelNp = trim((string)getSetting('values_content_title_np', 'मूल मान्यताहरू'));
+$valuesMenuLabelEn = trim((string)getSetting('values_content_title_en', 'Core Values'));
+$chairmanMenuLabelNp = trim((string)getSetting('chairman_message_title_np', 'अध्यक्षको सन्देश'));
+$chairmanMenuLabelEn = trim((string)getSetting('chairman_message_title_en', "Chairman's Message"));
+$ceoMenuLabelNp = trim((string)getSetting('ceo_message_title_np', 'प्रमुख कार्यकारी अधिकृतको सन्देश'));
+$ceoMenuLabelEn = trim((string)getSetting('ceo_message_title_en', "CEO's Message"));
+$visionMissionMenuNp = trim($visionMenuLabelNp . ' / ' . $missionMenuLabelNp);
+$visionMissionMenuEn = trim($visionMenuLabelEn . ' / ' . $missionMenuLabelEn);
 
 /* ── Shared DB handle for header queries ── */
 try { $db = getDB(); } catch (Throwable $e) { $db = null; }
@@ -790,10 +802,10 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                         <ul class="dropdown">
                             <li><a href="<?php echo SITE_URL; ?>about.php"><i class="fas fa-info-circle"></i> <?php echo isEnglish() ? 'About Us' : 'हाम्रो बारेमा'; ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>about.php#history"><i class="fas fa-clock"></i> <?php echo isEnglish() ? 'History' : 'हाम्रो इतिहास'; ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>about.php#vision"><i class="fas fa-eye"></i> <?php echo isEnglish() ? 'Vision & Mission' : 'दृष्टि र लक्ष्य'; ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>about.php#values"><i class="fas fa-heart"></i> <?php echo isEnglish() ? 'Core Values' : 'मूल मान्यताहरू'; ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>about.php#chairman"><i class="fas fa-user-tie"></i> <?php echo isEnglish() ? "Chairman's Message" : 'अध्यक्षको सन्देश'; ?></a></li>
-                            <li><a href="<?php echo SITE_URL; ?>about.php#ceo"><i class="fas fa-user"></i> <?php echo isEnglish() ? "CEO's Message" : 'प्रमुख कार्यकारी अधिकृतको सन्देश'; ?></a></li>
+                            <li><a href="<?php echo SITE_URL; ?>about.php#vision"><i class="fas fa-eye"></i> <?php echo htmlspecialchars(isEnglish() ? $visionMissionMenuEn : $visionMissionMenuNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                            <li><a href="<?php echo SITE_URL; ?>about.php#values"><i class="fas fa-heart"></i> <?php echo htmlspecialchars(isEnglish() ? $valuesMenuLabelEn : $valuesMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                            <li><a href="<?php echo SITE_URL; ?>about.php#chairman"><i class="fas fa-user-tie"></i> <?php echo htmlspecialchars(isEnglish() ? $chairmanMenuLabelEn : $chairmanMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                            <li><a href="<?php echo SITE_URL; ?>about.php#ceo"><i class="fas fa-user"></i> <?php echo htmlspecialchars(isEnglish() ? $ceoMenuLabelEn : $ceoMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                             <li><a href="<?php echo SITE_URL; ?>institutional-profile.php"><i class="fas fa-building-columns text-success me-1"></i> <?php echo isEnglish() ? 'Institutional Profile' : 'संस्थागत प्रोफाइल'; ?></a></li>
                         </ul>
                     </li>
@@ -1008,10 +1020,10 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                                 <ul class="dropdown">
                                     <li><a href="<?php echo SITE_URL; ?>about.php"><i class="fas fa-info-circle"></i> <?php echo isEnglish() ? 'About Us' : 'हाम्रो बारेमा'; ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>about.php#history"><i class="fas fa-clock"></i> <?php echo isEnglish() ? 'History' : 'हाम्रो इतिहास'; ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>about.php#vision"><i class="fas fa-eye"></i> <?php echo isEnglish() ? 'Vision & Mission' : 'दृष्टि र लक्ष्य'; ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>about.php#values"><i class="fas fa-heart"></i> <?php echo isEnglish() ? 'Core Values' : 'मूल मान्यताहरू'; ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>about.php#chairman"><i class="fas fa-user-tie"></i> <?php echo isEnglish() ? "Chairman's Message" : 'अध्यक्षको सन्देश'; ?></a></li>
-                                    <li><a href="<?php echo SITE_URL; ?>about.php#ceo"><i class="fas fa-user"></i> <?php echo isEnglish() ? "CEO's Message" : 'प्रमुख कार्यकारी अधिकृतको सन्देश'; ?></a></li>
+                                    <li><a href="<?php echo SITE_URL; ?>about.php#vision"><i class="fas fa-eye"></i> <?php echo htmlspecialchars(isEnglish() ? $visionMissionMenuEn : $visionMissionMenuNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                                    <li><a href="<?php echo SITE_URL; ?>about.php#values"><i class="fas fa-heart"></i> <?php echo htmlspecialchars(isEnglish() ? $valuesMenuLabelEn : $valuesMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                                    <li><a href="<?php echo SITE_URL; ?>about.php#chairman"><i class="fas fa-user-tie"></i> <?php echo htmlspecialchars(isEnglish() ? $chairmanMenuLabelEn : $chairmanMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                                    <li><a href="<?php echo SITE_URL; ?>about.php#ceo"><i class="fas fa-user"></i> <?php echo htmlspecialchars(isEnglish() ? $ceoMenuLabelEn : $ceoMenuLabelNp, ENT_QUOTES, 'UTF-8'); ?></a></li>
                                     <li><a href="<?php echo SITE_URL; ?>institutional-profile.php"><i class="fas fa-building-columns text-success me-1"></i> <?php echo isEnglish() ? 'Institutional Profile' : 'संस्थागत प्रोफाइल'; ?></a></li>
                                     <?php
                                     // Fetch dynamic pages that should show in about menu
