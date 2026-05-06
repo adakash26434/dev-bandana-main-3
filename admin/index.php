@@ -789,7 +789,7 @@ if ($licExpiredLogin && !is_array($admin2faPending)) {
                 <?php unset($_SESSION['admin_2fa_backup_plain']); ?>
             <?php endif; ?>
         </form>
-        <?php else: ?>
+        <?php elseif (!$showLicenseRenewalOnLogin): ?>
         <form method="POST" action="">
             <?php echo csrfField(); ?>
             <div class="field">
@@ -810,6 +810,13 @@ if ($licExpiredLogin && !is_array($admin2faPending)) {
                 <i class="fas fa-sign-in-alt"></i> लग इन गर्नुहोस्
             </button>
         </form>
+        <?php else: ?>
+            <div class="field-compact" style="margin-top:6px;">
+                <a href="?renewal=1" class="link-primary-strong">भुक्तानी सूचना फारम खुल्लै छ (लग इन चाहिँदैन)</a>
+                <div class="small text-secondary" style="margin-top:6px;line-height:1.55;">
+                    व्यवस्थापन पहुँच भएको खाताबाट लग इन गर्नुपर्छ भने page माथि स्क्रोल गरी लग इन भाग प्रयोग गर्नुहोस्।
+                </div>
+            </div>
         <?php endif; ?>
 
         <div class="security-note">
