@@ -78,8 +78,11 @@ if (!function_exists('site_license_renewal_apply_office_notice')) {
             return ['ok' => false, 'error' => 'कारोबार नम्बर / Ref कम्तिमा ३ अक्षर हुनुपर्छ।'];
         }
         $submitter = trim($submitter);
+        if (mb_strlen($submitter) < 2 && function_exists('getSetting')) {
+            $submitter = trim((string) getSetting('site_name', ''));
+        }
         if (mb_strlen($submitter) < 2) {
-            return ['ok' => false, 'error' => 'पठाउने (कार्यालय/नाम) कम्तिमा २ अक्षर लेख्नुहोस्।'];
+            return ['ok' => false, 'error' => 'संस्थाको नाम Settings मा भर्नुहोस् वा फारममा लेख्नुहोस्।'];
         }
         ensureSiteLicenseRenewalNoticesTable($db);
         if (site_license_renewal_pending_count($db) > 0) {
@@ -119,7 +122,7 @@ if (!function_exists('site_license_renewal_notify_vendor')) {
             . '<p><strong>पठाउने (कार्यालय/नाम):</strong> ' . $user . '</p>'
             . '<p><strong>गेटवे:</strong> ' . $gw . '</p>'
             . '<p><strong>Txn / Ref:</strong> ' . $txn . '</p>'
-            . '<p><strong>रकम (Superadmin सेटिङ अनुसार):</strong> ' . $amt . '</p>'
+            . '<p><strong>रकम (नवीकरण सेटिङ अनुसार):</strong> ' . $amt . '</p>'
             . '<p><strong>टिप्पणी:</strong> ' . nl2br($note) . '</p>'
             . '<p><strong>Notice ID:</strong> ' . $id . '</p>'
             . '<p><small>Admin: ' . htmlspecialchars($siteUrl . 'admin/site-license.php', ENT_QUOTES, 'UTF-8') . '</small></p>';

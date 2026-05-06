@@ -85,7 +85,11 @@ try {
 $blockedPayAmount = trim((string) getSetting('site_license_renewal_amount', ''));
 $blockedKhalti = site_license_pay_id_or_default((string) getSetting('site_license_khalti_id', ''));
 $blockedEsewa = site_license_pay_id_or_default((string) getSetting('site_license_esewa_id', ''));
-$blockedSubmitterDefault = trim((string) ($_SESSION['admin_name'] ?? $_SESSION['admin_username'] ?? ''));
+$coopNameRenewal = function_exists('getSetting') ? trim((string) getSetting('site_name', '')) : '';
+$blockedSubmitterDefault = $coopNameRenewal !== ''
+    ? $coopNameRenewal
+    : trim((string) ($_SESSION['admin_name'] ?? $_SESSION['admin_username'] ?? ''));
+$blockedSubmitterCoopReadonly = ($coopNameRenewal !== '');
 
 $site = function_exists('getSetting') ? getSetting('site_name', 'सहकारी') : 'सहकारी';
 $siteH = htmlspecialchars($site, ENT_QUOTES, 'UTF-8');
@@ -247,8 +251,8 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
             </div>
 
             <div class="vendor-note">
-                <strong>विक्रेता / प्राविधिक:</strong> लाइसेन्स नवीकरण वा प्राविधिक सहयोगका लागि <strong>विक्रेता / प्राविधिक टोली</strong> लाई सम्पर्क गर्नुहोस्।
-                वैकल्पिक: <strong>Pay Now</strong> गरी तलको फारमबाट <strong>भुक्तानी सूचना</strong> पठाउनुहोस् — Superadmin ले «साइट म्याद» मा हेरी <strong>नयाँ मिति</strong> सेभ गर्छन्।
+                <strong>सूचना:</strong> SSL certificates तथा domain active शुल्क कृपया तुरुन्तै अनलाइनमार्फत भुक्तानी गर्नुहोला, अन्यथा domain स्वतः suspend हुन सक्नेछ।
+                अन्य cloud, maintenance, support तथा license सम्बन्धी लागतको विस्तृत जानकारी तथा भुक्तानी प्रक्रियाका लागि कृपया सम्बन्धित vendor सँग सम्पर्क गर्नुहुन अनुरोध गरिन्छ।
             </div>
 
             <?php if ($untilBs !== ''): ?>
@@ -287,10 +291,10 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
                 <div class="fw-bold mb-2 text-success"><i class="fas fa-mobile-screen-button me-1"></i>Pay Now — आफ्नो wallet बाट पठाउनुहोस्</div>
                 <p class="small text-secondary mb-2">तलका नम्बर <strong>विक्रेता खाता</strong> हुन्। आफ्नो Khalti वा eSewa बाट Send/Transfer गर्नुहोस्।</p>
                 <?php if ($blockedPayAmount !== ''): ?>
-                <p class="mb-1 small"><strong>रकम (Superadmin ले तोकेको — बदल्न मिल्दैन):</strong></p>
+                <p class="mb-1 small"><strong>रकम (नवीकरण सेटिङ — बदल्न मिल्दैन):</strong></p>
                 <div class="amt-locked mb-2 text-start"><?php echo htmlspecialchars($blockedPayAmount, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php else: ?>
-                <p class="small text-warning mb-2">रकम अझै सेट भएको छैन। Superadmin सम्पर्क गर्नुहोस्।</p>
+                <p class="small text-warning mb-2">रकम अझै सेट भएको छैन। व्यवस्थापक वा विक्रेता सम्पर्क गर्नुहोस्।</p>
                 <?php endif; ?>
                 <?php if ($blockedKhalti !== ''): ?>
                 <p class="mb-1 small"><strong>Khalti:</strong> <code><?php echo htmlspecialchars($blockedKhalti, ENT_QUOTES, 'UTF-8'); ?></code></p>
@@ -304,8 +308,15 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
                 <input type="hidden" name="action" value="submit_renewal_notice_blocked">
                 <?php echo csrfField(); ?>
                 <div class="mb-2">
-                    <label class="form-label small fw-semibold">पठाउने <span class="text-danger">*</span></label>
-                    <input type="text" name="submitter_name" class="form-control form-control-sm" required minlength="2" maxlength="120" value="<?php echo htmlspecialchars($blockedSubmitterDefault, ENT_QUOTES, 'UTF-8'); ?>" placeholder="कार्यालय / नाम">
+                    <label class="form-label small fw-semibold">संस्थाको नाम <?php echo $blockedSubmitterCoopReadonly ? '' : '<span class="text-danger">*</span>'; ?> (साइट सेटिङ)</label>
+                    <input type="text" name="submitter_name" class="form-control form-control-sm" maxlength="120" autocomplete="organization"
+                           value="<?php echo htmlspecialchars($blockedSubmitterDefault, ENT_QUOTES, 'UTF-8'); ?>"
+                           <?php echo $blockedSubmitterCoopReadonly
+                               ? 'readonly tabindex="-1" style="background:#f3f4f6;cursor:default;"'
+                               : 'required minlength="2" placeholder="साइट नाम भर्नुहोस्"'; ?>>
+                    <?php if ($blockedSubmitterCoopReadonly): ?>
+                    <div class="form-text">सेटिङको साइट नाम स्वतः भरिएको छ।</div>
+                    <?php endif; ?>
                 </div>
                 <div class="mb-2">
                     <label class="form-label small fw-semibold">गेटवेइ</label>
@@ -323,7 +334,7 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
                     <label class="form-label small fw-semibold">टिप्पणी</label>
                     <textarea name="renewal_note" class="form-control form-control-sm" rows="2" maxlength="2000" placeholder="ऐच्छिक"></textarea>
                 </div>
-                <button type="submit" class="btn btn-success w-100"><i class="fas fa-paper-plane me-1"></i>भुक्तानी सूचना पठाउनुहोस्</button>
+                <button type="submit" class="btn btn-success w-100"><i class="fas fa-paper-plane me-1"></i>Pay SSL certificates तथा domain active Charge now</button>
             </form>
             <?php endif; ?>
 
