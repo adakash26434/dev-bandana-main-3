@@ -261,7 +261,11 @@ if ($hasMemberIdCards) {
     $cardJoinSql = "LEFT JOIN member_id_cards c
          ON c.id = (
               SELECT id FROM member_id_cards
-               WHERE (member_id = m.id OR member_id = m.sadasyata_number)
+               WHERE (
+                    member_id COLLATE utf8mb4_unicode_ci = CAST(m.id AS CHAR) COLLATE utf8mb4_unicode_ci
+                    OR member_id COLLATE utf8mb4_unicode_ci = m.sadasyata_number COLLATE utf8mb4_unicode_ci
+                    OR member_id COLLATE utf8mb4_unicode_ci = m.member_id COLLATE utf8mb4_unicode_ci
+               )
                ORDER BY id DESC LIMIT 1
           )";
 }
