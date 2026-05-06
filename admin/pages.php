@@ -23,6 +23,15 @@ if ($action === 'add') {
     $action = 'edit'; /* नयाँ page पनि एउटै edit form बाट */
 }
 
+$aboutPageIdForHint = 0;
+try {
+    $stAboutHint = $db->prepare("SELECT id FROM pages WHERE slug = 'about' LIMIT 1");
+    $stAboutHint->execute();
+    $aboutPageIdForHint = (int) ($stAboutHint->fetchColumn() ?: 0);
+} catch (Throwable $e) {
+    $aboutPageIdForHint = 0;
+}
+
 function renderTinyEditorScript(): void {
     static $loaded = false;
     if ($loaded) return;
@@ -471,6 +480,22 @@ elseif ($action === 'edit' && (isset($_GET['id']) || isset($_POST['id']))) {
     );
     $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['message']);
     ?>
+
+    <div class="alert alert-info border mb-3">
+        <div class="fw-semibold mb-1"><i class="fas fa-circle-info me-1"></i>हाम्रो परिचय कहाँ सम्पादन गर्ने?</div>
+        <div class="small mb-2">
+            <strong>हाम्रो परिचय</strong> अब <code>गतिशील पृष्ठ (slug: about)</code> बाट मात्र सम्पादन हुन्छ।
+            <strong>स्थिर विषयवस्तु</strong> ट्याबमा रहेको सामग्री About का अरू section का लागि हो।
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="pages.php?action=edit<?php echo $aboutPageIdForHint > 0 ? '&id=' . $aboutPageIdForHint : ''; ?>&tab=dynamic" class="btn btn-sm btn-primary">
+                <i class="fas fa-pen-to-square me-1"></i>हाम्रो परिचय सम्पादन खोल्नुहोस्
+            </a>
+            <a href="pages.php?action=edit&tab=dynamic" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-plus me-1"></i>नयाँ गतिशील पृष्ठ
+            </a>
+        </div>
+    </div>
 
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs admin-nav-tabs mb-4">

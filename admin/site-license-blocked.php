@@ -45,10 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['action'] ?? '') =
         $gateway = trim((string) ($_POST['gateway'] ?? ''));
         $txn = trim((string) ($_POST['txn_reference'] ?? ''));
         $note = trim((string) ($_POST['renewal_note'] ?? ''));
-        $submitter = trim((string) ($_POST['submitter_name'] ?? ''));
-        if ($submitter === '') {
-            $submitter = trim((string) ($_SESSION['admin_name'] ?? $_SESSION['admin_username'] ?? ''));
-        }
+        $submitter = function_exists('getSetting') ? trim((string) getSetting('site_name', 'सहकारी')) : '';
         $aid = (int) ($_SESSION['admin_id'] ?? 0);
         $apply = site_license_renewal_apply_office_notice($dbBlocked, $gateway, $txn, $note, $submitter, $aid > 0 ? $aid : null);
         if (!$apply['ok']) {
@@ -272,7 +269,7 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
             <?php if ($blockedRenewalSent): ?>
             <div class="alert alert-success text-start small py-3 mb-3">
                 <strong><i class="fas fa-check-circle me-1"></i>भुक्तानी सूचना पठाइयो।</strong>
-                Superadmin ले «साइट म्याद» मा पेन्डिङ हेरी मिति सेभ गर्छन्। प्रतीक्षा वा विक्रेता सम्पर्क गर्नुहोस्।
+                भुक्तानी सूचना प्राप्त भएको छ। पुष्टि/सक्रिय हुन केही समय प्रतीक्षा गर्नुहोस् वा विक्रेता सम्पर्क गर्नुहोस्।
             </div>
             <?php elseif ($blockedPendingRow !== null): ?>
             <div class="alert alert-warning text-start small py-3 mb-3">
@@ -284,7 +281,7 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
                     <li>रकम (सेटिङ): <strong><?php echo htmlspecialchars((string) $blockedPendingRow['amount_reported'], ENT_QUOTES, 'UTF-8'); ?></strong></li>
                     <?php endif; ?>
                 </ul>
-                <div class="mt-2 text-muted">Superadmin ले मिति सेभ नगर्दासम्म पर्खनुहोस्। दोहोरो भुक्तानी नगर्नुहोस्।</div>
+                <div class="mt-2 text-muted">पुष्टि/सक्रिय अपडेट नआउँदासम्म प्रतीक्षा गर्नुहोस्। दोहोरो भुक्तानी नगर्नुहोस्।</div>
             </div>
             <?php elseif ($showPayForm): ?>
             <div class="pay-box">
@@ -308,15 +305,9 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
                 <input type="hidden" name="action" value="submit_renewal_notice_blocked">
                 <?php echo csrfField(); ?>
                 <div class="mb-2">
-                    <label class="form-label small fw-semibold">संस्थाको नाम <?php echo $blockedSubmitterCoopReadonly ? '' : '<span class="text-danger">*</span>'; ?> (साइट सेटिङ)</label>
-                    <input type="text" name="submitter_name" class="form-control form-control-sm" maxlength="120" autocomplete="organization"
-                           value="<?php echo htmlspecialchars($blockedSubmitterDefault, ENT_QUOTES, 'UTF-8'); ?>"
-                           <?php echo $blockedSubmitterCoopReadonly
-                               ? 'readonly tabindex="-1" style="background:#f3f4f6;cursor:default;"'
-                               : 'required minlength="2" placeholder="साइट नाम भर्नुहोस्"'; ?>>
-                    <?php if ($blockedSubmitterCoopReadonly): ?>
-                    <div class="form-text">सेटिङको साइट नाम स्वतः भरिएको छ।</div>
-                    <?php endif; ?>
+                    <label class="form-label small fw-semibold">संस्थाको नाम (साइट सेटिङबाट स्वतः)</label>
+                    <div class="form-control form-control-sm" style="background:#f3f4f6;cursor:default;"><?php echo htmlspecialchars($blockedSubmitterDefault !== '' ? $blockedSubmitterDefault : 'सहकारी', ENT_QUOTES, 'UTF-8'); ?></div>
+                    <input type="hidden" name="submitter_name" value="<?php echo htmlspecialchars($blockedSubmitterDefault !== '' ? $blockedSubmitterDefault : 'सहकारी', ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
                 <div class="mb-2">
                     <label class="form-label small fw-semibold">गेटवेइ</label>
@@ -341,8 +332,8 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
             <div class="steps">
                 <div class="fw-semibold text-success mb-2 small"><i class="fas fa-list-check me-1"></i>संक्षेप</div>
                 <ol class="mb-0">
-                    <li><strong>Superadmin बाहेक</strong> तपाईं यहाँ हुनुहुन्छ — माथि Pay Now + सूचना।</li>
-                    <li><strong>Superadmin</strong> ले «साइट म्याद» मा पेन्डिङ र <strong>मिति सेभ</strong> गर्छन्।</li>
+                    <li>यो पृष्ठ कार्यालय/साधारण Admin का लागि हो — माथि Pay Now + सूचना उपलब्ध छ।</li>
+                    <li>भुक्तानी सूचना पठाएपछि व्यवस्थापनतर्फबाट पुष्टि/सक्रिय प्रक्रिया हुन्छ।</li>
                 </ol>
             </div>
 

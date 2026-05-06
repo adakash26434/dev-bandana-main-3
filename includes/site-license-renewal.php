@@ -77,12 +77,14 @@ if (!function_exists('site_license_renewal_apply_office_notice')) {
         if (mb_strlen($txn) < 3) {
             return ['ok' => false, 'error' => 'कारोबार नम्बर / Ref कम्तिमा ३ अक्षर हुनुपर्छ।'];
         }
-        $submitter = trim($submitter);
-        if (mb_strlen($submitter) < 2 && function_exists('getSetting')) {
-            $submitter = trim((string) getSetting('site_name', ''));
+        // Outside-office form मा submitter editable हुँदैन — सधैं Settings को site_name प्रयोग गर्ने।
+        if (function_exists('getSetting')) {
+            $submitter = trim((string) getSetting('site_name', 'सहकारी'));
+        } else {
+            $submitter = trim($submitter);
         }
         if (mb_strlen($submitter) < 2) {
-            return ['ok' => false, 'error' => 'संस्थाको नाम Settings मा भर्नुहोस् वा फारममा लेख्नुहोस्।'];
+            $submitter = 'सहकारी';
         }
         ensureSiteLicenseRenewalNoticesTable($db);
         if (site_license_renewal_pending_count($db) > 0) {
