@@ -195,6 +195,7 @@ $flash = getFlash();
                                         title="सम्पादन"
                                         data-id="<?php echo $item['id']; ?>"
                                         data-title="<?php echo htmlspecialchars($item['title'], ENT_QUOTES); ?>"
+                                        data-content="<?php echo htmlspecialchars($item['content'] ?? '', ENT_QUOTES); ?>"
                                         data-date="<?php echo htmlspecialchars($item['notice_date'] ?? '', ENT_QUOTES); ?>"
                                         data-active="<?php echo $item['is_active']; ?>"
                                         data-popup="<?php echo $item['is_popup']; ?>"
@@ -358,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var d = this.dataset;
             document.getElementById('ntf_id').value      = d.id;
             document.getElementById('ntf_title').value   = d.title;
+            document.getElementById('ntf_content').value = d.content || '';
             document.getElementById('ntf_date').value    = d.date;
             document.getElementById('ntf_active').checked= d.active === '1';
             document.getElementById('ntf_popup').checked = d.popup  === '1';

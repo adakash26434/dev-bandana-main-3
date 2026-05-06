@@ -127,20 +127,25 @@ try {
 
 require_once __DIR__ . '/nav-menu-badges.php';
 $navMenuBadges = nav_get_public_submenu_badges($db);
+$currentLang = getCurrentLang();
 
 /* ── Services dropdown links (admin/services.php बाट) ── */
 $navServiceLinks = [];
 try {
     if ($db) {
         $svcRows = $db->query("SELECT id, title, title_en, title_np, icon FROM services WHERE is_active = 1 ORDER BY display_order, id LIMIT 30")->fetchAll();
-        $slugifyService = static function (string $label, int $id): string {
-            $s = trim(mb_strtolower($label, 'UTF-8'));
-            if ($s === '') return 'service-' . $id;
-            if (mb_strpos($s, 'बचत') !== false || mb_strpos($s, 'saving') !== false) return 'saving';
-            if (mb_strpos($s, 'ऋण') !== false || mb_strpos($s, 'loan') !== false || mb_strpos($s, 'rin') !== false) return 'loan';
-            if (mb_strpos($s, 'रेमिट') !== false || mb_strpos($s, 'remit') !== false) return 'remittance';
-            $ascii = trim(strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $label)), '-');
-            return $ascii !== '' ? $ascii : ('service-' . $id);
+        $serviceAnchorId = static function (array $service): string {
+            $id = (int)($service['id'] ?? 0);
+            $title = trim((string)($service['title'] ?? ''));
+            $titleNp = trim((string)($service['title_np'] ?? ''));
+            $label = $title !== '' ? $title : $titleNp;
+            $norm = mb_strtolower($label, 'UTF-8');
+            if (mb_strpos($norm, 'बचत') !== false || mb_strpos($norm, 'saving') !== false) return 'saving';
+            if (mb_strpos($norm, 'ऋण') !== false || mb_strpos($norm, 'loan') !== false || mb_strpos($norm, 'rin') !== false) return 'loan';
+            if (mb_strpos($norm, 'रेमिट') !== false || mb_strpos($norm, 'remit') !== false) return 'remittance';
+            $ascii = trim(strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $title)), '-');
+            if ($ascii !== '') return $ascii;
+            return $id > 0 ? ('service-' . $id) : 'service';
         };
         foreach ($svcRows as $sv) {
             $rawTitle = (string) (($currentLang === 'en' && !empty($sv['title_en'])) ? $sv['title_en'] : (!empty($sv['title_np']) ? $sv['title_np'] : ($sv['title'] ?? '')));
@@ -148,7 +153,7 @@ try {
             if ($title === '') continue;
             $icon = trim((string) ($sv['icon'] ?? 'fas fa-star'));
             if ($icon === '') $icon = 'fas fa-star';
-            $anchor = $slugifyService((string) ($sv['title'] ?? $title), (int) $sv['id']);
+            $anchor = $serviceAnchorId($sv);
             $navServiceLinks[] = ['title' => $title, 'icon' => $icon, 'anchor' => $anchor];
         }
     }
@@ -157,7 +162,6 @@ try {
 }
 
 $currentPage = getCurrentPage();
-$currentLang = getCurrentLang();
 $L = getLangStrings();
 
 $siteBrandName = ($currentLang === 'en' && trim($siteNameEn) !== '') ? $siteNameEn : $siteName;

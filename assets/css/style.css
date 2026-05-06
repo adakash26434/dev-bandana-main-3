@@ -4119,9 +4119,14 @@ img {
 
 .footer-bottom p {
     margin: 0;
-    font-size: 13px;
+    font-size: .74rem;
     color: rgba(255,255,255,0.68);
     color: color-mix(in srgb, var(--text-on-footer, #fff) 68%, transparent);
+}
+
+.footer-policy-links,
+.footer-policy-links a {
+    font-size: .74rem;
 }
 
 .footer-bottom .copyright {
@@ -4153,9 +4158,9 @@ img {
     align-items: center;
     gap: 8px;
     background: rgba(255,255,255,0.08);
-    padding: 8px 16px;
+    padding: 7px 14px;
     border-radius: 25px;
-    font-size: 13px;
+    font-size: .74rem;
     color: rgba(255,255,255,0.8);
     border: 1px solid rgba(255,255,255,0.1);
     transition: all 0.3s ease;

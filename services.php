@@ -4,12 +4,36 @@ $pageTitle = isEnglish() ? 'Services' : 'सेवाहरू';
 require_once 'includes/header.php';
 $L = getLangStrings();
 
-// Get services with is_new flag check
+// Get services (schema-safe for older DBs)
 try {
     $db = getDB();
-    $services = $db->query("SELECT *,
-        (CASE WHEN is_new = 1 AND (new_until IS NULL OR new_until >= CURDATE()) THEN 1 ELSE 0 END) as show_new_badge
-        FROM services WHERE is_active = 1 ORDER BY display_order")->fetchAll();
+    $hasIsNew = false;
+    $hasNewUntil = false;
+    try {
+        $col = $db->query("SHOW COLUMNS FROM services LIKE 'is_new'");
+        $hasIsNew = ($col && $col->fetch() !== false);
+    } catch (Throwable $e) {
+        $hasIsNew = false;
+    }
+    try {
+        $col = $db->query("SHOW COLUMNS FROM services LIKE 'new_until'");
+        $hasNewUntil = ($col && $col->fetch() !== false);
+    } catch (Throwable $e) {
+        $hasNewUntil = false;
+    }
+
+    if ($hasIsNew && $hasNewUntil) {
+        $sql = "SELECT *,
+            (CASE WHEN is_new = 1 AND (new_until IS NULL OR new_until >= CURDATE()) THEN 1 ELSE 0 END) as show_new_badge
+            FROM services WHERE is_active = 1 ORDER BY display_order";
+    } elseif ($hasIsNew) {
+        $sql = "SELECT *, (CASE WHEN is_new = 1 THEN 1 ELSE 0 END) as show_new_badge
+            FROM services WHERE is_active = 1 ORDER BY display_order";
+    } else {
+        $sql = "SELECT *, 0 as show_new_badge
+            FROM services WHERE is_active = 1 ORDER BY display_order";
+    }
+    $services = $db->query($sql)->fetchAll();
 } catch (Exception $e) {
     $services = [];
 }

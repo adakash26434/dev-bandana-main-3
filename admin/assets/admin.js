@@ -127,6 +127,19 @@ window.adminSwitchTab = function(showEl, hideEl) {
 document.addEventListener('DOMContentLoaded', function() {
 
     /* -------------------------------------------------
+       GLOBAL EDIT BUTTON SAFETY
+       — धेरै list pages मा edit buttons table/form भित्र हुन्छन्
+       — type नदिएको button default submit हुन सक्छ (form खुल्दैन)
+       — सबै edit buttons लाई safe type="button" enforce गर्नुहोस्
+    ------------------------------------------------- */
+    document.querySelectorAll('button[class*="btn-edit"], button.wc-edit-btn').forEach(function(btn) {
+        var t = (btn.getAttribute('type') || '').trim().toLowerCase();
+        if (t === '' || t === 'submit') {
+            btn.setAttribute('type', 'button');
+        }
+    });
+
+    /* -------------------------------------------------
        SIDEBAR TOGGLE (मोबाइल मा menu खोल्ने/बन्द गर्ने)
        — हाम्बर्गर button (≡) click गर्दा sidebar slide हुन्छ
     ------------------------------------------------- */
