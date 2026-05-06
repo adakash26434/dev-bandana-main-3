@@ -6,7 +6,7 @@ require_once 'includes/header.php';
 // Get about page content
 try {
     $db = getDB();
-    $stmt = $db->prepare("SELECT * FROM pages WHERE slug = 'about'");
+    $stmt = $db->prepare("SELECT * FROM pages WHERE slug = 'about' AND is_active = 1 ORDER BY id DESC LIMIT 1");
     $stmt->execute();
     $page = $stmt->fetch();
 
