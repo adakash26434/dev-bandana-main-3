@@ -49,7 +49,7 @@ function nrbFetchForex(): array {
             curl_setopt_array($ch, [
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT        => 8,
-                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYPEER => true,
                 CURLOPT_USERAGENT      => 'Mozilla/5.0',
             ]);
             $raw = curl_exec($ch);

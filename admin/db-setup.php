@@ -57,10 +57,7 @@ $legacyDbCredPath = dirname(__DIR__) . '/includes/database.php';
 $dbCredentialsFileOnServer =
     (is_file($adminDbCredPath) && is_readable($adminDbCredPath))
     || (is_file($legacyDbCredPath) && is_readable($legacyDbCredPath));
-$bootstrapAutoUnlockFromDbFile = $bootstrapMode
-    && $dbCredentialsFileOnServer
-    && DB_NAME !== ''
-    && DB_USER !== '';
+$bootstrapAutoUnlockFromDbFile = false;
 
 $bootstrapFileSuperUnlock =
     defined('SUPER_ADMIN_INITIAL_PASSWORD')
@@ -103,10 +100,7 @@ if ($bootstrapMode) {
         exit();
     }
 
-    if ($bootstrapAutoUnlockFromDbFile) {
-        /* `includes/database.local.php` मा DB name/user भरिएको → सिधै DB Setup UI */
-        $bootstrapSetupUnlocked = true;
-    } elseif (!empty($_SESSION['db_bootstrap_unlocked'])) {
+    if (!empty($_SESSION['db_bootstrap_unlocked'])) {
         $bootstrapSetupUnlocked = true;
     } elseif ($bootstrapFileSuperUnlock) {
         $bootstrapGateReason = 'need_superadmin_login';
@@ -215,6 +209,7 @@ if ($db) {
     }
 }
 $tablesMissing = count($allTables) - $tablesFound;
+$allowDangerousSqlRunner = defined('ALLOW_DANGEROUS_DB_SETUP_SQL') && ALLOW_DANGEROUS_DB_SETUP_SQL === true;
 
 /* Bootstrap gate: unlock बाहेक कुनै POST चलाउन दिँदैन */
 if ($bootstrapMode && !$bootstrapSetupUnlocked && $_SERVER['REQUEST_METHOD'] === 'POST'
@@ -302,15 +297,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
 
     $incDir     = dirname(__DIR__) . '/includes';
     $dbFilePath = $incDir . '/database.local.php';
-    $esc        = fn($v) => str_replace("'", "\\'", $v);
-
     $newContent = "<?php\n/**\n * DB credentials — Admin DB Setup (" . date('Y-m-d H:i:s') . ")\n"
         . " * Gitignored — cPanel git pull safe\n */\n\n"
-        . "if (!defined('DB_HOST')) define('DB_HOST', '" . $esc($newHost) . "');\n"
-        . "if (!defined('DB_NAME')) define('DB_NAME', '" . $esc($newName) . "');\n"
-        . "if (!defined('DB_USER')) define('DB_USER', '" . $esc($newUser) . "');\n"
-        . "if (!defined('DB_PASS')) define('DB_PASS', '" . $esc($newPass) . "');\n\n"
-        . "if (!defined('SITE_URL')) {\n    define('SITE_URL', '" . $esc($newSiteUrl) . "');\n}\n";
+        . "if (!defined('DB_HOST')) define('DB_HOST', " . var_export($newHost, true) . ");\n"
+        . "if (!defined('DB_NAME')) define('DB_NAME', " . var_export($newName, true) . ");\n"
+        . "if (!defined('DB_USER')) define('DB_USER', " . var_export($newUser, true) . ");\n"
+        . "if (!defined('DB_PASS')) define('DB_PASS', " . var_export($newPass, true) . ");\n\n"
+        . "if (!defined('SITE_URL')) {\n    define('SITE_URL', " . var_export($newSiteUrl, true) . ");\n}\n";
 
     $canWrite = (is_file($dbFilePath) && is_writable($dbFilePath))
         || (!is_file($dbFilePath) && is_writable($incDir));
@@ -374,9 +367,14 @@ if (!function_exists('execStatement')) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $db) {
 
     $action = $_POST['action'] ?? '';
+    $dangerousActions = ['reset_rebuild_testing', 'run_uploaded_sql', 'run_server_sql'];
+
+    if (in_array($action, $dangerousActions, true) && !$allowDangerousSqlRunner) {
+        $actionResult = '<div class="alert alert-danger"><i class="fas fa-ban me-2"></i>Security mode: यो SQL action default मा बन्द छ। आवश्यक परे अस्थायी रूपमा <code>ALLOW_DANGEROUS_DB_SETUP_SQL</code> true गर्नुहोस्।</div>';
+    }
 
     /* ── ०. TESTING HARD RESET: पुरानो data+tables drop गरेर fresh rebuild ── */
-    if ($action === 'reset_rebuild_testing') {
+    elseif ($action === 'reset_rebuild_testing') {
         $confirmText = trim((string)($_POST['confirm_text'] ?? ''));
         if ($confirmText !== 'RESET TEST DB') {
             $actionResult = '<div class="alert alert-danger"><i class="fas fa-ban me-2"></i>Confirmation text mismatch। <code>RESET TEST DB</code> ठीक टाइप गर्नुहोस्।</div>';

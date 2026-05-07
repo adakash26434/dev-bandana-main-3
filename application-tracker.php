@@ -8,9 +8,19 @@ require_once 'includes/header.php';
 $allResults       = [];
 $error            = '';
 $success          = '';
-/* सुरक्षा verification flag — phone/email खोज्दा सुरक्षा code जाँच गर्नुपर्छ */
+/* सुरक्षा verification flag — phone/email खोज्दा phone+email pair जाँच हुन्छ */
 $verificationOk   = false;
 $needsVerify      = false;
+$trackerAttemptWindowSec = 15 * 60; // 15 minutes
+$trackerMaxAttempts = 7;
+$trackerGuardKey = 'tracker_guard_' . hash('sha256', strtolower((string)($_SERVER['REMOTE_ADDR'] ?? 'unknown')));
+
+if (!isset($_SESSION['tracker_guard']) || !is_array($_SESSION['tracker_guard'])) {
+    $_SESSION['tracker_guard'] = [];
+}
+if (!isset($_SESSION['tracker_guard'][$trackerGuardKey]) || !is_array($_SESSION['tracker_guard'][$trackerGuardKey])) {
+    $_SESSION['tracker_guard'][$trackerGuardKey] = ['fails' => 0, 'blocked_until' => 0];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $searchType = $_POST['search_type'] ?? 'tracking_id';
@@ -36,19 +46,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $searchValue = mb_substr($searchValue, 0, $maxSvLen);
     }
 
-    if (!verifyCSRFToken()) {
+    if (in_array($searchType, ['phone', 'email'], true)
+        && (int)($_SESSION['tracker_guard'][$trackerGuardKey]['blocked_until'] ?? 0) > time()) {
+        $remainingMin = (int)ceil((((int)$_SESSION['tracker_guard'][$trackerGuardKey]['blocked_until']) - time()) / 60);
+        $error = isEnglish()
+            ? 'For your security, this search is temporarily paused. Please try again after ' . $remainingMin . ' minute(s).'
+            : 'सुरक्षाका लागि यो खोज केही समयका लागि रोकिएको छ। कृपया ' . $remainingMin . ' मिनेटपछि फेरि प्रयास गर्नुहोस्।';
+    } elseif (!verifyCSRFToken()) {
         $error = isEnglish() ? 'Security check failed. Please try again.' : 'सुरक्षा जाँच असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।';
 
     /* ── Tracking ID search — directly verify ── */
     } elseif ($searchType === 'tracking_id' && empty($searchValue)) {
         $error = isEnglish() ? 'Please enter a Tracking ID.' : 'कृपया Tracking ID प्रविष्ट गर्नुहोस्।';
 
-    /* ── Phone / Email खोज्दा Security verification अनिवार्य ──
-       Last 4 digits of phone + first 3 letters of email (before @) मिल्नुपर्छ
-       जस्तै: phone=9827157000, email=ram@gmail.com → code = "4567ram"
-       अब search value = sec_phone वा sec_email — duplicate entry छैन! */
+    /* ── Phone / Email खोज्दा security code verification ──
+       code = phone को अन्तिम 4 अंक + email को @ अघिका पहिला 3 अक्षर */
     } elseif (in_array($searchType, ['phone', 'email'])) {
-        $secCode      = trim($_POST['security_code'] ?? '');
+        $secCode      = trim((string)($_POST['security_code'] ?? ''));
         $needsVerify  = true;
 
         if (empty($secPhone) || empty($secEmail)) {
@@ -60,16 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ? 'Please enter the security verification code.'
                 : 'कृपया सुरक्षा प्रमाणीकरण कोड प्रविष्ट गर्नुहोस्।';
         } else {
-            /* Build expected code:
-               — phone खोज्दा: phone को अन्तिम 4 अंक + email को @ अघिका पहिला 3 अक्षर
-               — email खोज्दा: email को @ अघिका पहिला 3 अक्षर + phone को अन्तिम 4 अंक
-               दुवै case मा code = (last 4 of phone) + (first 3 of email) */
-            $phonePart = preg_replace('/\D/', '', $secPhone);   /* digits only */
+            $phonePart = preg_replace('/\D/', '', $secPhone);
             $last4     = strlen($phonePart) >= 4 ? substr($phonePart, -4) : $phonePart;
             $emailPart = '';
             if ($secEmail && strpos($secEmail, '@') !== false) {
                 $emailPart = strtolower(substr($secEmail, 0, strpos($secEmail, '@')));
-                $emailPart = substr($emailPart, 0, 3); /* first 3 chars */
+                $emailPart = substr($emailPart, 0, 3);
             }
             $expectedCode = strtolower($last4 . $emailPart);
 
@@ -77,8 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $verificationOk = true;
             } else {
                 $error = isEnglish()
-                    ? 'Verification code does not match. Please check your phone number and email.'
-                    : 'सुरक्षा कोड मिलेन। कृपया आफ्नो फोन नम्बर र इमेल जाँच गर्नुहोस्।';
+                    ? 'Verification code does not match. Please check phone/email and code.'
+                    : 'सुरक्षा कोड मिलेन। फोन/इमेल र कोड पुनः जाँच गर्नुहोस्।';
             }
         }
     } elseif ($searchType === 'tracking_id' && $searchValue !== '') {
@@ -345,6 +355,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } catch (Exception $e) {
             $error = isEnglish() ? 'An error occurred. Please try again.' : 'त्रुटि भयो। कृपया पुनः प्रयास गर्नुहोस्।';
+        }
+    }
+
+    if (in_array($searchType, ['phone', 'email'], true)) {
+        $hasResults = !empty($allResults);
+        if ($verificationOk && $hasResults) {
+            $_SESSION['tracker_guard'][$trackerGuardKey] = ['fails' => 0, 'blocked_until' => 0];
+        } elseif (!empty($error)) {
+            $fails = (int)($_SESSION['tracker_guard'][$trackerGuardKey]['fails'] ?? 0) + 1;
+            $blockedUntil = 0;
+            if ($fails >= $trackerMaxAttempts) {
+                $blockedUntil = time() + $trackerAttemptWindowSec;
+                $fails = 0;
+                $error = isEnglish()
+                    ? 'For your security, too many unsuccessful attempts were detected. Please try again after 15 minutes.'
+                    : 'सुरक्षाका कारण धेरै पटक नमिलेको प्रयास भयो। कृपया १५ मिनेटपछि फेरि प्रयास गर्नुहोस्।';
+            }
+            $_SESSION['tracker_guard'][$trackerGuardKey] = ['fails' => $fails, 'blocked_until' => $blockedUntil];
         }
     }
 }
@@ -614,8 +642,7 @@ function getAppTypeLabel($type) {
 
                                 <!-- ── Security Verification Section ──
                                      Phone / Email बाट खोज्दा मात्र देखिन्छ (JS ले control गर्छ)
-                                     सुरक्षाको लागि: phone को अन्तिम 4 अंक + email को @ अघिका पहिला 3 अक्षर
-                                     जस्तै phone=9827157000, email=ram@gmail.com → code = "4567ram" -->
+                                     Code format: phone last 4 + email first 3 -->
                                 <div id="verifySection" style="display:none;" class="col-12">
                                     <div class="card bg-light border-warning">
                                         <div class="card-body py-3">
@@ -625,8 +652,8 @@ function getAppTypeLabel($type) {
                                             </h6>
                                             <p class="text-muted small mb-3" id="verifySectionDesc">
                                                 <?php echo isEnglish()
-                                                    ? 'Enter the phone number &amp; email you used when applying — they are used for both search &amp; identity verification.'
-                                                    : 'आवेदन गर्दा प्रयोग गरेको फोन नम्बर र इमेल राख्नुहोस् — यिनै नम्बर खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छन्।'; ?>
+                                                    ? 'Enter phone and email used during application, then type security code (last 4 digits of phone + first 3 letters before @ in email).'
+                                                    : 'आवेदनमा प्रयोग गरेको फोन र इमेल राख्नुहोस्, अनि सुरक्षा कोड टाइप गर्नुहोस् (फोनको अन्तिम ४ अंक + इमेलको @ अघिका पहिला ३ अक्षर)।'; ?>
                                             </p>
                                             <div class="row g-2 mb-3">
                                                 <div class="col-md-4">
@@ -649,16 +676,16 @@ function getAppTypeLabel($type) {
                                                     <label class="form-label small"><i class="fas fa-key me-1 text-warning"></i>
                                                         <?php echo isEnglish() ? 'Security Code' : 'सुरक्षा कोड'; ?>
                                                     </label>
-                                                    <!-- type="password" — security code browser मा नदेखियोस् भनेर -->
                                                     <input type="password" name="security_code" id="securityCode" class="form-control"
-                                                           placeholder="<?php echo isEnglish() ? 'auto-generated below' : 'तल स्वतः बन्छ'; ?>"
-                                                           maxlength="10" autocomplete="off">
+                                                           placeholder="<?php echo isEnglish() ? 'e.g. 7000ram' : 'जस्तै: 7000ram'; ?>"
+                                                           maxlength="12" autocomplete="off">
                                                 </div>
                                             </div>
-                                            <!-- Security code preview — JS ले live बनाउँछ -->
-                                            <div id="secCodePreview" class="small rounded-2 p-2" style="background:#fff7e0;border:1px dashed #ffc107;display:none;">
+                                            <div class="small rounded-2 p-2" style="background:#fff7e0;border:1px dashed #ffc107;">
                                                 <i class="fas fa-info-circle text-warning me-1"></i>
-                                                <span id="secCodeText"></span>
+                                                <?php echo isEnglish()
+                                                    ? 'Code rule: last 4 digits of phone + first 3 letters of email before @ (example: 9827157000 + ram@gmail.com => 7000ram).'
+                                                    : 'कोड बनाउने नियम: फोनको अन्तिम ४ अंक + इमेलको @ अघिका पहिला ३ अक्षर (उदाहरण: 9827157000 + ram@gmail.com => 7000ram)।'; ?>
                                             </div>
                                         </div>
                                     </div>
@@ -2131,31 +2158,17 @@ if (searchTypeEl) {
 /* ================================================================
    Application Tracker — Security Verification Section JS
    — Phone / Email चुन्दा सुरक्षा section देखाउँछ
-   — Phone + Email field fill हुँदा security code live preview देखाउँछ
+   — Security code user ले manually टाइप गर्छ
    ================================================================ */
 (function() {
     const searchType   = document.getElementById('searchType');
     const verifySection = document.getElementById('verifySection');
     const verifyNote   = document.getElementById('verifyNote');
-    const secPhone     = document.getElementById('secPhone');
-    const secEmail     = document.getElementById('secEmail');
-    const secCode      = document.getElementById('securityCode');
-    const codePreview  = document.getElementById('secCodePreview');
-    const codeText     = document.getElementById('secCodeText');
 
     /* hint spans */
     const hintTid   = document.getElementById('hintTrackingId');
     const hintPhone = document.getElementById('hintPhone');
     const hintEmail = document.getElementById('hintEmail');
-
-    /* security code = last 4 digits of phone + first 3 chars of email-prefix */
-    function buildCode() {
-        const ph  = (secPhone  ? secPhone.value  : '').replace(/\D/g, '');
-        const em  = (secEmail  ? secEmail.value  : '');
-        const last4  = ph.length >= 4 ? ph.slice(-4) : ph;
-        const prefix = em.includes('@') ? em.split('@')[0].slice(0, 3).toLowerCase() : '';
-        return last4 + prefix;
-    }
 
     /* Element refs for column visibility */
     const colSearchType  = document.getElementById('colSearchType');
@@ -2210,27 +2223,10 @@ if (searchTypeEl) {
         if (hintTid)   hintTid.style.display = v === 'tracking_id' ? '' : 'none';
     }
 
-    /* Live security code preview */
-    function updateCodePreview() {
-        const code = buildCode();
-        if (code.length >= 2) {
-            codePreview.style.display = '';
-            codeText.textContent = '<?php echo isEnglish() ? "Your security code: " : "तपाईंको सुरक्षा कोड: "; ?>' + code
-                + ' — <?php echo isEnglish() ? "copy this into the Security Code box above." : "माथिको Security Code बाकसमा टाइप गर्नुहोस्।"; ?>';
-            /* auto-fill */
-            if (secCode) secCode.value = code;
-        } else {
-            codePreview.style.display = 'none';
-        }
-    }
-
-    if (searchType) searchType.addEventListener('change', function() { updateUI(); updateCodePreview(); });
-    if (secPhone)   secPhone.addEventListener('input', updateCodePreview);
-    if (secEmail)   secEmail.addEventListener('input', updateCodePreview);
+    if (searchType) searchType.addEventListener('change', updateUI);
 
     /* Run on page load (in case form is re-submitted with phone/email selected) */
     updateUI();
-    updateCodePreview();
 })();
 </script>
 

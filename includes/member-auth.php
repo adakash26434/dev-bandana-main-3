@@ -1083,7 +1083,7 @@ function sendDirectSMS($phone, $text) {
         if ($gateway === 'sparrow') {
             $ch = curl_init('http://api.sparrowsms.com/v2/sms/');
             curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>8,
-                CURLOPT_SSL_VERIFYPEER=>false,
+                CURLOPT_SSL_VERIFYPEER=>true,
                 CURLOPT_POSTFIELDS=>http_build_query(['token'=>$apiToken,'from'=>$senderId,'to'=>$phone,'text'=>mb_substr($text,0,160)])]);
             $resp = curl_exec($ch); curl_close($ch);
             $d = json_decode($resp,true);
@@ -1193,7 +1193,7 @@ function sendOTPviaSMS($phone, $otp, $siteName = '') {
                 CURLOPT_POSTFIELDS     => http_build_query(['token'=>$apiToken,'from'=>$senderId,'to'=>$phone,'text'=>$message]),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT        => 10,
-                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYPEER => true,
             ]);
             $resp = curl_exec($ch);
             curl_close($ch);

@@ -195,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     CURLOPT_POSTFIELDS     => http_build_query(['token'=>$apiToken,'from'=>$senderId,'to'=>$ph,'text'=>$smsText]),
                                     CURLOPT_RETURNTRANSFER => true,
                                     CURLOPT_TIMEOUT        => 10,
-                                    CURLOPT_SSL_VERIFYPEER => false,
+                                    CURLOPT_SSL_VERIFYPEER => true,
                                 ]);
                                 curl_exec($ch);
                                 curl_close($ch);

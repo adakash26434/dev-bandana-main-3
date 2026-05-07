@@ -10,9 +10,14 @@
  * • कुनै code edit गर्नुपर्दैन — सबै browser बाटै हुन्छ।
  */
 
-// Already installed? (Apache मा install.lock भए थप रूपमा .htaccess ले install.php 403 गर्न सक्छ)
-if (file_exists(__DIR__ . '/install.lock')) {
-    header('Location: admin/');
+// Security gate: block re-install by default once local DB config or lock exists.
+$installLockExists = file_exists(__DIR__ . '/install.lock');
+$localDbConfigExists = file_exists(__DIR__ . '/includes/database.local.php');
+$allowInstallRerun = defined('ALLOW_INSTALL_RERUN') && ALLOW_INSTALL_RERUN === true;
+if (($installLockExists || $localDbConfigExists) && !$allowInstallRerun) {
+    http_response_code(403);
+    header('Content-Type: text/plain; charset=UTF-8');
+    echo "Install wizard is disabled for security. Use admin/db-setup.php for maintenance.";
     exit;
 }
 

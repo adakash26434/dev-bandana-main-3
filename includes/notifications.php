@@ -261,7 +261,7 @@ function sendSMSNotification($eventType, $message) {
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_TIMEOUT        => 10, /* 10 second timeout */
                     CURLOPT_CONNECTTIMEOUT => 5,
-                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYPEER => true,
                 ]);
                 $response = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -597,7 +597,7 @@ function sendMemberStatusUpdate(
                             CURLOPT_POSTFIELDS     => http_build_query(['token'=>$apiToken,'from'=>$senderId,'to'=>$phone,'text'=>$smsText]),
                             CURLOPT_RETURNTRANSFER => true,
                             CURLOPT_TIMEOUT        => 10,
-                            CURLOPT_SSL_VERIFYPEER => false,
+                            CURLOPT_SSL_VERIFYPEER => true,
                         ]);
                         $resp = curl_exec($ch);
                         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

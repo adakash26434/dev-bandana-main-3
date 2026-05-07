@@ -6,8 +6,9 @@
  * Issue #4: Inline duplicate validation for email / phone / sadasyata_number
  *
  * SECURITY:
- * - Read-only query, no auth required (it only confirms existence — no PII leaked).
- * - Per-IP rate limit (60 req / minute) to prevent enumeration.
+ * - Read-only query, no auth required.
+ * - Per-IP rate limit (20 req / minute) to reduce enumeration.
+ * - Fail-close on rate-limit/invalid/db error.
  * - Input strictly whitelisted (field name) and length-capped.
  */
 require_once __DIR__ . '/_bootstrap.php';
@@ -16,12 +17,15 @@ header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
 
-/* ── Simple rate limit (file-based, per IP) ── */
+/* ── Simple rate limit (per IP) ── */
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 $rlKey = 'memchk_' . preg_replace('/[^0-9a-f.:]/i', '', $ip);
 if (function_exists('checkRateLimit')) {
-    if (!checkRateLimit($rlKey, 60, 60)) {
-        echo json_encode(['available' => true, 'message' => '']); // fail-open, don't block UX
+    if (!checkRateLimit($rlKey, 20, 60)) {
+        echo json_encode([
+            'available' => false,
+            'message' => 'धेरै पटक जाँच भयो। कृपया केही समयपछि पुनः प्रयास गर्नुहोस्।'
+        ]);
         exit;
     }
 }
@@ -37,7 +41,7 @@ $allowed = [
     'sadasyata_number' => 'sadasyata_number',
 ];
 if (!isset($allowed[$field]) || $value === '') {
-    echo json_encode(['available' => true]);
+    echo json_encode(['available' => false, 'message' => 'अमान्य अनुरोध']);
     exit;
 }
 $col = $allowed[$field];
@@ -63,6 +67,8 @@ try {
     ]);
 } catch (Throwable $e) {
     error_log('check-availability: ' . $e->getMessage());
-    /* Fail-open so that user can still try; server-side will catch dup on submit. */
-    echo json_encode(['available' => true]);
+    echo json_encode([
+        'available' => false,
+        'message' => 'अहिले जाँच गर्न मिलेन। कृपया केही समयपछि पुनः प्रयास गर्नुहोस्।'
+    ]);
 }

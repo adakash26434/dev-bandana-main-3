@@ -81,17 +81,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /* Document upload (PDF / Word) */
             $document = clean_text($_POST['existing_document'] ?? '');
             if (!empty($_FILES['document']['name']) && $_FILES['document']['error'] === 0) {
-                $allowedDocs = ['application/pdf','application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-                $docMime = $_FILES['document']['type'];
-                $docExt  = strtolower(pathinfo($_FILES['document']['name'], PATHINFO_EXTENSION));
-                if (in_array($docMime, $allowedDocs) || in_array($docExt, ['pdf','doc','docx'])) {
-                    $docName = 'doc_' . time() . '_' . preg_replace('/[^a-z0-9._-]/i','_',$_FILES['document']['name']);
-                    $docDir  = '../uploads/auctions/';
-                    if (!is_dir($docDir)) mkdir($docDir, 0755, true);
-                    if (move_uploaded_file($_FILES['document']['tmp_name'], $docDir . $docName)) {
-                        $document = 'uploads/auctions/' . $docName;
+                $docExt = strtolower(pathinfo($_FILES['document']['name'], PATHINFO_EXTENSION));
+                if (in_array($docExt, ['pdf', 'doc', 'docx'], true)) {
+                    $up = uploadFile($_FILES['document'], 'auctions');
+                    if ($up['success']) {
+                        $document = $up['path'];
+                    } else {
+                        setFlash('error', 'Document upload असफल: ' . ($up['message'] ?? 'Invalid file'));
+                        redirect('auctions.php' . ($id > 0 ? ('?action=edit&id=' . $id) : '?action=add'));
                     }
+                } else {
+                    setFlash('error', 'Document का लागि केवल PDF, DOC, DOCX मात्र अनुमति छ।');
+                    redirect('auctions.php' . ($id > 0 ? ('?action=edit&id=' . $id) : '?action=add'));
                 }
             }
 
@@ -379,13 +380,87 @@ if ($action === 'edit' || $action === 'add') {
                     <div class="col-md-6">
                         <label class="form-label fw-semibold"><i class="fas fa-image text-primary me-1"></i>मुख्य फोटो</label>
                         <input type="file" name="image" id="mainImgInput" class="form-control" accept="image/*,.webp,.png,.jpg,.jpeg">
-document.getElementById('mainImgInput').addEventListener('change', function () {
-    var file = this.files[0];
+                        <?php if (!empty($auction['image'])): ?>
+                        <div class="mt-2" id="mainImgPreview">
+                            <img src="<?php echo SITE_URL . htmlspecialchars($auction['image']); ?>" id="mainImgPreviewImg" class="img-thumbnail" style="max-height:120px;" alt="Preview">
+                        </div>
+                        <?php else: ?>
+                        <div class="mt-2 d-none" id="mainImgPreview">
+                            <img src="" id="mainImgPreviewImg" class="img-thumbnail" style="max-height:120px;" alt="Preview">
+                        </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Additional Photos -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold"><i class="fas fa-images text-info me-1"></i>थप फोटोहरू</label>
+                        <input type="file" name="additional_images[]" class="form-control" accept="image/*,.webp,.png,.jpg,.jpeg" multiple>
+                        <?php
+                        $exImgs = json_decode($auction['images'] ?? '[]', true) ?: [];
+                        if (!empty($exImgs)): ?>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            <?php foreach ($exImgs as $im): ?>
+                            <img src="<?php echo SITE_URL . htmlspecialchars($im); ?>" class="img-thumb" alt="img">
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Document -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold"><i class="fas fa-file-pdf text-danger me-1"></i>कागजपत्र (PDF/DOC/DOCX)</label>
+                        <input type="file" name="document" class="form-control" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                        <?php if (!empty($auction['document'])): ?>
+                        <div class="doc-preview">
+                            <i class="fas fa-file-alt text-danger"></i>
+                            <a href="<?php echo SITE_URL . htmlspecialchars($auction['document']); ?>" target="_blank" rel="noopener">
+                                हालको कागजपत्र हेर्नुहोस्
+                            </a>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Google Map Link -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold"><i class="fab fa-google text-danger me-1"></i>Google Map Link</label>
+                        <input type="url" name="google_map_link" class="form-control"
+                               value="<?php echo htmlspecialchars($auction['google_map_link'] ?? ''); ?>"
+                               placeholder="https://maps.google.com/...">
+                    </div>
+
+                    <!-- Google Map Embed -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold"><i class="fas fa-map-marked-alt text-primary me-1"></i>Google Map Embed (iframe)</label>
+                        <textarea name="google_map_embed" class="form-control" rows="3"
+                                  placeholder="<iframe ...></iframe>"><?php echo htmlspecialchars($auction['google_map_embed'] ?? ''); ?></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-1"></i><?php echo $isEdit ? 'अपडेट गर्नुहोस्' : 'सेभ गर्नुहोस्'; ?>
+                </button>
+                <a href="auctions.php" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>फिर्ता जानुहोस्
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('mainImgInput')?.addEventListener('change', function () {
+    var file = this.files && this.files[0];
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function (e) {
-        document.getElementById('mainImgPreviewImg').src = e.target.result;
-        document.getElementById('mainImgPreview').classList.remove('d-none');
+        var img = document.getElementById('mainImgPreviewImg');
+        var wrap = document.getElementById('mainImgPreview');
+        if (img && wrap) {
+            img.src = e.target.result;
+            wrap.classList.remove('d-none');
+        }
     };
     reader.readAsDataURL(file);
 });
