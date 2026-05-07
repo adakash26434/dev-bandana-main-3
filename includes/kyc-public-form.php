@@ -58,7 +58,7 @@ if (!function_exists('verifyPublicFormKycApprovedByMemberId')) {
     {
         $r = verifyPublicFormKycByMemberId($db, $memberIdRaw);
         if (!$r['ok']) return $r;
-        $st = strtolower(trim((string)($r['row']['status'] ?? '')));
+        $st = strtolower(trim((string)(isset($r['row']['status']) ? $r['row']['status'] : '')));
         if ($st !== 'approved') {
             return [
                 'ok' => false,
@@ -81,7 +81,7 @@ if (!function_exists('verifyPublicFormKycTriple')) {
 if (!function_exists('loadKycRowForLoggedMemberPublic')) {
     function loadKycRowForLoggedMemberPublic($db, $loggedMember)
     {
-        $mid = (int)($loggedMember['id'] ?? 0);
+        $mid = (int)(isset($loggedMember['id']) ? $loggedMember['id'] : 0);
         if ($mid < 1) return null;
 
         try {
@@ -97,7 +97,7 @@ if (!function_exists('loadKycRowForLoggedMemberPublic')) {
         } catch (Throwable $ignored) {
         }
 
-        $memId = trim((string)($loggedMember['sadasyata_number'] ?? ''));
+        $memId = trim((string)(isset($loggedMember['sadasyata_number']) ? $loggedMember['sadasyata_number'] : ''));
         if ($memId === '') return null;
 
         $v = verifyPublicFormKycByMemberId($db, $memId);
