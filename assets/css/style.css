@@ -8618,23 +8618,23 @@ input[readonly].nepali-datepicker:hover,
 
 /* Homepage institutional card: tighter, cleaner, hover polish */
 .institutional-stats-section .ip-stats-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
 }
 
 .institutional-stats-section .ip-stat-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 12px 10px;
-    border-right: 1px solid #e9edf3;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 12px 10px !important;
+    border-right: 1px solid #e9edf3 !important;
 }
 
 .institutional-stats-section .ip-stat-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 13px;
-    border-radius: 8px;
-    transition: transform 0.35s ease;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+    transition: transform 0.35s ease !important;
 }
 
 .institutional-stats-section .ip-stat-item:hover .ip-stat-icon {
@@ -8646,24 +8646,45 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .institutional-stats-section .ip-stat-value {
-    font-size: 0.98rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.92rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .institutional-stats-section .ip-stat-label {
-    font-size: 0.7rem;
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.66rem !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .institutional-stats-section .ip-stat-sub {
-    font-size: 0.66rem;
+    font-size: 0.62rem !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+}
+
+.institutional-stats-section .ip-card-header {
+    padding: 9px 14px !important;
+    min-height: 42px;
+}
+
+.institutional-stats-section .ip-fy-badge {
+    font-size: 0.9rem !important;
+    font-weight: 700;
     line-height: 1.1;
-    white-space: nowrap;
+}
+
+.institutional-stats-section .ip-date-info {
+    font-size: 0.72rem !important;
+}
+
+.institutional-stats-section .home-ip-btn.btn-sm {
+    padding: 3px 8px !important;
+    font-size: 0.72rem !important;
+    line-height: 1.2;
 }
 
 .institutional-stats-section .ip-ind-label {

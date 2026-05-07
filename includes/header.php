@@ -290,7 +290,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/nepali.datepicker.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css?v=<?php echo @filemtime(__DIR__ . '/../assets/css/style.css') ?: '1'; ?>">
     <!-- Universal CSS — सबै पृष्ठमा uniform font/colour/form/card -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/universal.css?v=4">
     <!-- 🎨 Design Tokens — Public + Member + Admin एकै font/color/spacing -->
