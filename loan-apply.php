@@ -689,6 +689,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div><!-- /loan-form-box -->
 </div><!-- /col -->
 </div><!-- /row -->
+</div><!-- /container -->
+</section><!-- /loan-form-section -->
 
 <style>
 .loan-wizard-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2rem;flex-wrap:wrap;gap:4px;}

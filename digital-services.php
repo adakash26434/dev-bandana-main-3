@@ -578,6 +578,30 @@ require_once 'includes/header.php';
                             </label>
                             <input type="file" name="attachment" class="form-control"
                                    accept="image/*,.pdf,.doc,.docx">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><?php echo isEnglish() ? 'Preferred Contact' : 'सम्पर्क माध्यम'; ?></label>
+                            <select name="preferred_contact" class="form-select">
+                                <option value="phone"  <?php echo (($_POST['preferred_contact'] ?? 'phone') === 'phone') ? 'selected' : ''; ?>><?php echo isEnglish() ? 'Phone Call' : 'फोन'; ?></option>
+                                <option value="email"  <?php echo (($_POST['preferred_contact'] ?? '') === 'email') ? 'selected' : ''; ?>><?php echo isEnglish() ? 'Email' : 'इमेल'; ?></option>
+                                <option value="branch" <?php echo (($_POST['preferred_contact'] ?? '') === 'branch') ? 'selected' : ''; ?>><?php echo isEnglish() ? 'Visit Branch' : 'शाखा भ्रमण'; ?></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" id="dsSubmitBtn" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            <?php echo isEnglish() ? 'Submit Digital Service Request' : 'डिजिटल सेवा अनुरोध पेश गर्नुहोस्'; ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
 .ds-service-card {
     display: flex;
     align-items: center;
