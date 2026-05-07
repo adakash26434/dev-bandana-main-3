@@ -7864,6 +7864,50 @@ body.chatbot-open {
     margin: 8px 0 10px;
 }
 
+.tools-category-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 12px;
+    padding: 16px;
+    height: 100%;
+    box-shadow: 0 4px 14px rgba(0,0,0,.06);
+}
+
+.tools-category-card h5 {
+    font-size: 1rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tools-links-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.tools-mini-link {
+    display: inline-block;
+    text-align: center;
+    background: var(--light-bg);
+    border: 1px solid rgba(0,0,0,.07);
+    border-radius: 10px;
+    padding: 10px 8px;
+    font-size: .84rem;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: .2s ease;
+}
+
+.tools-mini-link:hover {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
 /* ==============================================
    FIX: HEADER NAME - Center when 2 lines
    ============================================== */

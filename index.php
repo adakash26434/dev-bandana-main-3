@@ -298,79 +298,39 @@ if ($db instanceof PDO) {
             <h2><?php echo isEnglish() ? 'Digital Services' : 'अन्य डिजिटल सेवाहरू'; ?></h2>
             <p><?php echo isEnglish() ? 'Quick access to our online services' : 'हाम्रा अनलाइन सेवाहरूमा द्रुत पहुँच'; ?></p>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="0">
-                <a href="online-kyc.php" class="tool-widget-card d-block highlight-widget">
-                    <div class="widget-icon"><i class="fas fa-user-check"></i></div>
-                    <h5><?php echo isEnglish() ? 'Online KYC' : 'अनलाइन केवाइसी'; ?></h5>
-                </a>
+        <div class="row g-3">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="tools-category-card">
+                    <h5><i class="fas fa-file-signature me-2"></i><?php echo isEnglish() ? 'Online Forms' : 'अनलाइन फारमहरू'; ?></h5>
+                    <div class="tools-links-grid">
+                        <a href="online-kyc.php" class="tools-mini-link"><?php echo isEnglish() ? 'Online KYC' : 'अनलाइन केवाइसी'; ?></a>
+                        <a href="loan-apply.php" class="tools-mini-link"><?php echo isEnglish() ? 'Apply Loan' : 'ऋण आवेदन'; ?></a>
+                        <a href="online-account.php" class="tools-mini-link"><?php echo isEnglish() ? 'Open Account' : 'खाता खोल्नुहोस्'; ?></a>
+                        <a href="appointment.php" class="tools-mini-link"><?php echo isEnglish() ? 'Book Appointment' : 'भेटघाट बुक'; ?></a>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="50">
-                <a href="loan-apply.php" class="tool-widget-card d-block highlight-widget">
-                    <div class="widget-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                    <h5><?php echo isEnglish() ? 'Apply Loan' : 'ऋण आवेदन'; ?></h5>
-                </a>
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="80">
+                <div class="tools-category-card">
+                    <h5><i class="fas fa-calculator me-2"></i><?php echo isEnglish() ? 'Tools / Calculator' : 'टुल्स / क्याल्कुलेटर'; ?></h5>
+                    <div class="tools-links-grid">
+                        <a href="emi-calculator.php" class="tools-mini-link"><?php echo $L['emi_calculator']; ?></a>
+                        <a href="exchange-rate.php" class="tools-mini-link"><?php echo $L['exchange_rate']; ?></a>
+                        <a href="date-converter.php" class="tools-mini-link"><?php echo $L['date_converter']; ?></a>
+                        <a href="downloads.php" class="tools-mini-link"><?php echo $L['downloads']; ?></a>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="100">
-                <a href="online-account.php" class="tool-widget-card highlight-widget d-block">
-                    <div class="widget-icon"><i class="fas fa-user-plus"></i></div>
-                    <h5><?php echo isEnglish() ? 'Open Account' : 'खाता खोल्नुहोस्'; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="150">
-                <a href="appointment.php" class="tool-widget-card highlight-widget d-block">
-                    <div class="widget-icon"><i class="fas fa-calendar-check"></i></div>
-                    <h5><?php echo isEnglish() ? 'Book Appointment' : 'भेटघाट बुक'; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="200">
-                <a href="emi-calculator.php" class="tool-widget-card d-block">
-                    <div class="widget-icon"><i class="fas fa-calculator"></i></div>
-                    <h5><?php echo $L['emi_calculator']; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="250">
-                <a href="exchange-rate.php" class="tool-widget-card d-block">
-                    <div class="widget-icon"><i class="fas fa-exchange-alt"></i></div>
-                    <h5><?php echo $L['exchange_rate']; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="300">
-                <a href="date-converter.php" class="tool-widget-card d-block">
-                    <div class="widget-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <h5><?php echo $L['date_converter']; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="350">
-                <a href="downloads.php" class="tool-widget-card d-block">
-                    <div class="widget-icon"><i class="fas fa-download"></i></div>
-                    <h5><?php echo $L['downloads']; ?></h5>
-                </a>
-            </div>
-            <!-- डिजिटल सेवा - tracker card हटाइयो (issue #3) -->
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="400">
-                <a href="digital-services.php" class="tool-widget-card highlight-widget d-block" style="--highlight-color: #0d6efd;">
-                    <div class="widget-icon"><i class="fas fa-mobile-screen-button"></i></div>
-                    <h5><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="450">
-                <a href="member-welfare.php" class="tool-widget-card highlight-widget d-block" style="--highlight-color: #e91e63;">
-                    <div class="widget-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                    <h5><?php echo isEnglish() ? 'Member Welfare' : 'सदस्य सुविधा'; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="500">
-                <a href="grievance.php" class="tool-widget-card highlight-widget d-block">
-                    <div class="widget-icon"><i class="fas fa-exclamation-circle"></i></div>
-                    <h5><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></h5>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="550">
-                <a href="auction.php" class="tool-widget-card highlight-widget d-block">
-                    <div class="widget-icon"><i class="fas fa-gavel"></i></div>
-                    <h5><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></h5>
-                </a>
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="160">
+                <div class="tools-category-card">
+                    <h5><i class="fas fa-hands-helping me-2"></i><?php echo isEnglish() ? 'Member Services' : 'सदस्य सेवा / सहायता'; ?></h5>
+                    <div class="tools-links-grid">
+                        <a href="digital-services.php" class="tools-mini-link"><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></a>
+                        <a href="member-welfare.php" class="tools-mini-link"><?php echo isEnglish() ? 'Member Welfare' : 'सदस्य सुविधा'; ?></a>
+                        <a href="grievance.php" class="tools-mini-link"><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></a>
+                        <a href="auction.php" class="tools-mini-link"><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
