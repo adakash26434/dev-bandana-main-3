@@ -8516,6 +8516,13 @@ input[readonly].nepali-datepicker:hover,
     font-weight: 500;
 }
 
+.ip-stat-sub {
+    font-size: 0.68rem;
+    color: var(--primary-light);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
 .ip-indicators-row {
     display: flex;
     flex-wrap: wrap;
@@ -8560,6 +8567,14 @@ input[readonly].nepali-datepicker:hover,
     background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
 }
 
+.bar-warning {
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+}
+
+.bar-danger {
+    background: linear-gradient(90deg, #dc3545, var(--secondary-color));
+}
+
 .bar-info {
     background: linear-gradient(90deg, var(--primary-light), var(--secondary-color));
 }
@@ -8573,6 +8588,32 @@ input[readonly].nepali-datepicker:hover,
     font-weight: 700;
     min-width: 42px;
     text-align: right;
+}
+
+.ip-reserve-row {
+    padding: 12px 16px;
+    font-size: 0.84rem;
+    color: #444;
+    border-bottom: 1px solid #f0f0f0;
+    background: color-mix(in srgb, var(--primary-color) 5%, #fff);
+}
+
+.ip-reserve-pct {
+    background: #e8f5e9;
+    color: var(--primary-color);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.ip-note {
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    color: #666;
+    background: #fafafa;
+    font-style: italic;
 }
 
 .home-ip-preview-card {

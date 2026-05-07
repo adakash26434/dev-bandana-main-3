@@ -184,6 +184,9 @@ if (!function_exists('homeIpShortAmt')) {
                             <i class="fas fa-clock me-1"></i>
                             <span style="opacity:0.82;font-size:0.88em;margin-right:4px;"><?php echo isEnglish() ? 'Published:' : 'प्रकाशित:'; ?></span>
                             <?php echo htmlspecialchars((string)$institutionalProfile['report_date_bs']); ?>
+                            <?php if (!empty($institutionalProfile['report_date_ad'])): ?>
+                                &nbsp;/&nbsp; <?php echo date('d M Y', strtotime((string)$institutionalProfile['report_date_ad'])); ?>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                     <a href="institutional-profile.php" class="btn btn-sm btn-light home-ip-btn">
@@ -198,6 +201,9 @@ if (!function_exists('homeIpShortAmt')) {
                     <div class="ip-stat-body">
                         <div class="ip-stat-value"><?php echo number_format((int)($institutionalProfile['total_members'] ?? 0)); ?></div>
                         <div class="ip-stat-label"><?php echo isEnglish() ? 'Total Members' : 'कुल सदस्य'; ?></div>
+                        <?php if (!empty($institutionalProfile['total_balance_member'])): ?>
+                            <div class="ip-stat-sub"><?php echo number_format((int)$institutionalProfile['total_balance_member']); ?> <?php echo isEnglish() ? 'balance' : 'शेष'; ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="ip-stat-item ip-stat-success">
@@ -212,6 +218,9 @@ if (!function_exists('homeIpShortAmt')) {
                     <div class="ip-stat-body">
                         <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['share_capital'] ?? 0)); ?></div>
                         <div class="ip-stat-label"><?php echo isEnglish() ? 'Share Capital' : 'शेयर पूँजी'; ?></div>
+                        <?php if (!empty($institutionalProfile['share_capital_percent'])): ?>
+                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['share_capital_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="ip-stat-item ip-stat-teal">
@@ -219,6 +228,9 @@ if (!function_exists('homeIpShortAmt')) {
                     <div class="ip-stat-body">
                         <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['deposit'] ?? 0)); ?></div>
                         <div class="ip-stat-label"><?php echo isEnglish() ? 'Deposit' : 'कुल बचत'; ?></div>
+                        <?php if (!empty($institutionalProfile['deposit_percent'])): ?>
+                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['deposit_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="ip-stat-item ip-stat-warning">
@@ -226,6 +238,9 @@ if (!function_exists('homeIpShortAmt')) {
                     <div class="ip-stat-body">
                         <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['loan'] ?? 0)); ?></div>
                         <div class="ip-stat-label"><?php echo isEnglish() ? 'Loan' : 'कुल ऋण'; ?></div>
+                        <?php if (!empty($institutionalProfile['loan_percent'])): ?>
+                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['loan_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="ip-stat-item ip-stat-purple">
@@ -233,6 +248,9 @@ if (!function_exists('homeIpShortAmt')) {
                     <div class="ip-stat-body">
                         <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['reserved_fund'] ?? 0)); ?></div>
                         <div class="ip-stat-label"><?php echo isEnglish() ? 'Reserve Fund' : 'जगेडा कोष'; ?></div>
+                        <?php if (!empty($institutionalProfile['reserved_fund_percent'])): ?>
+                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['reserved_fund_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -245,8 +263,14 @@ if (!function_exists('homeIpShortAmt')) {
                 <?php if (!empty($institutionalProfile['npa_percent'])): ?>
                     <div class="ip-indicator">
                         <div class="ip-ind-label">NPA (खराब ऋण)</div>
-                        <div class="ip-ind-bar-wrap"><div class="ip-ind-bar bar-good" style="width:<?php echo min(((float)$institutionalProfile['npa_percent']) * 10, 100); ?>%"></div></div>
-                        <div class="ip-ind-value"><?php echo (float)$institutionalProfile['npa_percent']; ?>%</div>
+                        <div class="ip-ind-bar-wrap">
+                            <?php
+                            $npa = (float)$institutionalProfile['npa_percent'];
+                            $npaClass = $npa < 3 ? 'bar-good' : ($npa < 5 ? 'bar-warning' : 'bar-danger');
+                            ?>
+                            <div class="ip-ind-bar <?php echo $npaClass; ?>" style="width:<?php echo min($npa * 10, 100); ?>%"></div>
+                        </div>
+                        <div class="ip-ind-value <?php echo $npaClass; ?>"><?php echo $npa; ?>%</div>
                     </div>
                 <?php endif; ?>
                 <?php if (!empty($institutionalProfile['npl_percent'])): ?>
@@ -264,6 +288,24 @@ if (!function_exists('homeIpShortAmt')) {
                     </div>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
+
+            <?php if (!empty($institutionalProfile['total_loan_reserve_fund'])): ?>
+                <div class="ip-reserve-row">
+                    <i class="fas fa-vault me-2 text-success"></i>
+                    <strong><?php echo isEnglish() ? 'Loan Reserve Fund:' : 'ऋण सुरक्षण कोष:'; ?></strong>
+                    <?php echo homeIpShortAmt((float)$institutionalProfile['total_loan_reserve_fund']); ?>
+                    <?php if (!empty($institutionalProfile['total_loan_reserve_percent'])): ?>
+                        <span class="ip-reserve-pct">(<?php echo htmlspecialchars((string)$institutionalProfile['total_loan_reserve_percent']); ?>%)</span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($institutionalProfile['report_note'])): ?>
+                <div class="ip-note">
+                    <i class="fas fa-info-circle me-2 text-muted"></i>
+                    <?php echo nl2br(htmlspecialchars((string)$institutionalProfile['report_note'])); ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>
