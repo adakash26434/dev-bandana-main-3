@@ -7890,6 +7890,7 @@ body.chatbot-open {
 
 .tools-mini-link {
     position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -7940,6 +7941,15 @@ body.chatbot-open {
     transition: .2s ease;
 }
 
+.tools-mini-link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 110, 253, .08);
+    opacity: 0;
+    transition: .2s ease;
+}
+
 .tools-mini-link:hover {
     background: var(--primary-color);
     color: #fff;
@@ -7955,6 +7965,31 @@ body.chatbot-open {
 .tools-mini-link:hover::after {
     opacity: 1;
     right: 8px;
+}
+
+.tools-mini-link:focus-visible,
+.tools-mini-link:active {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+    transform: translateY(0) scale(.98);
+}
+
+.tools-mini-link:focus-visible::after,
+.tools-mini-link:active::after {
+    opacity: 1;
+    right: 8px;
+}
+
+.tools-mini-link:focus-visible::before,
+.tools-mini-link:active::before {
+    opacity: 1;
+}
+
+.tools-mini-link:focus-visible i,
+.tools-mini-link:active i {
+    background: #fff;
+    color: var(--primary-color);
 }
 
 .tools-cat-forms .tools-mini-link i {
