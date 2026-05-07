@@ -132,8 +132,8 @@ if ($db instanceof PDO) {
         // Check if institutional_profile table exists
         $profileCheck = $db->query("SHOW TABLES LIKE 'institutional_profile'");
         if ($profileCheck && $profileCheck->fetch() !== false) {
-            // Try publish_date first, fallback to fiscal_year for backward compatibility
-            $profileStmt = $db->query("SELECT * FROM institutional_profile WHERE is_active = 1 ORDER BY COALESCE(publish_date, created_at) DESC LIMIT 1");
+            // Keep ordering compatible with older schemas used in this project
+            $profileStmt = $db->query("SELECT * FROM institutional_profile WHERE is_active = 1 ORDER BY fiscal_year DESC, id DESC LIMIT 1");
             if ($profileStmt) {
                 $institutionalProfile = $profileStmt->fetch();
             }
@@ -146,46 +146,47 @@ if ($db instanceof PDO) {
 }
 ?>
 
-<!-- Institutional Profile Latest Update (Compact) -->
+<!-- Institutional Profile Latest Update -->
 <section class="institutional-stats-section">
     <div class="container">
-        <div class="home-ip-preview-card" data-aos="fade-up">
-            <div class="home-ip-preview-head">
-                <div class="home-ip-preview-title">
-                    <i class="fas fa-building-columns me-2"></i>
-                    <?php echo isEnglish() ? 'Institutional Financial Profile' : 'संस्थाको आर्थिक प्रोफाइल'; ?>
-                    <span class="home-ip-latest"><?php echo isEnglish() ? 'Latest' : 'Latest'; ?></span>
+        <div class="home-ip-rich-card" data-aos="fade-up">
+            <div class="home-ip-rich-header">
+                <div class="home-ip-rich-fy">
+                    <i class="fas fa-calendar-days me-2"></i>
+                    <?php echo !empty($institutionalProfile['fiscal_year']) ? 'आ.व. ' . htmlspecialchars((string)$institutionalProfile['fiscal_year']) : (isEnglish() ? 'Latest Update' : 'Latest Update'); ?>
                 </div>
-                <a href="institutional-profile.php" class="btn btn-sm btn-light home-ip-btn">
-                    <i class="fas fa-arrow-up-right-from-square me-1"></i><?php echo isEnglish() ? 'Full Details' : 'पूर्ण विवरण'; ?>
-                </a>
+                <div class="home-ip-rich-actions">
+                    <a href="institutional-profile.php" class="btn btn-sm btn-light home-ip-btn">
+                        <i class="fas fa-arrow-up-right-from-square me-1"></i><?php echo isEnglish() ? 'Full Details' : 'पूर्ण विवरण'; ?>
+                    </a>
+                </div>
             </div>
 
             <?php if ($institutionalProfile): ?>
-            <div class="home-ip-preview-meta">
-                <?php
-                $parts = [];
-                if (!empty($institutionalProfile['fiscal_year'])) {
-                    $parts[] = (isEnglish() ? 'FY ' : 'आ.व. ') . htmlspecialchars((string)$institutionalProfile['fiscal_year']);
-                }
-                if (!empty($institutionalProfile['report_date_bs'])) {
-                    $parts[] = htmlspecialchars((string)$institutionalProfile['report_date_bs']);
-                } elseif (!empty($institutionalProfile['publish_date'])) {
-                    $parts[] = formatDate((string)$institutionalProfile['publish_date'], 'Y-m-d');
-                }
-                echo implode('  /  ', $parts);
-                ?>
+            <div class="home-ip-rich-stats">
+                <div class="home-ip-rich-stat"><i class="fas fa-users"></i><div><strong><?php echo formatNepaliNumber((float)($institutionalProfile['total_members'] ?? 0)); ?></strong><span><?php echo isEnglish() ? 'Members' : 'कुल सदस्य'; ?></span></div></div>
+                <div class="home-ip-rich-stat"><i class="fas fa-landmark"></i><div><strong><?php echo formatNepaliCurrency((float)($institutionalProfile['total_assets'] ?? 0), false); ?></strong><span><?php echo isEnglish() ? 'Total Assets' : 'कुल सम्पत्ति'; ?></span></div></div>
+                <div class="home-ip-rich-stat"><i class="fas fa-coins"></i><div><strong><?php echo formatNepaliCurrency((float)($institutionalProfile['share_capital'] ?? 0), false); ?></strong><span><?php echo isEnglish() ? 'Share Capital' : 'शेयर पूँजी'; ?></span></div></div>
+                <div class="home-ip-rich-stat"><i class="fas fa-piggy-bank"></i><div><strong><?php echo formatNepaliCurrency((float)($institutionalProfile['deposit'] ?? 0), false); ?></strong><span><?php echo isEnglish() ? 'Deposit' : 'कुल बचत'; ?></span></div></div>
+                <div class="home-ip-rich-stat"><i class="fas fa-hand-holding-dollar"></i><div><strong><?php echo formatNepaliCurrency((float)($institutionalProfile['loan'] ?? 0), false); ?></strong><span><?php echo isEnglish() ? 'Loan' : 'कुल ऋण'; ?></span></div></div>
+                <div class="home-ip-rich-stat"><i class="fas fa-shield-halved"></i><div><strong><?php echo formatNepaliCurrency((float)($institutionalProfile['reserved_fund'] ?? 0), false); ?></strong><span><?php echo isEnglish() ? 'Reserved Fund' : 'जगेडा कोष'; ?></span></div></div>
             </div>
-            <div class="home-ip-preview-stats">
-                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Members' : 'कुल सदस्य'; ?></span><strong><?php echo formatNepaliNumber($institutionalProfile['total_members']); ?></strong></div>
-                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Total Assets' : 'कुल सम्पत्ति'; ?></span><strong><?php echo formatNepaliCurrency($institutionalProfile['total_assets'], false); ?></strong></div>
-                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Deposit' : 'कुल बचत'; ?></span><strong><?php echo formatNepaliCurrency($institutionalProfile['deposit'], false); ?></strong></div>
-                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Loan' : 'कुल ऋण'; ?></span><strong><?php echo formatNepaliCurrency($institutionalProfile['loan'], false); ?></strong></div>
+            <div class="home-ip-rich-indicators">
+                <?php if (!empty($institutionalProfile['npa_percent'])): ?>
+                    <span>NPA: <strong><?php echo htmlspecialchars((string)$institutionalProfile['npa_percent']); ?>%</strong></span>
+                <?php endif; ?>
+                <?php if (!empty($institutionalProfile['npl_percent'])): ?>
+                    <span>NPL: <strong><?php echo htmlspecialchars((string)$institutionalProfile['npl_percent']); ?>%</strong></span>
+                <?php endif; ?>
+                <?php if (!empty($institutionalProfile['liquidity_percent'])): ?>
+                    <span><?php echo isEnglish() ? 'Liquidity' : 'तरलता'; ?>: <strong><?php echo htmlspecialchars((string)$institutionalProfile['liquidity_percent']); ?>%</strong></span>
+                <?php endif; ?>
+                <span class="home-ip-rich-hint"><?php echo isEnglish() ? 'Previous months and full breakdown are available inside full details.' : 'पुराना महिना/वर्ष र विस्तृत विवरण भित्र "पूर्ण विवरण" मा हेर्न सकिन्छ।'; ?></span>
             </div>
             <?php else: ?>
-            <div class="home-ip-preview-empty">
-                <?php echo isEnglish() ? 'Latest profile summary will appear here. Open full profile for complete details.' : 'Latest प्रोफाइल summary यहाँ देखिनेछ। पूर्ण विवरणका लागि भित्रको प्रोफाइल पेज खोल्नुहोस्।'; ?>
-            </div>
+                <div class="home-ip-preview-empty">
+                    <?php echo isEnglish() ? 'Latest profile summary will appear here. Open full profile for all reports.' : 'Latest प्रोफाइल summary चाँडै यहाँ देखिनेछ। सबै महिना/वर्ष विवरणका लागि "पूर्ण विवरण" खोल्नुहोस्।'; ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>
