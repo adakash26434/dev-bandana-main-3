@@ -8619,14 +8619,20 @@ input[readonly].nepali-datepicker:hover,
 /* Homepage institutional card: tighter, cleaner, hover polish */
 .institutional-stats-section .ip-stats-grid {
     grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    background: #fff;
+    border-top: 1px solid #edf1f7;
+    border-bottom: 1px solid #edf1f7;
 }
 
 .institutional-stats-section .ip-stat-item {
     flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 8px !important;
-    padding: 12px 10px !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    padding: 10px 10px !important;
     border-right: 1px solid #e9edf3 !important;
+    min-height: 88px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
 }
 
 .institutional-stats-section .ip-stat-icon {
@@ -8643,32 +8649,47 @@ input[readonly].nepali-datepicker:hover,
 
 .institutional-stats-section .ip-stat-body {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .institutional-stats-section .ip-stat-value {
-    font-size: 0.92rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.1px;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    line-height: 1.15 !important;
+    color: #18212f !important;
 }
 
 .institutional-stats-section .ip-stat-label {
-    font-size: 0.66rem !important;
-    line-height: 1.1 !important;
+    font-size: 0.63rem !important;
+    line-height: 1.15 !important;
+    color: #6b778c !important;
+    font-weight: 600 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
 .institutional-stats-section .ip-stat-sub {
-    font-size: 0.62rem !important;
+    font-size: 0.61rem !important;
     line-height: 1.1 !important;
+    color: #2f6fa8 !important;
+    font-weight: 700 !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-height: 0.9em;
 }
 
 .institutional-stats-section .ip-card-header {
     padding: 7px 12px !important;
     min-height: 36px;
+    border-radius: 10px 10px 0 0;
 }
 
 .institutional-stats-section .ip-fy-badge {
@@ -8686,6 +8707,14 @@ input[readonly].nepali-datepicker:hover,
     display: none !important;
 }
 
+.institutional-stats-section .ip-stat-icon,
+.institutional-stats-section .ip-indicator i,
+.institutional-stats-section .ip-reserve-row i,
+.institutional-stats-section .ip-note i,
+.institutional-stats-section .home-ip-btn i {
+    display: none !important;
+}
+
 .institutional-stats-section .ip-date-info {
     font-size: 0.68rem !important;
 }
@@ -8697,11 +8726,13 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .institutional-stats-section .ip-ind-label {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    color: #5f6b7d;
 }
 
 .institutional-stats-section .ip-ind-value {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
+    font-weight: 700;
 }
 
 .home-ip-preview-card {
