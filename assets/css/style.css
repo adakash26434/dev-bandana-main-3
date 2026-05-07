@@ -7835,6 +7835,35 @@ body.chatbot-open {
     align-items: center;
 }
 
+/* Homepage: अन्य डिजिटल सेवाहरू cards compact (4 per row cleaner) */
+.tools-widget-section .tool-widget-card {
+    padding: 14px 10px !important;
+    min-height: 112px;
+    border-radius: 12px;
+}
+
+.tools-widget-section .tool-widget-card .widget-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+}
+
+.tools-widget-section .tool-widget-card .widget-icon i {
+    font-size: 20px;
+}
+
+.tools-widget-section .tool-widget-card h5 {
+    font-size: .86rem;
+    line-height: 1.25;
+    margin-bottom: 0;
+    padding: 0 2px;
+}
+
+.tools-widget-section .tools-subtitle {
+    margin: 8px 0 10px;
+}
+
 /* ==============================================
    FIX: HEADER NAME - Center when 2 lines
    ============================================== */
