@@ -772,6 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<?php endif; ?>
 
 <?php if (!$success && !empty($oldInput)): ?>
 <script>

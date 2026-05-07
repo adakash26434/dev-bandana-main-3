@@ -733,5 +733,6 @@ require_once 'includes/header.php';
 
 /* copyTrk() is defined globally in footer.php */
 </script>
+<?php endif; ?>
 
 <?php require_once 'includes/footer.php'; ?>
