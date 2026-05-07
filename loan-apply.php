@@ -1,4 +1,10 @@
 <?php
+if (isset($_GET['__ping']) && (string)$_GET['__ping'] === '1') {
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "loan-apply ping OK";
+    exit;
+}
+
 /* Temporary runtime debugger: open loan-apply.php?__dbg=1 */
 $__loanDbg = isset($_GET['__dbg']) && (string)$_GET['__dbg'] === '1';
 if ($__loanDbg) {
