@@ -226,7 +226,7 @@ if ($db instanceof PDO) {
 <!-- Services Section -->
 <section class="services-section section-padding">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Our Services' : 'हामीले प्रदान गर्ने सेवाहरू'; ?></h2>
             <p><?php echo isEnglish() ? 'We provide various financial services' : 'हामी विभिन्न वित्तीय सेवाहरू प्रदान गर्दछौं'; ?></p>
         </div>
@@ -294,7 +294,7 @@ if ($db instanceof PDO) {
 <!-- Tools Widget Section -->
 <section class="tools-widget-section">
     <div class="container">
-        <div class="section-header text-center mb-4" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center mb-4" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Digital Services' : 'अन्य डिजिटल सेवाहरू'; ?></h2>
             <p><?php echo isEnglish() ? 'Quick access to our online services' : 'हाम्रा अनलाइन सेवाहरूमा द्रुत पहुँच'; ?></p>
         </div>
@@ -476,7 +476,7 @@ if (empty($whyFeatures)) {
 ?>
 <section class="why-us-section section-padding">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Why Choose Us?' : 'किन हामीलाई छान्ने?'; ?></h2>
             <p><?php echo isEnglish() ? 'Reasons to choose our cooperative' : 'हाम्रो संस्था छान्नुको कारणहरू'; ?></p>
         </div>
@@ -521,7 +521,7 @@ if ($db instanceof PDO) {
 <?php if ($chairmanMessage || $ceoMessage || $informationOfficer || $grievanceOfficer): ?>
 <section class="leadership-messages-section section-padding bg-light">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <div class="section-badge-wrap">
                 <span class="section-badge"><i class="fas fa-user-tie"></i> <?php echo isEnglish() ? 'Leadership' : 'नेतृत्व'; ?></span>
             </div>
@@ -725,7 +725,7 @@ if (empty($appFeatures)) {
 ?>
 <section class="app-features-section section-padding">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <div class="section-badge-wrap">
                 <span class="section-badge"><?php echo isEnglish() ? 'App Features' : 'एप सुविधाहरू'; ?></span>
             </div>
@@ -779,7 +779,7 @@ if (empty($appFeatures)) {
 <?php if (!empty($latestNews)): ?>
 <section class="news-section section-padding bg-light">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Latest News' : 'ताजा समाचार'; ?></h2>
             <p><?php echo isEnglish() ? 'Stay updated with our latest news and activities' : 'हाम्रो ताजा समाचार र क्रियाकलापहरूसँग अद्यावधिक रहनुहोस्'; ?></p>
         </div>
@@ -843,7 +843,7 @@ if ($db instanceof PDO) {
 <?php if (!empty($awards)): ?>
 <section class="awards-section section-padding bg-light">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Awards & Recognition' : 'सहकारीले पाएको सम्मान तथा पुरस्कार'; ?></h2>
             <p><?php echo isEnglish() ? 'Our achievements and recognition over the years' : 'वर्षौंमा हाम्रो उपलब्धि र सम्मान'; ?></p>
         </div>
@@ -920,7 +920,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 ?>
 <section class="member-spotlight-section section-padding" id="member-spotlight">
     <div class="container">
-        <div class="section-header text-center mb-5" data-aos="fade-up">
+        <div class="section-header section-header-unified text-center mb-5" data-aos="fade-up">
             <div class="section-badge-wrap">
                 <!-- Gold star badge -->
                 <span class="section-badge" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;">

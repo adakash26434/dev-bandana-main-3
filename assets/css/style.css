@@ -7826,43 +7826,6 @@ body.chatbot-open {
     overflow: visible !important;
 }
 
-.tool-widget-card {
-    padding: 20px 12px !important;
-    min-height: 130px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Homepage: अन्य डिजिटल सेवाहरू cards compact (4 per row cleaner) */
-.tools-widget-section .tool-widget-card {
-    padding: 14px 10px !important;
-    min-height: 112px;
-    border-radius: 12px;
-}
-
-.tools-widget-section .tool-widget-card .widget-icon {
-    width: 52px;
-    height: 52px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-}
-
-.tools-widget-section .tool-widget-card .widget-icon i {
-    font-size: 20px;
-}
-
-.tools-widget-section .tool-widget-card h5 {
-    font-size: .86rem;
-    line-height: 1.25;
-    margin-bottom: 0;
-    padding: 0 2px;
-}
-
-.tools-widget-section .tools-subtitle {
-    margin: 8px 0 10px;
-}
 
 .tools-category-card {
     background: #fff;
@@ -8028,6 +7991,19 @@ body.chatbot-open {
 .tools-cat-member .tools-mini-link:hover i {
     background: #fff;
     color: var(--primary-color);
+}
+
+/* Homepage: keep key section titles visually consistent */
+.section-header.section-header-unified h2 {
+    font-size: clamp(1.85rem, 3.2vw, 3rem);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.section-header.section-header-unified p {
+    font-size: .95rem;
+    margin-top: 8px;
 }
 
 @media (max-width: 575.98px) {
@@ -11553,7 +11529,7 @@ input[readonly].nepali-datepicker:hover,
     background: linear-gradient(135deg, var(--primary-color) 0%, #0d5a1c 50%, var(--primary-color) 100%);
     background-size: 200% 100%;
     animation: ratesHeaderShimmer 4s ease-in-out infinite;
-    padding: 14px 22px;
+    padding: 10px 16px;
     color: var(--white);
     position: relative;
     overflow: hidden;
@@ -11595,7 +11571,7 @@ input[readonly].nepali-datepicker:hover,
 
 .rates-box-enhanced .rates-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: .98rem;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -11605,15 +11581,15 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .rates-box-enhanced .rates-header h3 i {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     background: rgba(255,255,255,0.2);
     backdrop-filter: blur(10px);
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 13px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     animation: iconPulse 2s ease-in-out infinite;
 }
@@ -11791,7 +11767,7 @@ input[readonly].nepali-datepicker:hover,
     background: linear-gradient(135deg, var(--secondary-color) 0%, #e8a800 50%, var(--secondary-color) 100%);
     background-size: 200% 100%;
     animation: noticeHeaderShimmer 4s ease-in-out infinite;
-    padding: 14px 22px;
+    padding: 10px 16px;
     color: var(--white);
     position: relative;
     overflow: hidden;
@@ -11828,7 +11804,7 @@ input[readonly].nepali-datepicker:hover,
 
 .notices-box-enhanced .notices-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: .98rem;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -11838,15 +11814,15 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .notices-box-enhanced .notices-header h3 i {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     background: rgba(255,255,255,0.25);
     backdrop-filter: blur(10px);
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 13px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     animation: iconPulse 2s ease-in-out infinite;
 }
