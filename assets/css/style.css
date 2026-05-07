@@ -8692,6 +8692,19 @@ input[readonly].nepali-datepicker:hover,
     border-radius: 10px 10px 0 0;
 }
 
+.institutional-stats-section .container {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.institutional-stats-section .ip-profile-card {
+    border-radius: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    margin-bottom: 0 !important;
+}
+
 .institutional-stats-section .ip-fy-badge {
     font-size: 0.84rem !important;
     font-weight: 700;

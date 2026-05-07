@@ -161,48 +161,9 @@ if (!function_exists('homeIpShortAmt')) {
 }
 ?>
 
-<section class="institutional-profile-section">
-    <div class="container">
-        <div class="institutional-profile-bar" data-aos="fade-up">
-            <div class="profile-title">
-                <i class="fas fa-university"></i>
-                <span><?php echo isEnglish() ? 'Institutional Profile' : 'प्रतिवेदन तथा प्रकाशनहरू'; ?></span>
-            </div>
-            <div class="profile-reports">
-                <a href="reports.php?type=monthly" class="report-quick-link monthly">
-                    <i class="fas fa-calendar-day"></i>
-                    <span><?php echo isEnglish() ? 'Monthly Reports' : 'मासिक प्रतिवेदन'; ?></span>
-                    <?php if ($latestMonthlyReport): ?>
-                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
-                    <?php endif; ?>
-                </a>
-                <a href="reports.php?type=annual" class="report-quick-link annual">
-                    <i class="fas fa-calendar"></i>
-                    <span><?php echo isEnglish() ? 'Annual Reports' : 'वार्षिक प्रतिवेदन'; ?></span>
-                    <?php if ($latestAnnualReport): ?>
-                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
-                    <?php endif; ?>
-                </a>
-                <a href="reports.php" class="report-quick-link all">
-                    <i class="fas fa-folder-open"></i>
-                    <span><?php echo isEnglish() ? 'All Reports' : 'सबै प्रतिवेदन'; ?></span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
 <?php if ($institutionalProfile): ?>
 <section class="institutional-stats-section">
     <div class="container">
-        <div class="text-center mb-4" data-aos="fade-up">
-            <h2 style="color:var(--primary-color);font-weight:700;"><?php echo isEnglish() ? 'Institutional Financial Profile' : 'संस्थाको आर्थिक प्रोफाइल'; ?></h2>
-            <p class="text-muted" style="max-width:650px;margin:0 auto;">
-                <?php echo isEnglish() ? 'Annual financial snapshot — members, share, deposit, loan and key indicators.' : 'वार्षिक आर्थिक तथ्याङ्क — सदस्य संख्या, शेयर, बचत, ऋण र कुल सम्पत्तिको विवरण'; ?>
-            </p>
-            <div style="width:60px;height:4px;background:linear-gradient(90deg,var(--primary-color),var(--primary-light));border-radius:2px;margin:16px auto 0;"></div>
-        </div>
-
         <div class="ip-profile-card mb-4" data-aos="fade-up">
             <div class="ip-card-header">
                 <div class="ip-fy-badge">
@@ -342,6 +303,37 @@ if (!function_exists('homeIpShortAmt')) {
     </div>
 </section>
 <?php endif; ?>
+
+<section class="institutional-profile-section">
+    <div class="container">
+        <div class="institutional-profile-bar" data-aos="fade-up">
+            <div class="profile-title">
+                <i class="fas fa-university"></i>
+                <span><?php echo isEnglish() ? 'Institutional Profile' : 'प्रतिवेदन तथा प्रकाशनहरू'; ?></span>
+            </div>
+            <div class="profile-reports">
+                <a href="reports.php?type=monthly" class="report-quick-link monthly">
+                    <i class="fas fa-calendar-day"></i>
+                    <span><?php echo isEnglish() ? 'Monthly Reports' : 'मासिक प्रतिवेदन'; ?></span>
+                    <?php if ($latestMonthlyReport): ?>
+                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
+                    <?php endif; ?>
+                </a>
+                <a href="reports.php?type=annual" class="report-quick-link annual">
+                    <i class="fas fa-calendar"></i>
+                    <span><?php echo isEnglish() ? 'Annual Reports' : 'वार्षिक प्रतिवेदन'; ?></span>
+                    <?php if ($latestAnnualReport): ?>
+                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
+                    <?php endif; ?>
+                </a>
+                <a href="reports.php" class="report-quick-link all">
+                    <i class="fas fa-folder-open"></i>
+                    <span><?php echo isEnglish() ? 'All Reports' : 'सबै प्रतिवेदन'; ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Services Section -->
 <section class="services-section section-padding">
