@@ -298,9 +298,6 @@ if ($db instanceof PDO) {
             <h2><?php echo isEnglish() ? 'Digital Services' : 'अन्य डिजिटल सेवाहरू'; ?></h2>
             <p><?php echo isEnglish() ? 'Quick access to our online services' : 'हाम्रा अनलाइन सेवाहरूमा द्रुत पहुँच'; ?></p>
         </div>
-        <div class="tools-subtitle" data-aos="fade-up">
-            <?php echo isEnglish() ? 'Online Forms' : 'अनलाइन फारमहरू'; ?>
-        </div>
         <div class="row justify-content-center">
             <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="0">
                 <a href="online-kyc.php" class="tool-widget-card d-block highlight-widget">
@@ -326,12 +323,6 @@ if ($db instanceof PDO) {
                     <h5><?php echo isEnglish() ? 'Book Appointment' : 'भेटघाट बुक'; ?></h5>
                 </a>
             </div>
-        </div>
-
-        <div class="tools-subtitle mt-2" data-aos="fade-up">
-            <?php echo isEnglish() ? 'Tools & Calculators' : 'टुल्स / क्याल्कुलेटर'; ?>
-        </div>
-        <div class="row justify-content-center">
             <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="200">
                 <a href="emi-calculator.php" class="tool-widget-card d-block">
                     <div class="widget-icon"><i class="fas fa-calculator"></i></div>
@@ -356,12 +347,6 @@ if ($db instanceof PDO) {
                     <h5><?php echo $L['downloads']; ?></h5>
                 </a>
             </div>
-        </div>
-
-        <div class="tools-subtitle mt-2" data-aos="fade-up">
-            <?php echo isEnglish() ? 'Member Support Services' : 'सदस्य सेवा / सहायता'; ?>
-        </div>
-        <div class="row justify-content-center">
             <!-- डिजिटल सेवा - tracker card हटाइयो (issue #3) -->
             <div class="col-lg-3 col-md-4 col-6 mb-3" data-aos="zoom-in" data-aos-delay="400">
                 <a href="digital-services.php" class="tool-widget-card highlight-widget d-block" style="--highlight-color: #0d6efd;">
