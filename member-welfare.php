@@ -14,11 +14,6 @@ $pageTitle = isEnglish() ? 'Member Welfare Claims' : 'सदस्य कल्�
 require_once 'includes/header.php';
 $L = getLangStrings();
 
-try {
-    ensureWelfareClaimsTables(getDB());
-} catch (Exception $e) {
-}
-
 $success = false;
 $error = '';
 $trackingId = '';
@@ -118,8 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = isEnglish() ? 'Please fill all required fields.' : 'कृपया सबै आवश्यक फिल्डहरू भर्नुहोस्।';
         } elseif (!$error) {
             try {
-                ensureWelfareClaimsTables($db);
-
                 // Generate tracking ID
                 $trackingId = 'WLF-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
 

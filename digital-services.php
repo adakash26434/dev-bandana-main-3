@@ -31,7 +31,6 @@ $serviceTypes = [
 $db = null;
 try {
     $db = getDB();
-    ensureDigitalServiceRequestsTables($db);
 } catch (Exception $e) {
 }
 
