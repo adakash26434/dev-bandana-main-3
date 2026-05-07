@@ -161,6 +161,37 @@ if (!function_exists('homeIpShortAmt')) {
 }
 ?>
 
+<section class="institutional-profile-section">
+    <div class="container">
+        <div class="institutional-profile-bar" data-aos="fade-up">
+            <div class="profile-title">
+                <i class="fas fa-university"></i>
+                <span><?php echo isEnglish() ? 'Institutional Profile' : 'प्रतिवेदन तथा प्रकाशनहरू'; ?></span>
+            </div>
+            <div class="profile-reports">
+                <a href="reports.php?type=monthly" class="report-quick-link monthly">
+                    <i class="fas fa-calendar-day"></i>
+                    <span><?php echo isEnglish() ? 'Monthly Reports' : 'मासिक प्रतिवेदन'; ?></span>
+                    <?php if ($latestMonthlyReport): ?>
+                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
+                    <?php endif; ?>
+                </a>
+                <a href="reports.php?type=annual" class="report-quick-link annual">
+                    <i class="fas fa-calendar"></i>
+                    <span><?php echo isEnglish() ? 'Annual Reports' : 'वार्षिक प्रतिवेदन'; ?></span>
+                    <?php if ($latestAnnualReport): ?>
+                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
+                    <?php endif; ?>
+                </a>
+                <a href="reports.php" class="report-quick-link all">
+                    <i class="fas fa-folder-open"></i>
+                    <span><?php echo isEnglish() ? 'All Reports' : 'सबै प्रतिवेदन'; ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <?php if ($institutionalProfile): ?>
 <section class="institutional-stats-section">
     <div class="container">
@@ -311,37 +342,6 @@ if (!function_exists('homeIpShortAmt')) {
     </div>
 </section>
 <?php endif; ?>
-
-<section class="institutional-profile-section">
-    <div class="container">
-        <div class="institutional-profile-bar" data-aos="fade-up">
-            <div class="profile-title">
-                <i class="fas fa-university"></i>
-                <span><?php echo isEnglish() ? 'Institutional Profile' : 'प्रतिवेदन तथा प्रकाशनहरू'; ?></span>
-            </div>
-            <div class="profile-reports">
-                <a href="reports.php?type=monthly" class="report-quick-link monthly">
-                    <i class="fas fa-calendar-day"></i>
-                    <span><?php echo isEnglish() ? 'Monthly Reports' : 'मासिक प्रतिवेदन'; ?></span>
-                    <?php if ($latestMonthlyReport): ?>
-                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
-                    <?php endif; ?>
-                </a>
-                <a href="reports.php?type=annual" class="report-quick-link annual">
-                    <i class="fas fa-calendar"></i>
-                    <span><?php echo isEnglish() ? 'Annual Reports' : 'वार्षिक प्रतिवेदन'; ?></span>
-                    <?php if ($latestAnnualReport): ?>
-                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
-                    <?php endif; ?>
-                </a>
-                <a href="reports.php" class="report-quick-link all">
-                    <i class="fas fa-folder-open"></i>
-                    <span><?php echo isEnglish() ? 'All Reports' : 'सबै प्रतिवेदन'; ?></span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- Services Section -->
 <section class="services-section section-padding">
