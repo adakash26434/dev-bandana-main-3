@@ -227,6 +227,9 @@ if ($db instanceof PDO) {
 <section class="services-section section-padding">
     <div class="container">
         <div class="section-header section-header-unified text-center" data-aos="fade-up">
+            <div class="section-badge-wrap">
+                <span class="section-badge"><i class="fas fa-hand-holding-heart"></i> <?php echo isEnglish() ? 'Services' : 'सेवाहरू'; ?></span>
+            </div>
             <h2><?php echo isEnglish() ? 'Our Services' : 'हामीले प्रदान गर्ने सेवाहरू'; ?></h2>
             <div class="section-divider"></div>
             <p><?php echo isEnglish() ? 'We provide various financial services' : 'हामी विभिन्न वित्तीय सेवाहरू प्रदान गर्दछौं'; ?></p>
@@ -296,6 +299,9 @@ if ($db instanceof PDO) {
 <section class="tools-widget-section">
     <div class="container">
         <div class="section-header section-header-unified text-center mb-4" data-aos="fade-up">
+            <div class="section-badge-wrap">
+                <span class="section-badge"><i class="fas fa-laptop-house"></i> <?php echo isEnglish() ? 'Digital' : 'डिजिटल'; ?></span>
+            </div>
             <h2><?php echo isEnglish() ? 'Digital Services' : 'अन्य डिजिटल सेवाहरू'; ?></h2>
             <div class="section-divider"></div>
             <p><?php echo isEnglish() ? 'Quick access to our online services' : 'हाम्रा अनलाइन सेवाहरूमा द्रुत पहुँच'; ?></p>
@@ -341,6 +347,14 @@ if ($db instanceof PDO) {
 <!-- Interest Rates & Notices Section -->
 <section class="rates-notices-section section-padding bg-light">
     <div class="container">
+        <div class="section-header section-header-unified text-center mb-4" data-aos="fade-up">
+            <div class="section-badge-wrap">
+                <span class="section-badge"><i class="fas fa-circle-info"></i> <?php echo isEnglish() ? 'Interest & Notice' : 'ब्याज र सूचना'; ?></span>
+            </div>
+            <h2><?php echo isEnglish() ? 'Interest & Notice Details' : 'ब्याज तथा सूचना विवरण'; ?></h2>
+            <div class="section-divider"></div>
+            <p><?php echo isEnglish() ? 'Latest interest rates and important notices' : 'नवीनतम ब्याज दरहरू र महत्वपूर्ण सूचनाहरू'; ?></p>
+        </div>
         <div class="row">
             <!-- Interest Rates -->
             <div class="col-lg-8 mb-4" data-aos="fade-right">
@@ -479,6 +493,9 @@ if (empty($whyFeatures)) {
 <section class="why-us-section section-padding">
     <div class="container">
         <div class="section-header section-header-unified text-center" data-aos="fade-up">
+            <div class="section-badge-wrap">
+                <span class="section-badge"><i class="fas fa-circle-check"></i> <?php echo isEnglish() ? 'Why Us' : 'किन हामी'; ?></span>
+            </div>
             <h2><?php echo isEnglish() ? 'Why Choose Us?' : 'किन हामीलाई छान्ने?'; ?></h2>
             <div class="section-divider"></div>
             <p><?php echo isEnglish() ? 'Reasons to choose our cooperative' : 'हाम्रो संस्था छान्नुको कारणहरू'; ?></p>
@@ -656,7 +673,7 @@ if ($db instanceof PDO) {
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
                 <div class="app-content">
-                    <h2><?php echo isEnglish() ? 'Manage your Digital Payments' : 'आफ्नो डिजिटल भुक्तानी व्यवस्थापन गर्नुहोस्'; ?></h2>
+                    <h2 class="home-heading-unified"><?php echo isEnglish() ? 'Manage your Digital Payments' : 'आफ्नो डिजिटल भुक्तानी व्यवस्थापन गर्नुहोस्'; ?></h2>
                     <h3><?php echo isEnglish() ? 'Anytime, Anywhere.' : 'जुनसुकै समय, जहाँबाट पनि।'; ?></h3>
                     <p class="app-tagline"><?php echo isEnglish() ? 'Download our Mobile Banking app!' : 'हाम्रो मोबाइल बैंकिङ एप डाउनलोड गर्नुहोस्!'; ?></p>
                     <p class="app-description"><?php echo isEnglish() ? 'Quick, Secure, and Convenient: Your all-in-one mobile banking app for seamless financial control.' : 'छिटो, सुरक्षित र सुविधाजनक: तपाईंको वित्तीय नियन्त्रणको लागि सबै-मा-एक मोबाइल बैंकिङ एप।'; ?></p>
@@ -730,7 +747,7 @@ if (empty($appFeatures)) {
     <div class="container">
         <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <div class="section-badge-wrap">
-                <span class="section-badge"><?php echo isEnglish() ? 'App Features' : 'एप सुविधाहरू'; ?></span>
+                <span class="section-badge"><i class="fas fa-mobile-alt"></i> <?php echo isEnglish() ? 'App Features' : 'एप सुविधाहरू'; ?></span>
             </div>
             <h2><?php echo isEnglish() ? 'What You Can Do With Our App' : 'हाम्रो एपबाट तपाईं के गर्न सक्नुहुन्छ'; ?></h2>
             <div class="section-divider"></div>
@@ -783,6 +800,9 @@ if (empty($appFeatures)) {
 <section class="news-section section-padding bg-light">
     <div class="container">
         <div class="section-header section-header-unified text-center" data-aos="fade-up">
+            <div class="section-badge-wrap">
+                <span class="section-badge"><i class="fas fa-newspaper"></i> <?php echo isEnglish() ? 'News' : 'समाचार'; ?></span>
+            </div>
             <h2><?php echo isEnglish() ? 'Latest News' : 'ताजा समाचार'; ?></h2>
             <p><?php echo isEnglish() ? 'Stay updated with our latest news and activities' : 'हाम्रो ताजा समाचार र क्रियाकलापहरूसँग अद्यावधिक रहनुहोस्'; ?></p>
         </div>
@@ -847,6 +867,9 @@ if ($db instanceof PDO) {
 <section class="awards-section section-padding bg-light">
     <div class="container">
         <div class="section-header section-header-unified text-center" data-aos="fade-up">
+            <div class="section-badge-wrap">
+                <span class="section-badge"><i class="fas fa-award"></i> <?php echo isEnglish() ? 'Awards' : 'सम्मान'; ?></span>
+            </div>
             <h2><?php echo isEnglish() ? 'Awards & Recognition' : 'सहकारीले पाएको सम्मान तथा पुरस्कार'; ?></h2>
             <p><?php echo isEnglish() ? 'Our achievements and recognition over the years' : 'वर्षौंमा हाम्रो उपलब्धि र सम्मान'; ?></p>
         </div>
@@ -1276,7 +1299,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
         <div class="cta-content" data-aos="zoom-in">
             <div class="row align-items-center">
                 <div class="col-lg-7">
-                    <h2><?php echo isEnglish() ? 'Become a Member Today!' : 'आज नै सदस्य बन्नुहोस्!'; ?></h2>
+                    <h2 class="home-heading-unified"><?php echo isEnglish() ? 'Become a Member Today!' : 'आज नै सदस्य बन्नुहोस्!'; ?></h2>
                     <p><?php echo isEnglish() ? 'Join our cooperative family and secure your financial future.' : 'हाम्रो सहकारी परिवारमा सामेल हुनुहोस् र आफ्नो वित्तीय भविष्य सुरक्षित गर्नुहोस्।'; ?></p>
                 </div>
                 <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
