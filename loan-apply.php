@@ -1,26 +1,4 @@
 <?php
-if (isset($_GET['__ping']) && (string)$_GET['__ping'] === '1') {
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "loan-apply ping OK";
-    exit;
-}
-
-/* Temporary runtime debugger: open loan-apply.php?__dbg=1 */
-$__loanDbg = isset($_GET['__dbg']) && (string)$_GET['__dbg'] === '1';
-if ($__loanDbg) {
-    @ini_set('display_errors', '1');
-    @ini_set('display_startup_errors', '1');
-    error_reporting(E_ALL);
-    register_shutdown_function(function () {
-        $e = error_get_last();
-        if (!$e) return;
-        if (!headers_sent()) {
-            header('Content-Type: text/plain; charset=utf-8');
-        }
-        echo "\n[loan-apply fatal] " . $e['message'] . " in " . $e['file'] . ':' . $e['line'] . "\n";
-    });
-}
-
 require_once 'includes/config.php';
 /* Optional includes are guarded so partial deploy won't trigger HTTP 500. */
 $kycPublicFormFile = __DIR__ . '/includes/kyc-public-form.php';
@@ -30,15 +8,7 @@ if (is_file($kycPublicFormFile)) {
     error_log('loan-apply: missing include file includes/kyc-public-form.php');
 }
 $pageTitle = isEnglish() ? 'Online Loan Application' : 'अनलाइन ऋण आवेदन';
-try {
-    require_once 'includes/header.php';
-} catch (Throwable $e) {
-    if ($__loanDbg) {
-        header('Content-Type: text/plain; charset=utf-8');
-        echo "[loan-apply bootstrap] header include failed: " . $e->getMessage();
-    }
-    exit;
-}
+require_once 'includes/header.php';
 $L = getLangStrings();
 
 $success = false;
