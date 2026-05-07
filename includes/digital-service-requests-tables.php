@@ -3,7 +3,7 @@
  * डिजिटल सेवा अनुरोध — DDL एकै ठाउँ
  */
 if (!function_exists('ensureDigitalServiceRequestsTables')) {
-    function ensureDigitalServiceRequestsTables(?PDO $db = null): void
+    function ensureDigitalServiceRequestsTables($db = null)
     {
         static $done = false;
         if ($done) {

@@ -5,7 +5,7 @@
  */
 
 if (!function_exists('kycApplicationsMemberIdColumnPublic')) {
-    function kycApplicationsMemberIdColumnPublic(PDO $db): string
+    function kycApplicationsMemberIdColumnPublic($db)
     {
         foreach (['member_id', 'sadasyata_number'] as $c) {
             try {
@@ -19,10 +19,10 @@ if (!function_exists('kycApplicationsMemberIdColumnPublic')) {
 }
 
 if (!function_exists('verifyPublicFormKycByMemberId')) {
-    function verifyPublicFormKycByMemberId(PDO $db, string $memberIdRaw): array
+    function verifyPublicFormKycByMemberId($db, $memberIdRaw)
     {
         $memberId = strtoupper(trim($memberIdRaw));
-        $fail = static function (string $np, string $en): array {
+        $fail = static function ($np, $en) {
             return ['ok' => false, 'row' => null, 'msg_np' => $np, 'msg_en' => $en];
         };
         if ($memberId === '') {
@@ -54,7 +54,7 @@ if (!function_exists('verifyPublicFormKycByMemberId')) {
 }
 
 if (!function_exists('verifyPublicFormKycApprovedByMemberId')) {
-    function verifyPublicFormKycApprovedByMemberId(PDO $db, string $memberIdRaw): array
+    function verifyPublicFormKycApprovedByMemberId($db, $memberIdRaw)
     {
         $r = verifyPublicFormKycByMemberId($db, $memberIdRaw);
         if (!$r['ok']) return $r;
@@ -72,14 +72,14 @@ if (!function_exists('verifyPublicFormKycApprovedByMemberId')) {
 }
 
 if (!function_exists('verifyPublicFormKycTriple')) {
-    function verifyPublicFormKycTriple(PDO $db, string $memberIdRaw, string $emailRaw, string $phoneRaw): array
+    function verifyPublicFormKycTriple($db, $memberIdRaw, $emailRaw, $phoneRaw)
     {
         return verifyPublicFormKycByMemberId($db, $memberIdRaw);
     }
 }
 
 if (!function_exists('loadKycRowForLoggedMemberPublic')) {
-    function loadKycRowForLoggedMemberPublic(PDO $db, array $loggedMember): ?array
+    function loadKycRowForLoggedMemberPublic($db, $loggedMember)
     {
         $mid = (int)($loggedMember['id'] ?? 0);
         if ($mid < 1) return null;

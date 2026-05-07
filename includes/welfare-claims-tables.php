@@ -3,7 +3,7 @@
  * सदस्य कल्याण दाबी — DDL एकै ठाउँ (ensure-tables + admin/public पृष्ठहरू)
  */
 if (!function_exists('ensureWelfareClaimsTables')) {
-    function ensureWelfareClaimsTables(?PDO $db = null): void
+    function ensureWelfareClaimsTables($db = null)
     {
         static $done = false;
         if ($done) {
