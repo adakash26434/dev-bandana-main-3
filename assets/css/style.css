@@ -7889,23 +7889,51 @@ body.chatbot-open {
 }
 
 .tools-mini-link {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     text-align: center;
     background: var(--light-bg);
     border: 1px solid rgba(0,0,0,.07);
     border-radius: 10px;
-    padding: 10px 8px;
+    padding: 11px 8px;
     font-size: .84rem;
     color: var(--text-color);
     text-decoration: none;
     font-weight: 600;
     transition: .2s ease;
+    min-height: 78px;
+}
+
+.tools-mini-link i {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .95rem;
+    background: #1f7a43;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(31,122,67,.2);
+}
+
+.tools-mini-link span {
+    display: block;
+    line-height: 1.2;
 }
 
 .tools-mini-link:hover {
     background: var(--primary-color);
     color: #fff;
     border-color: var(--primary-color);
+}
+
+.tools-mini-link:hover i {
+    background: #fff;
+    color: var(--primary-color);
 }
 
 /* ==============================================
