@@ -300,7 +300,7 @@ if ($db instanceof PDO) {
         </div>
         <div class="row g-3">
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
-                <div class="tools-category-card">
+                <div class="tools-category-card tools-cat-forms">
                     <h5><i class="fas fa-file-signature me-2"></i><?php echo isEnglish() ? 'Online Forms' : 'अनलाइन फारमहरू'; ?></h5>
                     <div class="tools-links-grid">
                         <a href="online-kyc.php" class="tools-mini-link"><i class="fas fa-user-check"></i><span><?php echo isEnglish() ? 'Online KYC' : 'अनलाइन केवाइसी'; ?></span></a>
@@ -311,7 +311,7 @@ if ($db instanceof PDO) {
                 </div>
             </div>
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="80">
-                <div class="tools-category-card">
+                <div class="tools-category-card tools-cat-tools">
                     <h5><i class="fas fa-calculator me-2"></i><?php echo isEnglish() ? 'Tools / Calculator' : 'टुल्स / क्याल्कुलेटर'; ?></h5>
                     <div class="tools-links-grid">
                         <a href="emi-calculator.php" class="tools-mini-link"><i class="fas fa-calculator"></i><span><?php echo $L['emi_calculator']; ?></span></a>
@@ -322,7 +322,7 @@ if ($db instanceof PDO) {
                 </div>
             </div>
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="160">
-                <div class="tools-category-card">
+                <div class="tools-category-card tools-cat-member">
                     <h5><i class="fas fa-hands-helping me-2"></i><?php echo isEnglish() ? 'Member Services' : 'सदस्य सेवा / सहायता'; ?></h5>
                     <div class="tools-links-grid">
                         <a href="digital-services.php" class="tools-mini-link"><i class="fas fa-mobile-screen-button"></i><span><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></span></a>
