@@ -149,51 +149,44 @@ if ($db instanceof PDO) {
 <!-- Institutional Profile Latest Update (Compact) -->
 <section class="institutional-stats-section">
     <div class="container">
-        <div class="card border-0 shadow-sm" data-aos="fade-up">
-            <div class="card-body d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 py-3">
-                <div>
-                    <div class="fw-bold mb-1">
-                        <i class="fas fa-building-columns text-primary me-2"></i>
-                        <?php echo isEnglish() ? 'Institutional Financial Profile (Latest Update)' : 'संस्थाको आर्थिक प्रोफाइल (Latest Update)'; ?>
-                    </div>
-                    <?php if ($institutionalProfile): ?>
-                        <div class="small text-muted">
-                            <?php
-                            $parts = [];
-                            if (!empty($institutionalProfile['fiscal_year'])) {
-                                $parts[] = (isEnglish() ? 'FY ' : 'आ.व. ') . htmlspecialchars((string)$institutionalProfile['fiscal_year']);
-                            }
-                            if (!empty($institutionalProfile['report_date_bs'])) {
-                                $parts[] = htmlspecialchars((string)$institutionalProfile['report_date_bs']);
-                            } elseif (!empty($institutionalProfile['publish_date'])) {
-                                $parts[] = formatDate((string)$institutionalProfile['publish_date'], 'Y-m-d');
-                            }
-                            echo implode(' | ', $parts);
-                            ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="small text-muted">
-                            <?php echo isEnglish() ? 'View full institutional profile details from the profile page.' : 'संस्थाको पूर्ण आर्थिक विवरण हेर्न प्रोफाइल पेज खोल्नुहोस्।'; ?>
-                        </div>
-                    <?php endif; ?>
+        <div class="home-ip-preview-card" data-aos="fade-up">
+            <div class="home-ip-preview-head">
+                <div class="home-ip-preview-title">
+                    <i class="fas fa-building-columns me-2"></i>
+                    <?php echo isEnglish() ? 'Institutional Financial Profile' : 'संस्थाको आर्थिक प्रोफाइल'; ?>
+                    <span class="home-ip-latest"><?php echo isEnglish() ? 'Latest' : 'Latest'; ?></span>
                 </div>
-                <div class="d-flex flex-wrap gap-2 small">
-                    <?php if ($institutionalProfile): ?>
-                        <span class="badge bg-light text-dark border">
-                            <?php echo isEnglish() ? 'Members: ' : 'सदस्य: '; ?><?php echo formatNepaliNumber($institutionalProfile['total_members']); ?>
-                        </span>
-                        <span class="badge bg-light text-dark border">
-                            <?php echo isEnglish() ? 'Deposit: ' : 'बचत: '; ?><?php echo formatNepaliCurrency($institutionalProfile['deposit'], false); ?>
-                        </span>
-                        <span class="badge bg-light text-dark border">
-                            <?php echo isEnglish() ? 'Loan: ' : 'ऋण: '; ?><?php echo formatNepaliCurrency($institutionalProfile['loan'], false); ?>
-                        </span>
-                    <?php endif; ?>
-                    <a href="institutional-profile.php" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-arrow-up-right-from-square me-1"></i><?php echo isEnglish() ? 'Full Details' : 'पूर्ण विवरण'; ?>
-                    </a>
-                </div>
+                <a href="institutional-profile.php" class="btn btn-sm btn-light home-ip-btn">
+                    <i class="fas fa-arrow-up-right-from-square me-1"></i><?php echo isEnglish() ? 'Full Details' : 'पूर्ण विवरण'; ?>
+                </a>
             </div>
+
+            <?php if ($institutionalProfile): ?>
+            <div class="home-ip-preview-meta">
+                <?php
+                $parts = [];
+                if (!empty($institutionalProfile['fiscal_year'])) {
+                    $parts[] = (isEnglish() ? 'FY ' : 'आ.व. ') . htmlspecialchars((string)$institutionalProfile['fiscal_year']);
+                }
+                if (!empty($institutionalProfile['report_date_bs'])) {
+                    $parts[] = htmlspecialchars((string)$institutionalProfile['report_date_bs']);
+                } elseif (!empty($institutionalProfile['publish_date'])) {
+                    $parts[] = formatDate((string)$institutionalProfile['publish_date'], 'Y-m-d');
+                }
+                echo implode('  /  ', $parts);
+                ?>
+            </div>
+            <div class="home-ip-preview-stats">
+                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Members' : 'कुल सदस्य'; ?></span><strong><?php echo formatNepaliNumber($institutionalProfile['total_members']); ?></strong></div>
+                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Total Assets' : 'कुल सम्पत्ति'; ?></span><strong><?php echo formatNepaliCurrency($institutionalProfile['total_assets'], false); ?></strong></div>
+                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Deposit' : 'कुल बचत'; ?></span><strong><?php echo formatNepaliCurrency($institutionalProfile['deposit'], false); ?></strong></div>
+                <div class="home-ip-stat"><span><?php echo isEnglish() ? 'Loan' : 'कुल ऋण'; ?></span><strong><?php echo formatNepaliCurrency($institutionalProfile['loan'], false); ?></strong></div>
+            </div>
+            <?php else: ?>
+            <div class="home-ip-preview-empty">
+                <?php echo isEnglish() ? 'Latest profile summary will appear here. Open full profile for complete details.' : 'Latest प्रोफाइल summary यहाँ देखिनेछ। पूर्ण विवरणका लागि भित्रको प्रोफाइल पेज खोल्नुहोस्।'; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>

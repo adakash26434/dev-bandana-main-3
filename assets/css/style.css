@@ -8401,6 +8401,107 @@ input[readonly].nepali-datepicker:hover,
     opacity: 0.9;
 }
 
+.home-ip-preview-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid rgba(16, 70, 138, 0.12);
+    box-shadow: 0 8px 22px rgba(12, 52, 101, 0.08);
+    overflow: hidden;
+}
+
+.home-ip-preview-head {
+    background: linear-gradient(135deg, #0d4e95, #1565c0);
+    color: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.home-ip-preview-title {
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.home-ip-latest {
+    font-size: 0.72rem;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-weight: 600;
+}
+
+.home-ip-btn {
+    border: 0;
+    color: #0d4e95;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.home-ip-preview-meta {
+    padding: 10px 16px 0;
+    color: #667085;
+    font-size: 0.83rem;
+}
+
+.home-ip-preview-stats {
+    padding: 10px 12px 14px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.home-ip-stat {
+    background: #f8fbff;
+    border: 1px solid #e6eef8;
+    border-radius: 10px;
+    padding: 10px 10px;
+}
+
+.home-ip-stat span {
+    display: block;
+    font-size: 0.74rem;
+    color: #5b667a;
+    margin-bottom: 4px;
+}
+
+.home-ip-stat strong {
+    display: block;
+    font-size: 0.96rem;
+    line-height: 1.2;
+    color: #0d2f57;
+}
+
+.home-ip-preview-empty {
+    padding: 14px 16px 16px;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 991px) {
+    .home-ip-preview-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575px) {
+    .home-ip-preview-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .home-ip-preview-title {
+        font-size: 0.92rem;
+    }
+    .home-ip-preview-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
 .stat-card {
     background: #fff;
     border-radius: 16px;
