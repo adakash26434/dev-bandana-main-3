@@ -104,6 +104,18 @@ try {
                                    ORDER BY sp.service_id, sp.display_order, sp.id DESC")->fetchAll();
 } catch (Exception $e) { $serviceProducts = []; }
 
+$editServiceId = (int)($_GET['edit'] ?? 0);
+$editService = null;
+if ($editServiceId > 0) {
+    foreach ($services as $svcRow) {
+        if ((int)($svcRow['id'] ?? 0) === $editServiceId) {
+            $editService = $svcRow;
+            break;
+        }
+    }
+}
+$openServiceForm = is_array($editService);
+
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 
@@ -125,14 +137,14 @@ $servicesArch = $svcPart['archived'];
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#svc-list" id="svc-list-btn" title="सक्रिय / जम्मा">
+        <button class="nav-link <?php echo $openServiceForm ? '' : 'active'; ?>" data-bs-toggle="tab" data-bs-target="#svc-list" id="svc-list-btn" title="सक्रिय / जम्मा">
             <i class="fas fa-list me-2"></i>सेवा सूची
             <span class="badge bg-success ms-1"><?php echo count($servicesLive); ?> / <?php echo count($services); ?></span>
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#svc-form" id="svc-form-btn">
-            <i class="fas fa-plus-circle me-2"></i><span id="svcFormTabLabel">नयाँ थप्नुहोस्</span>
+        <button class="nav-link <?php echo $openServiceForm ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#svc-form" id="svc-form-btn">
+            <i class="fas fa-plus-circle me-2"></i><span id="svcFormTabLabel"><?php echo $openServiceForm ? 'सम्पादन' : 'नयाँ थप्नुहोस्'; ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -145,7 +157,7 @@ $servicesArch = $svcPart['archived'];
 <div class="tab-content">
 
     <!-- ══ TAB 1: सूची ══ -->
-    <div class="tab-pane fade show active" id="svc-list">
+    <div class="tab-pane fade <?php echo $openServiceForm ? '' : 'show active'; ?>" id="svc-list">
         <div class="card admin-table-card svc-flat-top-card">
 
             <!-- खोज बक्स — client-side filter -->
@@ -208,17 +220,9 @@ $servicesArch = $svcPart['archived'];
                                 <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $s['display_order']; ?></span></td>
                                 <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-primary me-1 btn-edit-svc"
-                                            data-id="<?php echo $s['id']; ?>"
-                                            data-title="<?php echo htmlspecialchars($s['title_np'] ?: $s['title'], ENT_QUOTES); ?>"
-                                            data-title-en="<?php echo htmlspecialchars($s['title_en'] ?? '', ENT_QUOTES); ?>"
-                                            data-description="<?php echo htmlspecialchars($s['description_np'] ?: ($s['description'] ?? ''), ENT_QUOTES); ?>"
-                                            data-icon="<?php echo htmlspecialchars($s['icon'], ENT_QUOTES); ?>"
-                                            data-order="<?php echo $s['display_order']; ?>"
-                                            data-active="<?php echo $s['is_active']; ?>"
-                                            title="सम्पादन">
+                                    <a href="services.php?edit=<?php echo (int)$s['id']; ?>" class="btn btn-sm btn-primary me-1" title="सम्पादन">
                                         <i class="fas fa-edit"></i>
-                                    </button>
+                                    </a>
                                     <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो सेवा मेटाउन निश्चित हुनुहुन्छ?')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
@@ -269,17 +273,9 @@ $servicesArch = $svcPart['archived'];
                                 <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $s['display_order']; ?></span></td>
                                 <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-primary me-1 btn-edit-svc"
-                                            data-id="<?php echo $s['id']; ?>"
-                                            data-title="<?php echo htmlspecialchars($s['title_np'] ?: $s['title'], ENT_QUOTES); ?>"
-                                            data-title-en="<?php echo htmlspecialchars($s['title_en'] ?? '', ENT_QUOTES); ?>"
-                                            data-description="<?php echo htmlspecialchars($s['description_np'] ?: ($s['description'] ?? ''), ENT_QUOTES); ?>"
-                                            data-icon="<?php echo htmlspecialchars($s['icon'], ENT_QUOTES); ?>"
-                                            data-order="<?php echo $s['display_order']; ?>"
-                                            data-active="<?php echo $s['is_active']; ?>"
-                                            title="सम्पादन">
+                                    <a href="services.php?edit=<?php echo (int)$s['id']; ?>" class="btn btn-sm btn-primary me-1" title="सम्पादन">
                                         <i class="fas fa-edit"></i>
-                                    </button>
+                                    </a>
                                     <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो सेवा मेटाउन निश्चित हुनुहुन्छ?')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
@@ -300,52 +296,52 @@ $servicesArch = $svcPart['archived'];
     </div>
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
-    <div class="tab-pane fade" id="svc-form">
+    <div class="tab-pane fade <?php echo $openServiceForm ? 'show active' : ''; ?>" id="svc-form">
         <div class="card svc-flat-top-card">
             <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
                 <h5 class="mb-0 fw-bold" id="svcFormTitle">
-                    <i class="fas fa-plus-circle me-2"></i>नयाँ सेवा थप्नुहोस्
+                    <i class="fas fa-plus-circle me-2"></i><?php echo $openServiceForm ? 'सेवा सम्पादन' : 'नयाँ सेवा थप्नुहोस्'; ?>
                 </h5>
-                <button type="button" class="btn btn-light btn-sm" id="btnCancelSvc">
+                <a href="services.php" class="btn btn-light btn-sm" id="btnCancelSvc">
                     <i class="fas fa-arrow-left me-1"></i>सूचीमा फर्कनुहोस्
-                </button>
+                </a>
             </div>
             <div class="card-body p-4">
                 <form method="POST" id="svcForm" class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                    <input type="hidden" name="action" id="svcf_action" value="add">
-                    <input type="hidden" name="id" id="svcf_id" value="">
+                    <input type="hidden" name="action" id="svcf_action" value="<?php echo $openServiceForm ? 'edit' : 'add'; ?>">
+                    <input type="hidden" name="id" id="svcf_id" value="<?php echo (int)($editService['id'] ?? 0); ?>">
 
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold text-success">शीर्षक (नेपाली) <span class="text-danger">*</span></label>
-                            <input type="text" name="title" id="svcf_title" class="form-control admin-fancy-input" required placeholder="सेवाको शीर्षक नेपालीमा">
+                            <input type="text" name="title" id="svcf_title" class="form-control admin-fancy-input" required placeholder="सेवाको शीर्षक नेपालीमा" value="<?php echo htmlspecialchars($editService['title_np'] ?? ($editService['title'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold text-success">Title (English)</label>
-                            <input type="text" name="title_en" id="svcf_title_en" class="form-control admin-fancy-input" placeholder="Service title in English">
+                            <input type="text" name="title_en" id="svcf_title_en" class="form-control admin-fancy-input" placeholder="Service title in English" value="<?php echo htmlspecialchars($editService['title_en'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold text-success">विवरण</label>
-                            <textarea name="description" id="svcf_desc" class="form-control admin-fancy-input" rows="3" placeholder="सेवाको संक्षिप्त विवरण..."></textarea>
+                            <textarea name="description" id="svcf_desc" class="form-control admin-fancy-input" rows="3" placeholder="सेवाको संक्षिप्त विवरण..."><?php echo htmlspecialchars($editService['description_np'] ?? ($editService['description'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></textarea>
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-semibold text-success">आइकन क्लास (Font Awesome)</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-success text-white border-success" id="svcIconPreview"><i class="fas fa-star"></i></span>
+                                <span class="input-group-text bg-success text-white border-success" id="svcIconPreview"><i class="<?php echo htmlspecialchars($editService['icon'] ?? 'fas fa-star', ENT_QUOTES, 'UTF-8'); ?>"></i></span>
                                 <input type="text" name="icon" id="svcf_icon" class="form-control admin-fancy-input"
-                                       value="fas fa-star" placeholder="fas fa-star"
+                                       value="<?php echo htmlspecialchars($editService['icon'] ?? 'fas fa-star', ENT_QUOTES, 'UTF-8'); ?>" placeholder="fas fa-star"
                                        oninput="document.getElementById('svcIconPreview').innerHTML='<i class=\''+this.value+'\'></i>'">
                             </div>
                             <small class="text-muted">FontAwesome class — जस्तै: fas fa-piggy-bank, fas fa-hand-holding-usd</small>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold text-success">क्रम</label>
-                            <input type="number" name="display_order" id="svcf_order" class="form-control admin-fancy-input" value="0" min="0">
+                            <input type="number" name="display_order" id="svcf_order" class="form-control admin-fancy-input" value="<?php echo (int)($editService['display_order'] ?? 0); ?>" min="0">
                         </div>
                         <div class="col-md-2 d-flex align-items-end pb-1">
                             <div class="form-check form-switch fs-5">
-                                <input class="form-check-input" type="checkbox" name="is_active" id="svcf_active" checked>
+                                <input class="form-check-input" type="checkbox" name="is_active" id="svcf_active" <?php echo !isset($editService['is_active']) || (int)$editService['is_active'] === 1 ? 'checked' : ''; ?>>
                                 <label class="form-check-label fw-semibold" for="svcf_active">सक्रिय</label>
                             </div>
                         </div>
@@ -354,7 +350,7 @@ $servicesArch = $svcPart['archived'];
                     <hr class="my-4">
                     <div class="d-flex gap-3">
                         <button type="submit" id="svcf_submit" class="btn btn-success px-5 fw-semibold">
-                            <i class="fas fa-plus-circle me-2"></i>थप्नुहोस्
+                            <i class="fas fa-plus-circle me-2"></i><?php echo $openServiceForm ? 'अपडेट गर्नुहोस्' : 'थप्नुहोस्'; ?>
                         </button>
                         <button type="button" id="svcf_cancel2" class="btn btn-outline-secondary px-4">
                             <i class="fas fa-times me-1"></i>रद्द

@@ -5,6 +5,7 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/../includes/welfare-claims-tables.php';
+require_once __DIR__ . '/../includes/welfare-claims-submit-helper.php';
 requireMemberLogin();
 memberSecurityHeaders();
 
@@ -76,55 +77,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
         if (!in_array($claimType, $validTypes, true)) {
             $errorMsg = 'दाबी प्रकार छान्नुहोस्।';
         } else {
-            $typeLabels = [
-                'maternity' => 'सुत्केरी सुविधा',
-                'death'     => 'मृत्यु सुविधा',
-                'insurance' => 'बीमा दाबी',
-                'medical'   => 'उपचार खर्च',
-                'accident'  => 'दुर्घटना सुविधा',
-                'other'     => 'अन्य सुविधा',
-            ];
-            $claimTypeNp = $typeLabels[$claimType] ?? 'अन्य';
-
-            /* Document upload */
-            $uploadedDocs = [];
-            if (!empty($_FILES['documents']['name'][0])) {
-                foreach ($_FILES['documents']['tmp_name'] as $k => $tmp) {
-                    if (($_FILES['documents']['error'][$k] ?? 1) === 0) {
-                        $singleFile = [
-                            'name'     => $_FILES['documents']['name'][$k],
-                            'type'     => $_FILES['documents']['type'][$k],
-                            'tmp_name' => $tmp,
-                            'error'    => 0,
-                            'size'     => $_FILES['documents']['size'][$k],
-                        ];
-                        $r = uploadFile($singleFile, 'welfare_claims');
-                        if ($r['success']) $uploadedDocs[] = $r['path'];
-                    }
-                }
-            }
-            $docsString = implode(',', $uploadedDocs);
-
-            $trackingId = 'WLF-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid($memberId, true)), 0, 6));
-
             try {
-                $ins = $db->prepare("INSERT INTO member_welfare_claims
-                    (tracking_id, member_name, member_id, member_portal_id, phone, email, address,
-                     claim_type, claim_type_np, beneficiary_name, beneficiary_relation, claim_amount,
-                     description, deceased_name, deceased_relation, death_date, delivery_date,
-                     hospital_name, disease_illness, treatment_date, hospital_clinic,
-                     policy_number, insurer_name,
-                     supporting_documents, status)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending')");
-                $ins->execute([
-                    $trackingId, $memName, $memSadasyata, $memberId,
-                    $resolvedPhone, $resolvedEmail, $resolvedAddress,
-                    $claimType, $claimTypeNp, $beneName, $beneRel, $claimAmt,
-                    $desc, $dcName, $dcRel, $deathDate, $delivDate,
-                    $hospName, $disease, $treatDate, $hospClinic,
-                    $policyNo ?: null, $insurerNm ?: null,
-                    $docsString ?: null,
-                ]);
+                $submit = submitWelfareClaimUnified($db, [
+                    'member_name' => $memName,
+                    'member_id' => $memSadasyata,
+                    'member_portal_id' => $memberId,
+                    'phone' => $resolvedPhone,
+                    'email' => $resolvedEmail,
+                    'address' => $resolvedAddress,
+                    'claim_type' => $claimType,
+                    'beneficiary_name' => $beneName,
+                    'beneficiary_relation' => $beneRel,
+                    'claim_amount' => $claimAmt,
+                    'description' => $desc,
+                    'deceased_name' => $dcName,
+                    'deceased_relation' => $dcRel,
+                    'death_date' => $deathDate,
+                    'delivery_date' => $delivDate,
+                    'hospital_name' => $hospName,
+                    'disease_illness' => $disease,
+                    'treatment_date' => $treatDate,
+                    'hospital_clinic' => $hospClinic,
+                    'policy_number' => $policyNo ?: null,
+                    'insurer_name' => $insurerNm ?: null,
+                ], $_FILES);
+                $trackingId = $submit['tracking_id'];
                 $successMsg = "दाबी सफलतापूर्वक दर्ता भयो! Tracking ID: <strong>$trackingId</strong> — Admin ले समीक्षा गरेपछि सूचित गरिनेछ।";
             } catch (Throwable $e) {
                 $errorMsg = 'दाबी दर्ता गर्न समस्या भयो। पुनः प्रयास गर्नुहोस्।';

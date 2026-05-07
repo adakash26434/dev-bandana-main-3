@@ -36,12 +36,12 @@ if (isset($_POST['update_status'])) {
         }
         /* Member लाई status notification — email/SMS */
         try {
-            $nRow = $db->prepare("SELECT full_name, email, phone, tracking_id FROM account_applications WHERE id=?");
+            $nRow = $db->prepare("SELECT full_name, email, mobile, tracking_id FROM account_applications WHERE id=?");
             $nRow->execute([$id]);
             $nData = $nRow->fetch();
             if ($nData) {
                 sendMemberStatusUpdate('account',
-                    $nData['email'] ?? '', $nData['phone'] ?? '', $nData['full_name'] ?? '',
+                    $nData['email'] ?? '', $nData['mobile'] ?? '', $nData['full_name'] ?? '',
                     $status, $remarks, $nData['tracking_id'] ?? '');
             }
         } catch (Throwable $e) { error_log("[account-applications.php] " . $e->getMessage()); }

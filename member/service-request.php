@@ -45,13 +45,13 @@ $rBranch    = trim((string)($kycRow['branch'] ?? ''));
 
 /* Service type options with target table/purpose */
 $serviceTypes = [
-    'appointment'       => ['label' => '📅 भेटघाट — शाखा भ्रमण / भेट माग्ने',      'table' => 'appointments',      'purpose' => 'Member Portal Service Request'],
-    'loan_inquiry'      => ['label' => '💰 ऋण जानकारी — कर्जा सम्बन्धी सोधपुछ', 'table' => 'appointments',      'purpose' => 'ऋण जानकारी / Loan Inquiry'],
-    'account_info'      => ['label' => '🏦 खाता जानकारी — बचत खाता सम्बन्धी',   'table' => 'appointments',      'purpose' => 'खाता जानकारी / Account Info'],
-    'welfare_inquiry'   => ['label' => '❤️ कल्याण सोधपुछ — सुविधा जानकारी',    'table' => 'appointments',      'purpose' => 'कल्याण सोधपुछ / Welfare Inquiry'],
-    'document_request'  => ['label' => '📄 कागजात माग — NOC, Statement आदि',   'table' => 'appointments',      'purpose' => 'कागजात माग / Document Request'],
-    'grievance'         => ['label' => '📣 गुनासो — समस्या दर्ता गर्ने',         'table' => 'grievances',        'purpose' => ''],
-    'general'           => ['label' => '💬 सामान्य सोधपुछ',                       'table' => 'appointments',      'purpose' => 'सामान्य सोधपुछ / General Inquiry'],
+    'appointment'       => ['label' => '📅 भेटघाट — शाखा भ्रमण / भेट माग्ने',      'table' => 'appointments', 'purpose' => 'other'],
+    'loan_inquiry'      => ['label' => '💰 ऋण जानकारी — कर्जा सम्बन्धी सोधपुछ', 'table' => 'appointments', 'purpose' => 'loan_inquiry'],
+    'account_info'      => ['label' => '🏦 खाता जानकारी — बचत खाता सम्बन्धी',   'table' => 'appointments', 'purpose' => 'account_inquiry'],
+    'welfare_inquiry'   => ['label' => '❤️ कल्याण सोधपुछ — सुविधा जानकारी',    'table' => 'appointments', 'purpose' => 'other'],
+    'document_request'  => ['label' => '📄 कागजात माग — NOC, Statement आदि',   'table' => 'appointments', 'purpose' => 'other'],
+    'grievance'         => ['label' => '📣 गुनासो — समस्या दर्ता गर्ने',         'table' => 'grievances',   'purpose' => 'other'],
+    'general'           => ['label' => '💬 सामान्य सोधपुछ',                       'table' => 'appointments', 'purpose' => 'other'],
 ];
 
 $successMsg = '';
@@ -78,19 +78,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
         } else {
             $svc       = $serviceTypes[$svcType];
             $trackingId = 'REQ-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid($memberId,true)),0,6));
-            $fullPurpose = $svc['purpose'] ?: ($serviceTypes[$svcType]['label'] ?? $svcType);
+            $svcLabel = $serviceTypes[$svcType]['label'] ?? $svcType;
+            $corePurpose = $svc['purpose'] ?: 'other';
+            $detailPrefix = preg_replace('/^[^\s]+\s*/u', '', $svcLabel);
+            $detailText = trim($detailPrefix . ($message ? ("\n\n" . $message) : ''));
 
             try {
                 if ($svc['table'] === 'grievances') {
-                    $ins = $db->prepare("INSERT INTO grievances (tracking_id, name, phone, email, subject, message, status, created_at)
-                                         VALUES (?,?,?,?,?,?,'pending',NOW())");
-                    $ins->execute([$trackingId, $memName, $rPhone, $rEmail, $fullPurpose, $message]);
+                    $ins = $db->prepare("INSERT INTO grievances
+                        (tracking_id, name, member_id, phone, email, category, subject, description, is_anonymous, status, created_at)
+                        VALUES (?,?,?,?,?,'service',?,?,0,'pending',NOW())");
+                    $ins->execute([$trackingId, $memName, $memSadasyata, $rPhone, $rEmail, $detailPrefix, $detailText]);
                 } else {
-                    /* Insert into appointments */
+                    /* Canonical appointments insert (purpose enum + purpose_detail text). */
+                    $effectiveDate = $prefDate ?: date('Y-m-d');
+                    $effectiveTime = $prefTime ?: '10:00 AM';
                     $ins = $db->prepare("INSERT INTO appointments
-                        (tracking_id, name, phone, email, preferred_date, purpose, message, branch, status, created_at)
-                        VALUES (?,?,?,?,?,?,?,?,'pending',NOW())");
-                    $ins->execute([$trackingId, $memName, $rPhone, $rEmail, $prefDate, $fullPurpose . ($prefTime ? " ($prefTime)" : ''), $message, $branch]);
+                        (tracking_id, name, phone, email, member_id, preferred_date, preferred_time, purpose, purpose_detail, branch, status, created_at)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,'pending',NOW())");
+                    $ins->execute([$trackingId, $memName, $rPhone, $rEmail, $memSadasyata, $effectiveDate, $effectiveTime, $corePurpose, $detailText, $branch]);
                 }
                 $successMsg = "अनुरोध दर्ता भयो! Tracking ID: <strong>$trackingId</strong> — Admin ले confirm गरेपछि सूचित गरिनेछ।";
             } catch (Throwable $e) {

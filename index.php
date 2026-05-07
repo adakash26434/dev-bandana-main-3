@@ -146,7 +146,6 @@ if ($db instanceof PDO) {
 }
 ?>
 
-<?php if ($institutionalProfile): ?>
 <!-- Institutional Profile Latest Update (Compact) -->
 <section class="institutional-stats-section">
     <div class="container">
@@ -157,31 +156,39 @@ if ($db instanceof PDO) {
                         <i class="fas fa-building-columns text-primary me-2"></i>
                         <?php echo isEnglish() ? 'Institutional Financial Profile (Latest Update)' : 'संस्थाको आर्थिक प्रोफाइल (Latest Update)'; ?>
                     </div>
-                    <div class="small text-muted">
-                        <?php
-                        $parts = [];
-                        if (!empty($institutionalProfile['fiscal_year'])) {
-                            $parts[] = (isEnglish() ? 'FY ' : 'आ.व. ') . htmlspecialchars((string)$institutionalProfile['fiscal_year']);
-                        }
-                        if (!empty($institutionalProfile['report_date_bs'])) {
-                            $parts[] = htmlspecialchars((string)$institutionalProfile['report_date_bs']);
-                        } elseif (!empty($institutionalProfile['publish_date'])) {
-                            $parts[] = formatDate((string)$institutionalProfile['publish_date'], 'Y-m-d');
-                        }
-                        echo implode(' | ', $parts);
-                        ?>
-                    </div>
+                    <?php if ($institutionalProfile): ?>
+                        <div class="small text-muted">
+                            <?php
+                            $parts = [];
+                            if (!empty($institutionalProfile['fiscal_year'])) {
+                                $parts[] = (isEnglish() ? 'FY ' : 'आ.व. ') . htmlspecialchars((string)$institutionalProfile['fiscal_year']);
+                            }
+                            if (!empty($institutionalProfile['report_date_bs'])) {
+                                $parts[] = htmlspecialchars((string)$institutionalProfile['report_date_bs']);
+                            } elseif (!empty($institutionalProfile['publish_date'])) {
+                                $parts[] = formatDate((string)$institutionalProfile['publish_date'], 'Y-m-d');
+                            }
+                            echo implode(' | ', $parts);
+                            ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="small text-muted">
+                            <?php echo isEnglish() ? 'View full institutional profile details from the profile page.' : 'संस्थाको पूर्ण आर्थिक विवरण हेर्न प्रोफाइल पेज खोल्नुहोस्।'; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="d-flex flex-wrap gap-2 small">
-                    <span class="badge bg-light text-dark border">
-                        <?php echo isEnglish() ? 'Members: ' : 'सदस्य: '; ?><?php echo formatNepaliNumber($institutionalProfile['total_members']); ?>
-                    </span>
-                    <span class="badge bg-light text-dark border">
-                        <?php echo isEnglish() ? 'Deposit: ' : 'बचत: '; ?><?php echo formatNepaliCurrency($institutionalProfile['deposit'], false); ?>
-                    </span>
-                    <span class="badge bg-light text-dark border">
-                        <?php echo isEnglish() ? 'Loan: ' : 'ऋण: '; ?><?php echo formatNepaliCurrency($institutionalProfile['loan'], false); ?>
-                    </span>
+                    <?php if ($institutionalProfile): ?>
+                        <span class="badge bg-light text-dark border">
+                            <?php echo isEnglish() ? 'Members: ' : 'सदस्य: '; ?><?php echo formatNepaliNumber($institutionalProfile['total_members']); ?>
+                        </span>
+                        <span class="badge bg-light text-dark border">
+                            <?php echo isEnglish() ? 'Deposit: ' : 'बचत: '; ?><?php echo formatNepaliCurrency($institutionalProfile['deposit'], false); ?>
+                        </span>
+                        <span class="badge bg-light text-dark border">
+                            <?php echo isEnglish() ? 'Loan: ' : 'ऋण: '; ?><?php echo formatNepaliCurrency($institutionalProfile['loan'], false); ?>
+                        </span>
+                    <?php endif; ?>
                     <a href="institutional-profile.php" class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-arrow-up-right-from-square me-1"></i><?php echo isEnglish() ? 'Full Details' : 'पूर्ण विवरण'; ?>
                     </a>
@@ -190,7 +197,6 @@ if ($db instanceof PDO) {
         </div>
     </div>
 </section>
-<?php endif; ?>
 
 <section class="institutional-profile-section">
     <div class="container">

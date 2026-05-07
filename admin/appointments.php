@@ -207,11 +207,12 @@ if ($viewApt):
                     </table>
                 </div>
 
-                <?php if (!empty($viewApt['message'])): ?>
+                <?php $memberMessage = trim((string)($viewApt['purpose_detail'] ?? $viewApt['message'] ?? '')); ?>
+                <?php if ($memberMessage !== ''): ?>
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-comment-dots"></i>सदस्यको सन्देश</div>
                     <div class="p-3 apt-text-block">
-                        <?php echo nl2br(htmlspecialchars($viewApt['message'])); ?>
+                        <?php echo nl2br(htmlspecialchars($memberMessage)); ?>
                     </div>
                 </div>
                 <?php endif; ?>

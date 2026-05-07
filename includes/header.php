@@ -846,9 +846,6 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                             <?php if (!empty($navServiceLinks)): ?>
                                 <?php foreach ($navServiceLinks as $_svc): ?>
                                     <li><a href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_svc['anchor']); ?>"><i class="<?php echo htmlspecialchars($_svc['icon']); ?>"></i> <?php echo htmlspecialchars($_svc['title']); ?></a></li>
-                                    <?php foreach (($_svc['products'] ?? []) as $_sp): ?>
-                                        <li><a class="service-sub-link" href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_sp['anchor']); ?>"><i class="fas fa-angle-right"></i> <?php echo htmlspecialchars($_sp['title']); ?></a></li>
-                                    <?php endforeach; ?>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>
@@ -1090,9 +1087,6 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                                     <?php if (!empty($navServiceLinks)): ?>
                                         <?php foreach ($navServiceLinks as $_svc): ?>
                                             <li><a href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_svc['anchor']); ?>"><i class="<?php echo htmlspecialchars($_svc['icon']); ?>"></i> <?php echo htmlspecialchars($_svc['title']); ?></a></li>
-                                            <?php foreach (($_svc['products'] ?? []) as $_sp): ?>
-                                                <li><a class="service-sub-link" href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_sp['anchor']); ?>"><i class="fas fa-angle-right"></i> <?php echo htmlspecialchars($_sp['title']); ?></a></li>
-                                            <?php endforeach; ?>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>

@@ -6,6 +6,7 @@
  */
 require_once 'includes/config.php';
 require_once 'includes/welfare-claims-tables.php';
+require_once 'includes/welfare-claims-submit-helper.php';
 $kycPublicFormFile = __DIR__ . '/includes/kyc-public-form.php';
 if (is_file($kycPublicFormFile)) {
     require_once $kycPublicFormFile;
@@ -65,6 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $disease_illness = clean_text($_POST['disease_illness'] ?? '', 500);
         $treatment_date = clean_text($_POST['treatment_date'] ?? '', 40);
         $hospital_clinic = clean_text($_POST['hospital_clinic'] ?? '', 200);
+        $policy_number = clean_text($_POST['policy_number'] ?? '', 80);
+        $insurer_name = clean_text($_POST['insurer_name'] ?? '', 150);
+        $member_portal_id = $loggedMember ? (int)($loggedMember['id'] ?? 0) : null;
 
         $db = getDB();
         $isCoopMember = $loggedMember ? 'yes' : ((($_POST['is_coop_member'] ?? '') === 'yes') ? 'yes' : 'no');
@@ -108,72 +112,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        $validClaimTypes = ['maternity', 'death', 'insurance', 'medical', 'accident', 'other'];
+
         // Validation
         if (!$error && (empty($member_name) || empty($phone) || empty($claim_type))) {
             $error = isEnglish() ? 'Please fill all required fields.' : 'कृपया सबै आवश्यक फिल्डहरू भर्नुहोस्।';
+        } elseif (!$error && !in_array($claim_type, $validClaimTypes, true)) {
+            $error = isEnglish() ? 'Please select a valid claim type.' : 'कृपया मान्य दाबी प्रकार छान्नुहोस्।';
         } elseif (!$error) {
             try {
-                // Generate tracking ID
-                $trackingId = 'WLF-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
-
-                // Claim type labels in Nepali (PHP 7 compatible)
-                $claimTypeMapNp = [
-                    'maternity' => 'सुत्केरी सुविधा',
-                    'death' => 'मृत्यु सुविधा',
-                    'insurance' => 'बीमा दाबी',
-                    'medical' => 'उपचार खर्च',
-                    'other' => 'अन्य सुविधा',
-                ];
-                $claimTypeNp = $claimTypeMapNp[$claim_type] ?? 'अन्य';
-
-                // Handle document uploads
-                $documents = '';
-                if (isset($_FILES['documents']) && $_FILES['documents']['error'][0] === 0) {
-                    $uploadedFiles = [];
-                    foreach ($_FILES['documents']['tmp_name'] as $key => $tmp) {
-                        if ($_FILES['documents']['error'][$key] === 0) {
-                            $file = [
-                                'name' => $_FILES['documents']['name'][$key],
-                                'type' => $_FILES['documents']['type'][$key],
-                                'tmp_name' => $tmp,
-                                'error' => $_FILES['documents']['error'][$key],
-                                'size' => $_FILES['documents']['size'][$key]
-                            ];
-                            $uploadResult = uploadFile($file, 'welfare_claims');
-                            if ($uploadResult['success']) {
-                                $uploadedFiles[] = $uploadResult['path'];
-                            }
-                        }
-                    }
-                    $documents = implode(',', $uploadedFiles);
-                }
-
-                // Handle death certificate
-                $death_certificate = '';
-                if (isset($_FILES['death_certificate']) && $_FILES['death_certificate']['error'] === 0) {
-                    $uploadResult = uploadFile($_FILES['death_certificate'], 'welfare_claims');
-                    if ($uploadResult['success']) {
-                        $death_certificate = $uploadResult['path'];
-                    }
-                }
-
-                // Insert into database
-                $stmt = $db->prepare("INSERT INTO member_welfare_claims (
-                    tracking_id, member_name, member_id, phone, email, address,
-                    claim_type, claim_type_np, beneficiary_name, beneficiary_relation,
-                    claim_amount, description, supporting_documents,
-                    deceased_name, deceased_relation, death_date, death_certificate,
-                    delivery_date, hospital_name, disease_illness, treatment_date, hospital_clinic,
-                    status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
-
-                $stmt->execute([
-                    $trackingId, $member_name, $member_id, $phone, $email, $address,
-                    $claim_type, $claimTypeNp, $beneficiary_name, $beneficiary_relation,
-                    $claim_amount, $description, $documents,
-                    $deceased_name, $deceased_relation, $death_date ?: null, $death_certificate,
-                    $delivery_date ?: null, $hospital_name, $disease_illness, $treatment_date ?: null, $hospital_clinic
-                ]);
+                $submit = submitWelfareClaimUnified($db, [
+                    'member_name' => $member_name,
+                    'member_id' => $member_id,
+                    'member_portal_id' => $member_portal_id,
+                    'phone' => $phone,
+                    'email' => $email,
+                    'address' => $address,
+                    'claim_type' => $claim_type,
+                    'beneficiary_name' => $beneficiary_name,
+                    'beneficiary_relation' => $beneficiary_relation,
+                    'claim_amount' => $claim_amount,
+                    'description' => $description,
+                    'deceased_name' => $deceased_name,
+                    'deceased_relation' => $deceased_relation,
+                    'death_date' => $death_date ?: null,
+                    'delivery_date' => $delivery_date ?: null,
+                    'hospital_name' => $hospital_name,
+                    'disease_illness' => $disease_illness,
+                    'treatment_date' => $treatment_date ?: null,
+                    'hospital_clinic' => $hospital_clinic,
+                    'policy_number' => $policy_number ?: null,
+                    'insurer_name' => $insurer_name ?: null,
+                ], $_FILES);
+                $trackingId = $submit['tracking_id'];
+                $claimTypeNp = $submit['claim_type_np'];
 
                 $success = true;
                 logSecurityEvent('welfare_claim_submitted', 'Welfare claim submitted: ' . $claim_type . ' (Tracking: ' . $trackingId . ')');
@@ -227,6 +199,7 @@ $claimTypes = [
     'death' => ['np' => 'मृत्यु सुविधा', 'en' => 'Death Benefit', 'icon' => 'fa-heart-broken', 'color' => '#607d8b'],
     'insurance' => ['np' => 'बीमा दाबी', 'en' => 'Insurance Claim', 'icon' => 'fa-shield-alt', 'color' => '#2196f3'],
     'medical' => ['np' => 'उपचार खर्च', 'en' => 'Medical Expense', 'icon' => 'fa-hospital', 'color' => '#4caf50'],
+    'accident' => ['np' => 'दुर्घटना सुविधा', 'en' => 'Accident Benefit', 'icon' => 'fa-car-burst', 'color' => '#f59e0b'],
     'other' => ['np' => 'अन्य सुविधा', 'en' => 'Other Benefit', 'icon' => 'fa-gift', 'color' => '#ff9800']
 ];
 ?>
