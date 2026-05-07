@@ -112,7 +112,6 @@ $L = getLangStrings();
 // Get latest reports and institutional profile - with safe table checks
 $latestMonthlyReport = null;
 $latestAnnualReport = null;
-$institutionalProfile = null;
 if ($db instanceof PDO) {
     try {
         // Check if reports table exists
@@ -129,188 +128,20 @@ if ($db instanceof PDO) {
             }
         }
 
-        // Check if institutional_profile table exists
-        $profileCheck = $db->query("SHOW TABLES LIKE 'institutional_profile'");
-        if ($profileCheck && $profileCheck->fetch() !== false) {
-            // Keep ordering compatible with older schemas used in this project
-            $profileStmt = $db->query("SELECT * FROM institutional_profile WHERE is_active = 1 ORDER BY fiscal_year DESC, id DESC LIMIT 1");
-            if ($profileStmt) {
-                $institutionalProfile = $profileStmt->fetch();
-            }
-        }
     } catch (Throwable $e) {
         // Tables may not exist - use defaults
         $latestMonthlyReport = $latestAnnualReport = null;
-        $institutionalProfile = null;
-    }
-}
-
-if (!function_exists('homeIpShortAmt')) {
-    function homeIpShortAmt(float $v): string {
-        if ($v >= 1e7) {
-            return 'रू. ' . number_format($v / 1e7, 2) . ' करोड';
-        }
-        if ($v >= 1e5) {
-            return 'रू. ' . number_format($v / 1e5, 1) . ' लाख';
-        }
-        if ($v > 0) {
-            return 'रू. ' . number_format($v);
-        }
-        return '—';
     }
 }
 ?>
 
-<?php if ($institutionalProfile): ?>
-<section class="institutional-stats-section">
-    <div class="container">
-        <div class="ip-profile-card mb-4" data-aos="fade-up">
-            <div class="ip-card-header">
-                <div class="ip-fy-badge">
-                    <i class="fas fa-calendar-days me-2"></i>
-                    <?php echo !empty($institutionalProfile['fiscal_year']) ? 'आ.व. ' . htmlspecialchars((string)$institutionalProfile['fiscal_year']) : (isEnglish() ? 'Latest Update' : 'नयाँ विवरण'); ?>
-                </div>
-                <div class="ip-header-actions">
-                    <?php if (!empty($institutionalProfile['report_date_bs'])): ?>
-                        <div class="ip-date-info">
-                            <i class="fas fa-clock me-1"></i>
-                            <span style="opacity:0.82;font-size:0.88em;margin-right:4px;"><?php echo isEnglish() ? 'Published:' : 'प्रकाशित:'; ?></span>
-                            <?php echo htmlspecialchars((string)$institutionalProfile['report_date_bs']); ?>
-                            <?php if (!empty($institutionalProfile['report_date_ad'])): ?>
-                                &nbsp;/&nbsp; <?php echo date('d M Y', strtotime((string)$institutionalProfile['report_date_ad'])); ?>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-                    <a href="institutional-profile.php" class="btn btn-sm btn-light home-ip-btn">
-                        <i class="fas fa-arrow-up-right-from-square me-1"></i><?php echo isEnglish() ? 'Full Details' : 'पूर्ण विवरण'; ?>
-                    </a>
-                </div>
-            </div>
-
-            <div class="ip-stats-grid">
-                <div class="ip-stat-item ip-stat-primary">
-                    <div class="ip-stat-icon"><i class="fas fa-users"></i></div>
-                    <div class="ip-stat-body">
-                        <div class="ip-stat-value"><?php echo number_format((int)($institutionalProfile['total_members'] ?? 0)); ?></div>
-                        <div class="ip-stat-label"><?php echo isEnglish() ? 'Total Members' : 'कुल सदस्य'; ?></div>
-                        <?php if (!empty($institutionalProfile['total_balance_member'])): ?>
-                            <div class="ip-stat-sub"><?php echo number_format((int)$institutionalProfile['total_balance_member']); ?> <?php echo isEnglish() ? 'balance' : 'शेष'; ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="ip-stat-item ip-stat-success">
-                    <div class="ip-stat-icon"><i class="fas fa-landmark"></i></div>
-                    <div class="ip-stat-body">
-                        <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['total_assets'] ?? 0)); ?></div>
-                        <div class="ip-stat-label"><?php echo isEnglish() ? 'Total Assets' : 'कुल सम्पत्ति'; ?></div>
-                    </div>
-                </div>
-                <div class="ip-stat-item ip-stat-info">
-                    <div class="ip-stat-icon"><i class="fas fa-coins"></i></div>
-                    <div class="ip-stat-body">
-                        <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['share_capital'] ?? 0)); ?></div>
-                        <div class="ip-stat-label"><?php echo isEnglish() ? 'Share Capital' : 'शेयर पूँजी'; ?></div>
-                        <?php if (!empty($institutionalProfile['share_capital_percent'])): ?>
-                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['share_capital_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="ip-stat-item ip-stat-teal">
-                    <div class="ip-stat-icon"><i class="fas fa-piggy-bank"></i></div>
-                    <div class="ip-stat-body">
-                        <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['deposit'] ?? 0)); ?></div>
-                        <div class="ip-stat-label"><?php echo isEnglish() ? 'Deposit' : 'कुल बचत'; ?></div>
-                        <?php if (!empty($institutionalProfile['deposit_percent'])): ?>
-                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['deposit_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="ip-stat-item ip-stat-warning">
-                    <div class="ip-stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
-                    <div class="ip-stat-body">
-                        <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['loan'] ?? 0)); ?></div>
-                        <div class="ip-stat-label"><?php echo isEnglish() ? 'Loan' : 'कुल ऋण'; ?></div>
-                        <?php if (!empty($institutionalProfile['loan_percent'])): ?>
-                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['loan_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="ip-stat-item ip-stat-purple">
-                    <div class="ip-stat-icon"><i class="fas fa-shield-halved"></i></div>
-                    <div class="ip-stat-body">
-                        <div class="ip-stat-value"><?php echo homeIpShortAmt((float)($institutionalProfile['reserved_fund'] ?? 0)); ?></div>
-                        <div class="ip-stat-label"><?php echo isEnglish() ? 'Reserve Fund' : 'जगेडा कोष'; ?></div>
-                        <?php if (!empty($institutionalProfile['reserved_fund_percent'])): ?>
-                            <div class="ip-stat-sub"><?php echo htmlspecialchars((string)$institutionalProfile['reserved_fund_percent']); ?>% <?php echo isEnglish() ? 'growth' : 'वृद्धि'; ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-
-            <?php
-            $hasIndicators = !empty($institutionalProfile['npa_percent']) || !empty($institutionalProfile['npl_percent']) || !empty($institutionalProfile['liquidity_percent']);
-            if ($hasIndicators):
-            ?>
-            <div class="ip-indicators-row">
-                <?php if (!empty($institutionalProfile['npa_percent'])): ?>
-                    <div class="ip-indicator">
-                        <div class="ip-ind-label">NPA (खराब ऋण)</div>
-                        <div class="ip-ind-bar-wrap">
-                            <?php
-                            $npa = (float)$institutionalProfile['npa_percent'];
-                            $npaClass = $npa < 3 ? 'bar-good' : ($npa < 5 ? 'bar-warning' : 'bar-danger');
-                            ?>
-                            <div class="ip-ind-bar <?php echo $npaClass; ?>" style="width:<?php echo min($npa * 10, 100); ?>%"></div>
-                        </div>
-                        <div class="ip-ind-value <?php echo $npaClass; ?>"><?php echo $npa; ?>%</div>
-                    </div>
-                <?php endif; ?>
-                <?php if (!empty($institutionalProfile['npl_percent'])): ?>
-                    <div class="ip-indicator">
-                        <div class="ip-ind-label">NPL</div>
-                        <div class="ip-ind-bar-wrap"><div class="ip-ind-bar bar-info" style="width:<?php echo min(((float)$institutionalProfile['npl_percent']) * 10, 100); ?>%"></div></div>
-                        <div class="ip-ind-value"><?php echo (float)$institutionalProfile['npl_percent']; ?>%</div>
-                    </div>
-                <?php endif; ?>
-                <?php if (!empty($institutionalProfile['liquidity_percent'])): ?>
-                    <div class="ip-indicator">
-                        <div class="ip-ind-label"><?php echo isEnglish() ? 'Liquidity' : 'तरलता (Liquidity)'; ?></div>
-                        <div class="ip-ind-bar-wrap"><div class="ip-ind-bar bar-teal" style="width:<?php echo min((float)$institutionalProfile['liquidity_percent'], 100); ?>%"></div></div>
-                        <div class="ip-ind-value"><?php echo (float)$institutionalProfile['liquidity_percent']; ?>%</div>
-                    </div>
-                <?php endif; ?>
-            </div>
-            <?php endif; ?>
-
-            <?php if (!empty($institutionalProfile['total_loan_reserve_fund'])): ?>
-                <div class="ip-reserve-row">
-                    <i class="fas fa-vault me-2 text-success"></i>
-                    <strong><?php echo isEnglish() ? 'Loan Reserve Fund:' : 'ऋण सुरक्षण कोष:'; ?></strong>
-                    <?php echo homeIpShortAmt((float)$institutionalProfile['total_loan_reserve_fund']); ?>
-                    <?php if (!empty($institutionalProfile['total_loan_reserve_percent'])): ?>
-                        <span class="ip-reserve-pct">(<?php echo htmlspecialchars((string)$institutionalProfile['total_loan_reserve_percent']); ?>%)</span>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (!empty($institutionalProfile['report_note'])): ?>
-                <div class="ip-note">
-                    <i class="fas fa-info-circle me-2 text-muted"></i>
-                    <?php echo nl2br(htmlspecialchars((string)$institutionalProfile['report_note'])); ?>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
 <section class="institutional-profile-section">
     <div class="container">
         <div class="institutional-profile-bar" data-aos="fade-up">
-            <div class="profile-title">
+            <a href="institutional-profile.php" class="profile-title profile-title-link">
                 <i class="fas fa-university"></i>
-                <span><?php echo isEnglish() ? 'Institutional Profile' : 'प्रतिवेदन तथा प्रकाशनहरू'; ?></span>
-            </div>
+                <span><?php echo isEnglish() ? 'Institutional Profile' : 'संस्थागत प्रोफाइल'; ?></span>
+            </a>
             <div class="profile-reports">
                 <a href="reports.php?type=monthly" class="report-quick-link monthly">
                     <i class="fas fa-calendar-day"></i>

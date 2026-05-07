@@ -9645,6 +9645,15 @@ input[readonly].nepali-datepicker:hover,
     font-weight: 600;
 }
 
+.profile-title-link {
+    text-decoration: none;
+}
+
+.profile-title-link:hover {
+    color: var(--white);
+    opacity: 0.92;
+}
+
 .profile-title i {
     font-size: 1.3rem;
     color: var(--secondary-color);
