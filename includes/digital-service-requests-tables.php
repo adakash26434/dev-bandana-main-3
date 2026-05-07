@@ -12,7 +12,7 @@ if (!function_exists('ensureDigitalServiceRequestsTables')) {
         if (!$db && function_exists('getDB')) {
             try {
                 $db = getDB();
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 return;
             }
         }
@@ -61,12 +61,12 @@ if (!function_exists('ensureDigitalServiceRequestsTables')) {
             ] as $sql) {
                 try {
                     $db->exec($sql);
-                } catch (Throwable $e) {
+                } catch (Exception $e) {
                 }
             }
 
             $done = true;
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
         }
     }
 }

@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'मिति'       => date('Y-m-d H:i'),
                 ], $loanTrackingId);
             }
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             error_log('loan-apply submit error: ' . $e->getMessage());
             $error = isEnglish() ? 'An error occurred. Please try again.' : 'त्रुटि भयो। कृपया पुन: प्रयास गर्नुहोस्।';
         }

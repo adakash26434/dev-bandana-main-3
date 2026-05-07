@@ -12,7 +12,7 @@ if (!function_exists('ensureWelfareClaimsTables')) {
         if (!$db && function_exists('getDB')) {
             try {
                 $db = getDB();
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 return;
             }
         }
@@ -26,7 +26,7 @@ if (!function_exists('ensureWelfareClaimsTables')) {
             ] as $sql) {
                 try {
                     $db->exec($sql);
-                } catch (Throwable $e) {
+                } catch (Exception $e) {
                 }
             }
 
@@ -80,17 +80,17 @@ if (!function_exists('ensureWelfareClaimsTables')) {
             ] as $sql) {
                 try {
                     $db->exec($sql);
-                } catch (Throwable $e) {
+                } catch (Exception $e) {
                 }
             }
 
             try {
                 $db->exec('ALTER TABLE member_welfare_claims ADD COLUMN full_name VARCHAR(120) GENERATED ALWAYS AS (member_name) VIRTUAL');
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
             }
 
             $done = true;
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
         }
     }
 }
