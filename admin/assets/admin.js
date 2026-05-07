@@ -140,6 +140,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     /* -------------------------------------------------
+       GLOBAL EDIT -> FORM TAB FALLBACK
+       — केही page मा page-specific JS crash/skip हुँदा पनि
+         edit click गरेपछि form tab खुलोस्।
+       — Existing per-page handlers लाई interfere नगरी
+         fallback रूपमा मात्र काम गर्छ।
+    ------------------------------------------------- */
+    function __autoOpenFormTabFrom(btn) {
+        if (!btn) return;
+        var scope = btn.closest('.main-content, .container, .container-fluid') || document;
+        var candidates = Array.from(scope.querySelectorAll('.nav-link[data-bs-target]')).filter(function (el) {
+            var trg = (el.getAttribute('data-bs-target') || '').toLowerCase();
+            return trg.indexOf('form') !== -1;
+        });
+        if (!candidates.length) return;
+        var formBtn = candidates.find(function (el) { return !el.classList.contains('active'); }) || candidates[0];
+        if (!formBtn) return;
+        var nav = formBtn.closest('ul.nav, .nav');
+        var activeBtn = nav ? nav.querySelector('.nav-link.active[data-bs-target]') : null;
+        if (typeof adminSwitchTab === 'function') {
+            adminSwitchTab(formBtn, activeBtn || undefined);
+        } else if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            bootstrap.Tab.getOrCreateInstance(formBtn).show();
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('button[class*="btn-edit"], button.wc-edit-btn');
+        if (!btn) return;
+        setTimeout(function () { __autoOpenFormTabFrom(btn); }, 10);
+    });
+
+    /* -------------------------------------------------
        SIDEBAR TOGGLE (मोबाइल मा menu खोल्ने/बन्द गर्ने)
        — हाम्बर्गर button (≡) click गर्दा sidebar slide हुन्छ
     ------------------------------------------------- */

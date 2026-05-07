@@ -126,6 +126,7 @@ try {
 }
 
 require_once __DIR__ . '/nav-menu-badges.php';
+require_once __DIR__ . '/service-products-tables.php';
 $navMenuBadges = nav_get_public_submenu_badges($db);
 $currentLang = getCurrentLang();
 
@@ -133,7 +134,25 @@ $currentLang = getCurrentLang();
 $navServiceLinks = [];
 try {
     if ($db) {
+        if (function_exists('ensureServiceProductsTables')) {
+            ensureServiceProductsTables($db);
+        }
         $svcRows = $db->query("SELECT id, title, title_en, title_np, icon FROM services WHERE is_active = 1 ORDER BY display_order, id LIMIT 30")->fetchAll();
+        $productsByService = [];
+        try {
+            $spRows = $db->query("SELECT service_id, title_np, title_en, display_order, id
+                                  FROM service_products
+                                  WHERE is_active = 1
+                                  ORDER BY service_id, display_order, id")->fetchAll();
+            foreach (($spRows ?: []) as $sp) {
+                $sid = (int)($sp['service_id'] ?? 0);
+                if ($sid <= 0) continue;
+                if (!isset($productsByService[$sid])) $productsByService[$sid] = [];
+                $productsByService[$sid][] = $sp;
+            }
+        } catch (Throwable $e) {
+            $productsByService = [];
+        }
         $serviceAnchorId = static function (array $service): string {
             $id = (int)($service['id'] ?? 0);
             $title = trim((string)($service['title'] ?? ''));
@@ -154,7 +173,15 @@ try {
             $icon = trim((string) ($sv['icon'] ?? 'fas fa-star'));
             if ($icon === '') $icon = 'fas fa-star';
             $anchor = $serviceAnchorId($sv);
-            $navServiceLinks[] = ['title' => $title, 'icon' => $icon, 'anchor' => $anchor];
+            $products = [];
+            foreach (($productsByService[(int)($sv['id'] ?? 0)] ?? []) as $sp) {
+                $pTitleRaw = (string)(($currentLang === 'en' && !empty($sp['title_en'])) ? $sp['title_en'] : ($sp['title_np'] ?? ''));
+                $pTitle = trim($pTitleRaw);
+                if ($pTitle === '') continue;
+                $products[] = ['title' => $pTitle, 'anchor' => $anchor];
+                if (count($products) >= 4) break;
+            }
+            $navServiceLinks[] = ['title' => $title, 'icon' => $icon, 'anchor' => $anchor, 'products' => $products];
         }
     }
 } catch (Throwable $e) {
@@ -819,6 +846,9 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                             <?php if (!empty($navServiceLinks)): ?>
                                 <?php foreach ($navServiceLinks as $_svc): ?>
                                     <li><a href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_svc['anchor']); ?>"><i class="<?php echo htmlspecialchars($_svc['icon']); ?>"></i> <?php echo htmlspecialchars($_svc['title']); ?></a></li>
+                                    <?php foreach (($_svc['products'] ?? []) as $_sp): ?>
+                                        <li><a class="service-sub-link" href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_sp['anchor']); ?>"><i class="fas fa-angle-right"></i> <?php echo htmlspecialchars($_sp['title']); ?></a></li>
+                                    <?php endforeach; ?>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>
@@ -1060,6 +1090,9 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
                                     <?php if (!empty($navServiceLinks)): ?>
                                         <?php foreach ($navServiceLinks as $_svc): ?>
                                             <li><a href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_svc['anchor']); ?>"><i class="<?php echo htmlspecialchars($_svc['icon']); ?>"></i> <?php echo htmlspecialchars($_svc['title']); ?></a></li>
+                                            <?php foreach (($_svc['products'] ?? []) as $_sp): ?>
+                                                <li><a class="service-sub-link" href="<?php echo SITE_URL; ?>services.php#<?php echo htmlspecialchars($_sp['anchor']); ?>"><i class="fas fa-angle-right"></i> <?php echo htmlspecialchars($_sp['title']); ?></a></li>
+                                            <?php endforeach; ?>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <li><a href="<?php echo SITE_URL; ?>services.php#saving"><i class="fas fa-piggy-bank"></i> <?php echo $L['saving']; ?></a></li>

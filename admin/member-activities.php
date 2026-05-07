@@ -58,11 +58,11 @@ if ($search !== '') {
             OR REPLACE(REPLACE(REPLACE(COALESCE(phone, ''), '-', ''), ' ', ''), '+', '') = :phoneExact
             OR sadasyata_number = :sadaExact
             OR member_card_no = :cardExact
-            OR name LIKE :likeTerm
-            OR email LIKE :likeTerm
-            OR phone LIKE :likeTerm
-            OR sadasyata_number LIKE :likeTerm
-            OR member_card_no LIKE :likeTerm
+            OR name LIKE :likeName
+            OR email LIKE :likeEmail
+            OR phone LIKE :likePhone
+            OR sadasyata_number LIKE :likeSada
+            OR member_card_no LIKE :likeCard
          ORDER BY
             CASE
                 WHEN id = :idOrder THEN 0
@@ -75,7 +75,8 @@ if ($search !== '') {
     );
     $ms->execute([
         ':idExact' => (int)$search, ':emailExact' => $searchLower, ':phoneExact' => $searchDigits, ':sadaExact' => $search, ':cardExact' => $search,
-        ':likeTerm' => $searchLike, ':idOrder' => (int)$search, ':emailOrder' => $searchLower, ':sadaOrder' => $search, ':cardOrder' => $search,
+        ':likeName' => $searchLike, ':likeEmail' => $searchLike, ':likePhone' => $searchLike, ':likeSada' => $searchLike, ':likeCard' => $searchLike,
+        ':idOrder' => (int)$search, ':emailOrder' => $searchLower, ':sadaOrder' => $search, ':cardOrder' => $search,
     ]);
     $members = $ms->fetchAll(PDO::FETCH_ASSOC) ?: [];
 

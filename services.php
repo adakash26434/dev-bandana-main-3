@@ -1,5 +1,6 @@
 <?php
 require_once 'includes/config.php';
+require_once 'includes/service-products-tables.php';
 $pageTitle = isEnglish() ? 'Services' : 'सेवाहरू';
 require_once 'includes/header.php';
 $L = getLangStrings();
@@ -7,6 +8,7 @@ $L = getLangStrings();
 // Get services (schema-safe for older DBs)
 try {
     $db = getDB();
+    ensureServiceProductsTables($db);
     $hasIsNew = false;
     $hasNewUntil = false;
     try {
@@ -34,8 +36,26 @@ try {
             FROM services WHERE is_active = 1 ORDER BY display_order";
     }
     $services = $db->query($sql)->fetchAll();
+    $serviceProducts = [];
+    if (!empty($services)) {
+        $serviceIds = array_values(array_filter(array_map(fn($r) => (int)($r['id'] ?? 0), $services), fn($v) => $v > 0));
+        if (!empty($serviceIds)) {
+            $ph = implode(',', array_fill(0, count($serviceIds), '?'));
+            $pst = $db->prepare("SELECT service_id, title_np, title_en, description_np, description_en
+                                 FROM service_products
+                                 WHERE is_active = 1 AND service_id IN ($ph)
+                                 ORDER BY service_id, display_order, id");
+            $pst->execute($serviceIds);
+            foreach (($pst->fetchAll() ?: []) as $pr) {
+                $sid = (int)($pr['service_id'] ?? 0);
+                if (!isset($serviceProducts[$sid])) $serviceProducts[$sid] = [];
+                $serviceProducts[$sid][] = $pr;
+            }
+        }
+    }
 } catch (Exception $e) {
     $services = [];
+    $serviceProducts = [];
 }
 
 if (!function_exists('service_anchor_id')) {
@@ -95,6 +115,31 @@ if (!function_exists('service_anchor_id')) {
                         </div>
                         <h4><?php echo isEnglish() ? ($service['title'] ?: $service['title_np']) : ($service['title_np'] ?: $service['title']); ?></h4>
                         <p><?php echo isEnglish() ? ($service['description'] ?: $service['description_np']) : ($service['description_np'] ?: $service['description']); ?></p>
+                        <?php $sProducts = $serviceProducts[(int)($service['id'] ?? 0)] ?? []; ?>
+                        <?php if (!empty($sProducts)): ?>
+                            <button class="btn btn-sm btn-outline-primary mt-2 service-more-btn" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#service-products-<?php echo (int)$service['id']; ?>"
+                                    aria-expanded="false" aria-controls="service-products-<?php echo (int)$service['id']; ?>">
+                                <?php echo isEnglish() ? 'More Products' : 'थप उत्पादहरू'; ?> <i class="fas fa-chevron-down ms-1"></i>
+                            </button>
+                            <div class="collapse mt-3" id="service-products-<?php echo (int)$service['id']; ?>">
+                                <ul class="service-features mb-0">
+                                    <?php foreach ($sProducts as $sp): ?>
+                                        <li>
+                                            <i class="fas fa-check"></i>
+                                            <span>
+                                                <?php echo htmlspecialchars(isEnglish() ? (($sp['title_en'] ?: $sp['title_np']) ?? '') : (($sp['title_np'] ?: $sp['title_en']) ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+                                                <?php
+                                                $pDesc = isEnglish() ? (($sp['description_en'] ?: $sp['description_np']) ?? '') : (($sp['description_np'] ?: $sp['description_en']) ?? '');
+                                                if (trim((string)$pDesc) !== ''): ?>
+                                                <small class="d-block text-muted"><?php echo htmlspecialchars((string)$pDesc, ENT_QUOTES, 'UTF-8'); ?></small>
+                                                <?php endif; ?>
+                                            </span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
                         <?php if ($service['image']): ?>
                             <img src="<?php echo $service['image']; ?>" loading="lazy"  alt="<?php echo $service['title']; ?>" class="img-fluid mt-3 rounded">
                         <?php endif; ?>

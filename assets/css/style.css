@@ -1614,6 +1614,22 @@ img {
     color: var(--primary-light);
 }
 
+.service-more-btn {
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.service-more-btn[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.dropdown a.service-sub-link {
+    padding-left: 28px !important;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
 /* ==============================================
    INTEREST RATES - Enhanced Eye-Catching Design
    ============================================== */
@@ -5431,6 +5447,16 @@ textarea.form-control {
 .tool-widget-card .btn-sm {
     padding: 8px 20px;
     font-size: 13px;
+}
+
+.tools-subtitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 10px 0 12px;
+    text-align: left;
+    padding-left: 6px;
+    border-left: 4px solid var(--primary-color);
 }
 
 /* Highlight Widget (KYC & Loan Apply) - Premium Style */

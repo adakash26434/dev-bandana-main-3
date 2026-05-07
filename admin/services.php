@@ -5,6 +5,7 @@
  */
 $pageTitle = 'सेवा व्यवस्थापन';
 require_once '../includes/config.php';
+require_once '../includes/service-products-tables.php';
 if (!isAdminLoggedIn()) redirect(ADMIN_URL . 'index.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -18,6 +19,7 @@ if (empty($csrfToken)) $csrfToken = generateCSRFToken();
 $success = '';
 $error   = '';
 $db      = getDB();
+ensureServiceProductsTables($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     try {
@@ -57,6 +59,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $st->execute(array_merge([$target], $ids));
                 $success = 'Bulk status update सफल भयो।';
             }
+        } elseif ($act === 'product_add' || $act === 'product_edit') {
+            $pid = (int)($_POST['product_id'] ?? 0);
+            $serviceId = (int)($_POST['product_service_id'] ?? 0);
+            $titleNp = clean_text($_POST['product_title_np'] ?? '');
+            $titleEn = clean_text($_POST['product_title_en'] ?? '');
+            $descNp = trim((string)($_POST['product_description_np'] ?? ''));
+            $descEn = trim((string)($_POST['product_description_en'] ?? ''));
+            $order = (int)($_POST['product_display_order'] ?? 0);
+            $active = isset($_POST['product_is_active']) ? 1 : 0;
+            if ($serviceId <= 0 || $titleNp === '') {
+                $error = 'Product थप्न सेवा र नेपाली शीर्षक अनिवार्य छ।';
+            } elseif ($act === 'product_add') {
+                $db->prepare("INSERT INTO service_products (service_id, title_np, title_en, description_np, description_en, display_order, is_active)
+                              VALUES (?,?,?,?,?,?,?)")
+                    ->execute([$serviceId, $titleNp, $titleEn, $descNp, $descEn, $order, $active]);
+                $success = 'Service product सफलतापूर्वक थपियो।';
+            } else {
+                $db->prepare("UPDATE service_products
+                              SET service_id=?, title_np=?, title_en=?, description_np=?, description_en=?, display_order=?, is_active=?
+                              WHERE id=?")
+                    ->execute([$serviceId, $titleNp, $titleEn, $descNp, $descEn, $order, $active, $pid]);
+                $success = 'Service product सफलतापूर्वक अपडेट भयो।';
+            }
+        } elseif ($act === 'product_delete') {
+            $pid = (int)($_POST['product_id'] ?? 0);
+            if ($pid > 0) {
+                $db->prepare("DELETE FROM service_products WHERE id=?")->execute([$pid]);
+                $success = 'Service product हटाइयो।';
+            }
         }
     } catch (Exception $e) {
         $error = 'त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।';
@@ -66,6 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 try {
     $services = $db->query("SELECT * FROM services ORDER BY display_order, id DESC")->fetchAll();
 } catch (Exception $e) { $services = []; }
+try {
+    $serviceProducts = $db->query("SELECT sp.*, s.title_np AS service_title_np, s.title_en AS service_title_en, s.title AS service_title
+                                   FROM service_products sp
+                                   LEFT JOIN services s ON s.id = sp.service_id
+                                   ORDER BY sp.service_id, sp.display_order, sp.id DESC")->fetchAll();
+} catch (Exception $e) { $serviceProducts = []; }
 
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
@@ -96,6 +133,11 @@ $servicesArch = $svcPart['archived'];
     <li class="nav-item">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#svc-form" id="svc-form-btn">
             <i class="fas fa-plus-circle me-2"></i><span id="svcFormTabLabel">नयाँ थप्नुहोस्</span>
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#svc-products" id="svc-products-btn">
+            <i class="fas fa-list-check me-2"></i><span id="svcProductsTabLabel">Service Products</span>
         </button>
     </li>
 </ul>
@@ -323,6 +365,118 @@ $servicesArch = $svcPart['archived'];
         </div>
     </div>
 
+    <!-- ══ TAB 3: Service Products ══ -->
+    <div class="tab-pane fade" id="svc-products">
+        <div class="card svc-flat-top-card">
+            <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
+                <h5 class="mb-0 fw-bold" id="svcProductFormTitle">
+                    <i class="fas fa-list-check me-2"></i>Service Product थप्नुहोस्
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" id="svcProductForm">
+                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                    <input type="hidden" name="action" id="sp_action" value="product_add">
+                    <input type="hidden" name="product_id" id="sp_id" value="">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-success">Service <span class="text-danger">*</span></label>
+                            <select name="product_service_id" id="sp_service_id" class="form-select admin-fancy-input" required>
+                                <option value="">सेवा छान्नुहोस्...</option>
+                                <?php foreach ($services as $s): ?>
+                                <option value="<?php echo (int)$s['id']; ?>"><?php echo htmlspecialchars($s['title_np'] ?: $s['title']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-success">Product (नेपाली) <span class="text-danger">*</span></label>
+                            <input type="text" name="product_title_np" id="sp_title_np" class="form-control admin-fancy-input" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-success">Product (English)</label>
+                            <input type="text" name="product_title_en" id="sp_title_en" class="form-control admin-fancy-input">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-success">विवरण (नेपाली)</label>
+                            <textarea name="product_description_np" id="sp_desc_np" class="form-control admin-fancy-input" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-success">Description (English)</label>
+                            <textarea name="product_description_en" id="sp_desc_en" class="form-control admin-fancy-input" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label fw-semibold text-success">क्रम</label>
+                            <input type="number" name="product_display_order" id="sp_order" class="form-control admin-fancy-input" value="0" min="0">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end pb-1">
+                            <div class="form-check form-switch fs-5">
+                                <input class="form-check-input" type="checkbox" name="product_is_active" id="sp_active" checked>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3 mt-3">
+                        <button type="submit" id="sp_submit" class="btn btn-success px-4 fw-semibold">
+                            <i class="fas fa-plus-circle me-2"></i>Product थप्नुहोस्
+                        </button>
+                        <button type="button" id="sp_cancel" class="btn btn-outline-secondary px-4">रद्द</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Service</th>
+                                <th>Product</th>
+                                <th>Description</th>
+                                <th class="text-center">क्रम</th>
+                                <th class="text-center">स्थिति</th>
+                                <th class="text-center">कार्य</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($serviceProducts)): ?>
+                            <tr><td colspan="6" class="text-center text-muted py-3">Service products छैनन्।</td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($serviceProducts as $sp): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars(($sp['service_title_np'] ?: $sp['service_title']) ?: '—'); ?></td>
+                                <td>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($sp['title_np']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($sp['title_en'] ?: '—'); ?></small>
+                                </td>
+                                <td><small class="text-muted"><?php echo htmlspecialchars(mb_substr((string)($sp['description_np'] ?: $sp['description_en'] ?: ''), 0, 80)); ?></small></td>
+                                <td class="text-center"><?php echo (int)$sp['display_order']; ?></td>
+                                <td class="text-center"><span class="badge bg-<?php echo (int)$sp['is_active'] ? 'success' : 'secondary'; ?>"><?php echo (int)$sp['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-primary me-1 btn-edit-sp"
+                                            data-id="<?php echo (int)$sp['id']; ?>"
+                                            data-service-id="<?php echo (int)$sp['service_id']; ?>"
+                                            data-title-np="<?php echo htmlspecialchars($sp['title_np'], ENT_QUOTES); ?>"
+                                            data-title-en="<?php echo htmlspecialchars((string)$sp['title_en'], ENT_QUOTES); ?>"
+                                            data-desc-np="<?php echo htmlspecialchars((string)$sp['description_np'], ENT_QUOTES); ?>"
+                                            data-desc-en="<?php echo htmlspecialchars((string)$sp['description_en'], ENT_QUOTES); ?>"
+                                            data-order="<?php echo (int)$sp['display_order']; ?>"
+                                            data-active="<?php echo (int)$sp['is_active']; ?>">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('यो product हटाउने हो?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="product_delete">
+                                        <input type="hidden" name="product_id" value="<?php echo (int)$sp['id']; ?>">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -377,6 +531,42 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('svcFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>सेवा सम्पादन';
             document.getElementById('svcFormTabLabel').textContent = 'सम्पादन';
             switchToForm();
+        });
+    });
+
+    function clearProductForm() {
+        document.getElementById('sp_action').value = 'product_add';
+        document.getElementById('sp_id').value = '';
+        document.getElementById('sp_service_id').value = '';
+        document.getElementById('sp_title_np').value = '';
+        document.getElementById('sp_title_en').value = '';
+        document.getElementById('sp_desc_np').value = '';
+        document.getElementById('sp_desc_en').value = '';
+        document.getElementById('sp_order').value = '0';
+        document.getElementById('sp_active').checked = true;
+        document.getElementById('sp_submit').innerHTML = '<i class="fas fa-plus-circle me-2"></i>Product थप्नुहोस्';
+        document.getElementById('svcProductFormTitle').innerHTML = '<i class="fas fa-list-check me-2"></i>Service Product थप्नुहोस्';
+    }
+    var _spCancel = document.getElementById('sp_cancel');
+    if (_spCancel) _spCancel.addEventListener('click', clearProductForm);
+    document.querySelectorAll('.btn-edit-sp').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var d = this.dataset;
+            document.getElementById('sp_action').value = 'product_edit';
+            document.getElementById('sp_id').value = d.id;
+            document.getElementById('sp_service_id').value = d.serviceId;
+            document.getElementById('sp_title_np').value = d.titleNp || '';
+            document.getElementById('sp_title_en').value = d.titleEn || '';
+            document.getElementById('sp_desc_np').value = d.descNp || '';
+            document.getElementById('sp_desc_en').value = d.descEn || '';
+            document.getElementById('sp_order').value = d.order || '0';
+            document.getElementById('sp_active').checked = d.active === '1';
+            document.getElementById('sp_submit').innerHTML = '<i class="fas fa-save me-2"></i>Product अपडेट';
+            document.getElementById('svcProductFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Service Product सम्पादन';
+            var productsBtn = document.getElementById('svc-products-btn');
+            if (productsBtn) {
+                adminSwitchTab(productsBtn, document.getElementById('svc-list-btn'));
+            }
         });
     });
 });

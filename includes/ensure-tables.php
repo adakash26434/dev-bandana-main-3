@@ -24,6 +24,7 @@ require_once __DIR__ . '/vendors-tables.php';
 require_once __DIR__ . '/careers-tables.php';
 require_once __DIR__ . '/notification-log-tables.php';
 require_once __DIR__ . '/why-choose-tables.php';
+require_once __DIR__ . '/service-products-tables.php';
 
 if (!function_exists('ensurePublicTables')) {
 
@@ -338,6 +339,7 @@ function ensurePublicTables(): void {
         ensureVendorsTables($db);
 
         ensurePartnerFacilitiesTables($db);
+        ensureServiceProductsTables($db);
 
         /* ──────────────────────────────────────────────────
            14. ADMIN USERS (यदि setup भएको छैन भने)
