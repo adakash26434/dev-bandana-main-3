@@ -1,13 +1,6 @@
 <?php
 require_once 'includes/config.php';
 /* Optional includes are guarded so partial deploy won't trigger HTTP 500. */
-$ensureTablesFile = __DIR__ . '/includes/ensure-tables.php';
-if (is_file($ensureTablesFile)) {
-    require_once $ensureTablesFile;
-} else {
-    error_log('loan-apply: missing include file includes/ensure-tables.php');
-}
-
 $kycPublicFormFile = __DIR__ . '/includes/kyc-public-form.php';
 if (is_file($kycPublicFormFile)) {
     require_once $kycPublicFormFile;

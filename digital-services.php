@@ -1,6 +1,5 @@
 <?php
 require_once 'includes/config.php';
-require_once 'includes/ensure-tables.php';
 require_once 'includes/digital-service-requests-tables.php';
 require_once 'includes/kyc-public-form.php';
 $pageTitle = isEnglish() ? 'Digital Service Request' : 'डिजिटल सेवा अनुरोध';

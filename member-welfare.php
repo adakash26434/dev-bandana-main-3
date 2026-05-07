@@ -5,7 +5,6 @@
  * For: Maternity (सुत्केरी), Death (मृत्यु), Insurance (बीमा), Medical (उपचार), Other
  */
 require_once 'includes/config.php';
-require_once 'includes/ensure-tables.php';
 require_once 'includes/welfare-claims-tables.php';
 require_once 'includes/kyc-public-form.php';
 $pageTitle = isEnglish() ? 'Member Welfare Claims' : 'सदस्य कल्याण दाबी';
