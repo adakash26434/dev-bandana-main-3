@@ -660,7 +660,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color:var(--primary-color);opacity:.6;"></i>
             <p class="mb-1 fw-semibold"><?php echo isEnglish() ? 'Click to upload or drag & drop' : 'Click गर्नुहोस् वा तान्नुहोस्'; ?></p>
             <p class="text-muted small mb-2"><?php echo isEnglish() ? 'Citizenship, income proof, collateral documents' : 'नागरिकता, आय प्रमाण, धितो कागजातहरू'; ?></p>
-            <input type="file" name="documents[]" id="docFileInput" class="d-none" multiple accept=".pdf,.jpg,.jpeg,.png,image
+            <input type="file" name="documents[]" id="docFileInput" class="d-none" multiple accept=".pdf,.jpg,.jpeg,.png,image/*">
+            <button type="button" class="btn btn-outline-primary btn-sm px-3" onclick="document.getElementById('docFileInput').click();">
+                <i class="fas fa-folder-open me-1"></i><?php echo isEnglish() ? 'Choose Files' : 'फाइल छान्नुहोस्'; ?>
+            </button>
+            <div id="docFileList" class="mt-3 text-start small"></div>
+            <p class="text-muted small mt-2 mb-0"><?php echo isEnglish() ? 'Max 5MB per file | PDF/JPG/PNG' : 'प्रति फाइल अधिकतम 5MB | PDF/JPG/PNG'; ?></p>
+        </div>
+    </div>
+</div><!-- /loanPane4 -->
+
+<div class="d-flex align-items-center justify-content-between mt-4 loan-wiz-nav">
+    <button type="button" class="btn btn-outline-secondary px-4" id="loanPrevBtn">
+        <i class="fas fa-arrow-left me-1"></i><?php echo isEnglish() ? 'Previous' : 'अघिल्लो'; ?>
+    </button>
+    <div id="loanStepLabel" class="small text-muted fw-semibold"><?php echo isEnglish() ? 'Step 1 of 4' : 'चरण 1 / 4'; ?></div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary px-4" id="loanNextBtn">
+            <?php echo isEnglish() ? 'Next' : 'अर्को'; ?> <i class="fas fa-arrow-right ms-1"></i>
+        </button>
+        <button type="submit" class="btn btn-success px-4" id="loanSubmitBtn" style="display:none;">
+            <i class="fas fa-paper-plane me-1"></i><?php echo isEnglish() ? 'Submit Application' : 'आवेदन पेश गर्नुहोस्'; ?>
+        </button>
+    </div>
+</div>
+
+</form>
+</div><!-- /loan-form-box -->
+</div><!-- /col -->
+</div><!-- /row -->
+
+<style>
 .loan-wizard-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2rem;flex-wrap:wrap;gap:4px;}
 .loan-wiz-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;position:relative;}
 .loan-wiz-circle{width:48px;height:48px;border-radius:50%;border:2.5px solid #d0d0d0;display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:#aaa;background:#fff;transition:all .3s;}
