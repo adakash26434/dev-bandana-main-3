@@ -8022,6 +8022,14 @@ body.chatbot-open {
     background: var(--primary-color);
 }
 
+/* Keep icon visible on hover (prevent category override) */
+.tools-cat-forms .tools-mini-link:hover i,
+.tools-cat-tools .tools-mini-link:hover i,
+.tools-cat-member .tools-mini-link:hover i {
+    background: #fff;
+    color: var(--primary-color);
+}
+
 @media (max-width: 575.98px) {
     .tools-links-grid {
         grid-template-columns: 1fr;
