@@ -298,48 +298,37 @@ if ($db instanceof PDO) {
             <h2><?php echo isEnglish() ? 'Digital Services' : 'अन्य डिजिटल सेवाहरू'; ?></h2>
             <p><?php echo isEnglish() ? 'Quick access to our online services' : 'हाम्रा अनलाइन सेवाहरूमा द्रुत पहुँच'; ?></p>
         </div>
-        <div class="tools-accordion" id="digitalServicesAccordion">
-            <div class="tools-accordion-item" data-aos="fade-up" data-aos-delay="0">
-                <button class="tools-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#toolsForms" aria-expanded="true" aria-controls="toolsForms">
-                    <span><i class="fas fa-file-signature me-2"></i><?php echo isEnglish() ? 'Online Forms' : 'अनलाइन फारमहरू'; ?></span>
-                    <i class="fas fa-chevron-down tools-acc-icon"></i>
-                </button>
-                <div id="toolsForms" class="collapse show tools-accordion-panel" data-bs-parent="#digitalServicesAccordion">
-                    <div class="row g-3">
-                        <div class="col-lg-3 col-md-4 col-6"><a href="online-kyc.php" class="tool-widget-card d-block highlight-widget"><div class="widget-icon"><i class="fas fa-user-check"></i></div><h5><?php echo isEnglish() ? 'Online KYC' : 'अनलाइन केवाइसी'; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="loan-apply.php" class="tool-widget-card d-block highlight-widget"><div class="widget-icon"><i class="fas fa-hand-holding-usd"></i></div><h5><?php echo isEnglish() ? 'Apply Loan' : 'ऋण आवेदन'; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="online-account.php" class="tool-widget-card highlight-widget d-block"><div class="widget-icon"><i class="fas fa-user-plus"></i></div><h5><?php echo isEnglish() ? 'Open Account' : 'खाता खोल्नुहोस्'; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="appointment.php" class="tool-widget-card highlight-widget d-block"><div class="widget-icon"><i class="fas fa-calendar-check"></i></div><h5><?php echo isEnglish() ? 'Book Appointment' : 'भेटघाट बुक'; ?></h5></a></div>
+        <div class="row g-3">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="tools-category-card tools-cat-forms">
+                    <h5><i class="fas fa-file-signature me-2"></i><?php echo isEnglish() ? 'Online Forms' : 'अनलाइन फारमहरू'; ?></h5>
+                    <div class="tools-links-grid">
+                        <a href="online-kyc.php" class="tools-mini-link"><i class="fas fa-user-check"></i><span><?php echo isEnglish() ? 'Online KYC' : 'अनलाइन केवाइसी'; ?></span></a>
+                        <a href="loan-apply.php" class="tools-mini-link"><i class="fas fa-hand-holding-usd"></i><span><?php echo isEnglish() ? 'Apply Loan' : 'ऋण आवेदन'; ?></span></a>
+                        <a href="online-account.php" class="tools-mini-link"><i class="fas fa-user-plus"></i><span><?php echo isEnglish() ? 'Open Account' : 'खाता खोल्नुहोस्'; ?></span></a>
+                        <a href="appointment.php" class="tools-mini-link"><i class="fas fa-calendar-check"></i><span><?php echo isEnglish() ? 'Book Appointment' : 'भेटघाट बुक'; ?></span></a>
                     </div>
                 </div>
             </div>
-
-            <div class="tools-accordion-item" data-aos="fade-up" data-aos-delay="80">
-                <button class="tools-accordion-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#toolsCalc" aria-expanded="false" aria-controls="toolsCalc">
-                    <span><i class="fas fa-calculator me-2"></i><?php echo isEnglish() ? 'Tools / Calculator' : 'टुल्स / क्याल्कुलेटर'; ?></span>
-                    <i class="fas fa-chevron-down tools-acc-icon"></i>
-                </button>
-                <div id="toolsCalc" class="collapse tools-accordion-panel" data-bs-parent="#digitalServicesAccordion">
-                    <div class="row g-3">
-                        <div class="col-lg-3 col-md-4 col-6"><a href="emi-calculator.php" class="tool-widget-card d-block"><div class="widget-icon"><i class="fas fa-calculator"></i></div><h5><?php echo $L['emi_calculator']; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="exchange-rate.php" class="tool-widget-card d-block"><div class="widget-icon"><i class="fas fa-exchange-alt"></i></div><h5><?php echo $L['exchange_rate']; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="date-converter.php" class="tool-widget-card d-block"><div class="widget-icon"><i class="fas fa-calendar-alt"></i></div><h5><?php echo $L['date_converter']; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="downloads.php" class="tool-widget-card d-block"><div class="widget-icon"><i class="fas fa-download"></i></div><h5><?php echo $L['downloads']; ?></h5></a></div>
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="80">
+                <div class="tools-category-card tools-cat-tools">
+                    <h5><i class="fas fa-calculator me-2"></i><?php echo isEnglish() ? 'Tools / Calculator' : 'टुल्स / क्याल्कुलेटर'; ?></h5>
+                    <div class="tools-links-grid">
+                        <a href="emi-calculator.php" class="tools-mini-link"><i class="fas fa-calculator"></i><span><?php echo $L['emi_calculator']; ?></span></a>
+                        <a href="exchange-rate.php" class="tools-mini-link"><i class="fas fa-exchange-alt"></i><span><?php echo $L['exchange_rate']; ?></span></a>
+                        <a href="date-converter.php" class="tools-mini-link"><i class="fas fa-calendar-alt"></i><span><?php echo $L['date_converter']; ?></span></a>
+                        <a href="downloads.php" class="tools-mini-link"><i class="fas fa-download"></i><span><?php echo $L['downloads']; ?></span></a>
                     </div>
                 </div>
             </div>
-
-            <div class="tools-accordion-item" data-aos="fade-up" data-aos-delay="160">
-                <button class="tools-accordion-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#toolsMember" aria-expanded="false" aria-controls="toolsMember">
-                    <span><i class="fas fa-hands-helping me-2"></i><?php echo isEnglish() ? 'Member Services' : 'सदस्य सेवा / सहायता'; ?></span>
-                    <i class="fas fa-chevron-down tools-acc-icon"></i>
-                </button>
-                <div id="toolsMember" class="collapse tools-accordion-panel" data-bs-parent="#digitalServicesAccordion">
-                    <div class="row g-3">
-                        <div class="col-lg-3 col-md-4 col-6"><a href="digital-services.php" class="tool-widget-card highlight-widget d-block" style="--highlight-color: #0d6efd;"><div class="widget-icon"><i class="fas fa-mobile-screen-button"></i></div><h5><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="member-welfare.php" class="tool-widget-card highlight-widget d-block" style="--highlight-color: #e91e63;"><div class="widget-icon"><i class="fas fa-hand-holding-heart"></i></div><h5><?php echo isEnglish() ? 'Member Welfare' : 'सदस्य सुविधा'; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="grievance.php" class="tool-widget-card highlight-widget d-block"><div class="widget-icon"><i class="fas fa-exclamation-circle"></i></div><h5><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></h5></a></div>
-                        <div class="col-lg-3 col-md-4 col-6"><a href="auction.php" class="tool-widget-card highlight-widget d-block"><div class="widget-icon"><i class="fas fa-gavel"></i></div><h5><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></h5></a></div>
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="160">
+                <div class="tools-category-card tools-cat-member">
+                    <h5><i class="fas fa-hands-helping me-2"></i><?php echo isEnglish() ? 'Member Services' : 'सदस्य सेवा / सहायता'; ?></h5>
+                    <div class="tools-links-grid">
+                        <a href="digital-services.php" class="tools-mini-link"><i class="fas fa-mobile-screen-button"></i><span><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></span></a>
+                        <a href="member-welfare.php" class="tools-mini-link"><i class="fas fa-hand-holding-heart"></i><span><?php echo isEnglish() ? 'Member Welfare' : 'सदस्य सुविधा'; ?></span></a>
+                        <a href="grievance.php" class="tools-mini-link"><i class="fas fa-exclamation-circle"></i><span><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></span></a>
+                        <a href="auction.php" class="tools-mini-link"><i class="fas fa-gavel"></i><span><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span></a>
                     </div>
                 </div>
             </div>
