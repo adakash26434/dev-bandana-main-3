@@ -791,6 +791,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 })();
 </script>
+<?php endif; ?>
 
 <?php if (!$success && !empty($oldInput)): ?>
 <script>
