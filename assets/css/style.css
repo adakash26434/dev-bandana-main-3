@@ -9647,11 +9647,31 @@ input[readonly].nepali-datepicker:hover,
 
 .profile-title-link {
     text-decoration: none;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 22px;
+    font-size: 0.92rem;
+    transition: all 0.28s ease;
 }
 
 .profile-title-link:hover {
     color: var(--white);
-    opacity: 0.92;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.45);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.profile-title-link i {
+    color: #8fd36b;
+    font-size: 1rem;
+    transition: transform 0.28s ease, color 0.28s ease;
+}
+
+.profile-title-link:hover i {
+    color: #b4ef8f;
+    transform: rotate(-8deg) scale(1.04);
 }
 
 .profile-title i {
