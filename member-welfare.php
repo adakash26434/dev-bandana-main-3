@@ -537,6 +537,76 @@ $claimTypes = [
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Death Certificate' : 'मृत्यु प्रमाणपत्र'; ?></label>
                                     <input type="file" name="death_certificate" class="form-control" accept="image/*,.pdf">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medical Fields -->
+                        <div class="form-section type-fields" id="medical-fields" style="display:none;">
+                            <h5><i class="fas fa-notes-medical"></i> <?php echo isEnglish() ? 'Medical Claim Details' : 'उपचार दाबी विवरण'; ?></h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Disease / Illness' : 'रोग / समस्या'; ?></label>
+                                    <input type="text" name="disease_illness" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Treatment Date' : 'उपचार मिति'; ?></label>
+                                    <input type="date" name="treatment_date" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Hospital / Clinic' : 'अस्पताल / क्लिनिक'; ?></label>
+                                    <input type="text" name="hospital_clinic" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Common Claim Details -->
+                        <div class="form-section" id="beneficiary-fields" style="display:none;">
+                            <h5><i class="fas fa-user-friends"></i> <?php echo isEnglish() ? 'Beneficiary Details' : 'लाभग्राही विवरण'; ?></h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Beneficiary Name' : 'लाभग्राही नाम'; ?></label>
+                                    <input type="text" name="beneficiary_name" class="form-control" value="<?php echo e($_POST['beneficiary_name'] ?? ''); ?>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Relation' : 'नाता'; ?></label>
+                                    <input type="text" name="beneficiary_relation" class="form-control" value="<?php echo e($_POST['beneficiary_relation'] ?? ''); ?>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5><i class="fas fa-file-invoice-dollar"></i> <?php echo isEnglish() ? 'Claim Summary' : 'दाबी सारांश'; ?></h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Claim Amount (Rs.)' : 'दाबी रकम (रु.)'; ?></label>
+                                    <input type="number" name="claim_amount" class="form-control" min="0" step="0.01" value="<?php echo e($_POST['claim_amount'] ?? ''); ?>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Supporting Documents' : 'सहयोगी कागजात'; ?></label>
+                                    <input type="file" name="documents[]" class="form-control" multiple accept="image/*,.pdf,.doc,.docx">
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label"><?php echo isEnglish() ? 'Description' : 'विवरण'; ?></label>
+                                    <textarea name="description" class="form-control" rows="3"><?php echo e($_POST['description'] ?? ''); ?></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i><?php echo isEnglish() ? 'Submit Claim' : 'दाबी पेश गर्नुहोस्'; ?>
+                            </button>
+                            <div class="form-submit-hint"><?php echo isEnglish() ? 'You will receive a tracking ID after submission.' : 'पेश गरेपछि Tracking ID प्राप्त हुन्छ।'; ?></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
 .claim-types-sidebar {
     background: #fff;
     border-radius: 15px;
