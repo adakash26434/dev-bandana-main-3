@@ -8667,23 +8667,32 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .institutional-stats-section .ip-card-header {
-    padding: 9px 14px !important;
-    min-height: 42px;
+    padding: 7px 12px !important;
+    min-height: 36px;
 }
 
 .institutional-stats-section .ip-fy-badge {
-    font-size: 0.9rem !important;
+    font-size: 0.84rem !important;
     font-weight: 700;
     line-height: 1.1;
 }
 
+.institutional-stats-section .ip-fy-badge i {
+    display: none !important;
+}
+
+.institutional-stats-section .ip-stat-teal .ip-stat-icon,
+.institutional-stats-section .ip-stat-warning .ip-stat-icon {
+    display: none !important;
+}
+
 .institutional-stats-section .ip-date-info {
-    font-size: 0.72rem !important;
+    font-size: 0.68rem !important;
 }
 
 .institutional-stats-section .home-ip-btn.btn-sm {
-    padding: 3px 8px !important;
-    font-size: 0.72rem !important;
+    padding: 2px 7px !important;
+    font-size: 0.68rem !important;
     line-height: 1.2;
 }
 
