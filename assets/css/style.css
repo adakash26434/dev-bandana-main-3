@@ -7995,7 +7995,7 @@ body.chatbot-open {
 
 /* Homepage: keep key section titles visually consistent */
 .section-header.section-header-unified h2 {
-    font-size: clamp(1.85rem, 3.2vw, 3rem);
+    font-size: clamp(1.55rem, 2.5vw, 2.25rem);
     font-weight: 800;
     line-height: 1.2;
     letter-spacing: -0.01em;

@@ -228,6 +228,7 @@ if ($db instanceof PDO) {
     <div class="container">
         <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Our Services' : 'हामीले प्रदान गर्ने सेवाहरू'; ?></h2>
+            <div class="section-divider"></div>
             <p><?php echo isEnglish() ? 'We provide various financial services' : 'हामी विभिन्न वित्तीय सेवाहरू प्रदान गर्दछौं'; ?></p>
         </div>
 
@@ -296,6 +297,7 @@ if ($db instanceof PDO) {
     <div class="container">
         <div class="section-header section-header-unified text-center mb-4" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Digital Services' : 'अन्य डिजिटल सेवाहरू'; ?></h2>
+            <div class="section-divider"></div>
             <p><?php echo isEnglish() ? 'Quick access to our online services' : 'हाम्रा अनलाइन सेवाहरूमा द्रुत पहुँच'; ?></p>
         </div>
         <div class="row g-3">
@@ -478,6 +480,7 @@ if (empty($whyFeatures)) {
     <div class="container">
         <div class="section-header section-header-unified text-center" data-aos="fade-up">
             <h2><?php echo isEnglish() ? 'Why Choose Us?' : 'किन हामीलाई छान्ने?'; ?></h2>
+            <div class="section-divider"></div>
             <p><?php echo isEnglish() ? 'Reasons to choose our cooperative' : 'हाम्रो संस्था छान्नुको कारणहरू'; ?></p>
         </div>
         <div class="row">
