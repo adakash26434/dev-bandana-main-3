@@ -1,7 +1,19 @@
 <?php
 require_once 'includes/config.php';
-require_once 'includes/ensure-tables.php';
-require_once 'includes/kyc-public-form.php';
+/* Optional includes are guarded so partial deploy won't trigger HTTP 500. */
+$ensureTablesFile = __DIR__ . '/includes/ensure-tables.php';
+if (is_file($ensureTablesFile)) {
+    require_once $ensureTablesFile;
+} else {
+    error_log('loan-apply: missing include file includes/ensure-tables.php');
+}
+
+$kycPublicFormFile = __DIR__ . '/includes/kyc-public-form.php';
+if (is_file($kycPublicFormFile)) {
+    require_once $kycPublicFormFile;
+} else {
+    error_log('loan-apply: missing include file includes/kyc-public-form.php');
+}
 $pageTitle = isEnglish() ? 'Online Loan Application' : 'अनलाइन ऋण आवेदन';
 require_once 'includes/header.php';
 $L = getLangStrings();
@@ -79,7 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $isCoopMember = $loggedMember ? 'yes' : ((($_POST['is_coop_member'] ?? '') === 'yes') ? 'yes' : 'no');
             $kycMerge = null;
             if ($loggedMember) {
-                $kycMerge = loadKycRowForLoggedMemberPublic($db, $loggedMember);
+                if (function_exists('loadKycRowForLoggedMemberPublic')) {
+                    $kycMerge = loadKycRowForLoggedMemberPublic($db, $loggedMember);
+                }
                 $fnK = (is_array($kycMerge) && !empty($kycMerge['full_name'])) ? trim((string)$kycMerge['full_name']) : '';
                 $full_name = $fnK !== '' ? $fnK : trim((string)($loggedMember['name'] ?? $full_name));
                 $midCol = is_array($kycMerge)
@@ -99,22 +113,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             } elseif ($isCoopMember === 'yes') {
-                $v = verifyPublicFormKycByMemberId($db, $_POST['member_id'] ?? '');
-                if (!$v['ok']) {
-                    $error = isEnglish() ? $v['msg_en'] : $v['msg_np'];
+                if (!function_exists('verifyPublicFormKycByMemberId')) {
+                    $error = isEnglish()
+                        ? 'KYC verification service is temporarily unavailable. Please try again.'
+                        : 'KYC प्रमाणीकरण सेवा हाल उपलब्ध छैन। कृपया पुनः प्रयास गर्नुहोस्।';
                 } else {
-                    $kycMerge = $v['row'];
-                    $full_name = trim((string)($kycMerge['full_name'] ?? ''));
-                    $member_id = strtoupper(trim((string)($kycMerge['member_id'] ?? $kycMerge['sadasyata_number'] ?? $_POST['member_id'] ?? '')));
-                    $mobile = preg_replace('/[^0-9]/', '', (string)($kycMerge['mobile'] ?? $_POST['mobile'] ?? ''));
-                    $email = strtolower(trim((string)($kycMerge['email'] ?? $_POST['email'] ?? '')));
-                    if ($address === '') {
-                        $pa = trim((string)($kycMerge['permanent_address'] ?? ''));
-                        $ta = trim((string)($kycMerge['temporary_address'] ?? ''));
-                        $address = $ta !== '' ? ($pa !== '' ? $pa . ' / ' . $ta : $ta) : $pa;
-                    }
-                    if ($citizenship_no === '') {
-                        $citizenship_no = trim((string)($kycMerge['citizenship_no'] ?? ''));
+                    $v = verifyPublicFormKycByMemberId($db, $_POST['member_id'] ?? '');
+                    if (!$v['ok']) {
+                        $error = isEnglish() ? $v['msg_en'] : $v['msg_np'];
+                    } else {
+                        $kycMerge = $v['row'];
+                        $full_name = trim((string)($kycMerge['full_name'] ?? ''));
+                        $member_id = strtoupper(trim((string)($kycMerge['member_id'] ?? $kycMerge['sadasyata_number'] ?? $_POST['member_id'] ?? '')));
+                        $mobile = preg_replace('/[^0-9]/', '', (string)($kycMerge['mobile'] ?? $_POST['mobile'] ?? ''));
+                        $email = strtolower(trim((string)($kycMerge['email'] ?? $_POST['email'] ?? '')));
+                        if ($address === '') {
+                            $pa = trim((string)($kycMerge['permanent_address'] ?? ''));
+                            $ta = trim((string)($kycMerge['temporary_address'] ?? ''));
+                            $address = $ta !== '' ? ($pa !== '' ? $pa . ' / ' . $ta : $ta) : $pa;
+                        }
+                        if ($citizenship_no === '') {
+                            $citizenship_no = trim((string)($kycMerge['citizenship_no'] ?? ''));
+                        }
                     }
                 }
             }
