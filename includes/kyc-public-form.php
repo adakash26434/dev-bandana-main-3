@@ -11,7 +11,7 @@ if (!function_exists('kycApplicationsMemberIdColumnPublic')) {
             try {
                 $cc = $db->query('SHOW COLUMNS FROM kyc_applications LIKE ' . $db->quote($c));
                 if ($cc && $cc->fetch(PDO::FETCH_ASSOC)) return $c;
-            } catch (Throwable $ignored) {
+            } catch (Exception $ignored) {
             }
         }
         return '';
@@ -46,7 +46,7 @@ if (!function_exists('verifyPublicFormKycByMemberId')) {
             if ($row) return ['ok' => true, 'row' => $row, 'msg_np' => '', 'msg_en' => ''];
 
             return $fail('यो सदस्यता नम्बरको KYC रेकर्ड भेटिएन।', 'No KYC record found for this Member ID.');
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             error_log('verifyPublicFormKycByMemberId: ' . $e->getMessage());
             return $fail('KYC जाँच गर्दा त्रुटि भयो।', 'Could not verify against KYC.');
         }
@@ -94,7 +94,7 @@ if (!function_exists('loadKycRowForLoggedMemberPublic')) {
                 $row = $k->fetch(PDO::FETCH_ASSOC);
                 if ($row) return $row;
             }
-        } catch (Throwable $ignored) {
+        } catch (Exception $ignored) {
         }
 
         $memId = trim((string)(isset($loggedMember['sadasyata_number']) ? $loggedMember['sadasyata_number'] : ''));

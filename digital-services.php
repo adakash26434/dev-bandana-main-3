@@ -1,7 +1,10 @@
 <?php
 require_once 'includes/config.php';
 require_once 'includes/digital-service-requests-tables.php';
-require_once 'includes/kyc-public-form.php';
+$kycPublicFormFile = __DIR__ . '/includes/kyc-public-form.php';
+if (is_file($kycPublicFormFile)) {
+    require_once $kycPublicFormFile;
+}
 $pageTitle = isEnglish() ? 'Digital Service Request' : 'डिजिटल सेवा अनुरोध';
 
 $success    = false;
@@ -29,7 +32,7 @@ $db = null;
 try {
     $db = getDB();
     ensureDigitalServiceRequestsTables($db);
-} catch (Throwable $e) {
+} catch (Exception $e) {
 }
 
 /* =============================================
@@ -62,7 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $isCoopMember = $loggedMember ? 'yes' : ((($_POST['is_coop_member'] ?? '') === 'yes') ? 'yes' : 'no');
         $kycMerge = null;
         if ($loggedMember) {
-            $kycMerge = loadKycRowForLoggedMemberPublic($db, $loggedMember);
+            if (function_exists('loadKycRowForLoggedMemberPublic')) {
+                $kycMerge = loadKycRowForLoggedMemberPublic($db, $loggedMember);
+            }
             if (!$kycMerge || strtolower(trim((string)($kycMerge['status'] ?? ''))) !== 'approved') {
                 $error = isEnglish() ? 'KYC verification is required for digital services.' : 'डिजिटल सेवा प्रयोग गर्न KYC verified (approved) हुनुपर्छ।';
             }
@@ -73,15 +78,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $phone = preg_replace('/[^0-9]/', '', (string)($kycMerge['mobile'] ?? $loggedMember['phone'] ?? $phone));
             $email = strtolower(trim((string)($kycMerge['email'] ?? $loggedMember['email'] ?? $email)));
         } elseif ($isCoopMember === 'yes') {
-            $v = verifyPublicFormKycApprovedByMemberId($db, $_POST['member_id'] ?? '');
-            if (!$v['ok']) {
-                $error = isEnglish() ? $v['msg_en'] : $v['msg_np'];
+            if (!function_exists('verifyPublicFormKycApprovedByMemberId')) {
+                $error = isEnglish()
+                    ? 'KYC verification service is temporarily unavailable. Please try again.'
+                    : 'KYC प्रमाणीकरण सेवा हाल उपलब्ध छैन। कृपया पुनः प्रयास गर्नुहोस्।';
             } else {
-                $kycMerge = $v['row'];
-                $requesterName = trim((string)($kycMerge['full_name'] ?? ''));
-                $memberId = strtoupper(trim((string)($kycMerge['member_id'] ?? $_POST['member_id'] ?? '')));
-                $phone = preg_replace('/[^0-9]/', '', (string)($kycMerge['mobile'] ?? $_POST['phone'] ?? ''));
-                $email = strtolower(trim((string)($kycMerge['email'] ?? $_POST['email'] ?? '')));
+                $v = verifyPublicFormKycApprovedByMemberId($db, $_POST['member_id'] ?? '');
+                if (!$v['ok']) {
+                    $error = isEnglish() ? $v['msg_en'] : $v['msg_np'];
+                } else {
+                    $kycMerge = $v['row'];
+                    $requesterName = trim((string)($kycMerge['full_name'] ?? ''));
+                    $memberId = strtoupper(trim((string)($kycMerge['member_id'] ?? $_POST['member_id'] ?? '')));
+                    $phone = preg_replace('/[^0-9]/', '', (string)($kycMerge['mobile'] ?? $_POST['phone'] ?? ''));
+                    $email = strtolower(trim((string)($kycMerge['email'] ?? $_POST['email'] ?? '')));
+                }
             }
         }
 

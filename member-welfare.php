@@ -6,14 +6,17 @@
  */
 require_once 'includes/config.php';
 require_once 'includes/welfare-claims-tables.php';
-require_once 'includes/kyc-public-form.php';
+$kycPublicFormFile = __DIR__ . '/includes/kyc-public-form.php';
+if (is_file($kycPublicFormFile)) {
+    require_once $kycPublicFormFile;
+}
 $pageTitle = isEnglish() ? 'Member Welfare Claims' : 'सदस्य कल्याण दाबी';
 require_once 'includes/header.php';
 $L = getLangStrings();
 
 try {
     ensureWelfareClaimsTables(getDB());
-} catch (Throwable $e) {
+} catch (Exception $e) {
 }
 
 $success = false;
@@ -72,7 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $isCoopMember = $loggedMember ? 'yes' : ((($_POST['is_coop_member'] ?? '') === 'yes') ? 'yes' : 'no');
         $kycMerge = null;
         if ($loggedMember) {
-            $kycMerge = loadKycRowForLoggedMemberPublic($db, $loggedMember);
+            if (function_exists('loadKycRowForLoggedMemberPublic')) {
+                $kycMerge = loadKycRowForLoggedMemberPublic($db, $loggedMember);
+            }
             $fnK = (is_array($kycMerge) && !empty($kycMerge['full_name'])) ? trim((string)$kycMerge['full_name']) : '';
             $member_name = $fnK !== '' ? $fnK : trim((string)($loggedMember['name'] ?? $member_name));
             $midK = (is_array($kycMerge) && !empty($kycMerge['member_id'])) ? trim((string)$kycMerge['member_id']) : '';
@@ -85,19 +90,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $address = $ta !== '' ? ($pa !== '' ? $pa . ' / ' . $ta : $ta) : $pa;
             }
         } elseif ($isCoopMember === 'yes') {
-            $v = verifyPublicFormKycApprovedByMemberId($db, $_POST['member_id'] ?? '');
-            if (!$v['ok']) {
-                $error = isEnglish() ? $v['msg_en'] : $v['msg_np'];
+            if (!function_exists('verifyPublicFormKycApprovedByMemberId')) {
+                $error = isEnglish()
+                    ? 'KYC verification service is temporarily unavailable. Please try again.'
+                    : 'KYC प्रमाणीकरण सेवा हाल उपलब्ध छैन। कृपया पुनः प्रयास गर्नुहोस्।';
             } else {
-                $kycMerge = $v['row'];
-                $member_name = trim((string)($kycMerge['full_name'] ?? ''));
-                $member_id = strtoupper(trim((string)($kycMerge['member_id'] ?? $_POST['member_id'] ?? '')));
-                $phone = preg_replace('/[^0-9]/', '', (string)($kycMerge['mobile'] ?? $_POST['phone'] ?? ''));
-                $email = strtolower(trim((string)($kycMerge['email'] ?? $_POST['email'] ?? '')));
-                if ($address === '') {
-                    $pa = trim((string)($kycMerge['permanent_address'] ?? ''));
-                    $ta = trim((string)($kycMerge['temporary_address'] ?? ''));
-                    $address = $ta !== '' ? ($pa !== '' ? $pa . ' / ' . $ta : $ta) : $pa;
+                $v = verifyPublicFormKycApprovedByMemberId($db, $_POST['member_id'] ?? '');
+                if (!$v['ok']) {
+                    $error = isEnglish() ? $v['msg_en'] : $v['msg_np'];
+                } else {
+                    $kycMerge = $v['row'];
+                    $member_name = trim((string)($kycMerge['full_name'] ?? ''));
+                    $member_id = strtoupper(trim((string)($kycMerge['member_id'] ?? $_POST['member_id'] ?? '')));
+                    $phone = preg_replace('/[^0-9]/', '', (string)($kycMerge['mobile'] ?? $_POST['phone'] ?? ''));
+                    $email = strtolower(trim((string)($kycMerge['email'] ?? $_POST['email'] ?? '')));
+                    if ($address === '') {
+                        $pa = trim((string)($kycMerge['permanent_address'] ?? ''));
+                        $ta = trim((string)($kycMerge['temporary_address'] ?? ''));
+                        $address = $ta !== '' ? ($pa !== '' ? $pa . ' / ' . $ta : $ta) : $pa;
+                    }
                 }
             }
         }
