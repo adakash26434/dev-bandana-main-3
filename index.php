@@ -304,6 +304,7 @@ if ($db instanceof PDO) {
                             <i class="fas fa-exchange-alt"></i>
                             <span><?php echo $L['exchange_rate']; ?></span>
                             <small class="tools-mini-more"><?php echo isEnglish() ? 'More details' : 'थप विवरण'; ?></small>
+                            <small class="tools-link-badge"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></small>
                         </a>
                         <a href="date-converter.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="140">
                             <i class="fas fa-calendar-alt"></i>
@@ -314,6 +315,7 @@ if ($db instanceof PDO) {
                             <i class="fas fa-download"></i>
                             <span><?php echo $L['downloads']; ?></span>
                             <small class="tools-mini-more"><?php echo isEnglish() ? 'More details' : 'थप विवरण'; ?></small>
+                            <small class="tools-link-badge"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></small>
                         </a>
                     </div>
                 </div>
@@ -732,7 +734,7 @@ if ($db instanceof PDO) {
 $appFeatures = [];
 if ($db instanceof PDO) {
     try {
-        $appFeatures = $db->query("SELECT * FROM app_features WHERE is_active = 1 ORDER BY sort_order ASC LIMIT 8")->fetchAll();
+        $appFeatures = $db->query("SELECT * FROM app_features WHERE is_active = 1 ORDER BY sort_order ASC LIMIT 24")->fetchAll();
     } catch (Throwable $e) {
         $appFeatures = [];
     }
@@ -765,8 +767,10 @@ if (empty($appFeatures)) {
         <div class="app-features-grid" data-aos="fade-up" data-aos-delay="100" id="appFeaturesGrid">
             <?php
             $totalFeatures = count($appFeatures);
-            $showInitially = 4;
+            $showInitially = 6;
             foreach ($appFeatures as $index => $feature):
+                $featureTitle = isEnglish() ? ($feature['title'] ?? $feature['title_np']) : ($feature['title_np'] ?? $feature['title']);
+                $featureDescription = isEnglish() ? ($feature['description'] ?? $feature['description_np'] ?? '') : ($feature['description_np'] ?? $feature['description'] ?? '');
             ?>
             <div class="app-feature-item <?php echo ($feature['is_new'] ?? 0) ? 'has-new-badge' : ''; ?> <?php echo ($index >= $showInitially) ? 'hidden-feature' : ''; ?>" data-feature-index="<?php echo $index; ?>">
                 <?php if ($feature['is_new'] ?? 0): ?>
@@ -775,7 +779,13 @@ if (empty($appFeatures)) {
                 <div class="feature-icon-wrap">
                     <i class="<?php echo $feature['icon']; ?>"></i>
                 </div>
-                <h5><?php echo isEnglish() ? ($feature['title'] ?? $feature['title_np']) : ($feature['title_np'] ?? $feature['title']); ?></h5>
+                <h5><?php echo htmlspecialchars((string)$featureTitle); ?></h5>
+                <?php if (!empty(trim((string)$featureDescription))): ?>
+                    <details class="app-feature-details">
+                        <summary><?php echo isEnglish() ? 'Full Details' : 'पूर्ण विवरण'; ?></summary>
+                        <div class="app-feature-details-body"><?php echo nl2br(htmlspecialchars((string)$featureDescription)); ?></div>
+                    </details>
+                <?php endif; ?>
             </div>
             <?php endforeach; ?>
         </div>
