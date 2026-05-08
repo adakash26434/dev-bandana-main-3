@@ -7835,6 +7835,12 @@ body.chatbot-open {
     height: 100%;
     box-shadow: 0 4px 14px rgba(0,0,0,.06);
     overflow: hidden;
+    transition: transform .28s ease, box-shadow .28s ease;
+}
+
+.tools-category-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(0,0,0,.14);
 }
 
 .tools-category-card h5 {
@@ -7852,6 +7858,11 @@ body.chatbot-open {
     gap: 8px;
     position: relative;
     overflow: hidden;
+}
+
+.tools-category-card:hover h5 {
+    animation-play-state: paused;
+    filter: brightness(1.05);
 }
 
 .tools-category-card h5 i {
@@ -9653,6 +9664,9 @@ input[readonly].nepali-datepicker:hover,
     border-radius: 22px;
     font-size: 0.92rem;
     transition: all 0.28s ease;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
 }
 
 .profile-title-link:hover {
@@ -9711,6 +9725,19 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .report-quick-link .latest-badge {
+    position: absolute;
+    top: -8px;
+    right: -5px;
+    background: #ff4757;
+    color: var(--white);
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+.profile-title-link .latest-badge {
     position: absolute;
     top: -8px;
     right: -5px;

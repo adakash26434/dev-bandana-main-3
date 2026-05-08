@@ -112,6 +112,7 @@ $L = getLangStrings();
 // Get latest reports and institutional profile - with safe table checks
 $latestMonthlyReport = null;
 $latestAnnualReport = null;
+$hasInstitutionalProfile = false;
 if ($db instanceof PDO) {
     try {
         // Check if reports table exists
@@ -128,9 +129,19 @@ if ($db instanceof PDO) {
             }
         }
 
+        // Institutional profile availability (badge like monthly/annual)
+        $profileCheck = $db->query("SHOW TABLES LIKE 'institutional_profile'");
+        if ($profileCheck && $profileCheck->fetch() !== false) {
+            $profileStmt = $db->query("SELECT id FROM institutional_profile WHERE is_active = 1 ORDER BY fiscal_year DESC, id DESC LIMIT 1");
+            if ($profileStmt && $profileStmt->fetch()) {
+                $hasInstitutionalProfile = true;
+            }
+        }
+
     } catch (Throwable $e) {
         // Tables may not exist - use defaults
         $latestMonthlyReport = $latestAnnualReport = null;
+        $hasInstitutionalProfile = false;
     }
 }
 ?>
@@ -141,6 +152,9 @@ if ($db instanceof PDO) {
             <a href="institutional-profile.php" class="profile-title profile-title-link">
                 <i class="fas fa-university"></i>
                 <span><?php echo isEnglish() ? 'Institutional Profile' : 'संस्थागत प्रोफाइल'; ?></span>
+                <?php if ($hasInstitutionalProfile): ?>
+                    <small class="latest-badge"><?php echo isEnglish() ? 'Latest' : 'नयाँ'; ?></small>
+                <?php endif; ?>
             </a>
             <div class="profile-reports">
                 <a href="reports.php?type=monthly" class="report-quick-link monthly">
@@ -252,34 +266,34 @@ if ($db instanceof PDO) {
         <div class="row g-3">
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
                 <div class="tools-category-card tools-cat-forms">
-                    <h5><i class="fas fa-file-signature me-2"></i><?php echo isEnglish() ? 'Online Forms' : 'अनलाइन फारमहरू'; ?></h5>
+                    <h5 data-aos="fade-up"><i class="fas fa-file-signature me-2"></i><?php echo isEnglish() ? 'Online Forms' : 'अनलाइन फारमहरू'; ?></h5>
                     <div class="tools-links-grid">
-                        <a href="online-kyc.php" class="tools-mini-link"><i class="fas fa-user-check"></i><span><?php echo isEnglish() ? 'Online KYC' : 'अनलाइन केवाइसी'; ?></span></a>
-                        <a href="loan-apply.php" class="tools-mini-link"><i class="fas fa-hand-holding-usd"></i><span><?php echo isEnglish() ? 'Apply Loan' : 'ऋण आवेदन'; ?></span></a>
-                        <a href="online-account.php" class="tools-mini-link"><i class="fas fa-user-plus"></i><span><?php echo isEnglish() ? 'Open Account' : 'खाता खोल्नुहोस्'; ?></span></a>
-                        <a href="appointment.php" class="tools-mini-link"><i class="fas fa-calendar-check"></i><span><?php echo isEnglish() ? 'Book Appointment' : 'भेटघाट बुक'; ?></span></a>
+                        <a href="online-kyc.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="40"><i class="fas fa-user-check"></i><span><?php echo isEnglish() ? 'Online KYC' : 'अनलाइन केवाइसी'; ?></span></a>
+                        <a href="loan-apply.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="90"><i class="fas fa-hand-holding-usd"></i><span><?php echo isEnglish() ? 'Apply Loan' : 'ऋण आवेदन'; ?></span></a>
+                        <a href="online-account.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="140"><i class="fas fa-user-plus"></i><span><?php echo isEnglish() ? 'Open Account' : 'खाता खोल्नुहोस्'; ?></span></a>
+                        <a href="appointment.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="190"><i class="fas fa-calendar-check"></i><span><?php echo isEnglish() ? 'Book Appointment' : 'भेटघाट बुक'; ?></span></a>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="80">
                 <div class="tools-category-card tools-cat-tools">
-                    <h5><i class="fas fa-calculator me-2"></i><?php echo isEnglish() ? 'Tools / Calculator' : 'टुल्स / क्याल्कुलेटर'; ?></h5>
+                    <h5 data-aos="fade-up"><i class="fas fa-calculator me-2"></i><?php echo isEnglish() ? 'Tools / Calculator' : 'टुल्स / क्याल्कुलेटर'; ?></h5>
                     <div class="tools-links-grid">
-                        <a href="emi-calculator.php" class="tools-mini-link"><i class="fas fa-calculator"></i><span><?php echo $L['emi_calculator']; ?></span></a>
-                        <a href="exchange-rate.php" class="tools-mini-link"><i class="fas fa-exchange-alt"></i><span><?php echo $L['exchange_rate']; ?></span></a>
-                        <a href="date-converter.php" class="tools-mini-link"><i class="fas fa-calendar-alt"></i><span><?php echo $L['date_converter']; ?></span></a>
-                        <a href="downloads.php" class="tools-mini-link"><i class="fas fa-download"></i><span><?php echo $L['downloads']; ?></span></a>
+                        <a href="emi-calculator.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="40"><i class="fas fa-calculator"></i><span><?php echo $L['emi_calculator']; ?></span></a>
+                        <a href="exchange-rate.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="90"><i class="fas fa-exchange-alt"></i><span><?php echo $L['exchange_rate']; ?></span></a>
+                        <a href="date-converter.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="140"><i class="fas fa-calendar-alt"></i><span><?php echo $L['date_converter']; ?></span></a>
+                        <a href="downloads.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="190"><i class="fas fa-download"></i><span><?php echo $L['downloads']; ?></span></a>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="160">
                 <div class="tools-category-card tools-cat-member">
-                    <h5><i class="fas fa-hands-helping me-2"></i><?php echo isEnglish() ? 'Member Services' : 'सदस्य सेवा / सहायता'; ?></h5>
+                    <h5 data-aos="fade-up"><i class="fas fa-hands-helping me-2"></i><?php echo isEnglish() ? 'Member Services' : 'सदस्य सेवा / सहायता'; ?></h5>
                     <div class="tools-links-grid">
-                        <a href="digital-services.php" class="tools-mini-link"><i class="fas fa-mobile-screen-button"></i><span><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></span></a>
-                        <a href="member-welfare.php" class="tools-mini-link"><i class="fas fa-hand-holding-heart"></i><span><?php echo isEnglish() ? 'Member Welfare' : 'सदस्य सुविधा'; ?></span></a>
-                        <a href="grievance.php" class="tools-mini-link"><i class="fas fa-exclamation-circle"></i><span><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></span></a>
-                        <a href="auction.php" class="tools-mini-link"><i class="fas fa-gavel"></i><span><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span></a>
+                        <a href="digital-services.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="40"><i class="fas fa-mobile-screen-button"></i><span><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></span></a>
+                        <a href="member-welfare.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="90"><i class="fas fa-hand-holding-heart"></i><span><?php echo isEnglish() ? 'Member Welfare' : 'सदस्य सुविधा'; ?></span></a>
+                        <a href="grievance.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="140"><i class="fas fa-exclamation-circle"></i><span><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></span></a>
+                        <a href="auction.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="190"><i class="fas fa-gavel"></i><span><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span></a>
                     </div>
                 </div>
             </div>
