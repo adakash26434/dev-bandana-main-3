@@ -294,14 +294,14 @@ require __DIR__ . '/includes/chrome.php';
 
         <div class="mem-card">
             <div class="mem-card-header">
-                <div class="mem-card-title"><i class="fas fa-bell"></i>सूचनाहरू
+                <div class="mem-card-title"><i class="fas fa-bell"></i><?php echo $_t('सूचनाहरू', 'Notifications'); ?>
                     <?php if ($unread > 0): ?><span class="mem-notif-dot" style="position:static;"><?php echo $unread; ?></span><?php endif; ?>
                 </div>
-                <a href="<?php echo $siteUrl; ?>member/notifications.php" style="font-size:0.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;">सबै →</a>
+                <a href="<?php echo $siteUrl; ?>member/notifications.php" style="font-size:0.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;"><?php echo $_t('सबै', 'All'); ?> →</a>
             </div>
             <div class="mem-card-body" style="padding-top:6px;">
                 <?php if (empty($notifs)): ?>
-                <div class="mem-empty"><span class="mem-empty-icon">🔔</span><div>कुनै सूचना छैन।</div></div>
+                <div class="mem-empty"><span class="mem-empty-icon">🔔</span><div><?php echo $_t('कुनै सूचना छैन।', 'No notifications.'); ?></div></div>
                 <?php else:
                     $iconMap = ['success'=>['fas fa-circle-check','#16a34a','#f0fdf4'],'error'=>['fas fa-circle-xmark','#dc2626','#fef2f2'],'warning'=>['fas fa-triangle-exclamation','#d97706','#fffbeb'],'info'=>['fas fa-circle-info','var(--secondary-color,#c0392b)','#fef2f2']];
                     foreach ($notifs as $n): $ic = $iconMap[$n['type']] ?? $iconMap['info'];
@@ -326,18 +326,18 @@ require __DIR__ . '/includes/chrome.php';
     ═══════════════════════════════════════════════════════════ -->
     <div class="mem-card" style="margin-top:18px;">
         <div class="mem-card-header">
-            <div class="mem-card-title"><i class="fas fa-hospital"></i>साझेदार संस्था सेवा इतिहास</div>
+            <div class="mem-card-title"><i class="fas fa-hospital"></i><?php echo $_t('साझेदार संस्था सेवा इतिहास', 'Partner Service History'); ?></div>
             <?php if (!empty($partnerHistory)): ?>
-            <span style="font-size:.75rem;color:#6b7280;font-weight:600;"><?php echo count($partnerHistory); ?> रेकर्ड</span>
+            <span style="font-size:.75rem;color:#6b7280;font-weight:600;"><?php echo count($partnerHistory); ?> <?php echo $_t('रेकर्ड', 'records'); ?></span>
             <?php endif; ?>
         </div>
         <div class="mem-card-body" style="padding-top:8px;">
             <?php if (empty($partnerHistory)): ?>
             <div class="mem-empty">
                 <span class="mem-empty-icon">🏥</span>
-                <div>अहिलेसम्म कुनै साझेदार संस्थामा सेवा लिइएको छैन।</div>
+                <div><?php echo $_t('अहिलेसम्म कुनै साझेदार संस्थामा सेवा लिइएको छैन।', 'No partner services taken yet.'); ?></div>
                 <div style="margin-top:6px;font-size:.78rem;color:#9ca3af;">
-                    साझेदार संस्थामा Member Card देखाएपछि यहाँ history देखिन्छ।
+                    <?php echo $_t('साझेदार संस्थामा Member Card देखाएपछि यहाँ history देखिन्छ।', 'History appears here after showing your Member Card at partner organizations.'); ?>
                 </div>
             </div>
             <?php else:
@@ -348,17 +348,17 @@ require __DIR__ . '/includes/chrome.php';
             <div class="ph-total-bar">
                 <div class="ph-total-stat">
                     <div class="ph-total-num"><?php echo count($partnerHistory); ?></div>
-                    <div class="ph-total-lbl">कुल भेट</div>
+                    <div class="ph-total-lbl"><?php echo $_t('कुल भेट', 'Total Visits'); ?></div>
                 </div>
                 <div class="ph-divider"></div>
                 <div class="ph-total-stat">
                     <div class="ph-total-num" style="color:#16a34a;"><?php echo $totalTaken; ?></div>
-                    <div class="ph-total-lbl">सेवा लिइयो</div>
+                    <div class="ph-total-lbl"><?php echo $_t('सेवा लिइयो', 'Services Taken'); ?></div>
                 </div>
                 <div class="ph-divider"></div>
                 <div class="ph-total-stat">
                     <div class="ph-total-num" style="color:#0d9488;"><?php echo $totalOrgs; ?></div>
-                    <div class="ph-total-lbl">संस्थाहरू</div>
+                    <div class="ph-total-lbl"><?php echo $_t('संस्थाहरू', 'Organizations'); ?></div>
                 </div>
             </div>
 
@@ -366,14 +366,14 @@ require __DIR__ . '/includes/chrome.php';
             <div class="ph-summary-row">
                 <span class="ph-summary-pill active" data-filter="all" onclick="phFilter('all', this)">
                     <i class="fas fa-th-large" style="font-size:.75rem;"></i>
-                    सबै
+                    <?php echo $_t('सबै', 'All'); ?>
                     <span class="ph-pill-count"><?php echo count($partnerHistory); ?></span>
                 </span>
                 <?php foreach ($partnerSummary as $pname => $pdata): ?>
                 <span class="ph-summary-pill" data-filter="<?php echo htmlspecialchars($pname, ENT_QUOTES); ?>" onclick="phFilter(<?php echo json_encode($pname); ?>, this)">
                     <i class="fas fa-building" style="font-size:.72rem;"></i>
                     <?php echo htmlspecialchars($pname); ?>
-                    <span class="ph-pill-count"><?php echo $pdata['total']; ?>पटक</span>
+                    <span class="ph-pill-count"><?php echo $pdata['total']; ?> <?php echo $_t('पटक', 'times'); ?></span>
                 </span>
                 <?php endforeach; ?>
             </div>
@@ -392,7 +392,7 @@ require __DIR__ . '/includes/chrome.php';
                         <div class="ph-org-name"><?php echo htmlspecialchars($h['partner_name'] ?? '—'); ?></div>
                         <div class="ph-svc-name">
                             <i class="fas fa-stethoscope" style="color:#0d9488;font-size:.72rem;margin-right:4px;"></i>
-                            <?php echo htmlspecialchars($h['service_name'] ?: 'सेवा उल्लेख छैन'); ?>
+                            <?php echo htmlspecialchars($h['service_name'] ?: $_t('सेवा उल्लेख छैन', 'Service not specified')); ?>
                         </div>
                         <?php if (!empty($h['service_note'])): ?>
                         <div class="ph-svc-note"><i class="fas fa-note-sticky" style="font-size:.65rem;margin-right:3px;"></i><?php echo htmlspecialchars($h['service_note']); ?></div>
@@ -401,7 +401,7 @@ require __DIR__ . '/includes/chrome.php';
                     </div>
                     <div class="ph-taken-badge <?php echo $taken ? 'ph-taken-yes' : 'ph-taken-no'; ?>">
                         <?php if ($taken): ?><i class="fas fa-circle-check" style="font-size:.72rem;"></i><?php else: ?><i class="fas fa-circle-xmark" style="font-size:.72rem;"></i><?php endif; ?>
-                        <?php echo $taken ? 'सेवा लिइयो' : 'नलिइएको'; ?>
+                        <?php echo $taken ? $_t('सेवा लिइयो', 'Taken') : $_t('नलिइएको', 'Not taken'); ?>
                     </div>
                 </div>
                 <?php endforeach; ?>

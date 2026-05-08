@@ -181,6 +181,28 @@ $extraHead = <<<HTML
 .empty-state i { font-size:3rem; display:block; margin-bottom:12px; }
 .doc-upload { border:2px dashed #e5e7eb; border-radius:10px; padding:16px; text-align:center; cursor:pointer; transition:border .2s; }
 .doc-upload:hover { border-color:var(--primary-color,#1a8754); }
+.wf-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+.wf-title { font-size:1.25rem; font-weight:700; color:var(--primary-color,#1a8754); margin:0; }
+.wf-title-icon, .wf-link-icon, .wf-tab-icon { margin-right:8px; }
+.wf-link-row { display:flex; gap:8px; }
+.wf-link { font-size:.8rem; color:var(--primary-color,#1a8754); text-decoration:none; }
+.wf-empty-title { font-size:1rem; font-weight:600; color:#6b7280; margin-bottom:6px; }
+.wf-empty-sub { font-size:.85rem; }
+.wf-claim-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.wf-claim-name { font-size:1rem; font-weight:700; color:#1f2937; margin-bottom:4px; }
+.wf-meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:.82rem; color:#6b7280; }
+.wf-icon-gap { margin-right:4px; }
+.wf-remarks { margin-top:10px; padding:9px 12px; background:#f9fafb; border-radius:8px; font-size:.82rem; color:#374151; }
+.wf-note { margin-top:8px; font-size:.82rem; color:#6b7280; }
+.wf-info-box { background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:12px 14px; font-size:.83rem; color:var(--secondary-dark,#922b21); margin-bottom:18px; display:flex; gap:8px; align-items:center; }
+.wf-info-box .icon { flex-shrink:0; }
+.wf-member-box { background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px; margin-bottom:18px; }
+.wf-member-title { font-size:.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:.05em; margin-bottom:10px; }
+.wf-readonly { background:#f0f0f0; color:#6b7280; }
+.wf-required { color:#dc2626; }
+.wf-file-list { margin-top:8px; font-size:.82rem; color:#16a34a; }
+.wf-submit-btn { width:100%; padding:12px; background:var(--primary-color,#1a8754); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+.wf-hidden-file { display:none; }
 </style>
 HTML;
 ?>
@@ -189,13 +211,13 @@ HTML;
 <main class="mp-main">
 <div class="mp-container">
 
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-    <h1 style="font-size:1.25rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0;">
-      <i class="fas fa-heart-pulse" style="margin-right:8px;"></i><?php echo $_t('कल्याण दाबी', 'Welfare Claims'); ?>
+  <div class="wf-head">
+    <h1 class="wf-title">
+      <i class="fas fa-heart-pulse wf-title-icon"></i><?php echo $_t('कल्याण दाबी', 'Welfare Claims'); ?>
     </h1>
-    <div style="display:flex;gap:8px;">
-      <a href="tracker.php?filter=welfare" style="font-size:.8rem;color:var(--primary-color,#1a8754);text-decoration:none;">
-        <i class="fas fa-magnifying-glass-chart"></i> <?php echo $_t('Tracker मा हेर्नुहोस्', 'Open in Tracker'); ?>
+    <div class="wf-link-row">
+      <a href="tracker.php?filter=welfare" class="wf-link">
+        <i class="fas fa-magnifying-glass-chart wf-link-icon"></i> <?php echo $_t('Tracker मा हेर्नुहोस्', 'Open in Tracker'); ?>
       </a>
     </div>
   </div>
@@ -222,8 +244,8 @@ HTML;
     <?php if (empty($myClaims)): ?>
     <div class="empty-state">
       <i class="fas fa-heart"></i>
-      <div style="font-size:1rem;font-weight:600;color:#6b7280;margin-bottom:6px;"><?php echo $_t('कुनै दाबी छैन', 'No claims found'); ?></div>
-      <div style="font-size:.85rem;"><?php echo $_t('नयाँ कल्याण दाबी दर्ता गर्न "नयाँ दाबी" tab खोल्नुहोस्।', 'Open "New Claim" tab to submit a welfare claim.'); ?></div>
+      <div class="wf-empty-title"><?php echo $_t('कुनै दाबी छैन', 'No claims found'); ?></div>
+      <div class="wf-empty-sub"><?php echo $_t('नयाँ कल्याण दाबी दर्ता गर्न "नयाँ दाबी" tab खोल्नुहोस्।', 'Open "New Claim" tab to submit a welfare claim.'); ?></div>
     </div>
     <?php else: ?>
     <?php foreach ($myClaims as $cl):
@@ -240,9 +262,9 @@ HTML;
         $isRej  = ($st === 'rejected');
     ?>
     <div class="claim-card">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div class="wf-claim-top">
         <div>
-          <div style="font-size:1rem;font-weight:700;color:#1f2937;margin-bottom:4px;">
+          <div class="wf-claim-name">
             <?= htmlspecialchars($cl['claim_type_np'] ?: $cl['claim_type']) ?>
           </div>
           <div class="track-id"><?= htmlspecialchars($cl['tracking_id'] ?? 'N/A') ?></div>
@@ -274,26 +296,26 @@ HTML;
         <?php endforeach; ?>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;font-size:.82rem;color:#6b7280;">
+      <div class="wf-meta-grid">
         <?php if ($cl['claim_amount'] > 0): ?>
-        <div><i class="fas fa-coins" style="margin-right:4px;color:#d97706;"></i>माग रकम: रू <?= number_format((float)$cl['claim_amount'],2) ?></div>
+        <div><i class="fas fa-coins wf-icon-gap" style="color:#d97706;"></i><?php echo $_t('माग रकम', 'Requested Amount'); ?>: रू <?= number_format((float)$cl['claim_amount'],2) ?></div>
         <?php endif; ?>
         <?php if ($cl['approved_amount'] > 0): ?>
-        <div><i class="fas fa-check-circle" style="margin-right:4px;color:#16a34a;"></i>स्वीकृत रकम: रू <?= number_format((float)$cl['approved_amount'],2) ?></div>
+        <div><i class="fas fa-check-circle wf-icon-gap" style="color:#16a34a;"></i><?php echo $_t('स्वीकृत रकम', 'Approved Amount'); ?>: रू <?= number_format((float)$cl['approved_amount'],2) ?></div>
         <?php endif; ?>
-        <div><i class="fas fa-calendar" style="margin-right:4px;"></i><?= date('Y-m-d', strtotime($cl['created_at'])) ?></div>
+        <div><i class="fas fa-calendar wf-icon-gap"></i><?= date('Y-m-d', strtotime($cl['created_at'])) ?></div>
         <?php if ($cl['beneficiary_name']): ?>
-        <div><i class="fas fa-user" style="margin-right:4px;"></i><?= htmlspecialchars($cl['beneficiary_name']) ?></div>
+        <div><i class="fas fa-user wf-icon-gap"></i><?= htmlspecialchars($cl['beneficiary_name']) ?></div>
         <?php endif; ?>
       </div>
       <?php if ($cl['admin_remarks']): ?>
-      <div style="margin-top:10px;padding:9px 12px;background:#f9fafb;border-radius:8px;font-size:.82rem;color:#374151;">
-        <strong><i class="fas fa-comment" style="margin-right:5px;color:#6b7280;"></i>Admin टिप्पणी:</strong>
+      <div class="wf-remarks">
+        <strong><i class="fas fa-comment" style="margin-right:5px;color:#6b7280;"></i><?php echo $_t('Admin टिप्पणी', 'Admin Remark'); ?>:</strong>
         <?= htmlspecialchars($cl['admin_remarks']) ?>
       </div>
       <?php endif; ?>
       <?php if ($cl['description']): ?>
-      <div style="margin-top:8px;font-size:.82rem;color:#6b7280;"><?= nl2br(htmlspecialchars(mb_substr($cl['description'],0,200))) ?><?= mb_strlen($cl['description'])>200?'…':'' ?></div>
+      <div class="wf-note"><?= nl2br(htmlspecialchars(mb_substr($cl['description'],0,200))) ?><?= mb_strlen($cl['description'])>200?'…':'' ?></div>
       <?php endif; ?>
     </div>
     <?php endforeach; ?>
@@ -302,9 +324,9 @@ HTML;
 
   <!-- Tab: New Claim Form -->
   <div class="wf-pane <?= $activeTab==='new'?'active':'' ?>" id="pane-new">
-    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:.83rem;color:var(--secondary-dark,#922b21);margin-bottom:18px;display:flex;gap:8px;align-items:center;">
-      <i class="fas fa-circle-info" style="flex-shrink:0;"></i>
-      <div>तपाईंको नाम, फोन र ठेगाना <strong>profile बाट auto-fill</strong> भएको छ। केवल दाबीको विवरण भर्नुहोस्।</div>
+    <div class="wf-info-box">
+      <i class="fas fa-circle-info icon"></i>
+      <div><?php echo $_t('तपाईंको नाम, फोन र ठेगाना profile बाट auto-fill भएको छ। केवल दाबीको विवरण भर्नुहोस्।', 'Your name, phone, and address are auto-filled from profile. Please fill only claim details.'); ?></div>
     </div>
 
     <form method="POST" enctype="multipart/form-data">
@@ -312,39 +334,39 @@ HTML;
       <input type="hidden" name="action" value="submit_claim">
 
       <!-- Pre-filled member info (readonly) -->
-      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:18px;">
-        <div style="font-size:.75rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">सदस्य जानकारी (Auto-filled)</div>
+      <div class="wf-member-box">
+        <div class="wf-member-title"><?php echo $_t('सदस्य जानकारी (Auto-filled)', 'Member Information (Auto-filled)'); ?></div>
         <div class="form-row cols2">
           <div class="form-group" style="margin-bottom:8px;">
-            <label>नाम</label>
-            <input type="text" class="form-control" value="<?= htmlspecialchars($memName) ?>" readonly style="background:#f0f0f0;color:#6b7280;">
+            <label><?php echo $_t('नाम', 'Name'); ?></label>
+            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($memName) ?>" readonly>
           </div>
           <div class="form-group" style="margin-bottom:8px;">
-            <label>सदस्यता नम्बर</label>
-            <input type="text" class="form-control" value="<?= htmlspecialchars($memSadasyata) ?>" readonly style="background:#f0f0f0;color:#6b7280;">
+            <label><?php echo $_t('सदस्यता नम्बर', 'Membership Number'); ?></label>
+            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($memSadasyata) ?>" readonly>
           </div>
           <div class="form-group" style="margin-bottom:8px;">
-            <label>फोन</label>
-            <input type="text" class="form-control" value="<?= htmlspecialchars($resolvedPhone) ?>" readonly style="background:#f0f0f0;color:#6b7280;">
+            <label><?php echo $_t('फोन', 'Phone'); ?></label>
+            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($resolvedPhone) ?>" readonly>
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label>Email</label>
-            <input type="text" class="form-control" value="<?= htmlspecialchars($resolvedEmail) ?>" readonly style="background:#f0f0f0;color:#6b7280;">
+            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($resolvedEmail) ?>" readonly>
           </div>
         </div>
       </div>
 
       <!-- Claim Type -->
       <div class="form-group">
-        <label>दाबी प्रकार <span style="color:#dc2626;">*</span></label>
+        <label><?php echo $_t('दाबी प्रकार', 'Claim Type'); ?> <span class="wf-required">*</span></label>
         <select name="claim_type" class="form-control" required onchange="showTypeFields(this.value)">
-          <option value="">— प्रकार छान्नुहोस् —</option>
-          <option value="death">⚫ मृत्यु सुविधा</option>
-          <option value="maternity">🟢 सुत्केरी सुविधा</option>
-          <option value="medical">🔵 उपचार खर्च</option>
-          <option value="accident">🟠 दुर्घटना सुविधा</option>
-          <option value="insurance">🟣 बीमा दाबी</option>
-          <option value="other">⚪ अन्य सुविधा</option>
+          <option value=""><?php echo $_t('— प्रकार छान्नुहोस् —', '— Select claim type —'); ?></option>
+          <option value="death"><?php echo $_t('⚫ मृत्यु सुविधा', '⚫ Death benefit'); ?></option>
+          <option value="maternity"><?php echo $_t('🟢 सुत्केरी सुविधा', '🟢 Maternity benefit'); ?></option>
+          <option value="medical"><?php echo $_t('🔵 उपचार खर्च', '🔵 Medical expense'); ?></option>
+          <option value="accident"><?php echo $_t('🟠 दुर्घटना सुविधा', '🟠 Accident benefit'); ?></option>
+          <option value="insurance"><?php echo $_t('🟣 बीमा दाबी', '🟣 Insurance claim'); ?></option>
+          <option value="other"><?php echo $_t('⚪ अन्य सुविधा', '⚪ Other benefit'); ?></option>
         </select>
       </div>
 
@@ -426,7 +448,7 @@ HTML;
       </div>
 
       <div class="form-group">
-        <label>विस्तृत विवरण <span style="color:#dc2626;">*</span></label>
+        <label><?php echo $_t('विस्तृत विवरण', 'Detailed Description'); ?> <span class="wf-required">*</span></label>
         <textarea name="description" class="form-control" rows="4" required placeholder="दाबीको पूरा विवरण लेख्नुहोस्..."></textarea>
       </div>
 
@@ -437,13 +459,13 @@ HTML;
           <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem;color:#9ca3af;display:block;margin-bottom:6px;"></i>
           <div style="font-size:.85rem;color:#6b7280;">Click गरी files छान्नुहोस् वा यहाँ drag गर्नुहोस्</div>
           <div style="font-size:.75rem;color:#9ca3af;margin-top:3px;">PDF, JPG, PNG — अधिकतम 10MB प्रति file</div>
-          <input type="file" id="docUpload" name="documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="showFiles(this)">
+          <input type="file" id="docUpload" name="documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" class="wf-hidden-file" onchange="showFiles(this)">
         </label>
-        <div id="fileList" style="margin-top:8px;font-size:.82rem;color:#16a34a;"></div>
+        <div id="fileList" class="wf-file-list"></div>
       </div>
 
-      <button type="submit" style="width:100%;padding:12px;background:var(--primary-color,#1a8754);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-        <i class="fas fa-paper-plane"></i> दाबी दर्ता गर्नुहोस्
+      <button type="submit" class="wf-submit-btn">
+        <i class="fas fa-paper-plane"></i> <?php echo $_t('दाबी दर्ता गर्नुहोस्', 'Submit Claim'); ?>
       </button>
     </form>
   </div>

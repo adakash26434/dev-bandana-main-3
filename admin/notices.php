@@ -42,15 +42,15 @@ checkCSRF();
                 $db->prepare("UPDATE notices SET title=?, content=?, notice_date=?, is_active=?, is_popup=? WHERE id=?")
                    ->execute([$title, $content, $noticeDate, $isActive, $isPopup, $noticeId]);
             }
-            setFlash('success', 'सूचना सफलतापूर्वक अपडेट भयो।');
+            setFlash('success', $__t('सूचना सफलतापूर्वक अपडेट भयो।', 'Notice updated successfully.'));
         } else {
             $db->prepare("INSERT INTO notices (title, content, notice_date, attachment, is_active, is_popup) VALUES (?,?,?,?,?,?)")
                ->execute([$title, $content, $noticeDate, $attachment, $isActive, $isPopup]);
-            setFlash('success', 'नयाँ सूचना सफलतापूर्वक थपियो।');
+            setFlash('success', $__t('नयाँ सूचना सफलतापूर्वक थपियो।', 'New notice added successfully.'));
         }
         redirect('notices.php');
     } catch (Exception $e) {
-        setFlash('error', 'त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।');
+        setFlash('error', $__t('त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।', 'An error occurred. Please try again later.'));
         redirect('notices.php');
     }
 }
@@ -63,16 +63,16 @@ if ($action === 'bulk_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $selected = $_POST['selected_ids'] ?? [];
         $ids = array_values(array_filter(array_map('intval', (array)$selected), fn($v) => $v > 0));
         if (empty($ids) || !in_array($bulk, ['active','inactive'], true)) {
-            setFlash('error', 'Bulk update का लागि notice छान्नुहोस्।');
+            setFlash('error', $__t('Bulk update का लागि notice छान्नुहोस्।', 'Please select notices for bulk update.'));
             redirect('notices.php');
         }
         $target = $bulk === 'active' ? 1 : 0;
         $ph = implode(',', array_fill(0, count($ids), '?'));
         $st = $db->prepare("UPDATE notices SET is_active = ? WHERE id IN ($ph)");
         $st->execute(array_merge([$target], $ids));
-        setFlash('success', 'Bulk status update सफल भयो।');
+        setFlash('success', $__t('Bulk status update सफल भयो।', 'Bulk status update succeeded.'));
     } catch (Exception $e) {
-        setFlash('error', 'Bulk status update असफल भयो।');
+        setFlash('error', $__t('Bulk status update असफल भयो।', 'Bulk status update failed.'));
     }
     redirect('notices.php');
 }
@@ -82,9 +82,9 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
         $db = getDB();
         checkCSRF();
         $db->prepare("DELETE FROM notices WHERE id=?")->execute([$id]);
-        setFlash('success', 'सूचना मेटाइयो।');
+        setFlash('success', $__t('सूचना मेटाइयो।', 'Notice deleted.'));
     } catch (Exception $e) {
-        setFlash('error', 'मेटाउन सकिएन।');
+        setFlash('error', $__t('मेटाउन सकिएन।', 'Could not delete notice.'));
     }
     redirect('notices.php');
 }
@@ -133,10 +133,10 @@ $flash = getFlash();
                         <input type="hidden" name="action" value="bulk_status">
                         <div class="px-3 py-2 border-bottom bg-light d-flex gap-2 justify-content-end">
                             <button type="submit" name="bulk" value="active" class="btn btn-sm btn-outline-success">
-                                <i class="fas fa-check-circle me-1"></i>Bulk Active
+                                <i class="fas fa-check-circle me-1"></i><?php echo $__t('Bulk सक्रिय', 'Bulk Active'); ?>
                             </button>
                             <button type="submit" name="bulk" value="inactive" class="btn btn-sm btn-outline-secondary">
-                                <i class="fas fa-ban me-1"></i>Bulk Inactive
+                                <i class="fas fa-ban me-1"></i><?php echo $__t('Bulk निष्क्रिय', 'Bulk Inactive'); ?>
                             </button>
                         </div>
                     <table class="table table-hover align-middle mb-0" id="noticesTable">
@@ -169,7 +169,7 @@ $flash = getFlash();
                                 <td>
                                     <div class="fw-semibold text-dark"><?php echo htmlspecialchars($item['title']); ?></div>
                                     <?php if ($item['attachment']): ?>
-                                        <small class="text-muted"><i class="fas fa-paperclip me-1 text-success"></i>फाइल संलग्न</small>
+                                        <small class="text-muted"><i class="fas fa-paperclip me-1 text-success"></i><?php echo $__t('फाइल संलग्न', 'File attached'); ?></small>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -180,9 +180,9 @@ $flash = getFlash();
                                 </td>
                                 <td class="text-center">
                                     <?php if ($item['is_popup']): ?>
-                                        <span class="badge bg-info"><i class="fas fa-bell me-1"></i>पप-अप</span>
+                                        <span class="badge bg-info"><i class="fas fa-bell me-1"></i><?php echo $__t('पप-अप', 'Popup'); ?></span>
                                     <?php else: ?>
-                                        <span class="badge bg-light text-muted">होइन</span>
+                                        <span class="badge bg-light text-muted"><?php echo $__t('होइन', 'No'); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">

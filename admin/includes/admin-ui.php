@@ -30,6 +30,16 @@
  */
 if (!defined('IS_ADMIN_PAGE')) { http_response_code(403); exit('Access denied.'); }
 
+if (!function_exists('adminUiT')) {
+    function adminUiT(string $np, string $en): string {
+        static $isEn = null;
+        if ($isEn === null) {
+            $isEn = function_exists('isEnglish') ? (bool)isEnglish() : false;
+        }
+        return $isEn ? $en : $np;
+    }
+}
+
 /* ──────────────────────────────────────────────────────────────
    adminPageHeader
    Page header: left = icon + title + subtitle, right = buttons
@@ -73,7 +83,7 @@ function adminAlert(string $type, string $msg, bool $dismiss = true): string {
     ];
     $icon     = $icons[$type] ?? 'fa-circle-info';
     $closeBtn = $dismiss
-        ? '<button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="बन्द"></button>'
+        ? '<button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="' . htmlspecialchars(adminUiT('बन्द', 'Close')) . '"></button>'
         : '';
     return '<div class="alert alert-' . $type . ' alert-dismissible fade show" role="alert">'
          . '<i class="fas ' . $icon . ' fa-fw flex-shrink-0"></i>'
@@ -85,7 +95,9 @@ function adminAlert(string $type, string $msg, bool $dismiss = true): string {
    adminEmptyRow
    Beautiful empty state <tr> for table tbody
    ────────────────────────────────────────────────────────────── */
-function adminEmptyRow(int $colspan = 6, string $msg = 'कुनै डाटा उपलब्ध छैन।', string $sub = 'माथिको बटनबाट नयाँ थप्नुहोस्।'): string {
+function adminEmptyRow(int $colspan = 6, string $msg = '', string $sub = ''): string {
+    if ($msg === '') $msg = adminUiT('कुनै डाटा उपलब्ध छैन।', 'No data available.');
+    if ($sub === '') $sub = adminUiT('माथिको बटनबाट नयाँ थप्नुहोस्।', 'Use the button above to add new records.');
     return '<tr><td colspan="' . $colspan . '" class="text-center admin-empty-state">'
          . '<i class="fas fa-inbox" style="font-size:2.2rem;"></i>'
          . '<div style="font-size:0.9rem;font-weight:600;color:#6b7280;margin-top:8px;">'
@@ -129,14 +141,14 @@ function adminActiveBadge($isActive): string {
              . 'display:inline-flex;align-items:center;gap:5px;">'
              . '<span style="width:6px;height:6px;border-radius:50%;background:#22c55e;'
              . 'box-shadow:0 0 0 2px rgba(34,197,94,0.25);flex-shrink:0;"></span>'
-             . 'Active</span>';
+             . htmlspecialchars(adminUiT('सक्रिय', 'Active')) . '</span>';
     }
     return '<span class="badge" style="'
          . 'background:#f3f4f6;color:#6b7280;border-radius:20px;'
          . 'padding:4px 10px;font-weight:600;font-size:0.72rem;'
          . 'display:inline-flex;align-items:center;gap:5px;">'
          . '<span style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;"></span>'
-         . 'Hidden</span>';
+         . htmlspecialchars(adminUiT('लुकाइएको', 'Hidden')) . '</span>';
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -204,14 +216,14 @@ function adminAddBtn(string $label, string $href = '#', string $icon = 'fa-plus'
 function adminToggleBtn(int $recordId, $isActive, string $csrfToken, string $extraFields = ''): string {
     if ($isActive) {
         $btn = '<button type="submit" class="btn btn-sm btn-success" '
-             . 'title="Active छ — थिच्दा Hidden हुन्छ" '
+             . 'title="' . htmlspecialchars(adminUiT('सक्रिय छ — थिच्दा लुकाइन्छ', 'Currently active — click to hide')) . '" '
              . 'style="min-width:82px;">'
-             . '<i class="fas fa-eye fa-fw"></i> Active</button>';
+             . '<i class="fas fa-eye fa-fw"></i> ' . htmlspecialchars(adminUiT('सक्रिय', 'Active')) . '</button>';
     } else {
         $btn = '<button type="submit" class="btn btn-sm btn-outline-secondary" '
-             . 'title="Hidden छ — थिच्दा Active हुन्छ" '
+             . 'title="' . htmlspecialchars(adminUiT('लुकाइएको छ — थिच्दा सक्रिय हुन्छ', 'Currently hidden — click to activate')) . '" '
              . 'style="min-width:82px;">'
-             . '<i class="fas fa-eye-slash fa-fw"></i> Hidden</button>';
+             . '<i class="fas fa-eye-slash fa-fw"></i> ' . htmlspecialchars(adminUiT('लुकाइएको', 'Hidden')) . '</button>';
     }
     return '<form method="POST" class="d-inline">'
          . '<input type="hidden" name="action" value="toggle">'

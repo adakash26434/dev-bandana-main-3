@@ -78,10 +78,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('logo', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'Logo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('Logo save गर्न सकिएन', 'Could not save logo');
                 }
             } else {
-                $uploadErrors[] = 'Logo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('Logo upload', 'Logo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -91,10 +91,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('logo_np', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'Nepali logo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('Nepali logo save गर्न सकिएन', 'Could not save Nepali logo');
                 }
             } else {
-                $uploadErrors[] = 'Nepali logo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('Nepali logo upload', 'Nepali logo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -104,10 +104,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('logo_en', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'English logo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('English logo save गर्न सकिएन', 'Could not save English logo');
                 }
             } else {
-                $uploadErrors[] = 'English logo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('English logo upload', 'English logo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -117,10 +117,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('chairman_photo', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'Chairman photo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('Chairman photo save गर्न सकिएन', 'Could not save chairman photo');
                 }
             } else {
-                $uploadErrors[] = 'Chairman photo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('Chairman photo upload', 'Chairman photo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -130,10 +130,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('ceo_photo', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'CEO photo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('CEO photo save गर्न सकिएन', 'Could not save CEO photo');
                 }
             } else {
-                $uploadErrors[] = 'CEO photo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('CEO photo upload', 'CEO photo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -143,10 +143,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('mobile_app_photo', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'Mobile app photo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('Mobile app photo save गर्न सकिएन', 'Could not save mobile app photo');
                 }
             } else {
-                $uploadErrors[] = 'Mobile app photo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('Mobile app photo upload', 'Mobile app photo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -156,10 +156,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('about_page_image', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'About page image save गर्न सकिएन';
+                    $uploadErrors[] = $__t('About page image save गर्न सकिएन', 'Could not save About page image');
                 }
             } else {
-                $uploadErrors[] = 'About page image upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('About page image upload', 'About page image upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -169,10 +169,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('about_intro_image', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'About intro image save गर्न सकिएन';
+                    $uploadErrors[] = $__t('About intro image save गर्न सकिएन', 'Could not save About intro image');
                 }
             } else {
-                $uploadErrors[] = 'About intro image upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('About intro image upload', 'About intro image upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -182,10 +182,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('history_photo', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'History photo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('History photo save गर्न सकिएन', 'Could not save history photo');
                 }
             } else {
-                $uploadErrors[] = 'History photo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('History photo upload', 'History photo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -195,10 +195,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('himal_bg', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'Himal photo save गर्न सकिएन';
+                    $uploadErrors[] = $__t('Himal photo save गर्न सकिएन', 'Could not save himal photo');
                 }
             } else {
-                $uploadErrors[] = 'Himal photo upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('Himal photo upload', 'Himal photo upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
 
@@ -208,10 +208,10 @@ checkCSRF();
             if ($upload['success']) {
                 $result = updateSetting('seo_og_image', $upload['path']);
                 if (!$result) {
-                    $uploadErrors[] = 'SEO share image save गर्न सकिएन';
+                    $uploadErrors[] = $__t('SEO share image save गर्न सकिएन', 'Could not save SEO share image');
                 }
             } else {
-                $uploadErrors[] = 'SEO share image upload: ' . ($upload['message'] ?? 'Unknown error');
+                $uploadErrors[] = $__t('SEO share image upload', 'SEO share image upload') . ': ' . ($upload['message'] ?? $__t('अज्ञात त्रुटि', 'Unknown error'));
             }
         }
         if (!empty($_POST['clear_seo_og_image'])) {
@@ -224,7 +224,7 @@ checkCSRF();
         }
 
         $updateSuccess = true;
-        setFlash('success', 'सेटिङ्स सफलतापूर्वक अपडेट भयो।');
+        setFlash('success', $__t('सेटिङ्स सफलतापूर्वक अपडेट भयो।', 'Settings updated successfully.'));
 
         // Use JavaScript redirect to ensure session is saved
         echo '<script>window.location.href = "settings.php";</script>';
@@ -232,7 +232,7 @@ checkCSRF();
 
     } catch (Exception $e) {
         $updateError = $e->getMessage();
-        setFlash('error', 'त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।');
+        setFlash('error', $__t('त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।', 'An error occurred. Please try again later.'));
     }
 }
 

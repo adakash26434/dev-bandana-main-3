@@ -106,44 +106,44 @@ if (!$request) {
         <div class="row g-4">
             <div class="col-lg-8">
                 <div class="info-section">
-                    <h6><i class="fas fa-user"></i> सदस्य / अनुरोधकर्ता</h6>
+                    <h6><i class="fas fa-user"></i> <?php echo $__t('सदस्य / अनुरोधकर्ता', 'Member / Requester'); ?></h6>
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>नाम:</strong> <?php echo e($request['requester_name']); ?></p>
-                            <p><strong>सदस्य नं.:</strong> <?php echo e($request['member_id']) ?: 'N/A'; ?></p>
-                            <p><strong>फोन:</strong> <a href="tel:<?php echo e($request['phone']); ?>"><?php echo e($request['phone']); ?></a></p>
+                            <p><strong><?php echo $__t('नाम', 'Name'); ?>:</strong> <?php echo e($request['requester_name']); ?></p>
+                            <p><strong><?php echo $__t('सदस्य नं.', 'Member ID'); ?>:</strong> <?php echo e($request['member_id']) ?: 'N/A'; ?></p>
+                            <p><strong><?php echo $__t('फोन', 'Phone'); ?>:</strong> <a href="tel:<?php echo e($request['phone']); ?>"><?php echo e($request['phone']); ?></a></p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>इमेल:</strong> <?php echo e($request['email']) ?: 'N/A'; ?></p>
+                            <p><strong><?php echo $__t('इमेल', 'Email'); ?>:</strong> <?php echo e($request['email']) ?: 'N/A'; ?></p>
                             <p><strong><?php echo $__t('सेवा', 'Service'); ?>:</strong> <?php echo e($request['service_type_np'] ?: (isset($serviceLabels[$request['service_type']]) ? $__t($serviceLabels[$request['service_type']]['np'], $serviceLabels[$request['service_type']]['en']) : $request['service_type'])); ?></p>
-                            <p><strong>मिति:</strong> <?php echo formatNepaliDate($request['created_at']); ?></p>
+                            <p><strong><?php echo $__t('मिति', 'Date'); ?>:</strong> <?php echo formatNepaliDate($request['created_at']); ?></p>
                         </div>
                     </div>
                 </div>
                 <div class="info-section">
-                    <h6><i class="fas fa-list-check"></i> सेवा विवरण</h6>
+                    <h6><i class="fas fa-list-check"></i> <?php echo $__t('सेवा विवरण', 'Service Details'); ?></h6>
                     <div class="row">
-                        <div class="col-md-6"><p><strong>खाता नं.:</strong> <?php echo e($request['account_number']) ?: 'N/A'; ?></p></div>
+                        <div class="col-md-6"><p><strong><?php echo $__t('खाता नं.', 'Account No.'); ?>:</strong> <?php echo e($request['account_number']) ?: 'N/A'; ?></p></div>
                         <div class="col-md-6"><p><strong><?php echo $__t('सम्पर्क माध्यम', 'Preferred Contact'); ?>:</strong> <?php echo e($request['preferred_contact']); ?></p></div>
                         <?php if ($request['statement_from'] || $request['statement_to']): ?>
-                        <div class="col-md-6"><p><strong>Statement:</strong> <?php echo e($request['statement_from']); ?> - <?php echo e($request['statement_to']); ?></p></div>
+                        <div class="col-md-6"><p><strong><?php echo $__t('स्टेटमेन्ट', 'Statement'); ?>:</strong> <?php echo e($request['statement_from']); ?> - <?php echo e($request['statement_to']); ?></p></div>
                         <?php endif; ?>
                         <?php if ($request['biller_name'] || $request['bill_reference']): ?>
-                        <div class="col-md-6"><p><strong>Bill:</strong> <?php echo e($request['biller_name']); ?> / <?php echo e($request['bill_reference']); ?></p></div>
+                        <div class="col-md-6"><p><strong><?php echo $__t('बिल', 'Bill'); ?>:</strong> <?php echo e($request['biller_name']); ?> / <?php echo e($request['bill_reference']); ?></p></div>
                         <?php endif; ?>
                         <?php if ($request['recharge_number'] || $request['recharge_amount']): ?>
-                        <div class="col-md-6"><p><strong>Recharge:</strong> <?php echo e($request['recharge_number']); ?> / रू. <?php echo number_format((float)$request['recharge_amount'], 2); ?></p></div>
+                        <div class="col-md-6"><p><strong><?php echo $__t('रिचार्ज', 'Recharge'); ?>:</strong> <?php echo e($request['recharge_number']); ?> / रू. <?php echo number_format((float)$request['recharge_amount'], 2); ?></p></div>
                         <?php endif; ?>
                         <?php if (!empty($request['service_amount'])): ?>
-                        <div class="col-md-6"><p><strong>सेवा रकम:</strong> रू. <?php echo number_format((float)$request['service_amount'], 2); ?></p></div>
+                        <div class="col-md-6"><p><strong><?php echo $__t('सेवा रकम', 'Service Amount'); ?>:</strong> रू. <?php echo number_format((float)$request['service_amount'], 2); ?></p></div>
                         <?php endif; ?>
                     </div>
                     <?php if ($request['request_details']): ?>
-                    <p><strong>थप विवरण:</strong></p>
+                    <p><strong><?php echo $__t('थप विवरण', 'Additional Details'); ?>:</strong></p>
                     <div class="bg-light p-3 rounded"><?php echo nl2br(e($request['request_details'])); ?></div>
                     <?php endif; ?>
                     <?php if ($request['attachment']): ?>
-                    <p class="mt-3"><strong>कागजात:</strong> <a href="<?php echo SITE_URL . e($request['attachment']); ?>" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file"></i> हेर्नुहोस्</a></p>
+                    <p class="mt-3"><strong><?php echo $__t('कागजात', 'Attachment'); ?>:</strong> <a href="<?php echo SITE_URL . e($request['attachment']); ?>" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file"></i> <?php echo $__t('हेर्नुहोस्', 'View'); ?></a></p>
                     <?php endif; ?>
                 </div>
                 <?php if ($request['admin_remarks']): ?>
@@ -183,7 +183,7 @@ if (!$request) {
                                 <?php endif; ?>
                                 <input type="file" name="admin_attachment" class="form-control"
                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                                <small class="text-muted">PDF, JPG, PNG, DOC — max 5MB</small>
+                                <small class="text-muted"><?php echo $__t('PDF, JPG, PNG, DOC — अधिकतम 5MB', 'PDF, JPG, PNG, DOC — max 5MB'); ?></small>
                             </div>
                             <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> <?php echo $__t('अपडेट गर्नुहोस्', 'Update'); ?></button>
                         </form>
@@ -198,7 +198,7 @@ if (!$request) {
                 </div>
                 <div class="card mt-3">
                     <div class="card-body text-center">
-                        <h6>Tracking ID</h6>
+                        <h6><?php echo $__t('Tracking ID', 'Tracking ID'); ?></h6>
                         <p class="fs-5 font-monospace text-primary"><?php echo e($request['tracking_id']); ?></p>
                     </div>
                 </div>

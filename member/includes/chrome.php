@@ -158,6 +158,10 @@ $_hasIdCard = true;
 .mem-bell-btn{position:relative;background:none;border:0;cursor:pointer;color:inherit;padding:8px;border-radius:8px;transition:background .15s;}
 .mem-bell-btn:hover{background:rgba(255,255,255,.15);}
 .mem-bell-btn .mem-notif-dot{position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;border-radius:10px;font-size:.62rem;font-weight:700;padding:1px 5px;min-width:16px;text-align:center;}
+.mem-lang-btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
+.mem-lang-code{font-size:11px;font-weight:800;line-height:1;}
+.mem-nav-item-rel{position:relative;}
+.mem-notif-dot-inline{position:static;margin-left:4px;}
 </style>
 <?php echo $extraHead; ?>
 </head>
@@ -180,8 +184,8 @@ $_hasIdCard = true;
 
         <!-- Bell -->
         <div class="bell-wrap">
-            <a class="mem-bell-btn" href="<?php echo htmlspecialchars($_langToggleUrl, ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $_t('भाषा परिवर्तन', 'Switch Language'); ?>" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
-                <small style="font-size:11px;font-weight:800;line-height:1;"><?php echo htmlspecialchars($_langBadge); ?></small>
+            <a class="mem-bell-btn mem-lang-btn" href="<?php echo htmlspecialchars($_langToggleUrl, ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $_t('भाषा परिवर्तन', 'Switch Language'); ?>">
+                <small class="mem-lang-code"><?php echo htmlspecialchars($_langBadge); ?></small>
             </a>
             <button class="mem-bell-btn" id="bellBtn" title="<?php echo $_t('सूचनाहरू', 'Notifications'); ?>" type="button">
                 <i class="fas fa-bell"></i>
@@ -249,9 +253,9 @@ $_hasIdCard = true;
     <nav class="mem-nav">
         <a href="<?php echo $_siteUrl; ?>member/" class="mem-nav-item <?php echo $_active==='dashboard'?'active':''; ?>"><i class="fas fa-house"></i><?php echo $_t('ड्यासबोर्ड', 'Dashboard'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/tracker.php" class="mem-nav-item <?php echo $_active==='tracker'?'active':''; ?>"><i class="fas fa-magnifying-glass-chart"></i><?php echo $_t('ट्र्याकर', 'Tracker'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>member/notifications.php" class="mem-nav-item <?php echo $_active==='notifications'?'active':''; ?>" style="position:relative;">
+        <a href="<?php echo $_siteUrl; ?>member/notifications.php" class="mem-nav-item mem-nav-item-rel <?php echo $_active==='notifications'?'active':''; ?>">
             <i class="fas fa-bell"></i><?php echo $_t('सूचनाहरू', 'Notifications'); ?>
-            <?php if ($_unread > 0): ?><span class="mem-notif-dot" style="position:static;margin-left:4px;"><?php echo $_unread; ?></span><?php endif; ?>
+            <?php if ($_unread > 0): ?><span class="mem-notif-dot mem-notif-dot-inline"><?php echo $_unread; ?></span><?php endif; ?>
         </a>
         <?php if ($_hasIdCard): ?>
         <a href="<?php echo $_siteUrl; ?>member/id-card.php" class="mem-nav-item <?php echo $_active==='idcard'?'active':''; ?>"><i class="fas fa-id-card"></i><?php echo $_t('परिचयपत्र', 'ID Card'); ?></a>

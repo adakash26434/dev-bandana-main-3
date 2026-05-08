@@ -2,11 +2,11 @@
 
         <!-- v9.6 Mobile bottom-nav (admin) -->
         <nav class="mob-bottomnav" aria-label="Admin quick nav">
-            <a href="<?php echo ADMIN_URL; ?>dashboard.php" class="mob-bn-item <?php echo ($currentPage??'')==='dashboard'?'active':''; ?>"><i class="fas fa-gauge-high"></i><span>ड्यासबोर्ड</span></a>
-            <a href="<?php echo ADMIN_URL; ?>notices.php" class="mob-bn-item"><i class="fas fa-bullhorn"></i><span>सूचना</span></a>
-            <a href="<?php echo ADMIN_URL; ?>members.php" class="mob-bn-item"><i class="fas fa-users"></i><span>सदस्य</span></a>
-            <a href="<?php echo ADMIN_URL; ?>settings.php" class="mob-bn-item"><i class="fas fa-gear"></i><span>सेटिङ</span></a>
-            <a href="<?php echo ADMIN_URL; ?>logout.php" class="mob-bn-item"><i class="fas fa-right-from-bracket"></i><span>लगआउट</span></a>
+            <a href="<?php echo ADMIN_URL; ?>dashboard.php" class="mob-bn-item <?php echo ($currentPage??'')==='dashboard'?'active':''; ?>"><i class="fas fa-gauge-high"></i><span><?php echo !empty($adminIsEnglish) ? 'Dashboard' : 'ड्यासबोर्ड'; ?></span></a>
+            <a href="<?php echo ADMIN_URL; ?>notices.php" class="mob-bn-item"><i class="fas fa-bullhorn"></i><span><?php echo !empty($adminIsEnglish) ? 'Notices' : 'सूचना'; ?></span></a>
+            <a href="<?php echo ADMIN_URL; ?>members.php" class="mob-bn-item"><i class="fas fa-users"></i><span><?php echo !empty($adminIsEnglish) ? 'Members' : 'सदस्य'; ?></span></a>
+            <a href="<?php echo ADMIN_URL; ?>settings.php" class="mob-bn-item"><i class="fas fa-gear"></i><span><?php echo !empty($adminIsEnglish) ? 'Settings' : 'सेटिङ'; ?></span></a>
+            <a href="<?php echo ADMIN_URL; ?>logout.php" class="mob-bn-item"><i class="fas fa-right-from-bracket"></i><span><?php echo !empty($adminIsEnglish) ? 'Logout' : 'लगआउट'; ?></span></a>
         </nav>
         <script>document.body.classList.add('has-bottomnav');</script>
     </main><!-- End main-content -->
@@ -75,8 +75,8 @@
 
     document.addEventListener('DOMContentLoaded', function() {
 
-        /* --- Global: native date inputs -> Nepali datepicker fields --- */
-        document.querySelectorAll('input[type="date"]:not([data-keep-gregorian])').forEach(function(inp) {
+        /* --- Global: explicit BS calendar only (avoid silent UX mutation) --- */
+        document.querySelectorAll('input[type="date"][data-calendar="bs"]:not([data-keep-gregorian])').forEach(function(inp) {
             if (inp.dataset.ndpAutoDone === '1') return;
             inp.dataset.ndpAutoDone = '1';
             try { inp.type = 'text'; } catch (e) {}
@@ -191,6 +191,8 @@
              2) 'नयाँ थप्नुहोस्' tab second
            ───────────────────────────────────────────────────── */
         function normalizeAdminTabs() {
+            /* Respect page-defined tab labels/order; do not rewrite globally. */
+            return;
             var tabBars = document.querySelectorAll('.admin-nav-tabs');
             tabBars.forEach(function(bar) {
                 var items = Array.prototype.slice.call(bar.querySelectorAll(':scope > .nav-item'));
@@ -248,6 +250,8 @@
            (keep dismissible success/error alerts visible)
            ───────────────────────────────────────────────────── */
         function hideAdminGuidanceBlocks() {
+            /* Keep author-defined guidance/alerts visible by default. */
+            return;
             document.querySelectorAll('.admin-help-tip').forEach(function(el) {
                 el.style.display = 'none';
             });
@@ -273,7 +277,7 @@
         document.querySelectorAll('a[href*="action=delete"], a[href*="delete="]').forEach(function(link) {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (!confirm('के तपाईं यो मेटाउन निश्चित हुनुहुन्छ?')) return;
+                if (!confirm(<?php echo json_encode(!empty($adminIsEnglish) ? 'Are you sure you want to delete this item?' : 'के तपाईं यो मेटाउन निश्चित हुनुहुन्छ?'); ?>)) return;
                 var form = document.createElement('form');
                 form.method = 'POST';
                 var url = new URL(link.href, window.location.origin);
@@ -305,11 +309,11 @@
                 try {
                     $(tbl).DataTable({
                         language: {
-                            search    : 'खोज्नुहोस्:',
-                            lengthMenu: '_MENU_ पङ्क्ति प्रति पृष्ठ',
-                            info      : '_START_–_END_ / जम्मा _TOTAL_',
+                            search    : <?php echo json_encode(!empty($adminIsEnglish) ? 'Search:' : 'खोज्नुहोस्:'); ?>,
+                            lengthMenu: <?php echo json_encode(!empty($adminIsEnglish) ? '_MENU_ rows per page' : '_MENU_ पङ्क्ति प्रति पृष्ठ'); ?>,
+                            info      : <?php echo json_encode(!empty($adminIsEnglish) ? '_START_–_END_ / total _TOTAL_' : '_START_–_END_ / जम्मा _TOTAL_'); ?>,
                             paginate  : { previous: '‹', next: '›' },
-                            emptyTable: 'कुनै डाटा छैन'
+                            emptyTable: <?php echo json_encode(!empty($adminIsEnglish) ? 'No data available' : 'कुनै डाटा छैन'); ?>
                         },
                         pageLength: 10,
                         lengthMenu: [[10, 20, 50, 100], [10, 20, 50, 100]],

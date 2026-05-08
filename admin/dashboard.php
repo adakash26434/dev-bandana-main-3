@@ -413,34 +413,34 @@ try {
 <div class="ds-pane" id="pane-requests">
   <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 class="dash-section-title"><i class="fas fa-user-clock"></i> सदस्य अनुरोध</h2>
+      <h2 class="dash-section-title"><i class="fas fa-user-clock"></i> <?php echo $__t('सदस्य अनुरोध', 'Member Requests'); ?></h2>
       <a href="member-online-portal.php?status=pending" class="btn btn-warning btn-sm">
-        <i class="fas fa-list"></i> सबै हेर्नुहोस्
+        <i class="fas fa-list"></i> <?php echo $__t('सबै हेर्नुहोस्', 'View All'); ?>
       </a>
     </div>
 
     <div class="row g-3 mb-3">
       <div class="col-6 col-md-4">
-        <a href="member-online-portal.php?status=pending" class="ds-card" title="पेन्डिङ दर्ता अनुरोध हेर्नुहोस्">
+        <a href="member-online-portal.php?status=pending" class="ds-card" title="<?php echo $__t('पेन्डिङ दर्ता अनुरोध हेर्नुहोस्', 'View pending registration requests'); ?>">
           <div class="ds-icon warn"><i class="fas fa-user-plus"></i></div>
-          <div><div class="ds-val"><?= $stats['requests'] ?></div><div class="ds-lbl">पेन्डिङ दर्ता</div></div>
+          <div><div class="ds-val"><?= $stats['requests'] ?></div><div class="ds-lbl"><?php echo $__t('पेन्डिङ दर्ता', 'Pending Registrations'); ?></div></div>
         </a>
       </div>
       <div class="col-6 col-md-4">
-        <a href="member-online-portal.php?tab=resets" class="ds-card" title="Password reset अनुरोध हेर्नुहोस्">
+        <a href="member-online-portal.php?tab=resets" class="ds-card" title="<?php echo $__t('Password reset अनुरोध हेर्नुहोस्', 'View password reset requests'); ?>">
           <div class="ds-icon danger"><i class="fas fa-key"></i></div>
-          <div><div class="ds-val"><?= $stats['pwResets'] ?></div><div class="ds-lbl">Password Reset</div></div>
+          <div><div class="ds-val"><?= $stats['pwResets'] ?></div><div class="ds-lbl"><?php echo $__t('Password Reset', 'Password Reset'); ?></div></div>
         </a>
       </div>
     </div>
 
     <h2 class="dash-subtitle-row">
-      <i class="fas fa-clock"></i> हालैका दर्ता अनुरोधहरू
+      <i class="fas fa-clock"></i> <?php echo $__t('हालैका दर्ता अनुरोधहरू', 'Recent Registration Requests'); ?>
     </h2>
     <?php if (empty($pendingMembers)): ?>
       <div class="text-center py-4 dash-muted-block">
         <div class="dash-empty-icon-lg"><i class="fas fa-circle-check"></i></div>
-        <div>कुनै पेन्डिङ अनुरोध छैन।</div>
+        <div><?php echo $__t('कुनै पेन्डिङ अनुरोध छैन।', 'No pending requests.'); ?></div>
       </div>
     <?php else: ?>
       <?php foreach ($pendingMembers as $m): ?>
@@ -461,7 +461,7 @@ try {
             </div>
           </div>
           <a href="member-online-portal.php?view=<?= (int)$m['id'] ?>" class="btn btn-sm btn-outline-success">
-            <i class="fas fa-eye"></i> हेर्नुहोस्
+            <i class="fas fa-eye"></i> <?php echo $__t('हेर्नुहोस्', 'View'); ?>
           </a>
         </div>
       <?php endforeach; ?>
@@ -473,37 +473,37 @@ try {
 <div class="ds-pane" id="pane-welfare">
   <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 class="dash-section-title"><i class="fas fa-hand-holding-heart dash-heart-icon"></i> कल्याण दाबी व्यवस्थापन</h2>
-      <a href="welfare-claims.php" class="btn btn-sm btn-outline-success"><i class="fas fa-arrow-up-right-from-square"></i> सबै दाबी</a>
+      <h2 class="dash-section-title"><i class="fas fa-hand-holding-heart dash-heart-icon"></i> <?php echo $__t('कल्याण दाबी व्यवस्थापन', 'Welfare Claims Management'); ?></h2>
+      <a href="welfare-claims.php" class="btn btn-sm btn-outline-success"><i class="fas fa-arrow-up-right-from-square"></i> <?php echo $__t('सबै दाबी', 'All Claims'); ?></a>
     </div>
     <div class="wf-summary-bar">
-      <a href="welfare-claims.php?status=pending" class="wf-stat-chip"><div class="val dash-val-pending"><?= $welfarePending ?></div><div class="lbl">पेन्डिङ</div></a>
-      <a href="welfare-claims.php?status=under_review" class="wf-stat-chip"><div class="val dash-val-review"><?= $welfareReview ?></div><div class="lbl">समीक्षाधीन</div></a>
-      <a href="welfare-claims.php?status=approved" class="wf-stat-chip"><div class="val dash-val-approved"><?= $welfareApproved ?></div><div class="lbl">स्वीकृत</div></a>
+      <a href="welfare-claims.php?status=pending" class="wf-stat-chip"><div class="val dash-val-pending"><?= $welfarePending ?></div><div class="lbl"><?php echo $__t('पेन्डिङ', 'Pending'); ?></div></a>
+      <a href="welfare-claims.php?status=under_review" class="wf-stat-chip"><div class="val dash-val-review"><?= $welfareReview ?></div><div class="lbl"><?php echo $__t('समीक्षाधीन', 'Under Review'); ?></div></a>
+      <a href="welfare-claims.php?status=approved" class="wf-stat-chip"><div class="val dash-val-approved"><?= $welfareApproved ?></div><div class="lbl"><?php echo $__t('स्वीकृत', 'Approved'); ?></div></a>
     </div>
     <?php if (empty($welfareByType)): ?>
-      <div class="text-center py-3 dash-empty-note">कुनै दाबी छैन।</div>
+      <div class="text-center py-3 dash-empty-note"><?php echo $__t('कुनै दाबी छैन।', 'No claims found.'); ?></div>
     <?php else: ?>
       <?php foreach ($welfareByType as $wt): $tk = $wt['claim_type']; $tm = $welfareClaimTypes[$tk] ?? ['np' => $tk, 'icon' => 'fa-circle', 'color' => '#6b7280', 'bg' => '#f3f4f6']; ?>
         <div class="wf-type-row">
           <div class="wf-type-icon dash-wf-type-icon" data-bg="<?= htmlspecialchars($tm['bg'] ?? '#f3f4f6', ENT_QUOTES, 'UTF-8') ?>" data-color="<?= htmlspecialchars($tm['color'] ?? '#6b7280', ENT_QUOTES, 'UTF-8') ?>"><i class="fas <?= $tm['icon'] ?>"></i></div>
-          <div class="wf-type-name"><?= htmlspecialchars($tm['np']) ?><div class="dash-type-total"><?= (int)($wt['total'] ?? 0) ?> दाबी</div></div>
+          <div class="wf-type-name"><?= htmlspecialchars($tm['np']) ?><div class="dash-type-total"><?= (int)($wt['total'] ?? 0) ?> <?php echo $__t('दाबी', 'claims'); ?></div></div>
           <div class="d-flex gap-1 flex-wrap">
-            <?php if ((int)($wt['pending_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=pending" class="wf-badge pending"><?= (int)$wt['pending_count'] ?> पेन्डिङ</a><?php endif; ?>
-            <?php if ((int)($wt['review_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=under_review" class="wf-badge review"><?= (int)$wt['review_count'] ?> समीक्षा</a><?php endif; ?>
-            <?php if ((int)($wt['approved_count'] ?? 0) > 0): ?><span class="wf-badge approved"><?= (int)$wt['approved_count'] ?> स्वीकृत</span><?php endif; ?>
+            <?php if ((int)($wt['pending_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=pending" class="wf-badge pending"><?= (int)$wt['pending_count'] ?> <?php echo $__t('पेन्डिङ', 'Pending'); ?></a><?php endif; ?>
+            <?php if ((int)($wt['review_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=under_review" class="wf-badge review"><?= (int)$wt['review_count'] ?> <?php echo $__t('समीक्षा', 'Review'); ?></a><?php endif; ?>
+            <?php if ((int)($wt['approved_count'] ?? 0) > 0): ?><span class="wf-badge approved"><?= (int)$wt['approved_count'] ?> <?php echo $__t('स्वीकृत', 'Approved'); ?></span><?php endif; ?>
           </div>
         </div>
       <?php endforeach; ?>
     <?php endif; ?>
 
-    <h3 class="dash-subtitle-row dash-subtitle-lg"><i class="fas fa-list"></i> पछिल्ला दाबीहरू</h3>
+    <h3 class="dash-subtitle-row dash-subtitle-lg"><i class="fas fa-list"></i> <?php echo $__t('पछिल्ला दाबीहरू', 'Recent Claims'); ?></h3>
     <?php if (empty($welfareRecent)): ?>
-      <div class="text-center py-3 dash-empty-note-lg">अहिलेसम्म कुनै दाबी रेकर्ड छैन।</div>
+      <div class="text-center py-3 dash-empty-note-lg"><?php echo $__t('अहिलेसम्म कुनै दाबी रेकर्ड छैन।', 'No claim records yet.'); ?></div>
     <?php else: ?>
       <div class="table-responsive border rounded">
         <table class="table table-sm table-hover mb-0 align-middle">
-          <thead class="table-light"><tr><th>दाबीकर्ता</th><th>प्रकार</th><th>स्थिति</th><th>रकम</th><th>मिति</th><th></th></tr></thead>
+          <thead class="table-light"><tr><th><?php echo $__t('दाबीकर्ता', 'Claimant'); ?></th><th><?php echo $__t('प्रकार', 'Type'); ?></th><th><?php echo $__t('स्थिति', 'Status'); ?></th><th><?php echo $__t('रकम', 'Amount'); ?></th><th><?php echo $__t('मिति', 'Date'); ?></th><th></th></tr></thead>
           <tbody>
             <?php foreach ($welfareRecent as $wr): $wtk = (string)($wr['claim_type'] ?? 'other'); $wtm = $welfareClaimTypes[$wtk] ?? ['np' => $wtk]; ?>
               <tr>
@@ -526,38 +526,38 @@ try {
 <div class="ds-pane" id="pane-programs">
   <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 class="dash-section-title"><i class="fas fa-clipboard-check"></i> कार्यक्रम उपस्थिति</h2>
+      <h2 class="dash-section-title"><i class="fas fa-clipboard-check"></i> <?php echo $__t('कार्यक्रम उपस्थिति', 'Program Attendance'); ?></h2>
       <div class="d-flex flex-wrap gap-2">
-        <a href="program-attendance.php" class="btn btn-success btn-sm"><i class="fas fa-table"></i> पूरै रिपोर्ट</a>
-        <a href="programs.php" class="btn btn-outline-success btn-sm"><i class="fas fa-calendar-plus"></i> कार्यक्रम व्यवस्थापन</a>
+        <a href="program-attendance.php" class="btn btn-success btn-sm"><i class="fas fa-table"></i> <?php echo $__t('पूरै रिपोर्ट', 'Full Report'); ?></a>
+        <a href="programs.php" class="btn btn-outline-success btn-sm"><i class="fas fa-calendar-plus"></i> <?php echo $__t('कार्यक्रम व्यवस्थापन', 'Program Management'); ?></a>
       </div>
     </div>
-    <p class="small text-muted mb-3">कुल रेकर्ड, खोज/मिति फिल्टर, पृष्ठ-पृष्ठ हेर्ने र Excel निर्यात <a href="program-attendance.php">उपस्थिति रिपोर्ट</a> पृष्ठमा छन्।</p>
+    <p class="small text-muted mb-3"><?php echo $__t('कुल रेकर्ड, खोज/मिति फिल्टर, पृष्ठ-पृष्ठ हेर्ने र Excel निर्यात उपस्थिति रिपोर्ट पृष्ठमा छन्।', 'Total records, search/date filters, pagination, and Excel export are available on the attendance report page.'); ?> <a href="program-attendance.php"><?php echo $__t('उपस्थिति रिपोर्ट', 'Attendance Report'); ?></a></p>
     <div class="row g-3 mb-4">
       <div class="col-6 col-md-4">
         <a href="program-attendance.php" class="ds-card">
           <div class="ds-icon dash-icon-purple"><i class="fas fa-user-check"></i></div>
-          <div><div class="ds-val"><?= (int)$stats['programAttend'] ?></div><div class="ds-lbl">कुल उपस्थिति रेकर्ड</div></div>
+          <div><div class="ds-val"><?= (int)$stats['programAttend'] ?></div><div class="ds-lbl"><?php echo $__t('कुल उपस्थिति रेकर्ड', 'Total Attendance Records'); ?></div></div>
         </a>
       </div>
       <div class="col-6 col-md-4">
         <a href="program-attendance.php" class="ds-card">
           <div class="ds-icon info"><i class="fas fa-users"></i></div>
-          <div><div class="ds-val"><?= (int)$stats['programUnique'] ?></div><div class="ds-lbl">भिन्न सदस्य (member_id)</div></div>
+          <div><div class="ds-val"><?= (int)$stats['programUnique'] ?></div><div class="ds-lbl"><?php echo $__t('भिन्न सदस्य (member_id)', 'Unique Members (member_id)'); ?></div></div>
         </a>
       </div>
       <div class="col-6 col-md-4">
         <a href="program-attendance.php" class="ds-card">
           <div class="ds-icon warn"><i class="fas fa-hourglass-half"></i></div>
-          <div><div class="ds-val"><?= (int)$dashPendingAttendanceReq ?></div><div class="ds-lbl">उपस्थिति अनुरोध पेन्डिङ</div></div>
+          <div><div class="ds-val"><?= (int)$dashPendingAttendanceReq ?></div><div class="ds-lbl"><?php echo $__t('उपस्थिति अनुरोध पेन्डिङ', 'Pending Attendance Requests'); ?></div></div>
         </a>
       </div>
     </div>
     <div class="row g-3">
       <div class="col-lg-6">
-        <h3 class="dash-subtitle-row dash-subtitle-tight"><i class="fas fa-chart-bar"></i> बढी उपस्थिति भएका कार्यक्रम</h3>
+        <h3 class="dash-subtitle-row dash-subtitle-tight"><i class="fas fa-chart-bar"></i> <?php echo $__t('बढी उपस्थिति भएका कार्यक्रम', 'Top Programs by Attendance'); ?></h3>
         <?php if (empty($dashAttendTopPrograms)): ?>
-          <div class="text-center py-4 dash-empty-note-md">अहिलेसम्म कुनै उपस्थिति रेकर्ड छैन।</div>
+          <div class="text-center py-4 dash-empty-note-md"><?php echo $__t('अहिलेसम्म कुनै उपस्थिति रेकर्ड छैन।', 'No attendance records yet.'); ?></div>
         <?php else: ?>
           <div class="list-group list-group-flush border rounded overflow-hidden">
             <?php foreach ($dashAttendTopPrograms as $tp): ?>
@@ -570,9 +570,9 @@ try {
         <?php endif; ?>
       </div>
       <div class="col-lg-6">
-        <h3 class="dash-subtitle-row dash-subtitle-tight"><i class="fas fa-clock"></i> पछिल्लो उपस्थिति</h3>
+        <h3 class="dash-subtitle-row dash-subtitle-tight"><i class="fas fa-clock"></i> <?php echo $__t('पछिल्लो उपस्थिति', 'Recent Attendance'); ?></h3>
         <?php if (empty($dashAttendRecent)): ?>
-          <div class="text-center py-4 dash-empty-note-md">डाटा छैन।</div>
+          <div class="text-center py-4 dash-empty-note-md"><?php echo $__t('डाटा छैन।', 'No data.'); ?></div>
         <?php else: ?>
           <div class="list-group list-group-flush border rounded overflow-hidden">
             <?php foreach ($dashAttendRecent as $ar): ?>

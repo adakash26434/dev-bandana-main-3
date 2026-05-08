@@ -66,6 +66,14 @@ $flash = getFlash();
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
 
+<style>
+.appfeat-flat-top{border-top-left-radius:0!important;border-top-right-radius:0!important;}
+.appfeat-icon-wrap{width:44px;height:44px;background:linear-gradient(135deg,rgba(26,95,42,.12),rgba(40,167,69,.18));border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.appfeat-inline-form{display:inline;}
+.appfeat-toggle-badge{cursor:pointer;}
+.appfeat-form-header{background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;}
+</style>
+
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#feat-list" id="feat-list-btn">
@@ -84,7 +92,7 @@ $flash = getFlash();
 
     <!-- ══ TAB 1: सूची ══ -->
     <div class="tab-pane fade show active" id="feat-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+        <div class="card admin-table-card appfeat-flat-top">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -94,7 +102,7 @@ $flash = getFlash();
                                 <th><?php echo $__t('शीर्षक', 'Title'); ?></th>
                                 <th><?php echo $__t('विवरण', 'Description'); ?></th>
                                 <th width="80" class="text-center"><?php echo $__t('क्रम', 'Order'); ?></th>
-                                <th width="80" class="text-center">New</th>
+                                <th width="80" class="text-center"><?php echo $__t('नयाँ', 'New'); ?></th>
                                 <th width="90" class="text-center"><?php echo $__t('स्थिति', 'Status'); ?></th>
                                 <th width="140" class="text-center"><?php echo $__t('कार्य', 'Actions'); ?></th>
                             </tr>
@@ -109,7 +117,7 @@ $flash = getFlash();
                             <?php foreach ($features as $f): ?>
                             <tr>
                                 <td class="ps-3">
-                                    <div style="width:44px;height:44px;background:linear-gradient(135deg,rgba(26,95,42,.12),rgba(40,167,69,.18));border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                                    <div class="appfeat-icon-wrap">
                                         <i class="<?php echo htmlspecialchars($f['icon']); ?> text-success fa-lg"></i>
                                     </div>
                                 </td>
@@ -120,16 +128,16 @@ $flash = getFlash();
                                 <td><small class="text-muted"><?php echo htmlspecialchars(mb_substr($f['description_np'] ?: ($f['description'] ?: ''), 0, 70)); ?>…</small></td>
                                 <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $f['sort_order']; ?></span></td>
                                 <td class="text-center">
-                                    <form method="POST" style="display:inline">
+                                    <form method="POST" class="appfeat-inline-form">
     <?php echo csrfField(); ?>
                                         <input type="hidden" name="action" value="toggle_new">
                                         <input type="hidden" name="id" value="<?php echo $f['id']; ?>">
-                                        <button class="badge bg-<?php echo $f['is_new'] ? 'warning text-dark' : 'light text-muted'; ?> border-0" style="cursor:pointer;" title="Toggle">
-                                            <?php echo $f['is_new'] ? '✓ NEW' : 'नहीं'; ?>
+                                        <button class="badge bg-<?php echo $f['is_new'] ? 'warning text-dark' : 'light text-muted'; ?> border-0 appfeat-toggle-badge" title="<?php echo $__t('टगल गर्नुहोस्', 'Toggle'); ?>">
+                                            <?php echo $f['is_new'] ? ('✓ ' . $__t('नयाँ', 'NEW')) : $__t('छैन', 'No'); ?>
                                         </button>
                                     </form>
                                 </td>
-                                <td class="text-center"><span class="badge bg-<?php echo $f['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $f['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $f['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $f['is_active'] ? $__t('सक्रिय', 'Active') : $__t('निष्क्रिय', 'Inactive'); ?></span></td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-primary me-1 btn-edit-feat"
                                             data-id="<?php echo $f['id']; ?>"
@@ -144,7 +152,7 @@ $flash = getFlash();
                                             title="सम्पादन">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो सुविधा हटाउन निश्चित हुनुहुन्छ?')">
+                                    <form method="POST" class="appfeat-inline-form" onsubmit="return confirm('<?php echo $__t('के तपाईं यो सुविधा हटाउन निश्चित हुनुहुन्छ?', 'Are you sure you want to delete this feature?'); ?>')">
     <?php echo csrfField(); ?>
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $f['id']; ?>">
@@ -162,8 +170,8 @@ $flash = getFlash();
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="feat-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card appfeat-flat-top">
+            <div class="card-header d-flex justify-content-between align-items-center appfeat-form-header">
                 <h5 class="mb-0 fw-bold" id="featFormTitle">
                     <i class="fas fa-plus-circle me-2"></i><?php echo $__t('नयाँ सुविधा थप्नुहोस्', 'Add New Feature'); ?>
                 </h5>
