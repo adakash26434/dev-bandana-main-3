@@ -175,18 +175,18 @@ try {
                 </p>
 
                 <!-- v10.3 (Issue #10): Footer policy links — admin बाट pages.php मा edit गर्न मिल्छ -->
-                <div class="footer-policy-links" style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:6px 0;">
-                    <a href="<?php echo SITE_URL; ?>page.php?slug=privacy-policy" style="color:rgba(255,255,255,.85);text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+                <div class="footer-policy-links">
+                    <a href="<?php echo SITE_URL; ?>page.php?slug=privacy-policy">
                         <i class="fas fa-shield-halved"></i>
                         <?php echo isEnglish() ? 'Privacy Policy' : 'गोपनीयता नीति'; ?>
                     </a>
-                    <span style="opacity:.4;">•</span>
-                    <a href="<?php echo SITE_URL; ?>page.php?slug=terms-of-service" style="color:rgba(255,255,255,.85);text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+                    <span class="footer-policy-dot">•</span>
+                    <a href="<?php echo SITE_URL; ?>page.php?slug=terms-of-service">
                         <i class="fas fa-file-contract"></i>
                         <?php echo isEnglish() ? 'Terms of Service' : 'सेवाका सर्तहरू'; ?>
                     </a>
-                    <span style="opacity:.4;">•</span>
-                    <a href="<?php echo SITE_URL; ?>page.php?slug=cookie-policy" style="color:rgba(255,255,255,.85);text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+                    <span class="footer-policy-dot">•</span>
+                    <a href="<?php echo SITE_URL; ?>page.php?slug=cookie-policy">
                         <i class="fas fa-cookie-bite"></i>
                         <?php echo isEnglish() ? 'Cookie Policy' : 'कुकी नीति'; ?>
                     </a>
@@ -204,7 +204,7 @@ try {
                 </div>
 
                 <?php if ($supportedName !== ''): ?>
-                <p class="developer" style="opacity:.9; margin-bottom:2px;">
+                <p class="developer footer-developer-supported">
                     <?php echo isEnglish() ? 'Supported By' : 'समर्थन'; ?>
                     <?php if ($supportedUrl !== ''): ?>
                     <a href="<?php echo htmlspecialchars($supportedUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener"><?php echo htmlspecialchars($supportedName, ENT_QUOTES, 'UTF-8'); ?></a>
@@ -214,7 +214,7 @@ try {
                 </p>
                 <?php endif; ?>
 
-                <p class="developer" style="opacity:.9; margin-bottom:0;">
+                <p class="developer footer-developer-main">
                     <?php echo isEnglish() ? 'Developed By' : 'विकास सहयोग'; ?>
                     <a href="<?php echo $developerUrl; ?>" target="_blank" rel="noopener"><?php echo $developerName; ?></a>
                 </p>

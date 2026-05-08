@@ -131,29 +131,50 @@ $pageTitle = $_t('सेवा अनुरोध', 'Service Request') . ' — '
 $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">';
 
 $statusColors = [
-    'pending' => 'var(--secondary-color,#c0392b)',
-    'confirmed' => 'var(--secondary-color,#c0392b)',
-    'completed' => 'var(--primary-color,#1a8754)',
-    'cancelled' => '#dc2626',
-    'processing' => 'var(--secondary-dark,#922b21)'
+    'pending' => 'var(--secondary-color)',
+    'confirmed' => 'var(--secondary-color)',
+    'completed' => 'var(--primary-color)',
+    'cancelled' => 'var(--secondary-dark,var(--secondary-color))',
+    'processing' => 'var(--secondary-dark,var(--secondary-color))'
 ];
 
 $extraHead = <<<HTML
 <style>
-.sr-info-bar { background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px;font-size:.83rem;color:#166534;margin-bottom:18px;display:flex;gap:8px;align-items:center; }
+.sr-info-bar { background:color-mix(in srgb, var(--primary-color) 12%, white);border:1px solid color-mix(in srgb, var(--primary-color) 24%, white);border-radius:10px;padding:12px 14px;font-size:.83rem;color:var(--primary-dark,var(--primary-color));margin-bottom:18px;display:flex;gap:8px;align-items:center; }
 .form-group { margin-bottom:14px; }
-.form-group label { display:block;font-size:.82rem;font-weight:600;color:#374151;margin-bottom:5px; }
-.form-control { width:100%;padding:10px 14px;min-height:44px;border:1.5px solid #d1d5db;border-radius:10px;font-family:inherit;font-size:.9rem;background:#f9fafb;transition:border-color .2s;line-height:1.4; }
-.form-control:focus { outline:none;border-color:var(--primary-color,#1a8754);background:#fff;box-shadow:0 0 0 3px rgba(26,95,42,.12); }
-.form-control[readonly] { background:#f0f0f0;color:#6b7280; }
+.form-group label { display:block;font-size:.82rem;font-weight:600;color:var(--text-color,#374151);margin-bottom:5px; }
+.form-control { width:100%;padding:10px 14px;min-height:44px;border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db);border-radius:10px;font-family:inherit;font-size:.9rem;background:#f9fafb;transition:border-color .2s;line-height:1.4; }
+.form-control:focus { outline:none;border-color:var(--primary-color,#1a8754);background:white;box-shadow:0 0 0 3px rgba(var(--primary-rgb,26,95,42),.12); }
+.form-control[readonly] { background:color-mix(in srgb, var(--primary-color) 8%, #f0f0f0);color:var(--text-light,#6b7280); }
 .form-row2 { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
 @media(max-width:540px){.form-row2{grid-template-columns:1fr;}}
-.svc-card { background:#fff;border:2px solid #e5e7eb;border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;margin-bottom:10px; }
-.svc-card:hover,.svc-card.sel { border-color:var(--primary-color,#1a8754);background:#f0fdf4; }
-.svc-card.sel { box-shadow:0 0 0 3px rgba(26,95,42,.12); }
-.svc-label { font-size:.9rem;font-weight:600;color:#1f2937; }
-.recent-card { background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px; }
+.svc-card { background:white;border:2px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;margin-bottom:10px; }
+.svc-card:hover,.svc-card.sel { border-color:var(--primary-color,#1a8754);background:color-mix(in srgb, var(--primary-color) 10%, white); }
+.svc-card.sel { box-shadow:0 0 0 3px rgba(var(--primary-rgb,26,95,42),.12); }
+.svc-label { font-size:.9rem;font-weight:600;color:var(--text-color,#1f2937); }
+.recent-card { background:color-mix(in srgb, var(--primary-color) 8%, white);border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px; }
 .status-dot { width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px; }
+.sr-title { font-size:1.25rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0 0 16px; }
+.sr-icon-gap { margin-right:8px; }
+.sr-alert-success { background:color-mix(in srgb, var(--primary-color) 12%, white);border:1px solid color-mix(in srgb, var(--primary-color) 24%, white);border-radius:10px;padding:14px 16px;color:var(--primary-dark,var(--primary-color));font-size:.9rem;margin-bottom:16px; }
+.sr-alert-error { background:color-mix(in srgb, var(--secondary-color) 12%, white);border:1px solid color-mix(in srgb, var(--secondary-color) 24%, white);border-radius:10px;padding:14px 16px;color:var(--secondary-dark,var(--secondary-color));font-size:.9rem;margin-bottom:16px; }
+.sr-link-strong { color:var(--primary-color,#1a8754);font-weight:700; }
+.sr-mt-10 { margin-top:10px; }
+.sr-prefill-box { background:color-mix(in srgb, var(--primary-color) 8%, white);border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:10px;padding:14px;margin-bottom:18px; }
+.sr-subtle-head { font-size:.75rem;font-weight:700;color:var(--text-muted,#9ca3af);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px; }
+.sr-mb-8 { margin-bottom:8px; }
+.sr-mb-0 { margin-bottom:0; }
+.sr-required { color:var(--secondary-color); }
+.sr-icon-brand { margin-right:4px;color:var(--primary-color,#1a8754); }
+.sr-submit { width:100%;padding:12px;background:var(--primary-color,#1a8754);color:var(--text-on-primary,white);border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px; }
+.sr-recent-wrap { margin-top:24px; }
+.sr-recent-title { font-size:.8rem;font-weight:700;color:var(--text-muted,#9ca3af);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px; }
+.sr-purpose { font-size:.82rem;font-weight:700;color:var(--text-color,#1f2937); }
+.sr-date { font-size:.72rem;color:var(--text-muted,#9ca3af);margin-top:2px; }
+.sr-right { display:flex;align-items:center;gap:8px; }
+.sr-track { font-size:.72rem;font-family:monospace;background:color-mix(in srgb, var(--primary-color) 10%, white);padding:2px 7px;border-radius:5px; }
+.sr-status { font-size:.75rem;font-weight:700; }
+.sr-more-link { font-size:.82rem;color:var(--primary-color,#1a8754);text-decoration:none; }
 </style>
 HTML;
 ?>
@@ -162,24 +183,24 @@ HTML;
 <main class="mp-main">
 <div class="mp-container">
 
-  <h1 style="font-size:1.25rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0 0 16px;">
-    <i class="fas fa-concierge-bell" style="margin-right:8px;"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?>
+  <h1 class="sr-title">
+    <i class="fas fa-concierge-bell sr-icon-gap"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?>
   </h1>
 
   <?php if ($successMsg): ?>
-  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;color:#166534;font-size:.9rem;margin-bottom:16px;">
-    <i class="fas fa-circle-check" style="margin-right:8px;"></i><?= $successMsg ?>
-    <div style="margin-top:10px;"><a href="tracker.php" style="color:var(--primary-color,#1a8754);font-weight:700;"><?php echo $_t('Tracker मा हेर्नुहोस्', 'Open in Tracker'); ?> →</a></div>
+  <div class="sr-alert-success">
+    <i class="fas fa-circle-check sr-icon-gap"></i><?= $successMsg ?>
+    <div class="sr-mt-10"><a href="tracker.php" class="sr-link-strong"><?php echo $_t('Tracker मा हेर्नुहोस्', 'Open in Tracker'); ?> →</a></div>
   </div>
   <?php endif; ?>
   <?php if ($errorMsg): ?>
-  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px 16px;color:#dc2626;font-size:.9rem;margin-bottom:16px;">
-    <i class="fas fa-circle-xmark" style="margin-right:8px;"></i><?= htmlspecialchars($errorMsg) ?>
+  <div class="sr-alert-error">
+    <i class="fas fa-circle-xmark sr-icon-gap"></i><?= htmlspecialchars($errorMsg) ?>
   </div>
   <?php endif; ?>
 
   <div class="sr-info-bar">
-    <i class="fas fa-magic-wand-sparkles" style="flex-shrink:0;"></i>
+    <i class="fas fa-magic-wand-sparkles"></i>
     <div><?php echo $_t('तपाईंको नाम, फोन, email — <strong>profile बाट auto-fill</strong> भएको छ। सेवा प्रकार र सन्देश मात्र भर्नुहोस्।', 'Your name, phone and email are <strong>auto-filled from profile</strong>. Only select service type and message.'); ?></div>
   </div>
 
@@ -188,22 +209,22 @@ HTML;
     <input type="hidden" name="action" value="submit">
 
     <!-- Pre-filled info -->
-    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:18px;">
-      <div style="font-size:.75rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;"><?php echo $_t('तपाईंको जानकारी (Auto-filled)', 'Your Information (Auto-filled)'); ?></div>
+    <div class="sr-prefill-box">
+      <div class="sr-subtle-head"><?php echo $_t('तपाईंको जानकारी (Auto-filled)', 'Your Information (Auto-filled)'); ?></div>
       <div class="form-row2">
-        <div class="form-group" style="margin-bottom:8px;">
+        <div class="form-group sr-mb-8">
           <label><?php echo $_t('नाम', 'Name'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($memName) ?>" readonly>
         </div>
-        <div class="form-group" style="margin-bottom:8px;">
+        <div class="form-group sr-mb-8">
           <label><?php echo $_t('सदस्यता नम्बर', 'Membership Number'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($memSadasyata) ?>" readonly>
         </div>
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group sr-mb-0">
           <label><?php echo $_t('फोन', 'Phone'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($rPhone) ?>" readonly>
         </div>
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group sr-mb-0">
           <label><?php echo $_t('इमेल', 'Email'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($rEmail) ?>" readonly>
         </div>
@@ -212,7 +233,7 @@ HTML;
 
     <!-- Service type -->
     <div class="form-group">
-      <label><?php echo $_t('सेवा प्रकार छान्नुहोस्', 'Select Service Type'); ?> <span style="color:#dc2626;">*</span></label>
+      <label><?php echo $_t('सेवा प्रकार छान्नुहोस्', 'Select Service Type'); ?> <span class="sr-required">*</span></label>
       <select name="service_type" class="form-control" required>
         <option value="">— <?php echo $_t('सेवा छान्नुहोस्', 'Select service'); ?> —</option>
         <?php foreach ($serviceTypes as $key => $svc): ?>
@@ -223,11 +244,11 @@ HTML;
 
     <div class="form-row2">
       <div class="form-group">
-        <label><i class="fas fa-calendar" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i><?php echo $_t('मनपर्ने मिति (Optional)', 'Preferred Date (Optional)'); ?></label>
+        <label><i class="fas fa-calendar sr-icon-brand"></i><?php echo $_t('मनपर्ने मिति (Optional)', 'Preferred Date (Optional)'); ?></label>
         <input type="date" name="preferred_date" class="form-control" min="<?= date('Y-m-d') ?>">
       </div>
       <div class="form-group">
-        <label><i class="fas fa-clock" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i><?php echo $_t('मनपर्ने समय', 'Preferred Time'); ?></label>
+        <label><i class="fas fa-clock sr-icon-brand"></i><?php echo $_t('मनपर्ने समय', 'Preferred Time'); ?></label>
         <select name="preferred_time" class="form-control">
           <option value="">— <?php echo $_t('समय छान्नुहोस्', 'Select time'); ?> —</option>
           <option>10:00 AM - 11:00 AM</option>
@@ -240,43 +261,43 @@ HTML;
     </div>
 
     <div class="form-group">
-      <label><i class="fas fa-building" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i><?php echo $_t('शाखा', 'Branch'); ?></label>
+      <label><i class="fas fa-building sr-icon-brand"></i><?php echo $_t('शाखा', 'Branch'); ?></label>
       <input type="text" name="branch" class="form-control" value="<?= htmlspecialchars($rBranch) ?>" placeholder="<?php echo $_t('जस्तै: प्रधान कार्यालय', 'e.g., Head Office'); ?>">
     </div>
 
     <div class="form-group">
-      <label><?php echo $_t('विस्तृत सन्देश', 'Detailed Message'); ?> <span style="color:#dc2626;">*</span></label>
+      <label><?php echo $_t('विस्तृत सन्देश', 'Detailed Message'); ?> <span class="sr-required">*</span></label>
       <textarea name="message" class="form-control" rows="4" required placeholder="<?php echo $_t('तपाईंको अनुरोधको पूरा विवरण लेख्नुहोस्...', 'Write full details of your request...'); ?>"></textarea>
     </div>
 
-    <button type="submit" style="width:100%;padding:12px;background:var(--primary-color,#1a8754);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+    <button type="submit" class="sr-submit">
       <i class="fas fa-paper-plane"></i> <?php echo $_t('अनुरोध पठाउनुहोस्', 'Submit Request'); ?>
     </button>
   </form>
 
   <!-- Recent requests -->
   <?php if (!empty($recentReqs)): ?>
-  <div style="margin-top:24px;">
-    <div style="font-size:.8rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">
-      <i class="fas fa-history" style="margin-right:4px;"></i><?php echo $_t('हालसालैका अनुरोधहरू', 'Recent Requests'); ?>
+  <div class="sr-recent-wrap">
+    <div class="sr-recent-title">
+      <i class="fas fa-history sr-icon-brand"></i><?php echo $_t('हालसालैका अनुरोधहरू', 'Recent Requests'); ?>
     </div>
     <?php foreach ($recentReqs as $rq):
-        $stColor = $statusColors[$rq['status']] ?? '#9ca3af';
+        $stColor = $statusColors[$rq['status']] ?? 'var(--text-muted,#9ca3af)';
     ?>
     <div class="recent-card">
       <div>
-        <span style="font-size:.82rem;font-weight:700;color:#1f2937;"><?= htmlspecialchars(mb_substr($rq['purpose'],0,50)) ?></span>
-        <div style="font-size:.72rem;color:#9ca3af;margin-top:2px;"><?= date('Y-m-d', strtotime($rq['created_at'])) ?></div>
+        <span class="sr-purpose"><?= htmlspecialchars(mb_substr($rq['purpose'],0,50)) ?></span>
+        <div class="sr-date"><?= date('Y-m-d', strtotime($rq['created_at'])) ?></div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span class="track-id" style="font-size:.72rem;font-family:monospace;background:#f3f4f6;padding:2px 7px;border-radius:5px;"><?= htmlspecialchars($rq['tracking_id']) ?></span>
-        <span style="font-size:.75rem;font-weight:700;color:<?= $stColor ?>;">
+      <div class="sr-right">
+        <span class="track-id sr-track"><?= htmlspecialchars($rq['tracking_id']) ?></span>
+        <span class="sr-status" style="color:<?= $stColor ?>;">
           <span class="status-dot" style="background:<?= $stColor ?>;"></span><?= htmlspecialchars($rq['status']) ?>
         </span>
       </div>
     </div>
     <?php endforeach; ?>
-    <a href="tracker.php?filter=appointment" style="font-size:.82rem;color:var(--primary-color,#1a8754);text-decoration:none;">
+    <a href="tracker.php?filter=appointment" class="sr-more-link">
       सबै Tracker मा हेर्नुहोस् →
     </a>
   </div>

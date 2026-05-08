@@ -113,16 +113,16 @@ function adminEmptyRow(int $colspan = 6, string $msg = '', string $sub = ''): st
 function adminBadge(string $color, string $text, bool $dark = false): string {
     /* Map Bootstrap color names → soft pill styles */
     $softStyles = [
-        'success'   => 'background:#dcfce7;color:#166534;',
-        'danger'    => 'background:#fee2e2;color:#991b1b;',
-        'warning'   => 'background:#fef9c3;color:#713f12;',
-        'info'      => 'background:#fef2f2;color:var(--secondary-dark,#922b21);',
-        'primary'   => 'background:#dcfce7;color:#166534;',
-        'secondary' => 'background:#f3f4f6;color:#4b5563;',
-        'dark'      => 'background:#1f2937;color:#fff;',
+        'success'   => 'background:color-mix(in srgb, var(--primary-color) 14%, #ffffff);color:var(--primary-dark,var(--primary-color));',
+        'danger'    => 'background:color-mix(in srgb, var(--secondary-color) 16%, #ffffff);color:var(--secondary-dark,var(--secondary-color));',
+        'warning'   => 'background:color-mix(in srgb, var(--secondary-color) 14%, #ffffff);color:var(--secondary-dark,var(--secondary-color));',
+        'info'      => 'background:color-mix(in srgb, var(--accent-color,#17a2b8) 14%, #ffffff);color:var(--accent-color,#17a2b8);',
+        'primary'   => 'background:color-mix(in srgb, var(--primary-color) 14%, #ffffff);color:var(--primary-dark,var(--primary-color));',
+        'secondary' => 'background:color-mix(in srgb, var(--secondary-color) 10%, #ffffff);color:var(--secondary-dark,var(--secondary-color));',
+        'dark'      => 'background:var(--primary-dark,var(--primary-color));color:var(--text-on-primary,#fff);',
         'light'     => 'background:#f9fafb;color:#374151;border:1px solid #e5e7eb;',
     ];
-    $style = $softStyles[$color] ?? ('background:#f3f4f6;color:#374151;');
+    $style = $softStyles[$color] ?? ('background:color-mix(in srgb, var(--primary-color) 10%, #ffffff);color:var(--primary-dark,var(--primary-color));');
     return '<span class="badge" style="'
          . 'border-radius:20px;padding:4px 10px;font-weight:600;font-size:0.72rem;'
          . $style . '">'
@@ -136,15 +136,15 @@ function adminBadge(string $color, string $text, bool $dark = false): string {
 function adminActiveBadge($isActive): string {
     if ($isActive) {
         return '<span class="badge" style="'
-             . 'background:#dcfce7;color:#166534;border-radius:20px;'
+             . 'background:color-mix(in srgb, var(--primary-color) 14%, #ffffff);color:var(--primary-dark,var(--primary-color));border-radius:20px;'
              . 'padding:4px 10px;font-weight:600;font-size:0.72rem;'
              . 'display:inline-flex;align-items:center;gap:5px;">'
-             . '<span style="width:6px;height:6px;border-radius:50%;background:#22c55e;'
-             . 'box-shadow:0 0 0 2px rgba(34,197,94,0.25);flex-shrink:0;"></span>'
+             . '<span style="width:6px;height:6px;border-radius:50%;background:var(--primary-color);'
+             . 'box-shadow:0 0 0 2px color-mix(in srgb, var(--primary-color) 25%, transparent);flex-shrink:0;"></span>'
              . htmlspecialchars(adminUiT('सक्रिय', 'Active')) . '</span>';
     }
     return '<span class="badge" style="'
-         . 'background:#f3f4f6;color:#6b7280;border-radius:20px;'
+         . 'background:color-mix(in srgb, var(--secondary-color) 10%, #ffffff);color:var(--secondary-dark,var(--secondary-color));border-radius:20px;'
          . 'padding:4px 10px;font-weight:600;font-size:0.72rem;'
          . 'display:inline-flex;align-items:center;gap:5px;">'
          . '<span style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;"></span>'
@@ -157,16 +157,16 @@ function adminActiveBadge($isActive): string {
    ────────────────────────────────────────────────────────────── */
 function adminStatusBadge(string $status): string {
     $map = [
-        'pending'    => ['bg' => '#fef9c3', 'color' => '#713f12', 'icon' => 'fa-clock',       'label' => 'प्रतीक्षारत'],
-        'approved'   => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle-check', 'label' => 'स्वीकृत'],
-        'rejected'   => ['bg' => '#fee2e2', 'color' => '#991b1b', 'icon' => 'fa-circle-xmark', 'label' => 'अस्वीकृत'],
-        'processing' => ['bg' => '#fef2f2', 'color' => 'var(--secondary-dark,#922b21)', 'icon' => 'fa-spinner',      'label' => 'प्रक्रियामा'],
-        'resolved'   => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-check',        'label' => 'समाधान'],
-        'closed'     => ['bg' => '#f3f4f6', 'color' => '#4b5563', 'icon' => 'fa-xmark',        'label' => 'बन्द'],
-        'active'     => ['bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle',       'label' => 'Active'],
-        'inactive'   => ['bg' => '#f3f4f6', 'color' => '#6b7280', 'icon' => 'fa-circle',       'label' => 'Inactive'],
+        'pending'    => ['bg' => 'color-mix(in srgb, var(--secondary-color) 14%, #ffffff)', 'color' => 'var(--secondary-dark,var(--secondary-color))', 'icon' => 'fa-clock',       'label' => 'प्रतीक्षारत'],
+        'approved'   => ['bg' => 'color-mix(in srgb, var(--primary-color) 14%, #ffffff)', 'color' => 'var(--primary-dark,var(--primary-color))', 'icon' => 'fa-circle-check', 'label' => 'स्वीकृत'],
+        'rejected'   => ['bg' => 'color-mix(in srgb, var(--secondary-color) 16%, #ffffff)', 'color' => 'var(--secondary-dark,var(--secondary-color))', 'icon' => 'fa-circle-xmark', 'label' => 'अस्वीकृत'],
+        'processing' => ['bg' => 'color-mix(in srgb, var(--accent-color,#17a2b8) 14%, #ffffff)', 'color' => 'var(--accent-color,#17a2b8)', 'icon' => 'fa-spinner',      'label' => 'प्रक्रियामा'],
+        'resolved'   => ['bg' => 'color-mix(in srgb, var(--primary-color) 14%, #ffffff)', 'color' => 'var(--primary-dark,var(--primary-color))', 'icon' => 'fa-check',        'label' => 'समाधान'],
+        'closed'     => ['bg' => 'color-mix(in srgb, var(--secondary-color) 10%, #ffffff)', 'color' => 'var(--secondary-dark,var(--secondary-color))', 'icon' => 'fa-xmark',        'label' => 'बन्द'],
+        'active'     => ['bg' => 'color-mix(in srgb, var(--primary-color) 14%, #ffffff)', 'color' => 'var(--primary-dark,var(--primary-color))', 'icon' => 'fa-circle',       'label' => 'Active'],
+        'inactive'   => ['bg' => 'color-mix(in srgb, var(--secondary-color) 10%, #ffffff)', 'color' => 'var(--secondary-dark,var(--secondary-color))', 'icon' => 'fa-circle',       'label' => 'Inactive'],
     ];
-    $s = $map[strtolower($status)] ?? ['bg' => '#f3f4f6', 'color' => '#374151', 'icon' => 'fa-circle', 'label' => $status];
+    $s = $map[strtolower($status)] ?? ['bg' => 'color-mix(in srgb, var(--primary-color) 10%, #ffffff)', 'color' => 'var(--primary-dark,var(--primary-color))', 'icon' => 'fa-circle', 'label' => $status];
     return '<span class="badge" style="'
          . 'background:' . $s['bg'] . ';color:' . $s['color'] . ';'
          . 'border-radius:20px;padding:4px 10px;font-weight:600;font-size:0.72rem;'

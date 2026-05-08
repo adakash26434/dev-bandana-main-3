@@ -549,43 +549,43 @@ function getAppTypeLabel($type) {
                 <div class="tracker-types-strip mb-4">
                     <p class="tracker-types-label"><?php echo isEnglish() ? 'Track any application type:' : 'जुनसुकै आवेदन ट्र्याक गर्नुहोस्:'; ?></p>
                     <div class="tracker-type-pills">
-                        <div class="type-pill" style="--pill-color:#3b82f6">
+                        <div class="type-pill" style="--pill-color:var(--primary-color)">
                             <div class="type-pill-icon"><i class="fas fa-briefcase"></i></div>
                             <span><?php echo isEnglish() ? 'Job' : 'रोजगारी'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#10b981">
+                        <div class="type-pill" style="--pill-color:var(--primary-light)">
                             <div class="type-pill-icon"><i class="fas fa-hand-holding-usd"></i></div>
                             <span><?php echo isEnglish() ? 'Loan' : 'ऋण'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#06b6d4">
+                        <div class="type-pill" style="--pill-color:var(--accent-color)">
                             <div class="type-pill-icon"><i class="fas fa-user-plus"></i></div>
                             <span><?php echo isEnglish() ? 'Account' : 'खाता'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#f59e0b">
+                        <div class="type-pill" style="--pill-color:var(--secondary-color)">
                             <div class="type-pill-icon"><i class="fas fa-exclamation-circle"></i></div>
                             <span><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#6b7280">
+                        <div class="type-pill" style="--pill-color:var(--primary-dark)">
                             <div class="type-pill-icon"><i class="fas fa-id-card"></i></div>
                             <span>KYC</span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#ef4444">
+                        <div class="type-pill" style="--pill-color:var(--secondary-color)">
                             <div class="type-pill-icon"><i class="fas fa-gavel"></i></div>
                             <span><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#20c997">
+                        <div class="type-pill" style="--pill-color:var(--primary-light)">
                             <div class="type-pill-icon"><i class="fas fa-calendar-check"></i></div>
                             <span><?php echo isEnglish() ? 'Appointment' : 'भेटघाट'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#6f42c1">
+                        <div class="type-pill" style="--pill-color:var(--accent-color)">
                             <div class="type-pill-icon"><i class="fas fa-comments"></i></div>
                             <span><?php echo isEnglish() ? 'Survey' : 'सर्वेक्षण'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#e91e63">
+                        <div class="type-pill" style="--pill-color:var(--secondary-color)">
                             <div class="type-pill-icon"><i class="fas fa-hand-holding-heart"></i></div>
                             <span><?php echo isEnglish() ? 'Welfare' : 'सुविधा'; ?></span>
                         </div>
-                        <div class="type-pill" style="--pill-color:#0ea5e9">
+                        <div class="type-pill" style="--pill-color:var(--primary-color)">
                             <div class="type-pill-icon"><i class="fas fa-mobile-alt"></i></div>
                             <span><?php echo isEnglish() ? 'Digital' : 'डिजिटल'; ?></span>
                         </div>
@@ -622,10 +622,10 @@ function getAppTypeLabel($type) {
                                         </option>
                                     </select>
                                     <!-- Phone/Email चुनेपछि यहाँ tip देखाउने -->
-                                    <small id="searchTypeTip" class="text-muted" style="display:none">
+                                    <small id="searchTypeTip" class="text-muted d-none">
                                         <i class="fas fa-info-circle me-1 text-info"></i>
-                                        <span id="tipPhone" style="display:none"><?php echo isEnglish() ? 'Enter your phone number &amp; email below — they will be used for search &amp; verification.' : 'तल फोन र इमेल राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
-                                        <span id="tipEmail" style="display:none"><?php echo isEnglish() ? 'Enter your email &amp; phone below — they will be used for search &amp; verification.' : 'तल इमेल र फोन राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
+                                        <span id="tipPhone" class="d-none"><?php echo isEnglish() ? 'Enter your phone number &amp; email below — they will be used for search &amp; verification.' : 'तल फोन र इमेल राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
+                                        <span id="tipEmail" class="d-none"><?php echo isEnglish() ? 'Enter your email &amp; phone below — they will be used for search &amp; verification.' : 'तल इमेल र फोन राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
                                     </small>
                                 </div>
 
@@ -643,7 +643,7 @@ function getAppTypeLabel($type) {
                                 <!-- ── Security Verification Section ──
                                      Phone / Email बाट खोज्दा मात्र देखिन्छ (JS ले control गर्छ)
                                      Code format: phone last 4 + email first 3 -->
-                                <div id="verifySection" style="display:none;" class="col-12">
+                                <div id="verifySection" class="col-12 d-none">
                                     <div class="card bg-light border-warning">
                                         <div class="card-body py-3">
                                             <h6 class="mb-1 text-warning-emphasis" id="verifySectionTitle">
@@ -681,7 +681,7 @@ function getAppTypeLabel($type) {
                                                            maxlength="12" autocomplete="off">
                                                 </div>
                                             </div>
-                                            <div class="small rounded-2 p-2" style="background:#fff7e0;border:1px dashed #ffc107;">
+                                            <div class="small rounded-2 p-2 tracker-verify-rule">
                                                 <i class="fas fa-info-circle text-warning me-1"></i>
                                                 <?php echo isEnglish()
                                                     ? 'Code rule: last 4 digits of phone + first 3 letters of email before @ (example: 9827157000 + ram@gmail.com => 7000ram).'
@@ -725,22 +725,22 @@ function getAppTypeLabel($type) {
 
                 <?php if (!empty($publicIdCardLink)): ?>
                 <!-- v9.9: Public Digital ID Card preview — verified phone+email match approved member -->
-                <div class="public-id-card-cta mb-3" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 6px 20px rgba(26,95,42,.25);">
-                    <div style="width:54px;height:54px;background:rgba(255,255,255,.18);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-id-card" style="font-size:1.5rem;"></i>
+                <div class="public-id-card-cta mb-3">
+                    <div class="public-id-card-icon-wrap">
+                        <i class="fas fa-id-card public-id-card-icon"></i>
                     </div>
-                    <div style="flex:1;min-width:200px;">
-                        <div style="font-weight:700;font-size:1rem;margin-bottom:2px;">
+                    <div class="public-id-card-content">
+                        <div class="public-id-card-title">
                             <?php echo isEnglish() ? '🪪 Your Digital Member ID Card' : '🪪 तपाईंको डिजिटल सदस्य परिचयपत्र'; ?>
                         </div>
-                        <div style="font-size:.85rem;opacity:.92;">
+                        <div class="public-id-card-text">
                             <?php echo isEnglish()
                                 ? 'Verified for ' . htmlspecialchars($publicIdCardName) . '. Click to preview your official member ID card.'
                                 : htmlspecialchars($publicIdCardName) . ' को आधिकारिक डिजिटल परिचयपत्र हेर्नुहोस् (verified phone + email)।'; ?>
                         </div>
                     </div>
                     <a href="<?php echo htmlspecialchars($publicIdCardLink); ?>" target="_blank" rel="noopener"
-                       style="background:#fff;color:var(--primary-color);text-decoration:none;padding:10px 20px;border-radius:10px;font-weight:700;font-size:.92rem;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;">
+                       class="public-id-card-btn">
                         <i class="fas fa-eye"></i>
                         <?php echo isEnglish() ? 'View ID Card' : 'ID Card हेर्नुहोस्'; ?>
                     </a>
@@ -780,7 +780,7 @@ function getAppTypeLabel($type) {
                     align-items: center;
                     gap: 8px;
                     flex-wrap: wrap;
-                    border-bottom: 2px solid #e9ecef;
+                    border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 16%, #e9ecef);
                     padding-bottom: 0;
                 }
                 .tracker-tab-btn {
@@ -790,7 +790,7 @@ function getAppTypeLabel($type) {
                     padding: 10px 20px;
                     font-size: 0.95rem;
                     font-weight: 600;
-                    color: #666;
+                    color: var(--text-light,#666);
                     cursor: pointer;
                     display: flex;
                     align-items: center;
@@ -799,8 +799,8 @@ function getAppTypeLabel($type) {
                     border-radius: 6px 6px 0 0;
                     transition: all 0.2s;
                 }
-                .tracker-tab-btn:hover { color: var(--primary-color); background: #f8fff9; }
-                .tracker-tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: #f0faf2; }
+                .tracker-tab-btn:hover { color: var(--primary-color); background: color-mix(in srgb, var(--primary-color) 8%, white); }
+                .tracker-tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: color-mix(in srgb, var(--primary-color) 12%, white); }
                 .tab-count-badge {
                     display: inline-flex;
                     align-items: center;
@@ -811,12 +811,12 @@ function getAppTypeLabel($type) {
                     font-size: 0.75rem;
                     font-weight: 700;
                 }
-                .tab-badge-active { background: #ffc107; color: #333; }
-                .tab-badge-done { background: #6c757d; color: #fff; }
+                .tab-badge-active { background: var(--primary-color); color: var(--text-on-primary,white); }
+                .tab-badge-done { background: var(--text-muted,#6c757d); color: white; }
                 .tracker-tab-empty-msg {
                     flex: 1;
                     text-align: center;
-                    color: #999;
+                    color: var(--text-muted,#999);
                     font-size: 0.9rem;
                     padding: 8px;
                 }
@@ -1449,7 +1449,7 @@ function getAppTypeLabel($type) {
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="tracker-help-card">
-                                <div class="thc-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+                                <div class="thc-icon thc-icon-primary">
                                     <i class="fas fa-hashtag"></i>
                                 </div>
                                 <div>
@@ -1460,7 +1460,7 @@ function getAppTypeLabel($type) {
                         </div>
                         <div class="col-md-4">
                             <div class="tracker-help-card">
-                                <div class="thc-icon" style="background:linear-gradient(135deg,#10b981,#065f46)">
+                                <div class="thc-icon thc-icon-success">
                                     <i class="fas fa-phone"></i>
                                 </div>
                                 <div>
@@ -1471,7 +1471,7 @@ function getAppTypeLabel($type) {
                         </div>
                         <div class="col-md-4">
                             <div class="tracker-help-card">
-                                <div class="thc-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309)">
+                                <div class="thc-icon thc-icon-warn">
                                     <i class="fas fa-headset"></i>
                                 </div>
                                 <div>
@@ -1562,21 +1562,21 @@ if (searchTypeEl) {
    ============================================================ */
 
 /* ── Custom colors (keep for badge classes) ── */
-.bg-teal   { background-color: #20c997 !important; }
-.bg-purple { background-color: #6f42c1 !important; }
-.bg-pink   { background-color: #e91e63 !important; }
-.bg-warning.text-dark { color: #333 !important; }
-.text-teal { color: #20c997 !important; }
-.text-purple { color: #6f42c1 !important; }
-.text-pink { color: #e91e63 !important; }
+.bg-teal   { background-color: var(--accent-color) !important; }
+.bg-purple { background-color: var(--secondary-color) !important; }
+.bg-pink   { background-color: var(--primary-dark) !important; }
+.bg-warning.text-dark { color: var(--text-color,#333) !important; }
+.text-teal { color: var(--accent-color) !important; }
+.text-purple { color: var(--secondary-color) !important; }
+.text-pink { color: var(--primary-dark) !important; }
 
 /* ── Detail Info Grid — applicant info in tracker detail panel ── */
 .di-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 8px;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
+    background: color-mix(in srgb, var(--primary-color) 7%, white);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 15%, #e9ecef);
     border-radius: 10px;
     padding: 12px 14px;
 }
@@ -1590,7 +1590,7 @@ if (searchTypeEl) {
 .di-label {
     font-size: 0.68rem;
     font-weight: 700;
-    color: #6c757d;
+    color: var(--text-light,#6c757d);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     margin-bottom: 2px;
@@ -1601,7 +1601,7 @@ if (searchTypeEl) {
 .di-label i { margin-right: 3px; font-size: 0.65rem; }
 .di-value {
     font-size: 0.85rem;
-    color: #212529;
+    color: var(--text-color,#212529);
     font-weight: 500;
     line-height: 1.35;
     word-break: break-word;
@@ -1610,9 +1610,9 @@ if (searchTypeEl) {
     .di-grid { grid-template-columns: 1fr 1fr; }
     .di-item-wide  { grid-column: 1 / -1; }
 }
-.border-teal   { border-color: #20c997 !important; }
-.border-purple { border-color: #6f42c1 !important; }
-.border-pink   { border-color: #e91e63 !important; }
+.border-teal   { border-color: var(--accent-color) !important; }
+.border-purple { border-color: var(--secondary-color) !important; }
+.border-pink   { border-color: var(--primary-dark) !important; }
 
 /* ── HERO SECTION ── */
 .tracker-hero-section {
@@ -1652,7 +1652,7 @@ if (searchTypeEl) {
     align-items: center;
     justify-content: center;
     font-size: 2.2rem;
-    color: #fff;
+    color: var(--text-on-primary,white);
     backdrop-filter: blur(8px);
     position: relative;
     z-index: 2;
@@ -1673,7 +1673,7 @@ if (searchTypeEl) {
 .tracker-hero-title {
     font-size: 2.1rem;
     font-weight: 800;
-    color: #fff;
+    color: var(--text-on-primary,white);
     margin-bottom: 10px;
     letter-spacing: -0.3px;
 }
@@ -1704,7 +1704,7 @@ if (searchTypeEl) {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: #94a3b8;
+    color: var(--text-muted,#94a3b8);
     margin-bottom: 12px;
 }
 .tracker-type-pills {
@@ -1717,7 +1717,7 @@ if (searchTypeEl) {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #fff;
+    background: white;
     border: 1.5px solid rgba(0,0,0,0.07);
     border-radius: 50px;
     padding: 7px 14px 7px 8px;
@@ -1735,7 +1735,7 @@ if (searchTypeEl) {
     height: 32px;
     border-radius: 50%;
     background: var(--pill-color);
-    color: #fff;
+    color: var(--text-on-primary,white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1745,7 +1745,7 @@ if (searchTypeEl) {
 .type-pill span {
     font-size: 0.82rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-color,#374151);
     white-space: nowrap;
 }
 
@@ -1762,7 +1762,7 @@ if (searchTypeEl) {
     display: flex;
     align-items: center;
     gap: 16px;
-    color: var(--text-on-primary, #fff);
+    color: var(--text-on-primary, white);
 }
 .tracker-search-header-icon {
     width: 52px;
@@ -1777,12 +1777,12 @@ if (searchTypeEl) {
 }
 .tracker-search-card .card-body {
     padding: 28px;
-    background: #fff;
+    background: white;
 }
 .tracker-search-card .form-control,
 .tracker-search-card .form-select {
     border-radius: 10px;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid color-mix(in srgb, var(--primary-color) 18%, #e2e8f0);
     padding: 10px 14px;
     transition: all 0.2s;
 }
@@ -1797,7 +1797,7 @@ if (searchTypeEl) {
 }
 .btn-tracker-search {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: var(--text-on-primary, #fff);
+    color: var(--text-on-primary, white);
     border: none;
     border-radius: 12px;
     font-weight: 700;
@@ -1807,7 +1807,7 @@ if (searchTypeEl) {
 }
 .btn-tracker-search:hover {
     background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-    color: var(--text-on-primary, #fff);
+    color: var(--text-on-primary, white);
     transform: translateY(-1px);
     box-shadow: 0 7px 20px rgba(var(--primary-rgb,26,95,42),0.4);
 }
@@ -1815,9 +1815,71 @@ if (searchTypeEl) {
     transform: translateY(0);
 }
 
+.tracker-verify-rule {
+    background: color-mix(in srgb, var(--secondary-color) 12%, white);
+    border: 1px dashed var(--secondary-color);
+}
+
+.public-id-card-cta {
+    background: linear-gradient(135deg,var(--primary-color),var(--primary-light));
+    color: var(--text-on-primary,white);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 6px 20px rgba(var(--primary-rgb,26,95,42),.25);
+}
+
+.public-id-card-icon-wrap {
+    width: 54px;
+    height: 54px;
+    background: rgba(255,255,255,.18);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.public-id-card-icon {
+    font-size: 1.5rem;
+}
+
+.public-id-card-content {
+    flex: 1;
+    min-width: 200px;
+}
+
+.public-id-card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.public-id-card-text {
+    font-size: .85rem;
+    opacity: .92;
+}
+
+.public-id-card-btn {
+    background: white;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: .92rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
 /* ── RESULT CARDS — Premium ── */
 .result-card-premium {
-    background: #fff;
+    background: white;
     border-radius: 16px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.07);
     overflow: hidden;
@@ -1837,15 +1899,17 @@ if (searchTypeEl) {
     height: 5px;
     width: 100%;
 }
-.rcp-accent-primary  { background: linear-gradient(90deg,#3b82f6,#1d4ed8); }
-.rcp-accent-success  { background: linear-gradient(90deg,#10b981,#059669); }
-.rcp-accent-info     { background: linear-gradient(90deg,#06b6d4,#0284c7); }
-.rcp-accent-warning  { background: linear-gradient(90deg,#f59e0b,#d97706); }
-.rcp-accent-danger   { background: linear-gradient(90deg,#ef4444,#b91c1c); }
-.rcp-accent-secondary { background: linear-gradient(90deg,#6b7280,#374151); }
-.rcp-accent-teal     { background: linear-gradient(90deg,#20c997,#0f766e); }
-.rcp-accent-purple   { background: linear-gradient(90deg,#6f42c1,#4f28a0); }
-.rcp-accent-pink     { background: linear-gradient(90deg,#e91e63,#be185d); }
+.rcp-accent-primary,
+.rcp-accent-success,
+.rcp-accent-info,
+.rcp-accent-warning,
+.rcp-accent-danger,
+.rcp-accent-secondary,
+.rcp-accent-teal,
+.rcp-accent-purple,
+.rcp-accent-pink {
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+}
 
 .rcp-body {
     padding: 20px 22px 22px;
@@ -1865,17 +1929,19 @@ if (searchTypeEl) {
     justify-content: center;
     font-size: 1.3rem;
     flex-shrink: 0;
-    color: #fff;
+    color: var(--text-on-primary,white);
 }
-.rcp-icon-primary  { background: linear-gradient(135deg,#3b82f6,#1d4ed8); }
-.rcp-icon-success  { background: linear-gradient(135deg,#10b981,#059669); }
-.rcp-icon-info     { background: linear-gradient(135deg,#06b6d4,#0284c7); }
-.rcp-icon-warning  { background: linear-gradient(135deg,#f59e0b,#d97706); }
-.rcp-icon-danger   { background: linear-gradient(135deg,#ef4444,#b91c1c); }
-.rcp-icon-secondary { background: linear-gradient(135deg,#6b7280,#374151); }
-.rcp-icon-teal     { background: linear-gradient(135deg,#20c997,#0f766e); }
-.rcp-icon-purple   { background: linear-gradient(135deg,#6f42c1,#4f28a0); }
-.rcp-icon-pink     { background: linear-gradient(135deg,#e91e63,#be185d); }
+.rcp-icon-primary,
+.rcp-icon-success,
+.rcp-icon-info,
+.rcp-icon-warning,
+.rcp-icon-danger,
+.rcp-icon-secondary,
+.rcp-icon-teal,
+.rcp-icon-purple,
+.rcp-icon-pink {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+}
 
 .rcp-meta { flex: 1; min-width: 0; }
 
@@ -1887,18 +1953,21 @@ if (searchTypeEl) {
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-on-primary,white);
     letter-spacing: 0.2px;
 }
-.rcp-badge-primary  { background: #3b82f6; }
-.rcp-badge-success  { background: #10b981; }
-.rcp-badge-info     { background: #06b6d4; }
-.rcp-badge-warning  { background: #f59e0b; }
-.rcp-badge-danger   { background: #ef4444; }
-.rcp-badge-secondary { background: #6b7280; }
-.rcp-badge-teal     { background: #20c997; }
-.rcp-badge-purple   { background: #6f42c1; }
-.rcp-badge-pink     { background: #e91e63; }
+.rcp-badge-primary,
+.rcp-badge-success,
+.rcp-badge-info,
+.rcp-badge-warning,
+.rcp-badge-danger,
+.rcp-badge-secondary,
+.rcp-badge-teal,
+.rcp-badge-purple,
+.rcp-badge-pink {
+    background: var(--primary-color);
+    color: var(--text-on-primary, white);
+}
 
 .rcp-status-badge {
     display: inline-flex;
@@ -1909,10 +1978,10 @@ if (searchTypeEl) {
     font-weight: 700;
     letter-spacing: 0.2px;
 }
-.rcp-status-glow.bg-success { box-shadow: 0 0 0 3px rgba(40,167,69,0.18); }
-.rcp-status-glow.bg-warning { box-shadow: 0 0 0 3px rgba(255,193,7,0.2); }
-.rcp-status-glow.bg-danger  { box-shadow: 0 0 0 3px rgba(220,53,69,0.18); }
-.rcp-status-glow.bg-info    { box-shadow: 0 0 0 3px rgba(23,162,184,0.18); }
+.rcp-status-glow.bg-success { box-shadow: 0 0 0 3px rgba(var(--primary-rgb,26,95,42),0.18); }
+.rcp-status-glow.bg-warning { box-shadow: 0 0 0 3px rgba(var(--secondary-rgb,192,57,43),0.2); }
+.rcp-status-glow.bg-danger  { box-shadow: 0 0 0 3px rgba(var(--secondary-rgb,192,57,43),0.18); }
+.rcp-status-glow.bg-info    { box-shadow: 0 0 0 3px rgba(var(--accent-rgb,23,162,184),0.18); }
 
 /* Meta chips row */
 .rcp-chips {
@@ -1925,18 +1994,18 @@ if (searchTypeEl) {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: color-mix(in srgb, var(--primary-color) 7%, white);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 16%, #e2e8f0);
     border-radius: 6px;
     padding: 3px 9px;
     font-size: 0.76rem;
-    color: #475569;
+    color: var(--text-light,#475569);
 }
-.rcp-chip i { font-size: 0.7rem; color: #94a3b8; }
+.rcp-chip i { font-size: 0.7rem; color: var(--text-muted,#94a3b8); }
 
 /* Timeline wrap separator */
 .rcp-timeline-wrap {
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid color-mix(in srgb, var(--primary-color) 12%, #f1f5f9);
     padding-top: 16px;
     margin-top: 4px;
 }
@@ -1949,7 +2018,7 @@ if (searchTypeEl) {
     left: 12%;
     right: 12%;
     height: 3px;
-    background: linear-gradient(90deg, #e2e8f0, #cbd5e1);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--primary-color) 14%, #e2e8f0), color-mix(in srgb, var(--primary-color) 22%, #cbd5e1));
     z-index: 0;
     border-radius: 3px;
 }
@@ -1963,50 +2032,47 @@ if (searchTypeEl) {
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: #e9ecef;
-    color: #adb5bd;
+    background: color-mix(in srgb, var(--primary-color) 14%, #e9ecef);
+    color: var(--text-muted,#adb5bd);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 6px;
     font-size: 14px;
-    border: 3px solid #fff;
+    border: 3px solid white;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
 }
 .timeline-step.active .step-icon {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: var(--text-on-primary, #fff);
+    color: var(--text-on-primary, white);
     box-shadow: 0 3px 12px rgba(var(--primary-rgb,26,95,42),0.35);
 }
-.timeline-step.active.success .step-icon {
-    background: linear-gradient(135deg, #10b981, #059669);
-    box-shadow: 0 3px 12px rgba(16,185,129,0.35);
-}
+.timeline-step.active.success .step-icon,
 .timeline-step.active.rejected .step-icon {
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
-    box-shadow: 0 3px 12px rgba(239,68,68,0.35);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    box-shadow: 0 3px 12px rgba(var(--primary-rgb,26,95,42),0.35);
 }
 .timeline-step small {
     font-size: 10.5px;
     font-weight: 600;
-    color: #94a3b8;
+    color: var(--text-muted,#94a3b8);
     display: block;
     margin-top: 2px;
 }
 .timeline-step.active small { color: var(--primary-color); }
-.timeline-step.active.success small { color: #10b981; }
-.timeline-step.active.rejected small { color: #ef4444; }
+.timeline-step.active.success small,
+.timeline-step.active.rejected small { color: var(--primary-color); }
 
 /* Admin response/remark blocks */
 .admin-response-block {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
+    background: color-mix(in srgb, var(--primary-color) 8%, white);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 22%, white);
     border-radius: 10px;
     padding: 12px 14px;
     margin-top: 12px;
 }
-.admin-response-block p { margin-bottom: 0; color: #374151; }
+.admin-response-block p { margin-bottom: 0; color: var(--text-color,#374151); }
 
 /* ── TRACKER TABS ── */
 .tracker-tabs-nav {
@@ -2014,7 +2080,7 @@ if (searchTypeEl) {
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 16%, #e9ecef);
     padding-bottom: 0;
     margin-bottom: 20px;
 }
@@ -2025,7 +2091,7 @@ if (searchTypeEl) {
     padding: 10px 20px;
     font-size: 0.92rem;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-light,#64748b);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -2034,11 +2100,11 @@ if (searchTypeEl) {
     border-radius: 8px 8px 0 0;
     transition: all 0.2s;
 }
-.tracker-tab-btn:hover { color: var(--primary-color); background: #f0fdf4; }
+.tracker-tab-btn:hover { color: var(--primary-color); background: color-mix(in srgb, var(--primary-color) 12%, white); }
 .tracker-tab-btn.active {
     color: var(--primary-color);
     border-bottom-color: var(--primary-color);
-    background: #f0fdf4;
+    background: color-mix(in srgb, var(--primary-color) 12%, white);
 }
 .tab-count-badge {
     display: inline-flex;
@@ -2051,27 +2117,27 @@ if (searchTypeEl) {
     font-weight: 800;
     padding: 0 6px;
 }
-.tab-badge-active { background: var(--primary-color); color: #fff; }
-.tab-badge-done   { background: #94a3b8; color: #fff; }
+.tab-badge-active { background: var(--primary-color); color: var(--text-on-primary,white); }
+.tab-badge-done   { background: var(--text-muted,#94a3b8); color: white; }
 .tracker-tab-empty-msg {
     flex: 1;
     text-align: center;
-    color: #94a3b8;
+    color: var(--text-muted,#94a3b8);
     font-size: 0.9rem;
     padding: 8px;
 }
 
 /* ── HELP STRIP ── */
 .tracker-help-strip {
-    border-top: 2px solid #f1f5f9;
+    border-top: 2px solid color-mix(in srgb, var(--primary-color) 12%, #f1f5f9);
     padding-top: 30px;
 }
 .tracker-help-card {
     display: flex;
     align-items: flex-start;
     gap: 14px;
-    background: #fff;
-    border: 1.5px solid #e2e8f0;
+    background: white;
+    border: 1.5px solid color-mix(in srgb, var(--primary-color) 18%, #e2e8f0);
     border-radius: 14px;
     padding: 16px 18px;
     height: 100%;
@@ -2086,20 +2152,23 @@ if (searchTypeEl) {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    color: #fff;
+    color: var(--text-on-primary,white);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
     flex-shrink: 0;
 }
+.thc-icon-primary { background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); }
+.thc-icon-success { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
+.thc-icon-warn { background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark,var(--secondary-color))); }
 
 /* ── ALERT IMPROVEMENTS ── */
 .alert-warning.tracker-alert {
     border-radius: 12px;
     border: none;
-    background: #fffbeb;
-    border-left: 4px solid #f59e0b;
+    background: color-mix(in srgb, var(--secondary-color) 10%, white);
+    border-left: 4px solid var(--secondary-color);
 }
 .alert-success.tracker-alert {
     border-radius: 12px;

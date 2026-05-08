@@ -128,7 +128,7 @@ $sadasyaBadge = $stats['requests'] + $stats['pwResets'];
       $welfareRecent=$pdo->query("SELECT id, member_name AS claimant_name, claim_type, status, claim_amount, created_at FROM member_welfare_claims ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
   } catch (Throwable $e) { error_log("[dashboard welfare] ".$e->getMessage()); }
   $welfareBadge=$welfarePending+$welfareReview;
-  $welfareClaimTypes=['maternity'=>['np'=>'सुत्केरी सुविधा','icon'=>'fa-baby','color'=>'#e91e63','bg'=>'#fce4ec'],'death'=>['np'=>'मृत्यु सुविधा','icon'=>'fa-heart-broken','color'=>'#607d8b','bg'=>'#eceff1'],'insurance'=>['np'=>'बीमा दाबी','icon'=>'fa-shield-halved','color'=>'var(--secondary-color,#c0392b)','bg'=>'#fef2f2'],'medical'=>['np'=>'उपचार खर्च','icon'=>'fa-hospital','color'=>'#059669','bg'=>'#d1fae5'],'accident'=>['np'=>'दुर्घटना सुविधा','icon'=>'fa-triangle-exclamation','color'=>'#f97316','bg'=>'#ffedd5'],'other'=>['np'=>'अन्य सुविधा','icon'=>'fa-gift','color'=>'#d97706','bg'=>'#fef3c7']];
+  $welfareClaimTypes=['maternity'=>['np'=>'सुत्केरी सुविधा','icon'=>'fa-baby','color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)'],'death'=>['np'=>'मृत्यु सुविधा','icon'=>'fa-heart-broken','color'=>'var(--primary-dark)','bg'=>'color-mix(in srgb, var(--primary-dark) 10%, white)'],'insurance'=>['np'=>'बीमा दाबी','icon'=>'fa-shield-halved','color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)'],'medical'=>['np'=>'उपचार खर्च','icon'=>'fa-hospital','color'=>'var(--primary-light)','bg'=>'color-mix(in srgb, var(--primary-light) 12%, white)'],'accident'=>['np'=>'दुर्घटना सुविधा','icon'=>'fa-triangle-exclamation','color'=>'var(--accent-color,#17a2b8)','bg'=>'color-mix(in srgb, var(--accent-color,#17a2b8) 12%, white)'],'other'=>['np'=>'अन्य सुविधा','icon'=>'fa-gift','color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 10%, white)']];
 
 /* Recent activity */
 $log = [];
@@ -161,68 +161,68 @@ try {
 ?>
 
 <style>
-  .ds-card{border:1px solid #e5e7eb;border-radius:14px;background:#fff;padding:18px;
+  .ds-card{border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:14px;background:white;padding:18px;
            display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;
            box-shadow:0 2px 8px rgba(0,0,0,0.04);transition:all .2s;height:100%;}
-  .ds-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(26,95,42,0.12);
+  .ds-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(var(--primary-rgb,26,95,42),0.12);
                  border-color:var(--primary-color);color:inherit;text-decoration:none;}
   .ds-icon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;
-           font-size:1.4rem;color:#fff;flex-shrink:0;
+           font-size:1.4rem;color:var(--text-on-primary,white);flex-shrink:0;
            background:linear-gradient(135deg,var(--primary-color),var(--primary-light));}
-  .ds-icon.warn{background:linear-gradient(135deg,#d97706,#f59e0b);}
+  .ds-icon.warn{background:linear-gradient(135deg,var(--secondary-color),var(--secondary-dark,var(--secondary-color)));}
   .ds-icon.info{background:linear-gradient(135deg,var(--secondary-dark,#922b21),var(--secondary-color,#c0392b));}
-  .ds-icon.alt{background:linear-gradient(135deg,var(--secondary-color,#c0392b),#d45d50);}
-  .ds-icon.danger{background:linear-gradient(135deg,#b91c1c,#ef4444);}
-  .ds-val{font-size:1.7rem;font-weight:700;line-height:1;color:#111827;}
-  .ds-lbl{font-size:.82rem;color:#6b7280;margin-top:4px;}
-  .ds-section{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;margin-top:18px;}
+  .ds-icon.alt{background:linear-gradient(135deg,var(--secondary-color,#c0392b),var(--primary-light));}
+  .ds-icon.danger{background:linear-gradient(135deg,var(--secondary-dark,var(--secondary-color)),var(--secondary-color));}
+  .ds-val{font-size:1.7rem;font-weight:700;line-height:1;color:var(--text-color,#111827);}
+  .ds-lbl{font-size:.82rem;color:var(--text-light,#6b7280);margin-top:4px;}
+  .ds-section{background:white;border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:14px;padding:18px;margin-top:18px;}
   .ds-section h2{font-size:1.05rem;margin:0 0 14px;display:flex;align-items:center;gap:8px;color:var(--primary-color);}
 
   /* Tabs */
-  .ds-tabs{display:flex;gap:6px;border-bottom:2px solid #e5e7eb;margin-bottom:18px;flex-wrap:wrap;}
+  .ds-tabs{display:flex;gap:6px;border-bottom:2px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);margin-bottom:18px;flex-wrap:wrap;}
   .ds-tab{padding:10px 18px;background:transparent;border:none;border-bottom:3px solid transparent;
-          font-weight:600;font-size:.95rem;color:#6b7280;cursor:pointer;transition:all .15s;
+          font-weight:600;font-size:.95rem;color:var(--text-light,#6b7280);cursor:pointer;transition:all .15s;
           display:inline-flex;align-items:center;gap:8px;margin-bottom:-2px;}
   .ds-tab:hover{color:var(--primary-color);}
   .ds-tab.active{color:var(--primary-color);border-bottom-color:var(--primary-color);}
-  .ds-tab .badge-pill{background:#dc2626;color:#fff;border-radius:999px;font-size:.7rem;
+  .ds-tab .badge-pill{background:var(--secondary-color);color:var(--text-on-secondary,var(--text-on-primary,white));border-radius:999px;font-size:.7rem;
                       padding:2px 8px;font-weight:700;line-height:1.2;}
   .ds-pane{display:none;}
   .ds-pane.active{display:block;}
 
   /* Credential cards */
   .cred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
-  .cred-card{border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;
+  .cred-card{border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:12px;padding:14px;background:white;
              transition:all .15s;display:flex;flex-direction:column;gap:8px;}
-  .cred-card:hover{border-color:var(--primary-color);box-shadow:0 4px 12px rgba(26,95,42,.1);}
+  .cred-card:hover{border-color:var(--primary-color);box-shadow:0 4px 12px rgba(var(--primary-rgb,26,95,42),.1);}
   .cred-head{display:flex;align-items:center;gap:10px;}
-  .cred-logo{width:36px;height:36px;border-radius:8px;background:#f3f4f6;display:grid;
-             place-items:center;overflow:hidden;flex-shrink:0;color:#6b7280;}
+  .cred-logo{width:36px;height:36px;border-radius:8px;background:color-mix(in srgb, var(--primary-color) 10%, white);display:grid;
+             place-items:center;overflow:hidden;flex-shrink:0;color:var(--text-light,#6b7280);}
   .cred-logo img{width:100%;height:100%;object-fit:contain;}
-  .cred-name{font-weight:700;font-size:.95rem;color:#111827;}
-  .cred-cat{font-size:.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;}
+  .cred-name{font-weight:700;font-size:.95rem;color:var(--text-color,#111827);}
+  .cred-cat{font-size:.7rem;color:var(--text-light,#6b7280);text-transform:uppercase;letter-spacing:.05em;}
   .cred-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;}
-  .cred-btn{flex:1;min-width:80px;padding:6px 10px;border-radius:8px;border:1px solid #e5e7eb;
-            background:#f9fafb;font-size:.8rem;font-weight:600;cursor:pointer;color:#374151;
+  .cred-btn{flex:1;min-width:80px;padding:6px 10px;border-radius:8px;border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);
+            background:color-mix(in srgb, var(--primary-color) 8%, white);font-size:.8rem;font-weight:600;cursor:pointer;color:var(--text-color,#374151);
             display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;}
-  .cred-btn:hover{background:var(--primary-color);color:#fff;border-color:var(--primary-color);}
+  .cred-btn:hover{background:var(--primary-color);color:var(--text-on-primary,white);border-color:var(--primary-color);}
 
-  .wf-type-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f3f4f6;}.wf-type-row:last-child{border-bottom:none;}
+  .wf-type-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid color-mix(in srgb, var(--primary-color) 10%, #f3f4f6);}.wf-type-row:last-child{border-bottom:none;}
     .wf-type-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
-    .wf-type-name{flex-grow:1;font-size:.88rem;font-weight:600;color:#111827;}
+    .wf-type-name{flex-grow:1;font-size:.88rem;font-weight:600;color:var(--text-color,#111827);}
     .wf-badge{border-radius:999px;font-size:.72rem;font-weight:700;padding:2px 8px;display:inline-block;text-decoration:none;}
-    .wf-badge.pending{background:#fef9c3;color:#854d0e;}.wf-badge.review{background:#fef2f2;color:var(--secondary-dark,#922b21);}.wf-badge.approved{background:#dcfce7;color:#166534;}
+    .wf-badge.pending{background:color-mix(in srgb, var(--secondary-color) 16%, white);color:var(--secondary-dark,var(--secondary-color));}.wf-badge.review{background:color-mix(in srgb, var(--secondary-color) 12%, white);color:var(--secondary-dark,#922b21);}.wf-badge.approved{background:color-mix(in srgb, var(--primary-color) 16%, white);color:var(--primary-dark,var(--primary-color));}
     .wf-summary-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-    .wf-stat-chip{flex:1;min-width:90px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;text-align:center;text-decoration:none;color:inherit;}
-    .wf-stat-chip .val{font-size:1.4rem;font-weight:700;line-height:1;}.wf-stat-chip .lbl{font-size:.72rem;color:#6b7280;margin-top:2px;}
+    .wf-stat-chip{flex:1;min-width:90px;background:color-mix(in srgb, var(--primary-color) 8%, white);border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:10px;padding:10px 12px;text-align:center;text-decoration:none;color:inherit;}
+    .wf-stat-chip .val{font-size:1.4rem;font-weight:700;line-height:1;}.wf-stat-chip .lbl{font-size:.72rem;color:var(--text-light,#6b7280);margin-top:2px;}
     /* Pending member list */
-  .pm-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6;}
+  .pm-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid color-mix(in srgb, var(--primary-color) 10%, #f3f4f6);}
   .pm-row:last-child{border-bottom:none;}
-  .pm-avatar{width:38px;height:38px;border-radius:50%;background:#fef3c7;color:#92400e;
+  .pm-avatar{width:38px;height:38px;border-radius:50%;background:color-mix(in srgb, var(--secondary-color) 16%, white);color:var(--secondary-dark,var(--secondary-color));
              display:grid;place-items:center;font-weight:700;flex-shrink:0;}
   .pm-info{flex-grow:1;min-width:0;}
-  .pm-name{font-weight:600;font-size:.92rem;color:#111827;}
-  .pm-meta{font-size:.78rem;color:#6b7280;}
+  .pm-name{font-weight:600;font-size:.92rem;color:var(--text-color,#111827);}
+  .pm-meta{font-size:.78rem;color:var(--text-light,#6b7280);}
 </style>
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -484,9 +484,9 @@ try {
     <?php if (empty($welfareByType)): ?>
       <div class="text-center py-3 dash-empty-note"><?php echo $__t('कुनै दाबी छैन।', 'No claims found.'); ?></div>
     <?php else: ?>
-      <?php foreach ($welfareByType as $wt): $tk = $wt['claim_type']; $tm = $welfareClaimTypes[$tk] ?? ['np' => $tk, 'icon' => 'fa-circle', 'color' => '#6b7280', 'bg' => '#f3f4f6']; ?>
+      <?php foreach ($welfareByType as $wt): $tk = $wt['claim_type']; $tm = $welfareClaimTypes[$tk] ?? ['np' => $tk, 'icon' => 'fa-circle', 'color' => 'var(--text-light)', 'bg' => 'color-mix(in srgb, var(--primary-color) 8%, white)']; ?>
         <div class="wf-type-row">
-          <div class="wf-type-icon dash-wf-type-icon" data-bg="<?= htmlspecialchars($tm['bg'] ?? '#f3f4f6', ENT_QUOTES, 'UTF-8') ?>" data-color="<?= htmlspecialchars($tm['color'] ?? '#6b7280', ENT_QUOTES, 'UTF-8') ?>"><i class="fas <?= $tm['icon'] ?>"></i></div>
+          <div class="wf-type-icon dash-wf-type-icon" data-bg="<?= htmlspecialchars($tm['bg'] ?? 'color-mix(in srgb, var(--primary-color) 8%, white)', ENT_QUOTES, 'UTF-8') ?>" data-color="<?= htmlspecialchars($tm['color'] ?? 'var(--text-light)', ENT_QUOTES, 'UTF-8') ?>"><i class="fas <?= $tm['icon'] ?>"></i></div>
           <div class="wf-type-name"><?= htmlspecialchars($tm['np']) ?><div class="dash-type-total"><?= (int)($wt['total'] ?? 0) ?> <?php echo $__t('दाबी', 'claims'); ?></div></div>
           <div class="d-flex gap-1 flex-wrap">
             <?php if ((int)($wt['pending_count'] ?? 0) > 0): ?><a href="welfare-claims.php?type=<?= htmlspecialchars($tk, ENT_QUOTES, 'UTF-8') ?>&status=pending" class="wf-badge pending"><?= (int)$wt['pending_count'] ?> <?php echo $__t('पेन्डिङ', 'Pending'); ?></a><?php endif; ?>

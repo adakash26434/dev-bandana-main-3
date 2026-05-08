@@ -68,10 +68,10 @@ $flash = getFlash();
 
 <style>
 .appfeat-flat-top{border-top-left-radius:0!important;border-top-right-radius:0!important;}
-.appfeat-icon-wrap{width:44px;height:44px;background:linear-gradient(135deg,rgba(26,95,42,.12),rgba(40,167,69,.18));border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.appfeat-icon-wrap{width:44px;height:44px;background:linear-gradient(135deg,color-mix(in srgb, var(--primary-color) 12%, white),color-mix(in srgb, var(--primary-light) 16%, white));border-radius:10px;display:flex;align-items:center;justify-content:center;}
 .appfeat-inline-form{display:inline;}
 .appfeat-toggle-badge{cursor:pointer;}
-.appfeat-form-header{background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;}
+.appfeat-form-header{background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:var(--text-on-primary,white);}
 </style>
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">

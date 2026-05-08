@@ -139,25 +139,25 @@ $_hasIdCard = true;
 <style>
 /* ── Member Bell Dropdown (unified) ── */
 .bell-wrap{position:relative;}
-.bell-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;width:340px;max-height:460px;overflow-y:auto;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:1000;color:#1f2937;}
+.bell-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;width:340px;max-height:460px;overflow-y:auto;background:white;border-radius:12px;box-shadow:0 10px 30px rgba(var(--primary-rgb,26,95,42),.18);z-index:1000;color:var(--text-color,#1f2937);}
 .bell-dropdown.open{display:block;}
-.bell-dd-head{padding:12px 14px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;border-radius:12px 12px 0 0;}
+.bell-dd-head{padding:12px 14px;border-bottom:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:var(--text-on-primary,white);border-radius:12px 12px 0 0;}
 .bell-dd-head .title{font-weight:700;font-size:.9rem;}
-.bell-dd-head .badge{background:#fbbf24;color:#1f2937;font-size:.7rem;padding:2px 7px;border-radius:10px;font-weight:700;}
-.bell-dd-empty{padding:30px 16px;text-align:center;color:#6b7280;font-size:.85rem;}
-.bell-dd-item{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid #f3f4f6;cursor:pointer;transition:background .15s;}
-.bell-dd-item:hover{background:#f9fafb;}
-.bell-dd-item.unread{background:#f0fdf4;}
+.bell-dd-head .badge{background:var(--secondary-color);color:var(--text-on-secondary,var(--text-on-primary,white));font-size:.7rem;padding:2px 7px;border-radius:10px;font-weight:700;}
+.bell-dd-empty{padding:30px 16px;text-align:center;color:var(--text-light,#6b7280);font-size:.85rem;}
+.bell-dd-item{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid color-mix(in srgb, var(--primary-color) 10%, #f3f4f6);cursor:pointer;transition:background .15s;}
+.bell-dd-item:hover{background:color-mix(in srgb, var(--primary-color) 8%, white);}
+.bell-dd-item.unread{background:color-mix(in srgb, var(--primary-color) 12%, white);}
 .bell-dd-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;}
 .bell-dd-body{flex:1;min-width:0;}
-.bell-dd-title{font-weight:600;font-size:.82rem;color:#111827;}
-.bell-dd-msg{font-size:.74rem;color:#6b7280;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.bell-dd-time{font-size:.68rem;color:#9ca3af;margin-top:3px;}
-.bell-dd-foot{padding:10px 14px;text-align:center;border-top:1px solid #e5e7eb;background:#f9fafb;border-radius:0 0 12px 12px;}
+.bell-dd-title{font-weight:600;font-size:.82rem;color:var(--text-color,#111827);}
+.bell-dd-msg{font-size:.74rem;color:var(--text-light,#6b7280);margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.bell-dd-time{font-size:.68rem;color:var(--text-muted,#9ca3af);margin-top:3px;}
+.bell-dd-foot{padding:10px 14px;text-align:center;border-top:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);background:color-mix(in srgb, var(--primary-color) 8%, white);border-radius:0 0 12px 12px;}
 .bell-dd-foot a{color:var(--primary-color);font-weight:600;font-size:.82rem;text-decoration:none;}
 .mem-bell-btn{position:relative;background:none;border:0;cursor:pointer;color:inherit;padding:8px;border-radius:8px;transition:background .15s;}
 .mem-bell-btn:hover{background:rgba(255,255,255,.15);}
-.mem-bell-btn .mem-notif-dot{position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;border-radius:10px;font-size:.62rem;font-weight:700;padding:1px 5px;min-width:16px;text-align:center;}
+.mem-bell-btn .mem-notif-dot{position:absolute;top:4px;right:4px;background:var(--secondary-color);color:var(--text-on-secondary,var(--text-on-primary,white));border-radius:10px;font-size:.62rem;font-weight:700;padding:1px 5px;min-width:16px;text-align:center;}
 .mem-lang-btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
 .mem-lang-code{font-size:11px;font-weight:800;line-height:1;}
 .mem-nav-item-rel{position:relative;}
@@ -203,10 +203,10 @@ $_hasIdCard = true;
                 </div>
                 <?php else:
                     $_iconMap = [
-                        'success'=>['fas fa-circle-check','#16a34a','#f0fdf4'],
-                        'error'  =>['fas fa-circle-xmark','#dc2626','#fef2f2'],
-                        'warning'=>['fas fa-triangle-exclamation','#d97706','#fffbeb'],
-                        'info'   =>['fas fa-circle-info','var(--secondary-color,#c0392b)','#fef2f2'],
+                        'success'=>['fas fa-circle-check','var(--primary-color)','color-mix(in srgb, var(--primary-color) 12%, white)'],
+                        'error'  =>['fas fa-circle-xmark','var(--secondary-color)','color-mix(in srgb, var(--secondary-color) 14%, white)'],
+                        'warning'=>['fas fa-triangle-exclamation','var(--secondary-color)','color-mix(in srgb, var(--secondary-color) 12%, white)'],
+                        'info'   =>['fas fa-circle-info','var(--accent-color,#17a2b8)','color-mix(in srgb, var(--accent-color,#17a2b8) 12%, white)'],
                     ];
                     foreach ($_bellNotifs as $_n):
                         $_ic = $_iconMap[$_n['type']] ?? $_iconMap['info'];

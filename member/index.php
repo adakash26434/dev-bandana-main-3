@@ -129,16 +129,57 @@ $quickActions = [
     ['href' => $siteUrl.'member/apply-frame.php?p=appointment', 'icon' => 'fa-calendar-check',     'color' => 'var(--primary-color)', 'label' => $_t('भेटघाट', 'Appointment')],
     ['href' => $siteUrl.'member/kyc.php',                        'icon' => 'fa-id-card',             'color' => 'var(--secondary-color,#c0392b)', 'label' => $_t('KYC दर्ता', 'KYC Registration')],
     ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark,#922b21)', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=account',     'icon' => 'fa-university',          'color' => '#00695c', 'label' => $_t('खाता खोल्ने', 'Open Account')],
+    ['href' => $siteUrl.'member/apply-frame.php?p=account',     'icon' => 'fa-university',          'color' => 'var(--primary-color)', 'label' => $_t('खाता खोल्ने', 'Open Account')],
     ['href' => $siteUrl.'member/apply-frame.php?p=digital',     'icon' => 'fa-laptop',              'color' => 'var(--secondary-color,#c0392b)', 'label' => $_t('डिजिटल सेवा', 'Digital Service')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=grievance',   'icon' => 'fa-comment-exclamation', 'color' => '#c62828', 'label' => $_t('गुनासो', 'Grievance')],
-    ['href' => $siteUrl.'member/welfare.php',                   'icon' => 'fa-heart',               'color' => '#e65100', 'label' => $_t('कल्याण', 'Welfare')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=career',      'icon' => 'fa-briefcase',           'color' => '#37474f', 'label' => $_t('जागिर', 'Career')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=emi',         'icon' => 'fa-calculator',          'color' => '#0277bd', 'label' => 'EMI Calculator'],
+    ['href' => $siteUrl.'member/apply-frame.php?p=grievance',   'icon' => 'fa-comment-exclamation', 'color' => 'var(--secondary-color)', 'label' => $_t('गुनासो', 'Grievance')],
+    ['href' => $siteUrl.'member/welfare.php',                   'icon' => 'fa-heart',               'color' => 'var(--secondary-color)', 'label' => $_t('कल्याण', 'Welfare')],
+    ['href' => $siteUrl.'member/apply-frame.php?p=career',      'icon' => 'fa-briefcase',           'color' => 'var(--primary-dark)', 'label' => $_t('जागिर', 'Career')],
+    ['href' => $siteUrl.'member/apply-frame.php?p=emi',         'icon' => 'fa-calculator',          'color' => 'var(--accent-color,#17a2b8)', 'label' => 'EMI Calculator'],
+];
+$iconMap = [
+    'success'=>['fas fa-circle-check','var(--primary-color)','color-mix(in srgb, var(--primary-color) 12%, white)'],
+    'error'  =>['fas fa-circle-xmark','var(--secondary-color)','color-mix(in srgb, var(--secondary-color) 14%, white)'],
+    'warning'=>['fas fa-triangle-exclamation','var(--secondary-dark,var(--secondary-color))','color-mix(in srgb, var(--secondary-color) 14%, white)'],
+    'info'   =>['fas fa-circle-info','var(--accent-color)','color-mix(in srgb, var(--accent-color) 12%, white)']
 ];
 $pageTitle = $_t('सदस्य ड्यासबोर्ड', 'Member Dashboard') . ' — ' . $siteName;
 require __DIR__ . '/includes/chrome.php';
 ?>
+<style>
+.midx-greeting{margin-bottom:16px;}
+.midx-greeting-title{margin:0;color:var(--primary-color);}
+.midx-greeting-date{margin:4px 0 0;color:var(--text-light,#6b7280);font-size:.88rem;}
+.midx-stat-pending{color:var(--secondary-dark,var(--secondary-color));}
+.midx-stat-approved{color:var(--primary-color);}
+.midx-stat-notif{color:var(--secondary-color);}
+.midx-stat-partner{color:var(--accent-color);}
+.midx-ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+.midx-ds-card{border-radius:12px;padding:14px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;transition:transform .15s,box-shadow .15s;}
+.midx-ds-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(var(--primary-rgb,26,95,42),.12);}
+.midx-ds-icon-wrap{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.midx-ds-icon{color:var(--text-on-primary,white);font-size:1.1rem;}
+.midx-ds-label{font-size:.8rem;font-weight:700;color:var(--text-color,#1f2937);}
+.midx-ds-desc{font-size:.68rem;color:var(--text-light,#6b7280);}
+.midx-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.midx-link{font-size:.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;}
+.midx-body-pad-sm{padding-top:6px;}
+.midx-filter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.midx-filter-pill{padding:4px 10px;border-radius:18px;font-size:.7rem;font-weight:700;text-decoration:none;border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, #e5e7eb);background:white;color:var(--text-light,#6b7280);}
+.midx-filter-pill.is-active{border-color:var(--mem-primary);background:var(--mem-primary);color:var(--text-on-primary,white);}
+.midx-search-form{display:flex;gap:6px;align-items:center;margin-bottom:10px;}
+.midx-search-input{flex:1;min-width:0;border:1px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db);border-radius:8px;padding:6px 9px;font-size:.76rem;}
+.midx-search-btn{padding:6px 10px;border:none;border-radius:8px;background:var(--mem-primary);color:var(--text-on-primary,white);font-size:.74rem;font-weight:700;}
+.midx-reset-btn{padding:6px 10px;border:1px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db);border-radius:8px;background:white;color:var(--text-light,#6b7280);font-size:.74rem;font-weight:700;text-decoration:none;}
+.midx-empty-sub{margin-top:8px;font-size:.78rem;}
+.midx-track{font-size:.68rem;color:var(--text-light,#6b7280);font-family:monospace;}
+.midx-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--mem-accent);flex-shrink:0;margin-top:6px;}
+.midx-card-mt{margin-top:18px;}
+.midx-muted-count{font-size:.75rem;color:var(--text-light,#6b7280);font-weight:600;}
+.midx-empty-note{margin-top:6px;font-size:.78rem;color:var(--text-muted,#9ca3af);}
+.midx-ph-taken{color:var(--primary-color);}
+.midx-ph-org{color:var(--accent-color);font-size:.72rem;margin-right:4px;}
+.midx-ph-mini{font-size:.72rem;}
+</style>
 <?php if ($welcome): ?>
 <div class="mem-alert mem-alert-success" style="margin-bottom:16px;">
     <i class="fas fa-party-horn"></i>
@@ -148,9 +189,9 @@ require __DIR__ . '/includes/chrome.php';
 <?php endif; ?>
 
     <!-- Greeting -->
-    <div class="mem-greeting" style="margin-bottom:16px;">
-        <h2 style="margin:0;color:var(--primary-color);"><?php echo $greeting; ?>, <?php echo htmlspecialchars($memName); ?>! 👋</h2>
-        <p style="margin:4px 0 0;color:#6b7280;font-size:0.88rem;"><?php echo $_t('आजको मिति', 'Today'); ?>: <?php echo formatNepaliDate(date('Y-m-d')); ?></p>
+    <div class="mem-greeting midx-greeting">
+        <h2 class="midx-greeting-title"><?php echo $greeting; ?>, <?php echo htmlspecialchars($memName); ?>! 👋</h2>
+        <p class="midx-greeting-date"><?php echo $_t('आजको मिति', 'Today'); ?>: <?php echo formatNepaliDate(date('Y-m-d')); ?></p>
     </div>
 
     <!-- Stat cards (Programs हटाइयो) -->
@@ -161,23 +202,23 @@ require __DIR__ . '/includes/chrome.php';
             <div class="mem-stat-label"><?php echo $_t('कुल आवेदन', 'Total Applications'); ?></div>
         </div>
         <div class="mem-stat">
-            <div class="mem-stat-icon" style="color:#d97706;">⏳</div>
-            <div class="mem-stat-num"  style="color:#d97706;"><?php echo $pending; ?></div>
+            <div class="mem-stat-icon midx-stat-pending">⏳</div>
+            <div class="mem-stat-num midx-stat-pending"><?php echo $pending; ?></div>
             <div class="mem-stat-label"><?php echo $_t('पेन्डिङ', 'Pending'); ?></div>
         </div>
         <div class="mem-stat">
-            <div class="mem-stat-icon" style="color:#16a34a;">✅</div>
-            <div class="mem-stat-num"  style="color:#16a34a;"><?php echo $approved; ?></div>
+            <div class="mem-stat-icon midx-stat-approved">✅</div>
+            <div class="mem-stat-num midx-stat-approved"><?php echo $approved; ?></div>
             <div class="mem-stat-label"><?php echo $_t('स्वीकृत', 'Approved'); ?></div>
         </div>
         <div class="mem-stat">
-            <div class="mem-stat-icon" style="color:var(--secondary-color,#c0392b);">🔔</div>
-            <div class="mem-stat-num"  style="color:var(--secondary-color,#c0392b);"><?php echo $unread; ?></div>
+            <div class="mem-stat-icon midx-stat-notif">🔔</div>
+            <div class="mem-stat-num midx-stat-notif"><?php echo $unread; ?></div>
             <div class="mem-stat-label"><?php echo $_t('नयाँ सूचना', 'New Notifications'); ?></div>
         </div>
         <div class="mem-stat">
-            <div class="mem-stat-icon" style="color:#0d9488;">🏥</div>
-            <div class="mem-stat-num"  style="color:#0d9488;"><?php echo count($partnerHistory); ?></div>
+            <div class="mem-stat-icon midx-stat-partner">🏥</div>
+            <div class="mem-stat-num midx-stat-partner"><?php echo count($partnerHistory); ?></div>
             <div class="mem-stat-label"><?php echo $_t('साझेदार सेवा', 'Partner Services'); ?></div>
         </div>
     </div>
@@ -205,36 +246,34 @@ require __DIR__ . '/includes/chrome.php';
             <div class="mem-card-title"><i class="fas fa-laptop-code"></i><?php echo $_t('डिजिटल सेवाहरू', 'Digital Services'); ?></div>
         </div>
         <div class="mem-card-body">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
+            <div class="midx-ds-grid">
                 <?php
                 $ibUrl  = getSetting('internet_banking_url', '');
                 $iosUrl = getSetting('app_store_url', '');
                 $andUrl = getSetting('play_store_url', '');
                 $digitalServices = [];
-                if ($ibUrl)  $digitalServices[] = ['icon'=>'fa-laptop',      'color'=>'#0e7490','bg'=>'#ecfeff','label'=>'Internet Banking','href'=>$ibUrl, 'desc'=>$_t('Online खाता व्यवस्थापन','Online account management'),'target'=>'_blank'];
-                if ($iosUrl) $digitalServices[] = ['icon'=>'fa-apple','iconLib'=>'fab','color'=>'#111827','bg'=>'#f3f4f6','label'=>'iOS App','href'=>$iosUrl,'desc'=>$_t('App Store बाट डाउनलोड','Download from App Store'),'target'=>'_blank'];
-                if ($andUrl) $digitalServices[] = ['icon'=>'fa-google-play','iconLib'=>'fab','color'=>'#16a34a','bg'=>'#f0fdf4','label'=>'Android App','href'=>$andUrl,'desc'=>$_t('Play Store बाट डाउनलोड','Download from Play Store'),'target'=>'_blank'];
+                if ($ibUrl)  $digitalServices[] = ['icon'=>'fa-laptop',      'color'=>'var(--accent-color)','bg'=>'color-mix(in srgb, var(--accent-color) 12%, white)','label'=>'Internet Banking','href'=>$ibUrl, 'desc'=>$_t('Online खाता व्यवस्थापन','Online account management'),'target'=>'_blank'];
+                if ($iosUrl) $digitalServices[] = ['icon'=>'fa-apple','iconLib'=>'fab','color'=>'var(--text-color,#111827)','bg'=>'color-mix(in srgb, var(--primary-color) 10%, white)','label'=>'iOS App','href'=>$iosUrl,'desc'=>$_t('App Store बाट डाउनलोड','Download from App Store'),'target'=>'_blank'];
+                if ($andUrl) $digitalServices[] = ['icon'=>'fa-google-play','iconLib'=>'fab','color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>'Android App','href'=>$andUrl,'desc'=>$_t('Play Store बाट डाउनलोड','Download from Play Store'),'target'=>'_blank'];
                 $digitalServices = array_merge($digitalServices, [
-                    ['icon'=>'fa-mobile-screen-button','color'=>'var(--secondary-color,#c0392b)','bg'=>'#fef2f2','label'=>'Mobile Banking',   'href'=>$siteUrl.'digital-services.php#mobile-banking','desc'=>$_t('कुनै पनि समय बैंकिङ','Anytime banking')],
-                    ['icon'=>'fa-qrcode',              'color'=>'var(--secondary-dark,#922b21)','bg'=>'#fef2f2','label'=>'QR Payment',       'href'=>$siteUrl.'digital-services.php#qr-payment',   'desc'=>$_t('छिटो भुक्तानी','Quick payment')],
-                    ['icon'=>'fa-file-invoice-dollar', 'color'=>'#059669','bg'=>'#ecfdf5','label'=>'Online Loan',       'href'=>$siteUrl.'member/apply-frame.php?p=loan',     'desc'=>$_t('घरबाटै ऋण आवेदन','Apply loan from home')],
-                    ['icon'=>'fa-piggy-bank',          'color'=>'#d97706','bg'=>'#fffbeb','label'=>'Online Bachat',     'href'=>$siteUrl.'digital-services.php#bachat',       'desc'=>$_t('बचत खाता Online','Online savings account')],
-                    ['icon'=>'fa-headset',             'color'=>'#c0392b','bg'=>'#fef2f2','label'=>'24/7 Support',      'href'=>$siteUrl.'digital-services.php#support',      'desc'=>$_t('सहायता केन्द्र','Support center')],
-                    ['icon'=>'fa-id-card',             'color'=>'var(--primary-color)','bg'=>'#f0fdf4','label'=>'Digital ID Card',   'href'=>$siteUrl.'member/id-card.php',
+                    ['icon'=>'fa-mobile-screen-button','color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>'Mobile Banking',   'href'=>$siteUrl.'digital-services.php#mobile-banking','desc'=>$_t('कुनै पनि समय बैंकिङ','Anytime banking')],
+                    ['icon'=>'fa-qrcode',              'color'=>'var(--secondary-dark,var(--secondary-color))','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>'QR Payment',       'href'=>$siteUrl.'digital-services.php#qr-payment',   'desc'=>$_t('छिटो भुक्तानी','Quick payment')],
+                    ['icon'=>'fa-file-invoice-dollar', 'color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>'Online Loan',       'href'=>$siteUrl.'member/apply-frame.php?p=loan',     'desc'=>$_t('घरबाटै ऋण आवेदन','Apply loan from home')],
+                    ['icon'=>'fa-piggy-bank',          'color'=>'var(--secondary-dark,var(--secondary-color))','bg'=>'color-mix(in srgb, var(--secondary-color) 10%, white)','label'=>'Online Bachat',     'href'=>$siteUrl.'digital-services.php#bachat',       'desc'=>$_t('बचत खाता Online','Online savings account')],
+                    ['icon'=>'fa-headset',             'color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>'24/7 Support',      'href'=>$siteUrl.'digital-services.php#support',      'desc'=>$_t('सहायता केन्द्र','Support center')],
+                    ['icon'=>'fa-id-card',             'color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>'Digital ID Card',   'href'=>$siteUrl.'member/id-card.php',
                      'desc'=>$mem['id_card_generated'] ? $_t('ID Card हेर्नुहोस्','View ID card') : $_t('Admin Generate गर्दैछन्','Pending admin generation')],
-                    ['icon'=>'fa-calculator',          'color'=>'#0277bd','bg'=>'#e1f5fe','label'=>'EMI Calculator',    'href'=>$siteUrl.'member/apply-frame.php?p=emi',     'desc'=>$_t('किस्ता गणना','Installment calculation')],
+                    ['icon'=>'fa-calculator',          'color'=>'var(--accent-color)','bg'=>'color-mix(in srgb, var(--accent-color) 12%, white)','label'=>'EMI Calculator',    'href'=>$siteUrl.'member/apply-frame.php?p=emi',     'desc'=>$_t('किस्ता गणना','Installment calculation')],
                 ]);
                 foreach ($digitalServices as $ds): ?>
                 <a href="<?php echo htmlspecialchars($ds['href']); ?>"
                    <?php if (!empty($ds['target'])): ?>target="<?php echo $ds['target']; ?>" rel="noopener"<?php endif; ?>
-                   style="background:<?php echo $ds['bg']; ?>;border-radius:12px;padding:14px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;transition:transform .15s,box-shadow .15s;"
-                   onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)';"
-                   onmouseout="this.style.transform='';this.style.boxShadow='';">
-                    <div style="width:44px;height:44px;border-radius:50%;background:<?php echo $ds['color']; ?>;display:flex;align-items:center;justify-content:center;">
-                        <i class="<?php echo $ds['iconLib'] ?? 'fas'; ?> <?php echo $ds['icon']; ?>" style="color:#fff;font-size:1.1rem;"></i>
+                   class="midx-ds-card" style="background:<?php echo $ds['bg']; ?>;">
+                    <div class="midx-ds-icon-wrap" style="background:<?php echo $ds['color']; ?>;">
+                        <i class="<?php echo $ds['iconLib'] ?? 'fas'; ?> <?php echo $ds['icon']; ?> midx-ds-icon"></i>
                     </div>
-                    <div style="font-size:.8rem;font-weight:700;color:#1f2937;"><?php echo $ds['label']; ?></div>
-                    <div style="font-size:.68rem;color:#6b7280;"><?php echo $ds['desc']; ?></div>
+                    <div class="midx-ds-label"><?php echo $ds['label']; ?></div>
+                    <div class="midx-ds-desc"><?php echo $ds['desc']; ?></div>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -242,38 +281,38 @@ require __DIR__ . '/includes/chrome.php';
     </div>
 
     <!-- Two-column: Recent apps + Notifications -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;" class="mem-grid-2">
+    <div class="mem-grid-2 midx-grid-2">
 
         <div class="mem-card">
             <div class="mem-card-header">
                 <div class="mem-card-title"><i class="fas fa-clock-rotate-left"></i><?php echo $_t('हालका आवेदनहरू', 'Recent Applications'); ?></div>
-                <a href="<?php echo $siteUrl; ?>member/tracker.php" style="font-size:0.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;"><?php echo $_t('सबै हेर्नुस्', 'View all'); ?> →</a>
+                <a href="<?php echo $siteUrl; ?>member/tracker.php" class="midx-link"><?php echo $_t('सबै हेर्नुस्', 'View all'); ?> →</a>
             </div>
-            <div class="mem-card-body" style="padding-top:6px;">
-                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+            <div class="mem-card-body midx-body-pad-sm">
+                <div class="midx-filter-row">
                     <?php $raFilters = ['all'=>$_t('सबै','All'),'pending'=>$_t('पेन्डिङ','Pending'),'approved'=>$_t('स्वीकृत','Approved'),'rejected'=>$_t('अस्वीकृत','Rejected')]; ?>
                     <?php foreach ($raFilters as $rk => $rl): ?>
                     <a href="?ra_status=<?php echo urlencode($rk); ?>&ra_q=<?php echo urlencode($raQ); ?>"
-                       style="padding:4px 10px;border-radius:18px;font-size:.7rem;font-weight:700;text-decoration:none;border:1.5px solid <?php echo $raStatus===$rk ? 'var(--mem-primary)' : '#e5e7eb'; ?>;background:<?php echo $raStatus===$rk ? 'var(--mem-primary)' : '#fff'; ?>;color:<?php echo $raStatus===$rk ? '#fff' : '#6b7280'; ?>;">
+                       class="midx-filter-pill <?php echo $raStatus===$rk ? 'is-active' : ''; ?>">
                         <?php echo $rl; ?>
                     </a>
                     <?php endforeach; ?>
                 </div>
-                <form method="GET" style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
+                <form method="GET" class="midx-search-form">
                     <input type="hidden" name="ra_status" value="<?php echo htmlspecialchars($raStatus); ?>">
                     <input type="text"  name="ra_q"      value="<?php echo htmlspecialchars($raQ); ?>"
                            placeholder="<?php echo $_t('सेवा वा Tracking ID खोज्नुहोस्...', 'Search service or tracking ID...'); ?>"
-                           style="flex:1;min-width:0;border:1px solid #d1d5db;border-radius:8px;padding:6px 9px;font-size:.76rem;">
-                    <button type="submit" style="padding:6px 10px;border:none;border-radius:8px;background:var(--mem-primary);color:#fff;font-size:.74rem;font-weight:700;"><i class="fas fa-search"></i></button>
+                           class="midx-search-input">
+                    <button type="submit" class="midx-search-btn"><i class="fas fa-search"></i></button>
                     <?php if ($raQ !== '' || $raStatus !== 'all'): ?>
-                    <a href="<?php echo $siteUrl; ?>member/" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#6b7280;font-size:.74rem;font-weight:700;text-decoration:none;"><?php echo $_t('रिसेट','Reset'); ?></a>
+                    <a href="<?php echo $siteUrl; ?>member/" class="midx-reset-btn"><?php echo $_t('रिसेट','Reset'); ?></a>
                     <?php endif; ?>
                 </form>
                 <?php if (empty($recentApps)): ?>
                 <div class="mem-empty">
                     <span class="mem-empty-icon">📭</span>
                     <div><?php echo $_t('अहिलेसम्म कुनै आवेदन छैन।', 'No applications yet.'); ?></div>
-                    <div style="margin-top:8px;font-size:0.78rem;"><?php echo $_t('माथि Quick Apply बाट सेवा लिनुहोस्।', 'Use Quick Apply above to request services.'); ?></div>
+                    <div class="midx-empty-sub"><?php echo $_t('माथि Quick Apply बाट सेवा लिनुहोस्।', 'Use Quick Apply above to request services.'); ?></div>
                 </div>
                 <?php else: foreach ($recentApps as $app): ?>
                 <div class="mem-app-item">
@@ -285,7 +324,7 @@ require __DIR__ . '/includes/chrome.php';
                     </div>
                     <div class="mem-app-right">
                         <?php echo memberStatusBadge($app['status']); ?>
-                        <?php if ($app['tracking_id']): ?><span style="font-size:0.68rem;color:#6b7280;font-family:monospace;"><?php echo htmlspecialchars($app['tracking_id']); ?></span><?php endif; ?>
+                        <?php if ($app['tracking_id']): ?><span class="midx-track"><?php echo htmlspecialchars($app['tracking_id']); ?></span><?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; endif; ?>
@@ -297,13 +336,12 @@ require __DIR__ . '/includes/chrome.php';
                 <div class="mem-card-title"><i class="fas fa-bell"></i><?php echo $_t('सूचनाहरू', 'Notifications'); ?>
                     <?php if ($unread > 0): ?><span class="mem-notif-dot" style="position:static;"><?php echo $unread; ?></span><?php endif; ?>
                 </div>
-                <a href="<?php echo $siteUrl; ?>member/notifications.php" style="font-size:0.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;"><?php echo $_t('सबै', 'All'); ?> →</a>
+                <a href="<?php echo $siteUrl; ?>member/notifications.php" class="midx-link"><?php echo $_t('सबै', 'All'); ?> →</a>
             </div>
-            <div class="mem-card-body" style="padding-top:6px;">
+            <div class="mem-card-body midx-body-pad-sm">
                 <?php if (empty($notifs)): ?>
                 <div class="mem-empty"><span class="mem-empty-icon">🔔</span><div><?php echo $_t('कुनै सूचना छैन।', 'No notifications.'); ?></div></div>
                 <?php else:
-                    $iconMap = ['success'=>['fas fa-circle-check','#16a34a','#f0fdf4'],'error'=>['fas fa-circle-xmark','#dc2626','#fef2f2'],'warning'=>['fas fa-triangle-exclamation','#d97706','#fffbeb'],'info'=>['fas fa-circle-info','var(--secondary-color,#c0392b)','#fef2f2']];
                     foreach ($notifs as $n): $ic = $iconMap[$n['type']] ?? $iconMap['info'];
                 ?>
                 <div class="mem-notif-item <?php echo !$n['is_read'] ? 'unread' : ''; ?>" onclick="markRead(<?php echo $n['id']; ?>, this)" style="border-radius:8px;">
@@ -313,7 +351,7 @@ require __DIR__ . '/includes/chrome.php';
                         <div class="mem-notif-msg"><?php echo htmlspecialchars(mb_strimwidth($n['message'] ?? '', 0, 80, '…')); ?></div>
                         <div class="mem-notif-time"><?php echo formatNepaliDate($n['created_at'], true); ?></div>
                     </div>
-                    <?php if (!$n['is_read']): ?><span style="width:8px;height:8px;border-radius:50%;background:var(--mem-accent);flex-shrink:0;margin-top:6px;"></span><?php endif; ?>
+                    <?php if (!$n['is_read']): ?><span class="midx-unread-dot"></span><?php endif; ?>
                 </div>
                 <?php endforeach; endif; ?>
             </div>
@@ -324,19 +362,19 @@ require __DIR__ . '/includes/chrome.php';
     <!-- ══════════════════════════════════════════════════════
          साझेदार संस्था सेवा इतिहास — v6 redesigned
     ═══════════════════════════════════════════════════════════ -->
-    <div class="mem-card" style="margin-top:18px;">
+    <div class="mem-card midx-card-mt">
         <div class="mem-card-header">
             <div class="mem-card-title"><i class="fas fa-hospital"></i><?php echo $_t('साझेदार संस्था सेवा इतिहास', 'Partner Service History'); ?></div>
             <?php if (!empty($partnerHistory)): ?>
-            <span style="font-size:.75rem;color:#6b7280;font-weight:600;"><?php echo count($partnerHistory); ?> <?php echo $_t('रेकर्ड', 'records'); ?></span>
+            <span class="midx-muted-count"><?php echo count($partnerHistory); ?> <?php echo $_t('रेकर्ड', 'records'); ?></span>
             <?php endif; ?>
         </div>
-        <div class="mem-card-body" style="padding-top:8px;">
+        <div class="mem-card-body">
             <?php if (empty($partnerHistory)): ?>
             <div class="mem-empty">
                 <span class="mem-empty-icon">🏥</span>
                 <div><?php echo $_t('अहिलेसम्म कुनै साझेदार संस्थामा सेवा लिइएको छैन।', 'No partner services taken yet.'); ?></div>
-                <div style="margin-top:6px;font-size:.78rem;color:#9ca3af;">
+                <div class="midx-empty-note">
                     <?php echo $_t('साझेदार संस्थामा Member Card देखाएपछि यहाँ history देखिन्छ।', 'History appears here after showing your Member Card at partner organizations.'); ?>
                 </div>
             </div>
@@ -352,12 +390,12 @@ require __DIR__ . '/includes/chrome.php';
                 </div>
                 <div class="ph-divider"></div>
                 <div class="ph-total-stat">
-                    <div class="ph-total-num" style="color:#16a34a;"><?php echo $totalTaken; ?></div>
+                    <div class="ph-total-num midx-ph-taken"><?php echo $totalTaken; ?></div>
                     <div class="ph-total-lbl"><?php echo $_t('सेवा लिइयो', 'Services Taken'); ?></div>
                 </div>
                 <div class="ph-divider"></div>
                 <div class="ph-total-stat">
-                    <div class="ph-total-num" style="color:#0d9488;"><?php echo $totalOrgs; ?></div>
+                    <div class="ph-total-num midx-stat-partner"><?php echo $totalOrgs; ?></div>
                     <div class="ph-total-lbl"><?php echo $_t('संस्थाहरू', 'Organizations'); ?></div>
                 </div>
             </div>
@@ -365,13 +403,13 @@ require __DIR__ . '/includes/chrome.php';
             <!-- Per-partner filter pills -->
             <div class="ph-summary-row">
                 <span class="ph-summary-pill active" data-filter="all" onclick="phFilter('all', this)">
-                    <i class="fas fa-th-large" style="font-size:.75rem;"></i>
+                    <i class="fas fa-th-large midx-ph-mini"></i>
                     <?php echo $_t('सबै', 'All'); ?>
                     <span class="ph-pill-count"><?php echo count($partnerHistory); ?></span>
                 </span>
                 <?php foreach ($partnerSummary as $pname => $pdata): ?>
                 <span class="ph-summary-pill" data-filter="<?php echo htmlspecialchars($pname, ENT_QUOTES); ?>" onclick="phFilter(<?php echo json_encode($pname); ?>, this)">
-                    <i class="fas fa-building" style="font-size:.72rem;"></i>
+                    <i class="fas fa-building midx-ph-mini"></i>
                     <?php echo htmlspecialchars($pname); ?>
                     <span class="ph-pill-count"><?php echo $pdata['total']; ?> <?php echo $_t('पटक', 'times'); ?></span>
                 </span>
@@ -391,16 +429,16 @@ require __DIR__ . '/includes/chrome.php';
                     <div class="ph-info">
                         <div class="ph-org-name"><?php echo htmlspecialchars($h['partner_name'] ?? '—'); ?></div>
                         <div class="ph-svc-name">
-                            <i class="fas fa-stethoscope" style="color:#0d9488;font-size:.72rem;margin-right:4px;"></i>
+                            <i class="fas fa-stethoscope midx-ph-org"></i>
                             <?php echo htmlspecialchars($h['service_name'] ?: $_t('सेवा उल्लेख छैन', 'Service not specified')); ?>
                         </div>
                         <?php if (!empty($h['service_note'])): ?>
-                        <div class="ph-svc-note"><i class="fas fa-note-sticky" style="font-size:.65rem;margin-right:3px;"></i><?php echo htmlspecialchars($h['service_note']); ?></div>
+                        <div class="ph-svc-note"><i class="fas fa-note-sticky midx-ph-mini"></i><?php echo htmlspecialchars($h['service_note']); ?></div>
                         <?php endif; ?>
-                        <div class="ph-date"><i class="fas fa-clock" style="font-size:.63rem;margin-right:3px;"></i><?php echo formatNepaliDate($h['created_at'], true); ?></div>
+                        <div class="ph-date"><i class="fas fa-clock midx-ph-mini"></i><?php echo formatNepaliDate($h['created_at'], true); ?></div>
                     </div>
                     <div class="ph-taken-badge <?php echo $taken ? 'ph-taken-yes' : 'ph-taken-no'; ?>">
-                        <?php if ($taken): ?><i class="fas fa-circle-check" style="font-size:.72rem;"></i><?php else: ?><i class="fas fa-circle-xmark" style="font-size:.72rem;"></i><?php endif; ?>
+                        <?php if ($taken): ?><i class="fas fa-circle-check midx-ph-mini"></i><?php else: ?><i class="fas fa-circle-xmark midx-ph-mini"></i><?php endif; ?>
                         <?php echo $taken ? $_t('सेवा लिइयो', 'Taken') : $_t('नलिइएको', 'Not taken'); ?>
                     </div>
                 </div>

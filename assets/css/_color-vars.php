@@ -150,4 +150,68 @@ footer,
 .site-footer {
     color: var(--text-on-footer, #fff);
 }
+
+/* Keep text/icon readable after admin color changes */
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-check:checked + .btn-primary,
+.btn-check:active + .btn-primary {
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active {
+    background: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+    color: var(--text-on-secondary, #fff) !important;
+}
+
+.bg-primary a,
+.text-bg-primary a,
+.bg-secondary a,
+.text-bg-secondary a {
+    color: inherit;
+}
+
+/* Gradient headers/cards using brand colors */
+.gradient-card-header,
+.svc-form-header-grad,
+.tracker-search-header,
+.public-id-card-cta {
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.gradient-card-header i,
+.svc-form-header-grad i,
+.tracker-search-header i,
+.public-id-card-cta i {
+    color: inherit !important;
+}
+
+/* Header/Footer contrast-safe links */
+.top-bar a,
+.topbar a,
+.header-top a,
+.site-topbar a {
+    color: inherit;
+}
+
+.footer-policy-links a {
+    color: color-mix(in srgb, var(--text-on-footer, #fff) 86%, transparent) !important;
+}
+
+.footer-policy-links a:hover,
+.footer-bottom .developer a:hover {
+    color: var(--text-on-footer, #fff) !important;
+}
 </style>

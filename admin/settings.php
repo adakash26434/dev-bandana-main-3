@@ -24,7 +24,7 @@ checkCSRF();
 
         /* Color inputs सुरक्षित/valid hex मा मात्र save गर्ने:
            invalid value ले UI text invisible/unstyled बनाउने risk कम हुन्छ। */
-        $sanitizeHexColor = function ($value, $fallback = 'var(--primary-color)') {
+        $sanitizeHexColor = function ($value, $fallback = '#1a5f2a') {
             $value = trim((string)$value);
             if (!preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $value)) return $fallback;
             // 3-digit hex लाई 6-digit मा normalize
@@ -51,13 +51,13 @@ checkCSRF();
                     $value = function_exists('clean_text') ? clean_text((string) $value, 300) : trim((string) $value);
                 }
                 if ($key === 'primary_color') {
-                    $value = $sanitizeHexColor($value, 'var(--primary-color)');
+                    $value = $sanitizeHexColor($value, '#1a5f2a');
                 } elseif ($key === 'secondary_color') {
                     $value = $sanitizeHexColor($value, '#c0392b');
                 } elseif ($key === 'header_color') {
                     $value = $sanitizeHexColor($value, '#c0392b');
                 } elseif ($key === 'footer_color') {
-                    $value = $sanitizeHexColor($value, 'var(--primary-color)');
+                    $value = $sanitizeHexColor($value, '#1a5f2a');
                 } elseif ($key === 'topbar_color') {
                     $value = $sanitizeHexColor($value, '#c0392b');
                 }
@@ -784,14 +784,14 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                         <div class="col-md-4">
                             <label class="form-label"><?php echo $__t('प्राथमिक रंग', 'Primary Color'); ?></label>
                             <input type="color" name="primary_color" class="form-control form-control-color w-100"
-                                   value="<?php echo $settings['primary_color'] ?? 'var(--primary-color)'; ?>"
+                                   value="<?php echo $settings['primary_color'] ?? '#1a5f2a'; ?>"
                                    style="height: 50px;">
                             <small class="text-muted"><?php echo $__t('मुख्य रंग', 'Main color'); ?></small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label"><?php echo $__t('फुटर रंग', 'Footer Color'); ?></label>
                             <input type="color" name="footer_color" class="form-control form-control-color w-100"
-                                   value="<?php echo $settings['footer_color'] ?? 'var(--primary-color)'; ?>"
+                                   value="<?php echo $settings['footer_color'] ?? '#1a5f2a'; ?>"
                                    style="height: 50px;">
                             <small class="text-muted"><?php echo $__t('फुटर पृष्ठभूमि', 'Footer bg'); ?></small>
                         </div>

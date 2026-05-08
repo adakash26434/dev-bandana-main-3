@@ -408,7 +408,7 @@ body.page-loaded .page-loader {
 }
 
 body {
-    font-family: 'Mukta', sans-serif;
+    font-family: 'Mukta', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 16px;
     line-height: 1.6;
     color: var(--text-color);
@@ -4194,6 +4194,36 @@ img {
 .footer-policy-links,
 .footer-policy-links a {
     font-size: .74rem;
+}
+
+.footer-policy-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin: 6px 0;
+}
+
+.footer-policy-links a {
+    color: rgba(255,255,255,.85);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.footer-policy-dot {
+    opacity: .4;
+}
+
+.footer-developer-supported {
+    opacity: .9;
+    margin-bottom: 2px;
+}
+
+.footer-developer-main {
+    opacity: .9;
+    margin-bottom: 0;
 }
 
 .footer-bottom .copyright {
@@ -12811,11 +12841,14 @@ input[readonly].nepali-datepicker:hover,
 /* ==============================================
    NEW BADGE FOR MENU ITEMS
    ============================================== */
-.nav-new-badge {
+.nav-new-badge,
+.tools-link-badge,
+.report-quick-link .latest-badge,
+.profile-title-link .latest-badge {
     display: inline-flex;
     align-items: center;
-    background: linear-gradient(135deg, var(--danger), #e83e8c);
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-on-primary, #fff);
     font-size: 0.65rem;
     font-weight: 700;
     padding: 2px 6px;
@@ -12838,6 +12871,21 @@ input[readonly].nepali-datepicker:hover,
 .dropdown .nav-new-badge {
     font-size: 0.6rem;
     padding: 1px 5px;
+}
+
+.tools-link-badge,
+.report-quick-link .latest-badge,
+.profile-title-link .latest-badge {
+    border-radius: 10px;
+    top: -8px;
+    right: -5px;
+    position: absolute;
+}
+
+.tools-link-badge {
+    top: 6px;
+    right: 6px;
+    z-index: 2;
 }
 
 /* उप-मेनु संख्या चिन्ह — header-v2.css सँग मेल (टप बारको बिज्ञापन ब्याज जस्तै) */
