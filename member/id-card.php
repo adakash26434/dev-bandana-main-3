@@ -281,40 +281,40 @@ if ($cardLogoRaw !== '') {
     <button type="button" id="idcardFlipBtn" class="idcard-btn idcard-btn-ghost"><i class="fas fa-arrows-rotate"></i> <?php echo $_t('कार्ड उल्ट्याउनुहोस्', 'Flip Card'); ?></button>
     <button type="button" onclick="window.print()" class="idcard-btn idcard-btn-primary"><i class="fas fa-print"></i> <?php echo $_t('प्रिन्ट / डाउनलोड', 'Print / Download'); ?></button>
   </div>
-  <div style="max-width:440px;margin:0 auto 10px;padding:8px 12px;background:#faf5ff;border:1px solid #ddd6fe;border-radius:10px;color:#5b21b6;font-size:13px;">
+  <div class="idcard-note idcard-note-rating">
     <i class="fas fa-star me-1"></i><b><?php echo $_t('कार्यक्रम रेटिङ', 'Program Rating'); ?>:</b> <?php echo $cardStarHtml; ?>
-    <span style="color:#6b7280;">(<?php echo (int)$cardProgramAttended; ?>/<?php echo max(1, (int)$cardProgramEligible); ?>)</span>
+    <span class="idcard-note-muted">(<?php echo (int)$cardProgramAttended; ?>/<?php echo max(1, (int)$cardProgramEligible); ?>)</span>
   </div>
 
   <?php if ($isExpired): ?>
-  <div style="max-width:440px;margin:0 auto 14px;padding:12px 14px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:10px;color:#78350f;font-size:13px;line-height:1.5;">
+  <div class="idcard-note idcard-note-expired">
     <i class="fas fa-triangle-exclamation"></i>
     <b><?php echo $_t('तपाईंको ID Card को म्याद सकिएको छ।', 'Your ID card has expired.'); ?></b>
     <?php echo $_t('कृपया कार्यालयमा सम्पर्क गरी कार्ड renew गर्नुहोस् — Admin ले approve गरेपछि feri active हुनेछ।', 'Please contact office to renew it. It will be active again after admin approval.'); ?>
   </div>
   <?php elseif ($daysLeft <= 60): ?>
-  <div style="max-width:440px;margin:0 auto 14px;padding:10px 14px;background:#fffbeb;border:1px solid #fbbf24;border-radius:8px;color:#92400e;font-size:12.5px;">
+  <div class="idcard-note idcard-note-soon">
     <i class="fas fa-clock"></i>
     <?php echo $_t('कार्ड म्याद', 'Card validity'); ?> <?= $daysLeft ?> <?php echo $_t('दिनमा सकिँदैछ। समयमै renew गर्नुहोस्।', 'days remaining. Please renew on time.'); ?>
   </div>
   <?php endif; ?>
   <?php if (($me['card_status'] ?? 'active') === 'locked'): ?>
-  <div style="max-width:440px;margin:0 auto 14px;padding:12px 14px;background:linear-gradient(135deg,#fef2f2,#fee2e2);border:2px solid #ef4444;border-radius:10px;color:#7f1d1d;font-size:13px;line-height:1.6;">
+  <div class="idcard-note idcard-note-locked">
     <i class="fas fa-lock"></i>
     <b><?php echo $_t('यो कार्ड 5+ गलत verify प्रयासका कारण LOCK भएको छ।', 'This card is locked due to 5+ failed verification attempts.'); ?></b>
     <?php echo $_t('कृपया admin/office बाट unlock गराउनुहोस्।', 'Please request unlock from admin/office.'); ?>
     <?php if (!empty($_GET['unlock_requested']) || !empty($me['unlock_requested'])): ?>
-      <div style="margin-top:8px;font-weight:600;">✅ <?php echo $_t('Unlock request पठाइएको छ।', 'Unlock request submitted.'); ?></div>
+      <div class="idcard-note-success">✅ <?php echo $_t('Unlock request पठाइएको छ।', 'Unlock request submitted.'); ?></div>
     <?php endif; ?>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-      <form method="POST" style="margin:0;">
+    <div class="idcard-note-actions">
+      <form method="POST" class="idcard-form-inline">
         <input type="hidden" name="action" value="request_unlock">
         <input type="hidden" name="card_id" value="<?php echo (int)($me['card_row_id'] ?? 0); ?>">
-        <button type="submit" class="idcard-btn idcard-btn-ghost" style="flex:0 0 auto;border-color:#ef4444;color:#991b1b;">
+        <button type="submit" class="idcard-btn idcard-btn-ghost idcard-btn-danger-outline">
           <i class="fas fa-unlock-keyhole"></i> <?php echo $_t('अनलक अनुरोध', 'Unlock Request'); ?>
         </button>
       </form>
-      <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', (string)$cardPhone)); ?>" class="idcard-btn idcard-btn-primary" style="flex:0 0 auto;">
+      <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', (string)$cardPhone)); ?>" class="idcard-btn idcard-btn-primary idcard-btn-fixed">
         <i class="fas fa-phone"></i> <?php echo $_t('कार्यालय कल', 'Office Call'); ?>
       </a>
     </div>
@@ -409,20 +409,20 @@ if ($cardLogoRaw !== '') {
   <div class="idcard-details">
     <div class="idcard-detail"><div class="dl">CARD NUMBER</div><div class="dv code"><?= htmlspecialchars($cn) ?></div></div>
     <div class="idcard-detail"><div class="dl"><?php echo $_t('जारी मिति', 'Issued Date'); ?></div><div class="dv"><?= date('Y-m-d', $issuedTs) ?></div></div>
-    <div class="idcard-detail"><div class="dl"><?php echo $_t('म्याद सकिने मिति', 'Expiry Date'); ?></div><div class="dv" style="<?= $isExpired ? 'color:#b91c1c;' : '' ?>"><?= date('Y-m-d', $expiryTs) ?><?= $isExpired ? ($_t(' (म्याद सकिएको)', ' (Expired)')) : '' ?></div></div>
+    <div class="idcard-detail"><div class="dl"><?php echo $_t('म्याद सकिने मिति', 'Expiry Date'); ?></div><div class="dv <?= $isExpired ? 'dv-expired' : '' ?>"><?= date('Y-m-d', $expiryTs) ?><?= $isExpired ? ($_t(' (म्याद सकिएको)', ' (Expired)')) : '' ?></div></div>
     <div class="idcard-detail"><div class="dl"><?php echo $_t('मोबाइल', 'Mobile'); ?></div><div class="dv"><?= htmlspecialchars($me['mobile'] ?: '-') ?></div></div>
     <div class="idcard-detail"><div class="dl"><?php echo $_t('इमेल', 'Email'); ?></div><div class="dv"><?= htmlspecialchars($me['email'] ?: '-') ?></div></div>
     <div class="idcard-detail" style="grid-column: 1/-1;"><div class="dl"><?php echo $_t('ठेगाना', 'Address'); ?></div><div class="dv"><?= htmlspecialchars($me['address'] ?: '-') ?></div></div>
 
     <?php if ($vCode || $cvv): ?>
-    <div class="idcard-detail" style="grid-column: 1/-1; background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-color: #10b981;">
-      <div class="dl" style="color:#065f46;"><i class="fas fa-shield-halved"></i> Verification Code</div>
-      <div class="dv code" style="color:#065f46; font-size:16px;"><?= htmlspecialchars($vCode) ?></div>
+    <div class="idcard-detail idcard-detail-full idcard-detail-vcode">
+      <div class="dl idcard-detail-vcode-label"><i class="fas fa-shield-halved"></i> Verification Code</div>
+      <div class="dv code idcard-detail-vcode-value"><?= htmlspecialchars($vCode) ?></div>
     </div>
-    <div class="idcard-detail" style="grid-column: 1/-1; background:#fef9c3; border-color:#eab308;">
-      <div class="dl" style="color:#854d0e;"><i class="fas fa-eye-slash"></i> CVV <?php echo $_t('(गोप्य 4 अङ्क)', '(secret 4 digits)'); ?></div>
-      <div class="dv code" style="color:#713f12; font-size:18px; letter-spacing:.3em;"><?= htmlspecialchars($cvv) ?></div>
-      <div style="font-size:11px; color:#854d0e; margin-top:6px; line-height:1.5;">
+    <div class="idcard-detail idcard-detail-full idcard-detail-cvv">
+      <div class="dl idcard-detail-cvv-label"><i class="fas fa-eye-slash"></i> CVV <?php echo $_t('(गोप्य 4 अङ्क)', '(secret 4 digits)'); ?></div>
+      <div class="dv code idcard-detail-cvv-value"><?= htmlspecialchars($cvv) ?></div>
+      <div class="idcard-detail-cvv-help">
         ⚠ <?php echo $_t('यो CVV कसैलाई share नगर्नुहोस्। यो र Verification Code राखेर मात्र अरूले तपाईंको सदस्यता verify गर्न सक्छन्।', 'Do not share this CVV. Only CVV + verification code can verify your membership.'); ?>
       </div>
     </div>
@@ -449,9 +449,21 @@ if ($cardLogoRaw !== '') {
   font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; justify-content: center;
   gap: 8px; text-decoration: none; transition: all .15s; font-family: inherit;
 }
-.idcard-btn-ghost { background: #fff; color: var(--primary-dark); border: 1.5px solid #cbd5d0; }
-.idcard-btn-primary { background: linear-gradient(135deg, var(--primary-dark), #1a8754); color: #fff; }
+.idcard-btn-ghost { background: white; color: var(--primary-dark); border: 1.5px solid color-mix(in srgb, var(--primary-color) 24%, #cbd5d0); }
+.idcard-btn-primary { background: linear-gradient(135deg, var(--primary-dark), var(--primary-color)); color: var(--text-on-primary,white); }
 .idcard-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.idcard-btn-fixed { flex:0 0 auto; }
+.idcard-btn-danger-outline { flex:0 0 auto; border-color:var(--secondary-color); color:var(--secondary-dark,var(--secondary-color)); }
+
+.idcard-note { max-width:440px; margin:0 auto 14px; border-radius:10px; font-size:13px; }
+.idcard-note-rating { margin-bottom:10px; padding:8px 12px; background:color-mix(in srgb, var(--accent-color) 10%, white); border:1px solid color-mix(in srgb, var(--accent-color) 22%, #ddd6fe); color:var(--accent-color); }
+.idcard-note-muted { color:var(--text-light,#6b7280); }
+.idcard-note-expired { padding:12px 14px; background:color-mix(in srgb, var(--secondary-color) 16%, white); border:2px solid var(--secondary-color); color:var(--secondary-dark,var(--secondary-color)); line-height:1.5; }
+.idcard-note-soon { padding:10px 14px; background:color-mix(in srgb, var(--secondary-color) 10%, white); border:1px solid color-mix(in srgb, var(--secondary-color) 30%, #fbbf24); color:var(--secondary-dark,var(--secondary-color)); font-size:12.5px; }
+.idcard-note-locked { padding:12px 14px; background:color-mix(in srgb, var(--secondary-color) 14%, white); border:2px solid var(--secondary-color); color:var(--secondary-dark,var(--secondary-color)); line-height:1.6; }
+.idcard-note-success { margin-top:8px; font-weight:600; }
+.idcard-note-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.idcard-form-inline { margin:0; }
 
 .idcard-flip { perspective: 1400px; max-width: 440px; margin: 0 auto 22px; }
 .idcard-flip-inner {
@@ -480,7 +492,7 @@ if ($cardLogoRaw !== '') {
 }
 .idcard-top { display:flex; justify-content:space-between; align-items:flex-start; }
 .idcard-brand { display:flex; align-items:center; gap:9px; }
-.idcard-logo { width:34px; height:34px; border-radius:7px; background:#fff; padding:3px; object-fit:contain; }
+.idcard-logo { width:34px; height:34px; border-radius:7px; background:white; padding:3px; object-fit:contain; }
 .idcard-org { font-weight:800; font-size:.95rem; line-height:1.1; letter-spacing:.01em; }
 .idcard-org-en { font-size:.62rem; opacity:.85; letter-spacing:.04em; margin-top:1px; }
 .idcard-tag {
@@ -491,7 +503,7 @@ if ($cardLogoRaw !== '') {
 .idcard-mid { display:flex; align-items:center; gap:14px; margin-top:14px; position:relative; }
 .idcard-chip {
   position: relative; width:46px; height:36px; border-radius:6px;
-  background: linear-gradient(135deg,#fde68a 0%, #f59e0b 50%, #b45309 100%);
+  background: linear-gradient(135deg,color-mix(in srgb, var(--secondary-color) 26%, white) 0%, var(--secondary-color) 50%, var(--secondary-dark,var(--secondary-color)) 100%);
   box-shadow: inset 0 0 0 1px rgba(120,53,15,.4), 0 1px 2px rgba(0,0,0,.25);
 }
 .idcard-chip span { position:absolute; background:rgba(120,53,15,.4); border-radius:1px; }
@@ -502,7 +514,7 @@ if ($cardLogoRaw !== '') {
 .idcard-wifi { font-size:18px; opacity:.65; }
 .idcard-photo {
   margin-left:auto; width:64px; height:80px; border-radius:6px; overflow:hidden;
-  background:#fff; padding:2px; box-shadow:0 2px 6px rgba(0,0,0,.3);
+  background:white; padding:2px; box-shadow:0 2px 6px rgba(0,0,0,.3);
 }
 .idcard-photo img { width:100%; height:100%; object-fit:cover; border-radius:4px; }
 .idcard-cardno {
@@ -549,8 +561,17 @@ if ($cardLogoRaw !== '') {
 /* ─── Details list ─── */
 .idcard-details {
   display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;
-  background:#fff; border-radius:14px; padding:14px; box-shadow:0 4px 14px rgba(0,0,0,.06);
+  background:white; border-radius:14px; padding:14px; box-shadow:0 4px 14px rgba(0,0,0,.06);
 }
+.idcard-detail .dv-expired { color:var(--secondary-dark,var(--secondary-color)); }
+.idcard-detail-full { grid-column:1/-1; }
+.idcard-detail-vcode { background:linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 12%, white), color-mix(in srgb, var(--primary-light) 18%, white)); border-color:var(--primary-color); }
+.idcard-detail-vcode-label { color:var(--primary-dark,var(--primary-color)); }
+.idcard-detail-vcode-value { color:var(--primary-dark,var(--primary-color)); font-size:16px; }
+.idcard-detail-cvv { background:color-mix(in srgb, var(--secondary-color) 16%, white); border-color:var(--secondary-color); }
+.idcard-detail-cvv-label { color:var(--secondary-dark,var(--secondary-color)); }
+.idcard-detail-cvv-value { color:var(--secondary-dark,var(--secondary-color)); font-size:18px; letter-spacing:.3em; }
+.idcard-detail-cvv-help { font-size:11px; color:var(--secondary-dark,var(--secondary-color)); margin-top:6px; line-height:1.5; }
 .idcard-detail { background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; }
 .idcard-detail .dl { font-size:.68rem; font-weight:700; color:#6b7280; letter-spacing:.04em; margin-bottom:4px; }
 .idcard-detail .dv { font-size:.85rem; color:#111827; word-break:break-word; }
@@ -563,7 +584,7 @@ if ($cardLogoRaw !== '') {
 .vh-icon { color:var(--secondary-color,#c0392b); font-size:1.4rem; flex-shrink:0; }
 .vh-title { font-weight:700; font-size:.88rem; color:var(--secondary-dark,#922b21); margin-bottom:4px; }
 .vh-text { font-size:.78rem; color:var(--secondary-dark,#922b21); line-height:1.55; }
-.vh-text b { font-family:'Courier New',monospace; background:#fff; padding:1px 6px; border-radius:4px; }
+.vh-text b { font-family:'Courier New',monospace; background:white; padding:1px 6px; border-radius:4px; }
 
 @media (max-width:480px) {
   .idcard-flip { max-width:100%; }

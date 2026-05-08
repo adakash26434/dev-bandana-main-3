@@ -172,28 +172,51 @@ $evDate       = $prog ? ($prog['event_date'] ? date('Y F d', strtotime($prog['ev
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e8f5e9);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
-.card{background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,.12);max-width:420px;width:100%;overflow:hidden;}
-.card-top{background:<?= htmlspecialchars($primaryColor) ?>;color:#fff;padding:20px 24px;text-align:center;}
-.card-top .prog-icon{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:10px;}
+body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,color-mix(in srgb, var(--primary-color) 10%, white),color-mix(in srgb, var(--primary-color) 16%, white));min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+.card{background:white;border-radius:18px;box-shadow:0 8px 40px rgba(var(--primary-rgb,26,95,42),.16);max-width:420px;width:100%;overflow:hidden;}
+.card-top{background:<?= htmlspecialchars($primaryColor) ?>;color:var(--text-on-primary,white);padding:20px 24px;text-align:center;}
+.card-top .prog-icon{width:56px;height:56px;border-radius:50%;background:color-mix(in srgb, var(--text-on-primary,white) 22%, transparent);display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:10px;}
 .card-top h1{font-size:1.15rem;font-weight:800;line-height:1.3;}
 .card-top .meta{font-size:.8rem;opacity:.85;margin-top:6px;}
 .card-body{padding:24px;}
-.success-icon{width:72px;height:72px;border-radius:50%;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#16a34a;margin:0 auto 14px;border:3px solid #bbf7d0;}
-.error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;color:#dc2626;font-size:.88rem;margin-bottom:14px;display:flex;gap:8px;}
-.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:.83rem;color:#1e40af;margin-bottom:14px;display:flex;gap:8px;}
+.success-icon{width:72px;height:72px;border-radius:50%;background:color-mix(in srgb, var(--primary-color) 14%, white);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--primary-color);margin:0 auto 14px;border:3px solid color-mix(in srgb, var(--primary-color) 28%, white);}
+.error-box{background:color-mix(in srgb, var(--secondary-color) 12%, white);border:1px solid color-mix(in srgb, var(--secondary-color) 24%, white);border-radius:10px;padding:14px;color:var(--secondary-dark,var(--secondary-color));font-size:.88rem;margin-bottom:14px;display:flex;gap:8px;}
+.info-box{background:color-mix(in srgb, var(--accent-color,#1e40af) 12%, white);border:1px solid color-mix(in srgb, var(--accent-color,#1e40af) 24%, white);border-radius:10px;padding:12px 14px;font-size:.83rem;color:var(--accent-color,#1e40af);margin-bottom:14px;display:flex;gap:8px;}
 .form-group{margin-bottom:13px;}
-.form-group label{display:block;font-size:.82rem;font-weight:600;color:#374151;margin-bottom:4px;}
-.form-control{width:100%;padding:10px 14px;min-height:44px;border:1.5px solid #d1d5db;border-radius:10px;font-family:inherit;font-size:.9rem;background:#f9fafb;transition:border-color .2s;line-height:1.4;}
-.form-control:focus{outline:none;border-color:<?= htmlspecialchars($primaryColor) ?>;background:#fff;}
-.btn-primary{width:100%;padding:12px;background:<?= htmlspecialchars($primaryColor) ?>;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text-color,#374151);margin-bottom:4px;}
+.form-control{width:100%;padding:10px 14px;min-height:44px;border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db);border-radius:10px;font-family:inherit;font-size:.9rem;background:color-mix(in srgb, var(--primary-color) 4%, white);transition:border-color .2s;line-height:1.4;}
+.form-control:focus{outline:none;border-color:<?= htmlspecialchars($primaryColor) ?>;background:white;}
+.btn-primary{width:100%;padding:12px;background:<?= htmlspecialchars($primaryColor) ?>;color:var(--text-on-primary,white);border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;}
 .btn-primary:hover{opacity:.9;}
-.btn-secondary{width:100%;padding:10px;background:#fff;color:<?= htmlspecialchars($primaryColor) ?>;border:2px solid <?= htmlspecialchars($primaryColor) ?>;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
-.divider{text-align:center;font-size:.78rem;color:#9ca3af;margin:14px 0;position:relative;}
-.divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#e5e7eb;z-index:0;}
-.divider span{background:#fff;padding:0 10px;position:relative;z-index:1;}
-.footer-link{text-align:center;margin-top:14px;font-size:.78rem;color:#9ca3af;}
+.btn-secondary{width:100%;padding:10px;background:white;color:<?= htmlspecialchars($primaryColor) ?>;border:2px solid <?= htmlspecialchars($primaryColor) ?>;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.divider{text-align:center;font-size:.78rem;color:var(--text-muted,#9ca3af);margin:14px 0;position:relative;}
+.divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);z-index:0;}
+.divider span{background:white;padding:0 10px;position:relative;z-index:1;}
+.footer-link{text-align:center;margin-top:14px;font-size:.78rem;color:var(--text-muted,#9ca3af);}
 .footer-link a{color:<?= htmlspecialchars($primaryColor) ?>;text-decoration:none;font-weight:600;}
+.meta-icon-gap{margin-right:4px;}
+.msg-center{ text-align:center;padding:8px 0; }
+.msg-title-warn{font-size:1.15rem;font-weight:800;color:var(--secondary-dark,var(--secondary-color));margin-bottom:8px;}
+.msg-title-ok{font-size:1.2rem;font-weight:800;color:var(--primary-dark,var(--primary-color));margin-bottom:6px;}
+.msg-title-info{font-size:1.1rem;font-weight:800;color:var(--accent-color,#1565c0);margin-bottom:6px;}
+.msg-sub{font-size:.88rem;color:var(--text-light,#6b7280);margin-bottom:12px;}
+.msg-sub-sm{font-size:.85rem;color:var(--text-light,#6b7280);}
+.msg-box-warn{background:color-mix(in srgb, var(--secondary-color) 10%, white);border:1px solid color-mix(in srgb, var(--secondary-color) 22%, white);border-radius:10px;padding:12px;font-size:.84rem;color:var(--secondary-dark,var(--secondary-color));text-align:left;line-height:1.5;}
+.msg-box-ok{background:color-mix(in srgb, var(--primary-color) 10%, white);border:1px solid color-mix(in srgb, var(--primary-color) 22%, white);border-radius:10px;padding:12px;font-size:.85rem;color:var(--primary-dark,var(--primary-color));}
+.success-icon-warn{background:color-mix(in srgb, var(--secondary-color) 10%, white);border-color:color-mix(in srgb, var(--secondary-color) 22%, white);}
+.success-icon-warn i{color:var(--secondary-dark,var(--secondary-color));}
+.success-icon-info{background:color-mix(in srgb, var(--accent-color,#1565c0) 10%, white);border-color:color-mix(in srgb, var(--accent-color,#1565c0) 22%, white);}
+.success-icon-info i{color:var(--accent-color,#1565c0);}
+.info-box-ok{background:color-mix(in srgb, var(--primary-color) 10%, white);border-color:color-mix(in srgb, var(--primary-color) 22%, white);color:var(--primary-dark,var(--primary-color));}
+.icon-shrink{flex-shrink:0;}
+.manual-form-hide{display:none;}
+.btn-inline-primary{ text-decoration:none;display:inline-flex;width:auto;padding:10px 16px;font-size:.9rem; }
+.mb-10{margin-bottom:10px;}
+.text-left{ text-align:left;line-height:1.5; }
+.text-soft{opacity:.95;font-size:.9em;}
+.text-soft-2{opacity:.9;font-size:.9em;}
+.req-icon{margin-right:6px;}
+.red-star{color:var(--secondary-color);}
 </style>
 </head>
 <body>
@@ -203,61 +226,61 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
     <h1><?= $prog ? htmlspecialchars($prog['title']) : htmlspecialchars($siteName) . ' — QR Attendance' ?></h1>
     <?php if ($prog): ?>
     <div class="meta">
-      <?php if ($evDate): ?><i class="fas fa-calendar" style="margin-right:4px;"></i><?= $evDate ?><?php endif; ?>
-      <?php if ($prog['event_time']): ?> &nbsp;·&nbsp; <i class="fas fa-clock" style="margin-right:3px;"></i><?= htmlspecialchars($prog['event_time']) ?><?php endif; ?>
-      <?php if ($prog['location']): ?><br><i class="fas fa-location-dot" style="margin-right:3px;"></i><?= htmlspecialchars($prog['location']) ?><?php endif; ?>
+      <?php if ($evDate): ?><i class="fas fa-calendar meta-icon-gap"></i><?= $evDate ?><?php endif; ?>
+      <?php if ($prog['event_time']): ?> &nbsp;·&nbsp; <i class="fas fa-clock meta-icon-gap"></i><?= htmlspecialchars($prog['event_time']) ?><?php endif; ?>
+      <?php if ($prog['location']): ?><br><i class="fas fa-location-dot meta-icon-gap"></i><?= htmlspecialchars($prog['location']) ?><?php endif; ?>
     </div>
     <?php endif; ?>
   </div>
 
   <div class="card-body">
     <?php if ($err && !$done && !$requestSubmitted): ?>
-    <div class="error-box"><i class="fas fa-circle-xmark" style="flex-shrink:0;margin-top:2px;"></i><div><?= htmlspecialchars($err) ?></div></div>
+    <div class="error-box"><i class="fas fa-circle-xmark icon-shrink"></i><div><?= htmlspecialchars($err) ?></div></div>
     <?php elseif ($requestSubmitted && $prog): ?>
-    <div style="text-align:center;padding:8px 0;">
-      <div class="success-icon" style="background:#fffbeb;border-color:#fcd34d;"><i class="fas fa-hourglass-half" style="color:#b45309;"></i></div>
-      <h2 style="font-size:1.15rem;font-weight:800;color:#92400e;margin-bottom:8px;"><?php echo $_t('अनुरोध पठाइयो', 'Request Sent'); ?></h2>
-      <p style="font-size:.88rem;color:#6b7280;margin-bottom:12px;">
+    <div class="msg-center">
+      <div class="success-icon success-icon-warn"><i class="fas fa-hourglass-half"></i></div>
+      <h2 class="msg-title-warn"><?php echo $_t('अनुरोध पठाइयो', 'Request Sent'); ?></h2>
+      <p class="msg-sub">
         <?= htmlspecialchars($memName ?: 'सदस्य') ?><?php if ($memCard): ?> (<?= htmlspecialchars($memCard) ?>)<?php endif; ?> — <strong><?= htmlspecialchars($prog['title']) ?></strong>
       </p>
-      <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;font-size:.84rem;color:#78350f;text-align:left;line-height:1.5;">
-        <i class="fas fa-user-shield" style="margin-right:6px;"></i><strong>Admin</strong> ले कार्यक्रम स्थलमा/panel मा <strong>स्वीकृत</strong> गरेपछि मात्र उपस्थिति सूची र सदस्यको इतिहासमा देखिन्छ। कृपया प्रतिक्षा गर्नुहोस् वा कर्मचारीलाई भन्नुहोस्।
+      <div class="msg-box-warn">
+        <i class="fas fa-user-shield req-icon"></i><strong>Admin</strong> ले कार्यक्रम स्थलमा/panel मा <strong>स्वीकृत</strong> गरेपछि मात्र उपस्थिति सूची र सदस्यको इतिहासमा देखिन्छ। कृपया प्रतिक्षा गर्नुहोस् वा कर्मचारीलाई भन्नुहोस्।
       </div>
     </div>
     <?php elseif ($done): ?>
-    <div style="text-align:center;padding:8px 0;">
+    <div class="msg-center">
       <div class="success-icon"><i class="fas fa-check"></i></div>
-      <h2 style="font-size:1.2rem;font-weight:800;color:#166534;margin-bottom:6px;"><?php echo $_t('उपस्थिति दर्ता भयो!', 'Attendance Recorded!'); ?></h2>
-      <p style="font-size:.88rem;color:#6b7280;margin-bottom:16px;">
+      <h2 class="msg-title-ok"><?php echo $_t('उपस्थिति दर्ता भयो!', 'Attendance Recorded!'); ?></h2>
+      <p class="msg-sub">
         <?= htmlspecialchars($memName ?: 'सदस्य') ?><?php if ($memCard): ?> (<?= htmlspecialchars($memCard) ?>)<?php endif; ?> — <strong><?= htmlspecialchars($prog['title']) ?></strong>
       </p>
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;font-size:.85rem;color:#166534;">
-        <i class="fas fa-circle-check" style="margin-right:6px;"></i>Check-in समय: <?= date('H:i A') ?>, <?= date('Y-m-d') ?>
+      <div class="msg-box-ok">
+        <i class="fas fa-circle-check req-icon"></i>Check-in समय: <?= date('H:i A') ?>, <?= date('Y-m-d') ?>
       </div>
     </div>
     <?php elseif ($alreadyDone && $prog): ?>
-    <div style="text-align:center;padding:8px 0;">
-      <div class="success-icon" style="background:#eff6ff;border-color:#bfdbfe;"><i class="fas fa-bookmark" style="color:#1565c0;"></i></div>
-      <h2 style="font-size:1.1rem;font-weight:800;color:#1565c0;margin-bottom:6px;"><?php echo $_t('पहिल्यै Check-in भइसक्यो', 'Already Checked In'); ?></h2>
-      <p style="font-size:.85rem;color:#6b7280;"><?php echo $_t('तपाईं यो कार्यक्रममा पहिल्यै उपस्थित दर्ता हुनुभएको छ।', 'You are already marked present for this program.'); ?></p>
+    <div class="msg-center">
+      <div class="success-icon success-icon-info"><i class="fas fa-bookmark"></i></div>
+      <h2 class="msg-title-info"><?php echo $_t('पहिल्यै Check-in भइसक्यो', 'Already Checked In'); ?></h2>
+      <p class="msg-sub-sm"><?php echo $_t('तपाईं यो कार्यक्रममा पहिल्यै उपस्थित दर्ता हुनुभएको छ।', 'You are already marked present for this program.'); ?></p>
     </div>
     <?php elseif ($prog): ?>
-      <div class="info-box" style="background:#f0fdf4;border-color:#86efac;color:#166534;">
-        <i class="fas fa-circle-info" style="flex-shrink:0;"></i>
-        <div style="text-align:left;line-height:1.5;">
+      <div class="info-box info-box-ok">
+        <i class="fas fa-circle-info icon-shrink"></i>
+        <div class="text-left">
           <strong><?php echo $_t('कार्यक्रम उपस्थिति QR:', 'Program Attendance QR:'); ?></strong>
           <?php echo $_t('सदस्यले स्थलमा उपस्थित भइसकेपछि मोबाइलबाट Member Portal खोली scan गर्दा दर्ता हुन्छ — Admin को attendance सूची र सदस्यको उपस्थिति इतिहासमा जान्छ, जति कार्यक्रममा check-in, त्यति नै गणना बढ्छ।', 'After arriving at the venue, members can scan from Member Portal on mobile to register attendance — it appears in admin attendance list and member attendance history, and the count increases per check-in.'); ?>
           <br>
-          <span style="opacity:.95;font-size:.9em;">
+          <span class="text-soft">
             <?php echo $_t('(Pre-registration भन्दा फरक — त्यो अगाडि नाम दर्ता मात्र हो।)', '(Different from pre-registration — that is only early name registration.)'); ?>
           </span>
           <br>
-          <span style="opacity:.95;font-size:.9em;">
+          <span class="text-soft">
             <strong><?php echo $_t('मोबाइल छैन?', 'No mobile phone?'); ?></strong>
             <?php echo $_t('तल सदस्यता/फोन भरेर उपस्थिति अनुरोध पठाउनुहोस् — Admin ले स्वीकृत गरेपछि मात्र सूचीमा आउँछ।', 'Fill member number/phone below and send attendance request — it appears in list only after admin approval.'); ?>
           </span>
           <br>
-          <span style="opacity:.9;font-size:.9em;">
+          <span class="text-soft-2">
             <?php echo $_t('थप कडा जाँच: Staff कार्ड + CVV verify।', 'Extra strict check: Staff verifies card + CVV.'); ?>
           </span>
         </div>
@@ -265,7 +288,7 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
       <?php if ($memberId): ?>
       <!-- Logged-in: one-click check-in -->
       <div class="info-box">
-        <i class="fas fa-user-check" style="flex-shrink:0;"></i>
+        <i class="fas fa-user-check icon-shrink"></i>
         <div><?php echo $_t('तपाईं', 'You are logged in as'); ?> <strong><?= htmlspecialchars($memName ?: 'Member') ?></strong><?php echo $_t(' को रूपमा login हुनुभएको छ।', '.'); ?></div>
       </div>
       <form method="POST">
@@ -276,14 +299,14 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
       <?php endif; ?>
 
       <!-- Manual check-in form -->
-      <form method="POST" id="manualForm" <?= $memberId ? 'style="display:none;"' : '' ?>>
+      <form method="POST" id="manualForm" class="<?= $memberId ? 'manual-form-hide' : '' ?>">
         <?= $csrfField ?><input type="hidden" name="action" value="checkin_manual">
         <div class="form-group">
-          <label><i class="fas fa-id-card" style="margin-right:4px;color:<?= htmlspecialchars($primaryColor) ?>;"></i><?php echo $_t('सदस्यता नम्बर', 'Member Number'); ?></label>
+          <label><i class="fas fa-id-card meta-icon-gap"></i><?php echo $_t('सदस्यता नम्बर', 'Member Number'); ?></label>
           <input type="text" name="member_card" class="form-control" placeholder="<?php echo $_t('जस्तै: A-001, SA-2025-001', 'e.g. A-001, SA-2025-001'); ?>">
         </div>
         <div class="form-group">
-          <label><i class="fas fa-phone" style="margin-right:4px;color:<?= htmlspecialchars($primaryColor) ?>;"></i><?php echo $_t('फोन नम्बर', 'Phone Number'); ?></label>
+          <label><i class="fas fa-phone meta-icon-gap"></i><?php echo $_t('फोन नम्बर', 'Phone Number'); ?></label>
           <input type="text" name="phone" class="form-control" placeholder="9XXXXXXXXX">
         </div>
         <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> <?php echo $_t('उपस्थिति अनुरोध पठाउनुहोस्', 'Send Attendance Request'); ?></button>
@@ -302,15 +325,15 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
         $loginNext = rtrim(SITE_URL, '/') . '/member/login.php?next=' . rawurlencode($memberAfterLogin);
       ?>
       <?php if (!$memberId && $prog && $token): ?>
-      <div style="margin-bottom:10px;">
-        <a href="<?= htmlspecialchars($loginNext) ?>" class="btn-primary" style="text-decoration:none;display:inline-flex;width:auto;padding:10px 16px;font-size:.9rem;">
+      <div class="mb-10">
+        <a href="<?= htmlspecialchars($loginNext) ?>" class="btn-primary btn-inline-primary">
           <i class="fas fa-right-to-bracket"></i> <?php echo $_t('Member Portal मा लगिन गरेर Check-in', 'Login to Member Portal and Check-in'); ?>
         </a>
       </div>
       <?php endif; ?>
-      <a href="<?= htmlspecialchars(SITE_URL) ?>"><i class="fas fa-home" style="margin-right:4px;"></i><?= htmlspecialchars($siteName) ?></a>
+      <a href="<?= htmlspecialchars(SITE_URL) ?>"><i class="fas fa-home meta-icon-gap"></i><?= htmlspecialchars($siteName) ?></a>
       &nbsp;·&nbsp;
-      <a href="<?= htmlspecialchars(SITE_URL) ?>member/"><i class="fas fa-user" style="margin-right:4px;"></i><?php echo $_t('सदस्य पोर्टल', 'Member Portal'); ?></a>
+      <a href="<?= htmlspecialchars(SITE_URL) ?>member/"><i class="fas fa-user meta-icon-gap"></i><?php echo $_t('सदस्य पोर्टल', 'Member Portal'); ?></a>
     </div>
   </div>
 </div>

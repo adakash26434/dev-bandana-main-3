@@ -521,7 +521,7 @@ function showFiles(input) {
     var list = document.getElementById('fileList');
     list.innerHTML = '';
     Array.from(input.files).forEach(function(f){
-        list.innerHTML += '<div><i class="fas fa-file" style="margin-right:4px;"></i>'+f.name+'</div>';
+        list.innerHTML += '<div><i class="fas fa-file wf-icon-gap-sm"></i>'+f.name+'</div>';
     });
 }
 </script>

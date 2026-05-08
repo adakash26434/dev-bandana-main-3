@@ -261,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- ── Success State ── -->
 <div class="row justify-content-center">
     <div class="col-lg-7">
-        <div class="form-success-card text-center py-5 px-4 rounded-4 shadow-sm" style="border:2px solid #c8e6c9;">
+        <div class="form-success-card form-success-card--token text-center py-5 px-4 rounded-4 shadow-sm">
             <div class="form-success-icon"><i class="fas fa-check-circle"></i></div>
             <h3 class="mt-3 fw-bold text-success"><?php echo isEnglish() ? 'Loan Application Submitted!' : 'ऋण आवेदन सफलतापूर्वक पेश भयो!'; ?></h3>
             <p class="text-muted mb-3"><?php echo isEnglish() ? 'Our loan officer will contact you within 2-3 business days.' : 'हाम्रो ऋण अधिकृत २-३ कार्य दिनभित्र सम्पर्क गर्नेछन्।'; ?></p>
@@ -695,17 +695,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <style>
 .loan-wizard-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2rem;flex-wrap:wrap;gap:4px;}
 .loan-wiz-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;position:relative;}
-.loan-wiz-circle{width:48px;height:48px;border-radius:50%;border:2.5px solid #d0d0d0;display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:#aaa;background:#fff;transition:all .3s;}
-.loan-wiz-label{font-size:.75rem;color:#aaa;font-weight:500;text-align:center;transition:color .3s;}
+.loan-wiz-circle{width:48px;height:48px;border-radius:50%;border:2.5px solid color-mix(in srgb, var(--primary-color) 16%, #d0d0d0);display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:var(--text-muted,#aaa);background:white;transition:all .3s;}
+.loan-wiz-label{font-size:.75rem;color:var(--text-muted,#aaa);font-weight:500;text-align:center;transition:color .3s;}
 .loan-wiz-step.active .loan-wiz-circle{border-color:var(--primary-color);background:var(--primary-color);color:#fff;box-shadow:0 4px 12px rgba(26,95,42,.25);}
 .loan-wiz-step.active .loan-wiz-label{color:var(--primary-color);font-weight:700;}
-.loan-wiz-step.done .loan-wiz-circle{border-color:var(--primary-color);background:#e8f5e9;color:var(--primary-color);}
+.loan-wiz-step.done .loan-wiz-circle{border-color:var(--primary-color);background:color-mix(in srgb, var(--primary-color) 16%, white);color:var(--primary-color);}
 .loan-wiz-step.done .loan-wiz-label{color:var(--primary-color);}
-.loan-wiz-connector{flex:1;min-width:28px;max-width:60px;height:2px;background:#e0e0e0;margin-top:-24px;transition:background .3s;}
+.loan-wiz-connector{flex:1;min-width:28px;max-width:60px;height:2px;background:color-mix(in srgb, var(--primary-color) 16%, #e0e0e0);margin-top:-24px;transition:background .3s;}
 .loan-wiz-connector.done{background:var(--primary-color);}
 /* ── Section Cards ── */
-.form-section-card{background:#fff;border:1.5px solid #e8edf0;border-radius:16px;padding:22px 24px;margin-bottom:0;transition:box-shadow .2s,border-color .2s;}
-.form-section-card:hover{border-color:#c8ddd0;box-shadow:0 4px 18px rgba(26,95,42,.07);}
+.form-section-card{background:white;border:1.5px solid color-mix(in srgb, var(--primary-color) 14%, #e8edf0);border-radius:16px;padding:22px 24px;margin-bottom:0;transition:box-shadow .2s,border-color .2s;}
+.form-section-card:hover{border-color:color-mix(in srgb, var(--primary-color) 24%, #c8ddd0);box-shadow:0 4px 18px rgba(var(--primary-rgb,26,95,42),.12);}
 .form-section-card-hdr{display:flex;align-items:center;gap:10px;}
 .form-section-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
 .bg-primary-soft{background:rgba(26,95,42,.1);color:var(--primary-color);}
@@ -713,6 +713,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .bg-warning-soft{background:rgba(255,193,7,.15);color:#856404;}
 .bg-info-soft{background:rgba(13,202,240,.1);color:#0dcaf0;}
 .bg-secondary-soft{background:rgba(108,117,125,.1);color:#6c757d;}
+.form-success-card--token{border:2px solid color-mix(in srgb, var(--primary-color) 24%, #c8e6c9);}
 /* ── Navigation ── */
 .loan-wiz-nav{flex-wrap:wrap;}
 /* Mobile */

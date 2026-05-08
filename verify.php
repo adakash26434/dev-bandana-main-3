@@ -248,7 +248,7 @@ body {
         radial-gradient(ellipse 85% 55% at 15% -5%, color-mix(in srgb, var(--primary-color) 14%, transparent) 0%, transparent 52%),
         radial-gradient(ellipse 70% 50% at 100% 0%, color-mix(in srgb, var(--secondary-color) 10%, transparent) 0%, transparent 48%),
         radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--accent-color,#17a2b8) 8%, transparent) 0%, transparent 45%),
-        linear-gradient(165deg,#f0fdf4 0%,#ecfdf5 38%,#f0f9ff 100%);
+        linear-gradient(165deg,color-mix(in srgb, var(--primary-color) 10%, white) 0%,color-mix(in srgb, var(--primary-light) 12%, white) 38%,color-mix(in srgb, var(--accent-color,#17a2b8) 10%, white) 100%);
     color: var(--text-color,#1f2937);
     padding: 20px 12px 40px;
 }
@@ -283,9 +283,9 @@ body {
 .vp-page-logo-icon {
     width: 60px; height: 60px; border-radius: 14px;
     background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
-    color: #fff; display: grid; place-items: center;
+    color: var(--text-on-primary,white); display: grid; place-items: center;
     font-size: 1.5rem; margin: 0 auto;
-    box-shadow: 0 6px 18px rgba(26,95,42,.28);
+    box-shadow: 0 6px 18px rgba(var(--primary-rgb,26,95,42),.28);
 }
 
 /* Main stack card */
@@ -302,28 +302,28 @@ body {
     width: 56px; height: 56px; margin: 0 auto 10px;
     border-radius: 50%;
     background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
-    color: #fff; display: grid; place-items: center;
-    font-size: 26px; box-shadow: 0 8px 20px rgba(13,92,46,.25);
+    color: var(--text-on-primary,white); display: grid; place-items: center;
+    font-size: 26px; box-shadow: 0 8px 20px rgba(var(--primary-rgb,26,95,42),.25);
 }
 h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line-height:1.2; letter-spacing:-.22px; color:var(--primary-dark,#0a4a25); }
-.vp-sub { text-align:center; color:#64748b; font-size:.88rem; margin:0 0 14px; line-height:1.45; }
+.vp-sub { text-align:center; color:var(--text-light,#64748b); font-size:.88rem; margin:0 0 14px; line-height:1.45; }
 
 .vp-field { margin-bottom:12px; }
 .vp-field label { display:block; font-size:12.5px; font-weight:700; color:var(--text-color,#374151); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
 .vp-field input {
     width:100%; padding:11px 12px; border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db);
     border-radius:9px; font-size:14px; font-family:inherit;
-    transition:border-color .15s,box-shadow .15s; background:#fff;
+    transition:border-color .15s,box-shadow .15s; background:white;
 }
 .vp-field input:focus { outline:none; border-color:var(--primary-color,#1a8754); box-shadow:0 0 0 3px rgba(13,92,46,.12); }
-.vp-field .hint { font-size:10px; color:#9ca3af; margin-top:3px; }
+.vp-field .hint { font-size:10px; color:var(--text-muted,#9ca3af); margin-top:3px; }
 #code { font-family:'Courier New',monospace; letter-spacing:.12em; text-transform:uppercase; font-weight:700; }
 #cvv  { font-family:'Courier New',monospace; letter-spacing:.35em; text-align:center; font-weight:700; font-size:16px; }
 
 .vp-btn {
     width:100%; padding:11px; border:none; border-radius:9px;
     background:linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
-    color:#fff; font-size:14px; font-weight:700; cursor:pointer;
+    color:var(--text-on-primary,white); font-size:14px; font-weight:700; cursor:pointer;
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
     box-shadow:0 4px 14px rgba(26,135,84,.3);
     transition:all .15s;
@@ -332,7 +332,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 
 .vp-result-ok { margin-bottom:18px; animation:pop .35s ease-out; }
 @keyframes pop { from{transform:scale(.98);opacity:0} to{transform:scale(1);opacity:1} }
-.vp-ok-head { display:flex; align-items:center; gap:10px; margin-bottom:16px; color:#065f46; font-weight:700; font-size:16px; }
+.vp-ok-head { display:flex; align-items:center; gap:10px; margin-bottom:16px; color:var(--primary-dark,var(--primary-color)); font-weight:700; font-size:16px; }
 .vp-ok-head i { font-size:22px; }
 .vp-result-fail {
     background:color-mix(in srgb, var(--secondary-color) 12%, #ffffff); border:1.5px solid var(--secondary-color); border-radius:14px;
@@ -341,16 +341,16 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     display:flex; align-items:center; gap:10px;
 }
 .vp-result-fail i { font-size:18px; }
-.vp-help { font-size:12px; color:#6b7280; text-align:center; margin-top:22px; padding-top:16px; border-top:1px solid rgba(226,232,240,.95); line-height:1.65; max-width:520px; margin-left:auto; margin-right:auto; }
+.vp-help { font-size:12px; color:var(--text-light,#6b7280); text-align:center; margin-top:22px; padding-top:16px; border-top:1px solid rgba(226,232,240,.95); line-height:1.65; max-width:520px; margin-left:auto; margin-right:auto; }
 .vp-help b { color:var(--primary-color,#1a8754); }
-.vp-mini-tab { border:1px solid #d1d5db; background:#fff; color:#334155; border-radius:999px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; }
-.vp-mini-tab.is-active { background:var(--primary-color,#1a8754); color:#fff; border-color:var(--primary-color,#1a8754); }
+.vp-mini-tab { border:1px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db); background:white; color:var(--text-color,#334155); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+.vp-mini-tab.is-active { background:var(--primary-color,#1a8754); color:var(--text-on-primary,white); border-color:var(--primary-color,#1a8754); }
 /* Form card — same language as program-attendance-verify */
 .verify-form-card {
     margin-top: 10px;
     border-radius: 20px;
     overflow: hidden;
-    background: #fff;
+    background: white;
     box-shadow: 0 4px 6px rgba(0,0,0,.04), 0 24px 50px rgba(13,92,46,.12);
     border: 1px solid rgba(226,232,240,.9);
 }
@@ -359,7 +359,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
     padding: 20px 18px 18px;
     text-align: center;
-    color: #fff;
+    color: var(--text-on-primary,white);
 }
 .verify-form-card__head .vp-icon {
     width: 56px; height: 56px; margin: 0 auto 12px;
@@ -369,7 +369,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     font-size: 24px;
 }
 .verify-form-card__head h1 {
-    color: #fff !important;
+    color: var(--text-on-primary,white) !important;
     font-size: 1.15rem !important;
     margin: 0 0 8px !important;
     letter-spacing: -.02em;
@@ -380,7 +380,21 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     margin: 0 !important;
     line-height: 1.55 !important;
 }
-.verify-form-card__head .vp-sub b { color: #fff; font-weight: 700; }
+.verify-form-card__head .vp-sub b { color: var(--text-on-primary,white); font-weight: 700; }
+.vp-save-wrap { padding:14px 18px; }
+.vp-ok-head.compact { margin:0; font-size:14px; }
+.vp-mini-shell { background:color-mix(in srgb, var(--primary-color) 8%, white); border:1.5px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb); border-radius:12px; padding:14px 14px 16px; margin-bottom:18px; }
+.vp-mini-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.vp-field.tight { margin-bottom:10px; }
+.vp-field-input { width:100%; padding:11px 12px; border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db); border-radius:9px; font-family:inherit; font-size:14px; }
+.vp-radio-row { display:flex; gap:14px; font-size:14px; color:var(--text-color,#374151); }
+.vp-radio-row label { display:inline-flex; align-items:center; gap:5px; cursor:pointer; }
+.vp-field.last { margin-bottom:14px; }
+.vp-btn.tight { padding:11px; }
+.vp-pane-hidden { display:none; }
+.vp-hint-sm { font-size:13px; }
+.vp-inline-label { display:inline-flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0; }
+.vp-code-live { color:var(--secondary-dark, var(--primary-dark, #0f766e));font-weight:600; }
 .verify-form-card__body { padding: 18px 16px 20px; }
 .verify-form-card__body .vp-field { margin-bottom: 14px; }
 .verify-form-card__body .vp-field label {
@@ -506,8 +520,8 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
       </div>
 
       <?php if ($logSaved || $programSaved || $programAlreadyRegistered): ?>
-        <div class="vp-result-ok" style="padding:14px 18px;">
-          <div class="vp-ok-head" style="margin:0;font-size:14px;">
+        <div class="vp-result-ok vp-save-wrap">
+          <div class="vp-ok-head compact">
             <i class="fas fa-floppy-disk"></i>
             <?php if ($programAlreadyRegistered): ?>
               <?php echo $_t('यो सदस्यको यो कार्यक्रममा पहिल्यै Registration भइसकेको छ।', 'This member is already registered for this program.'); ?>
@@ -520,8 +534,8 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
         </div>
       <?php endif; ?>
 
-      <div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px 14px 16px;margin-bottom:18px;">
-        <div class="vp-mini-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <div class="vp-mini-shell">
+        <div class="vp-mini-tabs">
           <button type="button" class="vp-mini-tab is-active" data-target="vpPaneService"><?php echo $_t('साझेदार सेवा रेकर्ड', 'Partner Service Record'); ?></button>
           <button type="button" class="vp-mini-tab" data-target="vpPaneProgram"><?php echo $_t('कार्यक्रम उपस्थिति', 'Program Attendance'); ?></button>
         </div>
@@ -535,43 +549,43 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
             <input type="hidden" name="member_id" value="<?= (int)($result['member']['id'] ?? 0) ?>">
             <input type="hidden" name="member_card_no" value="<?= htmlspecialchars($result['member']['member_id'] ?? '') ?>">
 
-            <div class="vp-field" style="margin-bottom:10px;">
+            <div class="vp-field tight">
               <label><?php echo $_t('साझेदार संस्था चयन गर्नुहोस्', 'Select Partner Organization'); ?></label>
-              <select name="partner_id" id="partnerSel" class="vp-field-input" style="width:100%;padding:11px 12px;border:1.5px solid #d1d5db;border-radius:9px;font-family:inherit;font-size:14px;">
+              <select name="partner_id" id="partnerSel" class="vp-field-input">
                 <option value="0"><?php echo $_t('— चयन गर्नुहोस् वा तल नाम लेख्नुहोस् —', '— Select or type name below —'); ?></option>
                 <?php foreach ($partners as $p): ?>
                   <option value="<?= (int)$p['id'] ?>" data-name="<?= htmlspecialchars($p['partner_name']) ?>"><?= htmlspecialchars($p['partner_name']) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
-            <div class="vp-field" style="margin-bottom:10px;">
+            <div class="vp-field tight">
               <label><?php echo $_t('संस्थाको नाम (custom)', 'Organization Name (custom)'); ?></label>
               <input type="text" name="partner_name" id="partnerName" placeholder="<?php echo $_t('उदाहरण: आकाश हस्पिटल', 'Example: Aakash Hospital'); ?>" required readonly>
             </div>
-            <div class="vp-field" style="margin-bottom:10px;">
+            <div class="vp-field tight">
               <label><?php echo $_t('लिएको सेवा (के सेवा?)', 'Service Used'); ?></label>
               <input type="text" name="service_name" id="serviceName" maxlength="255" placeholder="<?php echo $_t('उदाहरण: OPD Discount / Lab / Banking Service', 'Example: OPD Discount / Lab / Banking Service'); ?>" required>
             </div>
-            <div class="vp-field" style="margin-bottom:10px;">
+            <div class="vp-field tight">
               <label><?php echo $_t('सेवा लिनुभयो?', 'Service Taken?'); ?></label>
-              <div style="display:flex;gap:14px;font-size:14px;color:#374151;">
-                <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="service_taken" value="yes" checked> <?php echo $_t('हो', 'Yes'); ?></label>
-                <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="service_taken" value="no"> <?php echo $_t('होइन', 'No'); ?></label>
+              <div class="vp-radio-row">
+                <label><input type="radio" name="service_taken" value="yes" checked> <?php echo $_t('हो', 'Yes'); ?></label>
+                <label><input type="radio" name="service_taken" value="no"> <?php echo $_t('होइन', 'No'); ?></label>
               </div>
             </div>
-            <div class="vp-field" style="margin-bottom:14px;">
+            <div class="vp-field last">
               <label><?php echo $_t('नोट / सेवा विवरण (वैकल्पिक)', 'Note / Service Detail (optional)'); ?></label>
               <input type="text" name="service_note" maxlength="500" placeholder="<?php echo $_t('उदाहरण: OPD discount 10%', 'Example: OPD discount 10%'); ?>">
             </div>
-            <button type="submit" class="vp-btn" style="padding:11px;">
+            <button type="submit" class="vp-btn tight">
               <i class="fas fa-floppy-disk"></i> <?php echo $_t('सेवा रेकर्ड सुरक्षित गर्नुहोस्', 'Save Service Record'); ?>
             </button>
           </form>
         </div>
 
-        <div id="vpPaneProgram" class="vp-mini-pane" style="display:none;">
+        <div id="vpPaneProgram" class="vp-mini-pane vp-pane-hidden">
           <?php if (empty($activePrograms)): ?>
-            <div class="hint" style="font-size:13px;"><?php echo $_t('हाल सक्रिय कार्यक्रम उपलब्ध छैन।', 'No active program available right now.'); ?></div>
+            <div class="hint vp-hint-sm"><?php echo $_t('हाल सक्रिय कार्यक्रम उपलब्ध छैन।', 'No active program available right now.'); ?></div>
           <?php else: ?>
           <form method="POST" autocomplete="off" class="needs-validation" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generateCSRFToken()) ?>">
@@ -580,9 +594,9 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
             <input type="hidden" name="cvv"  value="<?= htmlspecialchars($cvv) ?>">
             <input type="hidden" name="member_id" value="<?= (int)($result['member']['id'] ?? 0) ?>">
             <input type="hidden" name="member_card_no" value="<?= htmlspecialchars($result['member']['member_id'] ?? '') ?>">
-            <div class="vp-field" style="margin-bottom:10px;">
+            <div class="vp-field tight">
               <label><?php echo $_t('सक्रिय कार्यक्रम छान्नुहोस्', 'Select Active Program'); ?></label>
-              <select name="program_id" id="programSel" required style="width:100%;padding:11px 12px;border:1.5px solid #d1d5db;border-radius:9px;font-family:inherit;font-size:14px;">
+              <select name="program_id" id="programSel" required class="vp-field-input">
                 <option value=""><?php echo $_t('— कार्यक्रम चयन गर्नुहोस् —', '— Select Program —'); ?></option>
                 <?php foreach ($activePrograms as $pg): ?>
                   <option value="<?= (int)$pg['id'] ?>" data-title="<?= htmlspecialchars($pg['title']) ?>">
@@ -594,16 +608,16 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
               </select>
               <input type="hidden" name="program_title" id="programTitleInput" value="">
             </div>
-            <div class="vp-field" style="margin-bottom:10px;">
-              <label style="display:inline-flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;">
+            <div class="vp-field tight">
+              <label class="vp-inline-label">
                 <input type="checkbox" name="is_priority" value="1"> <?php echo $_t('यो कार्यक्रम प्राथमिकता हो', 'This is a priority program'); ?>
               </label>
             </div>
-            <div class="vp-field" style="margin-bottom:14px;">
+            <div class="vp-field last">
               <label><?php echo $_t('टिप्पणी (वैकल्पिक)', 'Comment (optional)'); ?></label>
               <input type="text" name="attendance_note" maxlength="500" placeholder="<?php echo $_t('उदाहरण: वार्षिक साधारण सभा उपस्थित', 'Example: Attended annual general meeting'); ?>">
             </div>
-            <button type="submit" class="vp-btn" style="padding:11px;">
+            <button type="submit" class="vp-btn tight">
               <i class="fas fa-user-check"></i> <?php echo $_t('उपस्थिति सुरक्षित गर्नुहोस्', 'Save Attendance'); ?>
             </button>
           </form>
@@ -633,7 +647,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
                  placeholder="<?= htmlspecialchars($cardPrefix) ?>-XXXX-XXXX वा <?= htmlspecialchars($cardPrefix) ?>-2026-00001"
                  value="<?= htmlspecialchars($code) ?>">
           <div class="hint"><?php echo $_t('Code वा Card Number दुवै मान्य छन्।', 'Both code and card number are valid.'); ?></div>
-          <div class="hint" id="codeLiveHint" style="color:var(--secondary-dark, var(--primary-dark, #0f766e));font-weight:600;"></div>
+          <div class="hint vp-code-live" id="codeLiveHint"></div>
         </div>
 
         <div class="vp-field">

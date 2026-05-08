@@ -142,20 +142,20 @@ $rows = $db->query(
 }
 /* Modal footer button contrast fix */
 .cred-inline-actions .btn-coop.btn-outline {
-    background: #ffffff !important;
-    color: #14532d !important;
-    border: 1.5px solid #16a34a !important;
+    background: white !important;
+    color: var(--primary-dark,var(--primary-color)) !important;
+    border: 1.5px solid var(--primary-color) !important;
 }
 .cred-inline-actions .btn-coop.btn-outline:hover {
-    background: #f0fdf4 !important;
-    color: #14532d !important;
+    background: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+    color: var(--primary-dark,var(--primary-color)) !important;
 }
 .cred-inline-actions .btn-coop[type="submit"] {
-    background: #166534 !important;
-    color: #ffffff !important;
+    background: var(--primary-color) !important;
+    color: var(--text-on-primary,white) !important;
 }
 .cred-inline-actions .btn-coop[type="submit"]:hover {
-    background: #14532d !important;
+    background: var(--primary-dark,var(--primary-color)) !important;
 }
 @media (max-width: 768px) {
     .cred-page-title { font-size: 1.28rem; }
@@ -165,24 +165,46 @@ $rows = $db->query(
 .cred-empty-title {
     font-size: 0.95rem;
     font-weight: 600;
-    color: #4b5563 !important;
+    color: var(--text-color) !important;
 }
 .cred-empty-hint {
     font-size: 0.875rem;
-    color: #6b7280 !important;
+    color: var(--text-light) !important;
     max-width: 26rem;
     margin-left: auto;
     margin-right: auto;
 }
+.cred-page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.cred-warn-note{color:var(--secondary-dark,var(--secondary-color));}
+.cred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;}
+.cred-card{padding:18px;position:relative;}
+.cred-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.cred-favicon{width:42px;height:42px;border-radius:8px;object-fit:cover;background:color-mix(in srgb, var(--primary-color) 8%, var(--bg-soft));}
+.cred-head-meta{flex:1;min-width:0;}
+.cred-name{font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cred-cat{color:var(--text-muted);}
+.cred-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.cred-code{flex:1;background:var(--bg-soft);padding:6px 10px;border-radius:6px;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cred-code.pw{letter-spacing:2px;}
+.cred-open-btn{width:100%;font-size:.85rem;padding:8px;}
+.cred-actions-top{position:absolute;top:8px;right:8px;display:flex;gap:4px;}
+.cred-icon-btn{padding:4px;color:var(--text-muted);}
+.cred-icon-btn.danger{color:var(--secondary-color);}
+.cred-panel{max-width:700px;width:100%;margin:18px auto 0;}
+.cred-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.cred-panel-title{color:var(--primary-color);margin-top:0;}
+.cred-form-grid{display:grid;gap:12px;}
+.cred-form-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end;}
+.cred-toast{position:fixed;bottom:24px;right:24px;background:var(--primary-color);color:var(--text-on-primary,white);padding:12px 20px;border-radius:10px;box-shadow:0 4px 16px rgba(var(--primary-rgb),.24);z-index:99999;font-family:var(--font-primary);}
 </style>
 
 <div class="admin-content">
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <div class="page-header cred-page-header">
         <div>
             <h1 class="cred-page-title">🔑 अफिस Credentials</h1>
             <p class="cred-page-sub">
                 सरकारी/आधिकारिक sites — एकै ठाउँबाट access।
-                <small style="color:var(--color-warning);">🔒 सबै password AES-256 encrypted।</small>
+                <small class="cred-warn-note">🔒 सबै password AES-256 encrypted।</small>
             </p>
         </div>
         <?php if (is_admin_or_above()): ?>
@@ -212,29 +234,29 @@ $rows = $db->query(
             </div>
         </div>
     <?php else: ?>
-    <div class="cred-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;">
+    <div class="cred-grid">
         <?php foreach ($rows as $r): ?>
             <?php
               $logo = $r['site_logo'] ?: '';
               $favicon = $logo ?: ('https://www.google.com/s2/favicons?domain=' . urlencode(parse_url($r['site_url'], PHP_URL_HOST) ?? '') . '&sz=64');
             ?>
-            <div class="card-coop cred-card" style="padding:18px;position:relative;">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <div class="card-coop cred-card">
+                <div class="cred-head">
                     <a href="<?= e($r['site_url']) ?>" target="_blank" rel="noopener"
                        onclick="logAction(<?= (int)$r['id'] ?>, 'open')"
                        title="Site खोल्नुहोस्">
-                        <img src="<?= e($favicon) ?>" alt="" style="width:42px;height:42px;border-radius:8px;object-fit:cover;background:#f0f0f0;">
+                        <img src="<?= e($favicon) ?>" alt="" class="cred-favicon">
                     </a>
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    <div class="cred-head-meta">
+                        <div class="cred-name">
                             <?= e($r['site_name']) ?>
                         </div>
-                        <small style="color:var(--text-muted);"><?= e($r['category']) ?></small>
+                        <small class="cred-cat"><?= e($r['category']) ?></small>
                     </div>
                 </div>
 
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
-                    <code style="flex:1;background:var(--bg-soft);padding:6px 10px;border-radius:6px;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                <div class="cred-row">
+                    <code class="cred-code">
                         <?= e($r['username']) ?>
                     </code>
                     <button class="btn btn-sm btn-outline-secondary" title="Username copy"
@@ -243,8 +265,8 @@ $rows = $db->query(
                     </button>
                 </div>
 
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
-                    <code style="flex:1;background:var(--bg-soft);padding:6px 10px;border-radius:6px;font-size:.82rem;letter-spacing:2px;"
+                <div class="cred-row">
+                    <code class="cred-code pw"
                           id="pw-<?= (int)$r['id'] ?>">••••••••</code>
                     <button class="btn btn-sm btn-outline-secondary" title="देखाउनुहोस्"
                             onclick="revealPw(<?= (int)$r['id'] ?>)">
@@ -257,22 +279,22 @@ $rows = $db->query(
                 </div>
 
                 <a href="<?= e($r['site_url']) ?>" target="_blank" rel="noopener"
-                   class="btn-coop" style="width:100%;font-size:.85rem;padding:8px;"
+                   class="btn-coop cred-open-btn"
                    onclick="logAction(<?= (int)$r['id'] ?>, 'open')">
                     <i class="fas fa-external-link-alt"></i> Site खोल्नुहोस्
                 </a>
 
                 <?php if (is_admin_or_above()): ?>
-                <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px;">
-                    <button class="btn btn-sm btn-link" style="padding:4px;color:var(--text-muted);"
+                <div class="cred-actions-top">
+                    <button class="btn btn-sm btn-link cred-icon-btn"
                             onclick='editCred(<?= json_encode($r, JSON_HEX_APOS|JSON_HEX_QUOT) ?>)'>
                         <i class="fas fa-edit"></i>
                     </button>
-                    <form method="post" style="display:inline;" onsubmit="return confirm('हटाउने?');">
+                    <form method="post" class="d-inline" onsubmit="return confirm('हटाउने?');">
                         <?= csrfField() ?>
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
-                        <button type="submit" class="btn btn-sm btn-link" style="padding:4px;color:var(--color-danger);">
+                        <button type="submit" class="btn btn-sm btn-link cred-icon-btn danger">
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>
@@ -285,9 +307,9 @@ $rows = $db->query(
 </div>
 
 <!-- Add/Edit Inline Form (popup हटाइयो) -->
-<div id="credPanel" class="card-coop d-none" style="max-width:700px;width:100%;margin:18px auto 0;">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
-        <h3 style="color:var(--primary-color);margin-top:0;" id="credModalTitle">नयाँ Credential</h3>
+<div id="credPanel" class="card-coop d-none cred-panel">
+    <div class="cred-panel-head">
+        <h3 class="cred-panel-title" id="credModalTitle">नयाँ Credential</h3>
         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="closeCredModal()">
             <i class="fas fa-times me-1"></i>बन्द गर्नुहोस्
         </button>
@@ -296,7 +318,7 @@ $rows = $db->query(
             <?= csrfField() ?>
             <input type="hidden" name="action" value="create" id="credAction">
             <input type="hidden" name="id" value="" id="credId">
-            <div style="display:grid;gap:12px;">
+            <div class="cred-form-grid">
                 <input class="field-coop" name="site_name" id="cf_name" placeholder="Site नाम (e.g. NRB Portal)" required>
                 <input class="field-coop" name="site_url"  id="cf_url"  type="url" placeholder="https://..." required>
                 <input class="field-coop" name="site_logo" id="cf_logo" placeholder="Logo URL (खाली राखे favicon auto)">
@@ -311,7 +333,7 @@ $rows = $db->query(
                        placeholder="Password (edit मा खाली राखे पुरानै रहन्छ)">
                 <textarea class="field-coop" name="notes" id="cf_notes" rows="2" placeholder="Notes (optional)"></textarea>
             </div>
-            <div class="cred-inline-actions" style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+            <div class="cred-inline-actions cred-form-actions">
                 <button type="button" class="btn-coop btn-outline" onclick="closeCredModal()">रद्द</button>
                 <button type="submit" class="btn-coop">सुरक्षित गर्नुहोस्</button>
             </div>
@@ -396,8 +418,8 @@ function logAction(id, action) {
 
 function showToast(msg) {
     const t = document.createElement('div');
+    t.className = 'cred-toast';
     t.textContent = msg;
-    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--primary-color);color:#fff;padding:12px 20px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:99999;font-family:var(--font-primary);';
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2000);
 }

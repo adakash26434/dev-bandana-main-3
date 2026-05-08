@@ -70,8 +70,8 @@ $isCached    = ($source === 'nrb_cached');
                     <!-- Rates table -->
                     <div class="exchange-rate-widget">
                         <div class="table-responsive">
-                            <table class="table table-hover exchange-table align-middle mb-0" style="border-radius:12px;overflow:hidden;">
-                                <thead style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+                            <table class="table table-hover exchange-table align-middle mb-0 exr-table">
+                                <thead class="exr-thead">
                                     <tr>
                                         <th class="ps-3"><?php echo isEnglish() ? 'Currency' : 'मुद्रा'; ?></th>
                                         <th class="text-center" width="70"><?php echo isEnglish() ? 'Unit' : 'एकाइ'; ?></th>
@@ -92,11 +92,11 @@ $isCached    = ($source === 'nrb_cached');
                                             <div class="d-flex align-items-center gap-2">
                                                 <img src="https://flagcdn.com/w24/<?php echo htmlspecialchars($r['flag']); ?>.png"
                                                      alt="<?php echo htmlspecialchars($r['iso']); ?>"
-                                                     style="width:24px;height:16px;object-fit:cover;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.15);"
+                                                     class="exr-flag"
                                                      onerror="this.style.display='none'">
                                                 <div>
                                                     <span class="fw-semibold text-success"><?php echo htmlspecialchars($r['iso']); ?></span>
-                                                    <span class="text-muted ms-1" style="font-size:.85em;"><?php echo htmlspecialchars($r['name']); ?></span>
+                                                    <span class="text-muted ms-1 exr-currency-name"><?php echo htmlspecialchars($r['name']); ?></span>
                                                 </div>
                                             </div>
                                         </td>
@@ -104,7 +104,7 @@ $isCached    = ($source === 'nrb_cached');
                                             <span class="badge bg-light text-dark border"><?php echo $r['unit']; ?></span>
                                         </td>
                                         <td class="text-end">
-                                            <span class="fw-semibold" style="color:var(--primary-color);">रु. <?php echo $r['buy']; ?></span>
+                                            <span class="fw-semibold exr-buy">रु. <?php echo $r['buy']; ?></span>
                                         </td>
                                         <td class="text-end pe-3">
                                             <span class="fw-semibold text-danger">रु. <?php echo $r['sell']; ?></span>
@@ -116,7 +116,7 @@ $isCached    = ($source === 'nrb_cached');
                         </div>
 
                         <!-- Update info -->
-                        <div class="rate-note mt-4 p-3" style="background:rgba(var(--primary-rgb,26,95,42),.05);border-radius:10px;border-left:4px solid var(--primary-light);">
+                        <div class="rate-note mt-4 p-3 exr-rate-note">
                             <div class="d-flex align-items-start gap-2">
                                 <i class="fas fa-info-circle text-success mt-1"></i>
                                 <div>
@@ -156,6 +156,12 @@ $isCached    = ($source === 'nrb_cached');
     0%, 100% { opacity: 1; }
     50% { opacity: .4; }
 }
+.exr-table{border-radius:12px;overflow:hidden;}
+.exr-thead{background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:var(--text-on-primary,white);}
+.exr-flag{width:24px;height:16px;object-fit:cover;border-radius:2px;box-shadow:0 1px 3px rgba(var(--primary-rgb,26,95,42),.25);}
+.exr-currency-name{font-size:.85em;}
+.exr-buy{color:var(--primary-color);}
+.exr-rate-note{background:rgba(var(--primary-rgb,26,95,42),.05);border-radius:10px;border-left:4px solid var(--primary-light);}
 </style>
 
 <?php require_once 'includes/footer.php'; ?>

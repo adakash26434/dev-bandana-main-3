@@ -254,6 +254,13 @@ echo adminPageHeader($__t('साइट सेटिङ्स', 'Site Settings')
 ?>
 <?php echo adminHelpTip($__t('यो पृष्ठबाट Website को नाम, Logo, रंग, र सम्पर्क विवरण परिवर्तन गर्न सकिन्छ।', 'You can change website name, logo, colors and contact details from this page.'), [$__t('Logo बदल्न: "Site Logo" section मा जानुहोस्।', 'To change logo: go to "Site Logo" section.'), $__t('रंग बदल्न: "Primary Color" section मा color picker प्रयोग गर्नुहोस्।', 'To change colors: use color picker in "Primary Color" section.'), $__t('परिवर्तन गरेपछि: "Save" बटन थिच्नुहोस्।', 'After changes: click "Save" button.')]); ?>
 <?php $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['message']); ?>
+<style>
+.stg-help-compact{font-size:.82rem;}
+.stg-color-input{height:50px;}
+.stg-media-preview-logo{max-height:100px;}
+.stg-media-preview-md{max-height:120px;}
+.stg-media-preview-sm{max-height:90px;}
+</style>
 <?php
 $panel = (string)($_GET['panel'] ?? 'general');
 if (!in_array($panel, ['general', 'branding'], true)) {
@@ -469,7 +476,7 @@ if (!in_array($panel, ['general', 'branding'], true)) {
 
                     <!-- OAuth Settings -->
                     <hr><h6 class="text-success fw-bold mt-3"><i class="fas fa-key me-2"></i><?php echo $__t('Member Portal — Social Login (OAuth)', 'Member Portal — Social Login (OAuth)'); ?></h6>
-                    <div class="alert alert-info py-2 px-3" style="font-size:.82rem;">
+                    <div class="alert alert-info py-2 px-3 stg-help-compact">
                         <i class="fas fa-info-circle me-1"></i>
                         <?php echo $__t('Google OAuth', 'Google OAuth'); ?>: <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a> <?php echo $__t('बाट Client ID र Secret लिनुहोस्।', 'to get Client ID and Secret.'); ?><br>
                         Facebook: <a href="https://developers.facebook.com/apps" target="_blank">Meta Developers</a> <?php echo $__t('बाट App ID र Secret लिनुहोस्।', 'to get App ID and Secret.'); ?><br>
@@ -504,7 +511,7 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <?php if (!empty($_SESSION['is_superadmin'])): ?>
                     <hr>
                     <h6 class="text-success fw-bold mt-3"><i class="fas fa-shield-halved me-2"></i><?php echo $__t('2FA नीति (Superadmin)', '2FA Policy (Superadmin)'); ?></h6>
-                    <div class="alert alert-warning py-2 px-3" style="font-size:.82rem;">
+                    <div class="alert alert-warning py-2 px-3 stg-help-compact">
                         <i class="fas fa-lock me-1"></i> <?php echo $__t('तलको toggle अनुसार Google Authenticator 2FA login मा लागू हुन्छ।', 'Google Authenticator 2FA is enforced on login based on toggles below.'); ?>
                     </div>
                     <div class="form-check form-switch mb-2">
@@ -702,65 +709,65 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label fw-semibold"><?php echo $__t('साइट लोगो (Default)', 'Site Logo (Default)'); ?></label>
-                            <?php if (!empty($settings['logo'])): ?><img src="../<?php echo htmlspecialchars($settings['logo'], ENT_QUOTES, 'UTF-8'); ?>" alt="Logo" class="img-fluid mb-2 border rounded" style="max-height:100px;"><?php endif; ?>
+                            <?php if (!empty($settings['logo'])): ?><img src="../<?php echo htmlspecialchars($settings['logo'], ENT_QUOTES, 'UTF-8'); ?>" alt="Logo" class="img-fluid mb-2 border rounded stg-media-preview-logo"><?php endif; ?>
                             <input type="file" name="logo" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('Fallback लोगो', 'Fallback logo'); ?> · <?php echo $__t('अनुशंसित', 'Recommended'); ?>: 1200x460+</small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold"><?php echo $__t('नेपाली लोगो (NE)', 'Nepali Logo (NE)'); ?></label>
-                            <?php if (!empty($settings['logo_np'])): ?><img src="../<?php echo htmlspecialchars($settings['logo_np'], ENT_QUOTES, 'UTF-8'); ?>" alt="Logo NP" class="img-fluid mb-2 border rounded" style="max-height:100px;"><?php endif; ?>
+                            <?php if (!empty($settings['logo_np'])): ?><img src="../<?php echo htmlspecialchars($settings['logo_np'], ENT_QUOTES, 'UTF-8'); ?>" alt="Logo NP" class="img-fluid mb-2 border rounded stg-media-preview-logo"><?php endif; ?>
                             <input type="file" name="logo_np" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('नेपाली भाषा हुँदा यो देखिन्छ', 'Shown when site language is Nepali'); ?></small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold"><?php echo $__t('अंग्रेजी लोगो (EN)', 'English Logo (EN)'); ?></label>
-                            <?php if (!empty($settings['logo_en'])): ?><img src="../<?php echo htmlspecialchars($settings['logo_en'], ENT_QUOTES, 'UTF-8'); ?>" alt="Logo EN" class="img-fluid mb-2 border rounded" style="max-height:100px;"><?php endif; ?>
+                            <?php if (!empty($settings['logo_en'])): ?><img src="../<?php echo htmlspecialchars($settings['logo_en'], ENT_QUOTES, 'UTF-8'); ?>" alt="Logo EN" class="img-fluid mb-2 border rounded stg-media-preview-logo"><?php endif; ?>
                             <input type="file" name="logo_en" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('English भाषा हुँदा यो देखिन्छ', 'Shown when site language is English'); ?></small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold"><?php echo $__t('हेडर हिमाल फोटो', 'Header Himal Photo'); ?></label>
-                            <?php if (!empty($settings['himal_bg'])): ?><img src="../<?php echo htmlspecialchars($settings['himal_bg'], ENT_QUOTES, 'UTF-8'); ?>" alt="Himal" class="img-fluid mb-2 border rounded" style="max-height:100px;"><?php endif; ?>
+                            <?php if (!empty($settings['himal_bg'])): ?><img src="../<?php echo htmlspecialchars($settings['himal_bg'], ENT_QUOTES, 'UTF-8'); ?>" alt="Himal" class="img-fluid mb-2 border rounded stg-media-preview-logo"><?php endif; ?>
                             <input type="file" name="himal_bg" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('अनुशंसित', 'Recommended'); ?>: 1400x200</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold"><?php echo $__t('About पेज फोटो', 'About Page Image'); ?></label>
-                            <?php if (!empty($settings['about_page_image'])): ?><img src="../<?php echo htmlspecialchars($settings['about_page_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="About" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <?php if (!empty($settings['about_page_image'])): ?><img src="../<?php echo htmlspecialchars($settings['about_page_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="About" class="img-fluid mb-2 border rounded stg-media-preview-md"><?php endif; ?>
                             <input type="file" name="about_page_image" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('अनुशंसित', 'Recommended'); ?>: 600x400</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold"><?php echo $__t('About Intro दायाँ फोटो', 'About Intro Right Image'); ?></label>
-                            <?php if (!empty($settings['about_intro_image'])): ?><img src="../<?php echo htmlspecialchars($settings['about_intro_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="About Intro" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <?php if (!empty($settings['about_intro_image'])): ?><img src="../<?php echo htmlspecialchars($settings['about_intro_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="About Intro" class="img-fluid mb-2 border rounded stg-media-preview-md"><?php endif; ?>
                             <input type="file" name="about_intro_image" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('अनुशंसित', 'Recommended'); ?>: 700x900</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold"><?php echo $__t('इतिहास सेक्शन फोटो', 'History Section Photo'); ?></label>
-                            <?php if (!empty($settings['history_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['history_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="History" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <?php if (!empty($settings['history_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['history_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="History" class="img-fluid mb-2 border rounded stg-media-preview-md"><?php endif; ?>
                             <input type="file" name="history_photo" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('"हाम्रो इतिहास" section फोटो', '"Our History" section photo'); ?></small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold"><?php echo $__t('मोबाइल एप फोटो', 'Mobile App Photo'); ?></label>
-                            <?php if (!empty($settings['mobile_app_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['mobile_app_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="App" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <?php if (!empty($settings['mobile_app_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['mobile_app_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="App" class="img-fluid mb-2 border rounded stg-media-preview-md"><?php endif; ?>
                             <input type="file" name="mobile_app_photo" class="form-control" accept="image/*">
                             <small class="text-muted"><?php echo $__t('अनुशंसित', 'Recommended'); ?>: 400x600</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold"><?php echo $__t('अध्यक्ष फोटो', 'Chairman Photo'); ?></label>
-                            <?php if (!empty($settings['chairman_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['chairman_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="Chairman" class="img-fluid mb-2 border rounded" style="max-height:90px;"><?php endif; ?>
+                            <?php if (!empty($settings['chairman_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['chairman_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="Chairman" class="img-fluid mb-2 border rounded stg-media-preview-sm"><?php endif; ?>
                             <input type="file" name="chairman_photo" class="form-control" accept="image/*">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold"><?php echo $__t('CEO / कार्यकारी फोटो', 'CEO / Executive Photo'); ?></label>
-                            <?php if (!empty($settings['ceo_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['ceo_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="CEO" class="img-fluid mb-2 border rounded" style="max-height:90px;"><?php endif; ?>
+                            <?php if (!empty($settings['ceo_photo'])): ?><img src="../<?php echo htmlspecialchars($settings['ceo_photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="CEO" class="img-fluid mb-2 border rounded stg-media-preview-sm"><?php endif; ?>
                             <input type="file" name="ceo_photo" class="form-control" accept="image/*">
                         </div>
                         <div class="col-md-12">
                             <label class="form-label fw-semibold"><?php echo $__t('Default Share Image (SEO OG)', 'Default Share Image (SEO OG)'); ?></label>
-                            <?php if (!empty($settings['seo_og_image'])): ?><img src="../<?php echo htmlspecialchars($settings['seo_og_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="OG" class="img-fluid mb-2 border rounded" style="max-height:120px;"><?php endif; ?>
+                            <?php if (!empty($settings['seo_og_image'])): ?><img src="../<?php echo htmlspecialchars($settings['seo_og_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="OG" class="img-fluid mb-2 border rounded stg-media-preview-md"><?php endif; ?>
                             <input type="file" name="seo_og_image" class="form-control" accept="image/jpeg,image/png,image/webp">
                             <small class="text-muted d-block mt-1"><?php echo $__t('अनुशंसित', 'Recommended'); ?>: 1200x630</small>
                             <?php if (!empty($settings['seo_og_image'])): ?>
@@ -783,37 +790,37 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label"><?php echo $__t('प्राथमिक रंग', 'Primary Color'); ?></label>
-                            <input type="color" name="primary_color" class="form-control form-control-color w-100"
+                            <input type="color" name="primary_color" class="form-control form-control-color w-100 stg-color-input"
                                    value="<?php echo $settings['primary_color'] ?? '#1a5f2a'; ?>"
-                                   style="height: 50px;">
+                                   >
                             <small class="text-muted"><?php echo $__t('मुख्य रंग', 'Main color'); ?></small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label"><?php echo $__t('फुटर रंग', 'Footer Color'); ?></label>
-                            <input type="color" name="footer_color" class="form-control form-control-color w-100"
+                            <input type="color" name="footer_color" class="form-control form-control-color w-100 stg-color-input"
                                    value="<?php echo $settings['footer_color'] ?? '#1a5f2a'; ?>"
-                                   style="height: 50px;">
+                                   >
                             <small class="text-muted"><?php echo $__t('फुटर पृष्ठभूमि', 'Footer bg'); ?></small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label"><?php echo $__t('सेकेन्डरी रंग', 'Secondary Color'); ?></label>
-                            <input type="color" name="secondary_color" class="form-control form-control-color w-100"
+                            <input type="color" name="secondary_color" class="form-control form-control-color w-100 stg-color-input"
                                    value="<?php echo $settings['secondary_color'] ?? ($settings['topbar_color'] ?? '#c0392b'); ?>"
-                                   style="height: 50px;">
+                                   >
                             <small class="text-muted"><?php echo $__t('एक्सेन्ट रंग', 'Accent color'); ?></small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label"><?php echo $__t('हेडर रंग', 'Header Color'); ?></label>
-                            <input type="color" name="header_color" class="form-control form-control-color w-100"
+                            <input type="color" name="header_color" class="form-control form-control-color w-100 stg-color-input"
                                    value="<?php echo $settings['header_color'] ?? ($settings['topbar_color'] ?? '#c0392b'); ?>"
-                                   style="height: 50px;">
+                                   >
                             <small class="text-muted"><?php echo $__t('माथिल्लो utility/header strip', 'Top utility/header strip'); ?></small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label"><?php echo $__t('टप बार रंग', 'Top Bar Color'); ?> <span class="badge bg-danger ms-1"><?php echo $__t('रातो पट्टी', 'Red Strip'); ?></span></label>
-                            <input type="color" name="topbar_color" class="form-control form-control-color w-100"
+                            <input type="color" name="topbar_color" class="form-control form-control-color w-100 stg-color-input"
                                    value="<?php echo $settings['topbar_color'] ?? '#c0392b'; ?>"
-                                   style="height: 50px;">
+                                   >
                             <small class="text-muted"><?php echo $__t('Header माथिको रातो पट्टी', 'Red strip above header'); ?></small>
                         </div>
                     </div>

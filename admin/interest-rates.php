@@ -78,6 +78,14 @@ $flash = getFlash();
 <?php echo adminHelpTip('यो पृष्ठबाट Savings र Loan को ब्याज दर अपडेट गर्न सकिन्छ।', ['दर बदल्न: सम्बन्धित row को Edit बटन थिच्नुहोस्।', 'नयाँ category थप्न: "+" बटन थिच्नुहोस्।', 'परिवर्तन live site मा तुरुन्त देखिन्छ।']); ?>
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
+<style>
+.ir-flat-top{border-top-left-radius:0!important;border-top-right-radius:0!important;}
+.ir-head-primary{background:linear-gradient(135deg,var(--primary-color),var(--primary-light));}
+.ir-head-loan{background:linear-gradient(135deg,var(--secondary-dark,var(--secondary-color)),var(--secondary-color));}
+.ir-head-theme{color:var(--text-on-primary,white);}
+.ir-rate-badge{background:color-mix(in srgb, var(--primary-color) 12%, white);color:var(--primary-color);border:1px solid var(--primary-light);}
+.ir-inline-form{display:inline;}
+</style>
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0" id="rateTabs">
     <li class="nav-item">
@@ -103,8 +111,8 @@ $flash = getFlash();
 
     <!-- ══ TAB: बचत ══ -->
     <div class="tab-pane fade <?php echo $category !== 'loan' ? 'show active' : ''; ?>" id="panel-saving">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header gradient-card-header d-flex align-items-center justify-content-between" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));">
+        <div class="card admin-table-card ir-flat-top">
+            <div class="card-header gradient-card-header d-flex align-items-center justify-content-between ir-head-primary">
                 <h5 class="mb-0 text-white fw-bold"><i class="fas fa-piggy-bank me-2"></i>बचत ब्याज दर</h5>
                 <button class="btn btn-outline-light btn-sm px-3 fw-semibold add-rate-btn" data-category="saving">
                     <i class="fas fa-plus me-1"></i>बचत दर थप्नुहोस्
@@ -132,7 +140,7 @@ $flash = getFlash();
                                     <?php if ($item['description']): ?><small class="text-muted"><?php echo htmlspecialchars($item['description']); ?></small><?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge fs-6 fw-bold px-3 py-2" style="background:rgba(40,167,69,0.12);color:var(--primary-color);border:1px solid var(--primary-light);">
+                                    <span class="badge fs-6 fw-bold px-3 py-2 ir-rate-badge">
                                         <?php echo number_format($item['rate'], 2); ?>%
                                     </span>
                                 </td>
@@ -149,7 +157,7 @@ $flash = getFlash();
                                             data-active="<?php echo $item['is_active']; ?>">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('यो ब्याजदर मेटाउने हो?')">
+                                    <form method="POST" class="ir-inline-form" onsubmit="return confirm('यो ब्याजदर मेटाउने हो?')">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo (int)$item['id']; ?>">
                                         <input type="hidden" name="category" value="saving">
@@ -170,8 +178,8 @@ $flash = getFlash();
 
     <!-- ══ TAB: ऋण ══ -->
     <div class="tab-pane fade <?php echo $category === 'loan' ? 'show active' : ''; ?>" id="panel-loan">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex align-items-center justify-content-between" style="background:linear-gradient(135deg,#0c4da2,#1a73e8);">
+        <div class="card admin-table-card ir-flat-top">
+            <div class="card-header d-flex align-items-center justify-content-between ir-head-loan ir-head-theme">
                 <h5 class="mb-0 text-white fw-bold"><i class="fas fa-hand-holding-usd me-2"></i>ऋण ब्याज दर</h5>
                 <button class="btn btn-outline-light btn-sm px-3 fw-semibold add-rate-btn" data-category="loan">
                     <i class="fas fa-plus me-1"></i>ऋण दर थप्नुहोस्
@@ -199,7 +207,7 @@ $flash = getFlash();
                                     <?php if ($item['description']): ?><small class="text-muted"><?php echo htmlspecialchars($item['description']); ?></small><?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge fs-6 fw-bold px-3 py-2" style="background:rgba(26,95,42,0.1);color:var(--primary-color);border:1px solid var(--primary-color);">
+                                    <span class="badge fs-6 fw-bold px-3 py-2 ir-rate-badge">
                                         <?php echo number_format($item['rate'], 2); ?>%
                                     </span>
                                 </td>
@@ -216,7 +224,7 @@ $flash = getFlash();
                                             data-active="<?php echo $item['is_active']; ?>">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('यो ब्याजदर मेटाउने हो?')">
+                                    <form method="POST" class="ir-inline-form" onsubmit="return confirm('यो ब्याजदर मेटाउने हो?')">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo (int)$item['id']; ?>">
                                         <input type="hidden" name="category" value="loan">
@@ -237,8 +245,8 @@ $flash = getFlash();
 
     <!-- ══ TAB 3: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="panel-rate-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card ir-flat-top">
+            <div class="card-header d-flex justify-content-between align-items-center ir-head-primary ir-head-theme">
                 <h5 class="mb-0 fw-bold" id="rateFormTitle">
                     <i class="fas fa-plus-circle me-2"></i>नयाँ ब्याज दर थप्नुहोस्
                 </h5>

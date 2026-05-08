@@ -26,7 +26,7 @@ if (!function_exists('coopAlert')) {
             ? '<button type="button" class="coop-alert-close" onclick="this.parentElement.remove()" aria-label="Close">×</button>'
             : '';
         return <<<HTML
-<div class="coop-alert" style="background:{$m['bg']};color:#fff;padding:12px 16px;border-radius:var(--radius-md,10px);display:flex;align-items:center;gap:10px;margin:12px 0;box-shadow:var(--shadow-sm,0 1px 4px rgba(0,0,0,.06));font-family:var(--font-primary);">
+<div class="coop-alert" style="background:{$m['bg']};color:var(--text-on-primary,white);padding:12px 16px;border-radius:var(--radius-md,10px);display:flex;align-items:center;gap:10px;margin:12px 0;box-shadow:var(--shadow-sm,0 1px 4px rgba(var(--primary-rgb,26,95,42),.12));font-family:var(--font-primary);">
     <i class="fas {$m['icon']}"></i>
     <span style="flex:1;">{$msg}</span>
     {$btn}

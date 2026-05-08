@@ -56,7 +56,7 @@ function ipShortAmt(float $v): string {
 <?php if (empty($profiles)): ?>
 <!-- No data yet -->
 <div class="text-center py-5">
-    <div style="width:80px;height:80px;background:#f0f8f3;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+    <div class="ip-empty-icon-wrap">
         <i class="fas fa-building-columns fa-2x" style="color:var(--primary-color);"></i>
     </div>
     <h4 style="color:var(--primary-color);">संस्थागत प्रोफाइल उपलब्ध छैन</h4>
@@ -200,7 +200,7 @@ function ipShortAmt(float $v): string {
                 <?php $npl = (float)$p['npl_percent']; $bw = min($npl * 10, 100); ?>
                 <div class="ip-ind-bar bar-info" style="width:<?php echo $bw; ?>%"></div>
             </div>
-            <div class="ip-ind-value" style="color:#1565c0;"><?php echo $npl; ?>%</div>
+            <div class="ip-ind-value ip-ind-value-info"><?php echo $npl; ?>%</div>
         </div>
         <?php endif; ?>
 
@@ -211,7 +211,7 @@ function ipShortAmt(float $v): string {
                 <?php $liq = (float)$p['liquidity_percent']; $bw2 = min($liq, 100); ?>
                 <div class="ip-ind-bar bar-teal" style="width:<?php echo $bw2; ?>%"></div>
             </div>
-            <div class="ip-ind-value" style="color:#00796b;"><?php echo $liq; ?>%</div>
+            <div class="ip-ind-value ip-ind-value-teal"><?php echo $liq; ?>%</div>
         </div>
         <?php endif; ?>
     </div>
@@ -249,9 +249,9 @@ function ipShortAmt(float $v): string {
 /* ── Institutional Profile Public Page Styles ── */
 
 .ip-profile-card {
-    background: #fff;
+    background: white;
     border-radius: 16px;
-    box-shadow: 0 8px 26px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 26px rgba(var(--primary-rgb,26,95,42),0.10);
     overflow: hidden;
     border: 1px solid rgba(var(--primary-rgb,26,95,42),0.08);
 }
@@ -283,7 +283,7 @@ function ipShortAmt(float $v): string {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
     gap: 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f0f0f0);
 }
 
 .ip-stat-item {
@@ -291,11 +291,11 @@ function ipShortAmt(float $v): string {
     align-items: center;
     gap: 12px;
     padding: 16px 14px;
-    border-right: 1px solid #f2f4f3;
+    border-right: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f2f4f3);
     transition: background 0.2s;
 }
 .ip-stat-item:last-child { border-right: none; }
-.ip-stat-item:hover { background: color-mix(in srgb, var(--primary-color) 4%, #fff); }
+.ip-stat-item:hover { background: color-mix(in srgb, var(--primary-color) 4%, white); }
 
 .ip-stat-icon {
     width: 38px; height: 38px;
@@ -305,22 +305,22 @@ function ipShortAmt(float $v): string {
     flex-shrink: 0;
 }
 
-.ip-stat-primary .ip-stat-icon  { background:#e8f5e9; color:var(--primary-color); }
-.ip-stat-success .ip-stat-icon  { background:color-mix(in srgb, var(--secondary-color) 12%, #fff); color:var(--secondary-color); }
-.ip-stat-info .ip-stat-icon     { background:color-mix(in srgb, var(--primary-light) 14%, #fff); color:var(--primary-light); }
-.ip-stat-teal .ip-stat-icon     { background:color-mix(in srgb, var(--primary-color) 10%, #fff); color:var(--primary-dark); }
-.ip-stat-warning .ip-stat-icon  { background:color-mix(in srgb, var(--secondary-color) 14%, #fff); color:var(--secondary-dark, var(--secondary-color)); }
-.ip-stat-purple .ip-stat-icon   { background:color-mix(in srgb, var(--primary-dark) 12%, #fff); color:var(--primary-dark); }
+.ip-stat-primary .ip-stat-icon  { background:color-mix(in srgb, var(--primary-color) 16%, white); color:var(--primary-color); }
+.ip-stat-success .ip-stat-icon  { background:color-mix(in srgb, var(--secondary-color) 12%, white); color:var(--secondary-color); }
+.ip-stat-info .ip-stat-icon     { background:color-mix(in srgb, var(--primary-light) 14%, white); color:var(--primary-light); }
+.ip-stat-teal .ip-stat-icon     { background:color-mix(in srgb, var(--primary-color) 10%, white); color:var(--primary-dark); }
+.ip-stat-warning .ip-stat-icon  { background:color-mix(in srgb, var(--secondary-color) 14%, white); color:var(--secondary-dark, var(--secondary-color)); }
+.ip-stat-purple .ip-stat-icon   { background:color-mix(in srgb, var(--primary-dark) 12%, white); color:var(--primary-dark); }
 
 .ip-stat-value {
     font-size: 1.02rem;
     font-weight: 800;
-    color: #1a1a1a;
+    color: var(--text-color,#1a1a1a);
     line-height: 1.2;
 }
 .ip-stat-label {
     font-size: 0.75rem;
-    color: #777;
+    color: var(--text-light,#777);
     margin-top: 3px;
     font-weight: 500;
 }
@@ -336,18 +336,18 @@ function ipShortAmt(float $v): string {
     display: flex;
     flex-wrap: wrap;
     gap: 0;
-    background: color-mix(in srgb, var(--primary-color) 4%, #fff);
-    border-top: 1px solid color-mix(in srgb, var(--primary-color) 14%, #fff);
-    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 14%, #fff);
+    background: color-mix(in srgb, var(--primary-color) 4%, white);
+    border-top: 1px solid color-mix(in srgb, var(--primary-color) 14%, white);
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 14%, white);
     padding: 12px 16px;
     gap: 18px;
 }
 .ip-indicator { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 180px; }
-.ip-ind-label { font-size: 0.76rem; color: #555; white-space: nowrap; min-width: 98px; }
+.ip-ind-label { font-size: 0.76rem; color: var(--text-light,#555); white-space: nowrap; min-width: 98px; }
 .ip-ind-bar-wrap {
     flex: 1;
     height: 8px;
-    background: #e0e0e0;
+    background: color-mix(in srgb, var(--primary-color) 16%, #e0e0e0);
     border-radius: 4px;
     overflow: hidden;
     min-width: 80px;
@@ -355,23 +355,25 @@ function ipShortAmt(float $v): string {
 .ip-ind-bar { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
 .bar-good    { background: linear-gradient(90deg,var(--primary-color),var(--primary-light)); }
 .bar-warning { background: linear-gradient(90deg,var(--secondary-color),var(--accent-color)); }
-.bar-danger  { background: linear-gradient(90deg,#dc3545,var(--secondary-color)); }
+.bar-danger  { background: linear-gradient(90deg,var(--secondary-color),var(--secondary-dark,var(--secondary-color))); }
 .bar-info    { background: linear-gradient(90deg,var(--primary-light),var(--secondary-color)); }
 .bar-teal    { background: linear-gradient(90deg,var(--primary-dark),var(--primary-color)); }
 .ip-ind-value { font-size: 0.88rem; font-weight: 700; min-width: 42px; text-align: right; }
-.bar-good ~ .ip-ind-value, .ip-ind-value.bar-good { color: #155724; }
-.bar-danger ~ .ip-ind-value { color: #721c24; }
+.bar-good ~ .ip-ind-value, .ip-ind-value.bar-good { color: var(--primary-dark,var(--primary-color)); }
+.bar-danger ~ .ip-ind-value { color: var(--secondary-dark,var(--secondary-color)); }
+.ip-ind-value-info { color: var(--accent-color,#1565c0); }
+.ip-ind-value-teal { color: var(--primary-dark,#00796b); }
 
 /* Loan reserve */
 .ip-reserve-row {
     padding: 12px 16px;
     font-size: 0.84rem;
-    color: #444;
-    border-bottom: 1px solid #f0f0f0;
-    background: color-mix(in srgb, var(--primary-color) 5%, #fff);
+    color: var(--text-color,#444);
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f0f0f0);
+    background: color-mix(in srgb, var(--primary-color) 5%, white);
 }
 .ip-reserve-pct {
-    background:#e8f5e9;
+    background:color-mix(in srgb, var(--primary-color) 16%, white);
     color:var(--primary-color);
     padding:2px 8px;
     border-radius:8px;
@@ -384,22 +386,24 @@ function ipShortAmt(float $v): string {
 .ip-note {
     padding: 12px 16px;
     font-size: 0.82rem;
-    color: #666;
-    background: #fafafa;
+    color: var(--text-light,#666);
+    background: color-mix(in srgb, var(--primary-color) 6%, #fafafa);
+}
+.ip-empty-icon-wrap{width:80px;height:80px;background:color-mix(in srgb, var(--primary-color) 10%, white);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
     font-style: italic;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .ip-stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .ip-stat-item { border-right: 1px solid #f2f4f3; }
+    .ip-stat-item { border-right: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f2f4f3); }
     .ip-stat-item:nth-child(2n) { border-right: none; }
     .ip-indicators-row { flex-direction: column; gap: 12px; }
     .ip-card-header { padding: 12px 14px; }
 }
 @media (max-width: 480px) {
     .ip-stats-grid { grid-template-columns: 1fr; }
-    .ip-stat-item { border-right: none; border-bottom: 1px solid #f2f4f3; }
+    .ip-stat-item { border-right: none; border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f2f4f3); }
 }
 </style>
 

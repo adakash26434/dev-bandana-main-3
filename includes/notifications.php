@@ -67,21 +67,28 @@ function buildEmailHtml($subject, $eventLabel, $details, $trackingId = '') {
     $siteName  = getSetting('site_name', 'आकाश सहकारी');
     $siteUrl   = defined('SITE_URL') ? SITE_URL : '';
     $year      = date('Y');
+    $primaryColor   = getSetting('primary_color', '#1a5f2a');
+    $secondaryColor = getSetting('secondary_color', '#c0392b');
+    $primaryLight   = getSetting('primary_light', $primaryColor);
+    $emailBg        = 'color-mix(in srgb, ' . $primaryColor . ' 7%, white)';
+    $emailCardBg    = 'white';
+    $emailCardBorder= 'color-mix(in srgb, ' . $primaryColor . ' 14%, #e5e7eb)';
+    $emailMuted     = 'var(--text-light,#555)';
 
     /* Details table rows */
     $rows = '';
     foreach ($details as $label => $value) {
         if ($value === '' || $value === null) continue;
         $rows .= "<tr>
-            <td style='padding:8px 12px;font-weight:600;color:#555;width:35%;border-bottom:1px solid #f0f0f0;'>{$label}</td>
-            <td style='padding:8px 12px;color:#222;border-bottom:1px solid #f0f0f0;'>" . htmlspecialchars((string)$value) . "</td>
+            <td style='padding:8px 12px;font-weight:600;color:{$emailMuted};width:35%;border-bottom:1px solid #f0f0f0;'>{$label}</td>
+            <td style='padding:8px 12px;color:var(--text-color,#222);border-bottom:1px solid #f0f0f0;'>" . htmlspecialchars((string)$value) . "</td>
         </tr>";
     }
 
     $trackingRow = $trackingId
         ? "<tr>
             <td colspan='2' style='padding:12px;background:#e8f5e9;text-align:center;border-radius:6px;'>
-                <strong style='color:var(--primary-color);'>Tracking ID: {$trackingId}</strong>
+                <strong style='color:{$primaryColor};'>Tracking ID: {$trackingId}</strong>
             </td>
         </tr>"
         : '';
@@ -89,36 +96,36 @@ function buildEmailHtml($subject, $eventLabel, $details, $trackingId = '') {
     return "<!DOCTYPE html>
 <html lang='ne'>
 <head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'></head>
-<body style='margin:0;padding:0;background:#f4f6f9;font-family:Arial,sans-serif;'>
-<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6f9;padding:30px 0;'>
+<body style='margin:0;padding:0;background:{$emailBg};font-family:Arial,sans-serif;'>
+<table width='100%' cellpadding='0' cellspacing='0' style='background:{$emailBg};padding:30px 0;'>
 <tr><td align='center'>
-<table width='600' cellpadding='0' cellspacing='0' style='background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);max-width:600px;'>
+<table width='600' cellpadding='0' cellspacing='0' style='background:{$emailCardBg};border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(var(--primary-rgb,26,95,42),0.14);max-width:600px;border:1px solid {$emailCardBorder};'>
 
   <!-- Header -->
   <tr>
-    <td style='background:linear-gradient(135deg,var(--primary-color),var(--primary-light));padding:24px 32px;'>
-      <h1 style='color:#fff;margin:0;font-size:20px;'>{$siteName} — Admin Notification</h1>
-      <p style='color:rgba(255,255,255,0.8);margin:6px 0 0;font-size:14px;'>{$eventLabel}</p>
+    <td style='background:linear-gradient(135deg,{$primaryColor},{$primaryLight});padding:24px 32px;'>
+      <h1 style='color:var(--text-on-primary,white);margin:0;font-size:20px;'>{$siteName} — Admin Notification</h1>
+      <p style='color:color-mix(in srgb, var(--text-on-primary,white) 82%, transparent);margin:6px 0 0;font-size:14px;'>{$eventLabel}</p>
     </td>
   </tr>
 
   <!-- Body -->
   <tr>
     <td style='padding:28px 32px;'>
-      <h2 style='color:var(--primary-color);font-size:18px;margin:0 0 16px;'>{$subject}</h2>
-      <p style='color:#555;font-size:14px;margin:0 0 20px;'>
+      <h2 style='color:{$primaryColor};font-size:18px;margin:0 0 16px;'>{$subject}</h2>
+      <p style='color:{$emailMuted};font-size:14px;margin:0 0 20px;'>
         नयाँ आवेदन प्राप्त भयो। Admin Panel मा जानुहोस् र प्रक्रिया गर्नुहोस्।
       </p>
 
       <table width='100%' cellpadding='0' cellspacing='0'
-             style='border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;'>
+             style='border:1px solid {$emailCardBorder};border-radius:8px;overflow:hidden;'>
         {$rows}
         {$trackingRow}
       </table>
 
       <div style='text-align:center;margin-top:24px;'>
         <a href='{$siteUrl}admin/dashboard.php'
-           style='background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;padding:12px 28px;
+           style='background:linear-gradient(135deg,{$primaryColor},{$primaryLight});color:var(--text-on-primary,white);padding:12px 28px;
                   border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;'>
           Admin Panel खोल्नुहोस्
         </a>
@@ -128,8 +135,8 @@ function buildEmailHtml($subject, $eventLabel, $details, $trackingId = '') {
 
   <!-- Footer -->
   <tr>
-    <td style='background:#f8f9fa;padding:16px 32px;text-align:center;border-top:1px solid #eee;'>
-      <p style='color:#aaa;font-size:12px;margin:0;'>
+    <td style='background:color-mix(in srgb, {$primaryColor} 6%, #f8f9fa);padding:16px 32px;text-align:center;border-top:1px solid {$emailCardBorder};'>
+      <p style='color:var(--text-muted,#999);font-size:12px;margin:0;'>
         यो automatic notification हो — {$siteName} © {$year}
       </p>
     </td>
@@ -436,6 +443,11 @@ function sendMemberStatusUpdate(
 
     $siteName = getSetting('site_name', 'आकाश सहकारी');
     $siteUrl  = defined('SITE_URL') ? SITE_URL : '';
+    $primaryColor = getSetting('primary_color', '#1a5f2a');
+    $primaryLight = getSetting('primary_light', $primaryColor);
+    $emailBg      = 'color-mix(in srgb, ' . $primaryColor . ' 7%, white)';
+    $emailCardBg  = 'white';
+    $emailCardBorder = 'color-mix(in srgb, ' . $primaryColor . ' 14%, #e5e7eb)';
 
     /* Status को Nepali/English label */
     $statusLabels = [
@@ -472,51 +484,51 @@ function sendMemberStatusUpdate(
 
         /* Tracking link */
         $trackingLink = $trackingId
-            ? "<a href='{$siteUrl}application-tracker.php' style='color:var(--primary-color);font-weight:600;'>
+            ? "<a href='{$siteUrl}application-tracker.php' style='color:{$primaryColor};font-weight:600;'>
                 Application Tracker ({$trackingId})
                </a>"
-            : "<a href='{$siteUrl}application-tracker.php' style='color:var(--primary-color);'>Application Tracker</a>";
+            : "<a href='{$siteUrl}application-tracker.php' style='color:{$primaryColor};'>Application Tracker</a>";
 
         $commentBlock = $adminComment
-            ? "<div style='background:#f0faf2;border-left:4px solid var(--primary-light);padding:12px 16px;margin-top:16px;border-radius:0 8px 8px 0;'>
-                <strong style='color:var(--primary-color);'>Admin को जवाफ:</strong><br>
+            ? "<div style='background:#f0faf2;border-left:4px solid {$primaryLight};padding:12px 16px;margin-top:16px;border-radius:0 8px 8px 0;'>
+                <strong style='color:{$primaryColor};'>Admin को जवाफ:</strong><br>
                 <p style='margin:6px 0 0;color:#333;'>" . nl2br(htmlspecialchars($adminComment)) . "</p>
                </div>"
             : '';
 
         $htmlBody = "<!DOCTYPE html>
 <html lang='ne'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'></head>
-<body style='margin:0;padding:0;background:#f4f6f9;font-family:Arial,sans-serif;'>
-<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6f9;padding:30px 0;'>
+<body style='margin:0;padding:0;background:{$emailBg};font-family:Arial,sans-serif;'>
+<table width='100%' cellpadding='0' cellspacing='0' style='background:{$emailBg};padding:30px 0;'>
 <tr><td align='center'>
 <table width='600' cellpadding='0' cellspacing='0'
-       style='background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);max-width:600px;'>
+       style='background:{$emailCardBg};border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(var(--primary-rgb,26,95,42),0.14);max-width:600px;border:1px solid {$emailCardBorder};'>
 
   <tr>
-    <td style='background:linear-gradient(135deg,var(--primary-color),var(--primary-light));padding:24px 32px;'>
-      <h1 style='color:#fff;margin:0;font-size:20px;'>{$siteName}</h1>
-      <p style='color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:14px;'>{$eventLabel} — Status Update</p>
+    <td style='background:linear-gradient(135deg,{$primaryColor},{$primaryLight});padding:24px 32px;'>
+      <h1 style='color:var(--text-on-primary,white);margin:0;font-size:20px;'>{$siteName}</h1>
+      <p style='color:color-mix(in srgb, var(--text-on-primary,white) 82%, transparent);margin:6px 0 0;font-size:14px;'>{$eventLabel} — Status Update</p>
     </td>
   </tr>
 
   <tr>
     <td style='padding:28px 32px;'>
-      <p style='color:#555;font-size:16px;'>नमस्ते <strong>" . htmlspecialchars($memberName) . "</strong>,</p>
-      <p style='color:#555;font-size:15px;'>तपाईंको <strong>{$eventLabel}</strong> को स्थिति अपडेट भएको जानकारी गराउँदछौं।</p>
+      <p style='color:var(--text-light,#555);font-size:16px;'>नमस्ते <strong>" . htmlspecialchars($memberName) . "</strong>,</p>
+      <p style='color:var(--text-light,#555);font-size:15px;'>तपाईंको <strong>{$eventLabel}</strong> को स्थिति अपडेट भएको जानकारी गराउँदछौं।</p>
 
       <table width='100%' cellpadding='0' cellspacing='0'
-             style='border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;margin-top:16px;'>
+             style='border:1px solid {$emailCardBorder};border-radius:8px;overflow:hidden;margin-top:16px;'>
         <tr>
-          <td style='padding:12px 16px;background:#f8f9fa;font-weight:600;color:#555;width:40%;'>आवेदन प्रकार</td>
-          <td style='padding:12px 16px;color:#222;'>{$eventLabel}</td>
+          <td style='padding:12px 16px;background:color-mix(in srgb, {$primaryColor} 6%, #f8f9fa);font-weight:600;color:var(--text-light,#555);width:40%;'>आवेदन प्रकार</td>
+          <td style='padding:12px 16px;color:var(--text-color,#222);'>{$eventLabel}</td>
         </tr>
-        <tr style='background:#f0faf2;'>
-          <td style='padding:12px 16px;font-weight:600;color:#555;'>नयाँ स्थिति</td>
-          <td style='padding:12px 16px;color:var(--primary-color);font-weight:700;font-size:16px;'>{$statusLabel}</td>
+        <tr style='background:color-mix(in srgb, {$primaryColor} 10%, white);'>
+          <td style='padding:12px 16px;font-weight:600;color:var(--text-light,#555);'>नयाँ स्थिति</td>
+          <td style='padding:12px 16px;color:{$primaryColor};font-weight:700;font-size:16px;'>{$statusLabel}</td>
         </tr>
         " . ($trackingId ? "<tr>
-          <td style='padding:12px 16px;font-weight:600;color:#555;'>Tracking ID</td>
-          <td style='padding:12px 16px;color:var(--primary-color);font-weight:600;'>{$trackingId}</td>
+          <td style='padding:12px 16px;font-weight:600;color:var(--text-light,#555);'>Tracking ID</td>
+          <td style='padding:12px 16px;color:{$primaryColor};font-weight:600;'>{$trackingId}</td>
         </tr>" : '') . "
       </table>
 
@@ -524,13 +536,13 @@ function sendMemberStatusUpdate(
 
       <div style='text-align:center;margin-top:24px;'>
         <a href='{$siteUrl}application-tracker.php'
-           style='background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;padding:12px 28px;
+           style='background:linear-gradient(135deg,{$primaryColor},{$primaryLight});color:var(--text-on-primary,white);padding:12px 28px;
                   border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;'>
           आफ्नो स्थिति हेर्नुहोस्
         </a>
       </div>
 
-      <p style='color:#999;font-size:12px;margin-top:24px;border-top:1px solid #eee;padding-top:16px;'>
+      <p style='color:var(--text-muted,#999);font-size:12px;margin-top:24px;border-top:1px solid {$emailCardBorder};padding-top:16px;'>
         यो automatic notification हो — {$siteName} © " . date('Y') . "<br>
         कुनै प्रश्न भएमा हाम्रो कार्यालयमा सम्पर्क गर्नुहोस्।
       </p>
@@ -740,8 +752,11 @@ function sendEmailNotificationRaw($eventType, $subject, $bodyText, $details, $tr
     $fromEmail = getSetting('notify_email_from', getSetting('site_email', 'noreply@localhost'));
 
     /* Wrap plain-text body into HTML (preserve newlines) */
-    $htmlBody = '<div style="font-family:Arial,sans-serif;color:#333;line-height:1.6;padding:20px;background:#f9f9f9;">'
-              . '<div style="max-width:600px;margin:0 auto;background:#fff;padding:30px;border-radius:8px;border:1px solid #e5e7eb;">'
+    $primaryColor = getSetting('primary_color', '#1a5f2a');
+    $emailBg      = 'color-mix(in srgb, ' . $primaryColor . ' 7%, #f9f9f9)';
+    $emailCardBorder = 'color-mix(in srgb, ' . $primaryColor . ' 14%, #e5e7eb)';
+    $htmlBody = '<div style="font-family:Arial,sans-serif;color:var(--text-color,#333);line-height:1.6;padding:20px;background:' . $emailBg . ';">'
+              . '<div style="max-width:600px;margin:0 auto;background:white;padding:30px;border-radius:8px;border:1px solid ' . $emailCardBorder . ';">'
               . nl2br(htmlspecialchars($bodyText, ENT_QUOTES, 'UTF-8'))
               . '</div></div>';
 

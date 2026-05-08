@@ -127,14 +127,14 @@ $greeting = $hour < 12 ? $_t('शुभ बिहान', 'Good Morning') : ($ho
 /* सबै Quick Apply → /member/ भित्र (कल्याण = native welfare.php, बाँकी = apply-frame) */
 $quickActions = [
     ['href' => $siteUrl.'member/apply-frame.php?p=appointment', 'icon' => 'fa-calendar-check',     'color' => 'var(--primary-color)', 'label' => $_t('भेटघाट', 'Appointment')],
-    ['href' => $siteUrl.'member/kyc.php',                        'icon' => 'fa-id-card',             'color' => 'var(--secondary-color,#c0392b)', 'label' => $_t('KYC दर्ता', 'KYC Registration')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark,#922b21)', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
+    ['href' => $siteUrl.'member/kyc.php',                        'icon' => 'fa-id-card',             'color' => 'var(--secondary-color)', 'label' => $_t('KYC दर्ता', 'KYC Registration')],
+    ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark,var(--secondary-color))', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
     ['href' => $siteUrl.'member/apply-frame.php?p=account',     'icon' => 'fa-university',          'color' => 'var(--primary-color)', 'label' => $_t('खाता खोल्ने', 'Open Account')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=digital',     'icon' => 'fa-laptop',              'color' => 'var(--secondary-color,#c0392b)', 'label' => $_t('डिजिटल सेवा', 'Digital Service')],
+    ['href' => $siteUrl.'member/apply-frame.php?p=digital',     'icon' => 'fa-laptop',              'color' => 'var(--secondary-color)', 'label' => $_t('डिजिटल सेवा', 'Digital Service')],
     ['href' => $siteUrl.'member/apply-frame.php?p=grievance',   'icon' => 'fa-comment-exclamation', 'color' => 'var(--secondary-color)', 'label' => $_t('गुनासो', 'Grievance')],
     ['href' => $siteUrl.'member/welfare.php',                   'icon' => 'fa-heart',               'color' => 'var(--secondary-color)', 'label' => $_t('कल्याण', 'Welfare')],
     ['href' => $siteUrl.'member/apply-frame.php?p=career',      'icon' => 'fa-briefcase',           'color' => 'var(--primary-dark)', 'label' => $_t('जागिर', 'Career')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=emi',         'icon' => 'fa-calculator',          'color' => 'var(--accent-color,#17a2b8)', 'label' => 'EMI Calculator'],
+    ['href' => $siteUrl.'member/apply-frame.php?p=emi',         'icon' => 'fa-calculator',          'color' => 'var(--accent-color)', 'label' => 'EMI Calculator'],
 ];
 $iconMap = [
     'success'=>['fas fa-circle-check','var(--primary-color)','color-mix(in srgb, var(--primary-color) 12%, white)'],
@@ -179,9 +179,19 @@ require __DIR__ . '/includes/chrome.php';
 .midx-ph-taken{color:var(--primary-color);}
 .midx-ph-org{color:var(--accent-color);font-size:.72rem;margin-right:4px;}
 .midx-ph-mini{font-size:.72rem;}
+.midx-alert-gap{margin-bottom:16px;}
+.midx-stat-brand{color:var(--primary-color);}
+.midx-card-gap{margin-bottom:18px;}
+.midx-action-icon{background:var(--midx-action-color,var(--primary-color));}
+.midx-ds-card-bg{background:var(--midx-ds-bg,color-mix(in srgb, var(--primary-color) 10%, white));}
+.midx-ds-icon-bg{background:var(--midx-ds-color,var(--primary-color));}
+.midx-notif-item{border-radius:8px;}
+.midx-notif-dot-icon{background:var(--midx-ic-bg,color-mix(in srgb, var(--primary-color) 10%, white));color:var(--midx-ic-color,var(--primary-color));}
+.midx-flex-grow{flex:1;min-width:0;}
+.midx-notif-dot-inline{position:static;}
 </style>
 <?php if ($welcome): ?>
-<div class="mem-alert mem-alert-success" style="margin-bottom:16px;">
+<div class="mem-alert mem-alert-success midx-alert-gap">
     <i class="fas fa-party-horn"></i>
     <?php echo $welcome === 'google' ? 'Google बाट ' : ($welcome === 'facebook' ? 'Facebook बाट ' : ''); ?>
     <?php echo $_t('स्वागत छ,', 'Welcome,'); ?> <strong><?php echo htmlspecialchars($memName); ?></strong>!
@@ -197,8 +207,8 @@ require __DIR__ . '/includes/chrome.php';
     <!-- Stat cards (Programs हटाइयो) -->
     <div class="mem-stats">
         <div class="mem-stat">
-            <div class="mem-stat-icon" style="color:var(--primary-color);">📋</div>
-            <div class="mem-stat-num"  style="color:var(--primary-color);"><?php echo $totalApps; ?></div>
+            <div class="mem-stat-icon midx-stat-brand">📋</div>
+            <div class="mem-stat-num midx-stat-brand"><?php echo $totalApps; ?></div>
             <div class="mem-stat-label"><?php echo $_t('कुल आवेदन', 'Total Applications'); ?></div>
         </div>
         <div class="mem-stat">
@@ -232,7 +242,7 @@ require __DIR__ . '/includes/chrome.php';
             <div class="mem-actions">
                 <?php foreach ($quickActions as $qa): ?>
                 <a href="<?php echo htmlspecialchars($qa['href']); ?>" class="mem-action-btn">
-                    <div class="mem-action-icon" style="background:<?php echo $qa['color']; ?>;"><i class="fas <?php echo $qa['icon']; ?>"></i></div>
+                    <div class="mem-action-icon midx-action-icon" style="--midx-action-color:<?php echo htmlspecialchars($qa['color'], ENT_QUOTES, 'UTF-8'); ?>;"><i class="fas <?php echo $qa['icon']; ?>"></i></div>
                     <?php echo $qa['label']; ?>
                 </a>
                 <?php endforeach; ?>
@@ -241,7 +251,7 @@ require __DIR__ . '/includes/chrome.php';
     </div>
 
     <!-- Digital Services -->
-    <div class="mem-card" style="margin-bottom:18px;">
+    <div class="mem-card midx-card-gap">
         <div class="mem-card-header">
             <div class="mem-card-title"><i class="fas fa-laptop-code"></i><?php echo $_t('डिजिटल सेवाहरू', 'Digital Services'); ?></div>
         </div>
@@ -268,8 +278,8 @@ require __DIR__ . '/includes/chrome.php';
                 foreach ($digitalServices as $ds): ?>
                 <a href="<?php echo htmlspecialchars($ds['href']); ?>"
                    <?php if (!empty($ds['target'])): ?>target="<?php echo $ds['target']; ?>" rel="noopener"<?php endif; ?>
-                   class="midx-ds-card" style="background:<?php echo $ds['bg']; ?>;">
-                    <div class="midx-ds-icon-wrap" style="background:<?php echo $ds['color']; ?>;">
+                   class="midx-ds-card midx-ds-card-bg" style="--midx-ds-bg:<?php echo htmlspecialchars($ds['bg'], ENT_QUOTES, 'UTF-8'); ?>;">
+                    <div class="midx-ds-icon-wrap midx-ds-icon-bg" style="--midx-ds-color:<?php echo htmlspecialchars($ds['color'], ENT_QUOTES, 'UTF-8'); ?>;">
                         <i class="<?php echo $ds['iconLib'] ?? 'fas'; ?> <?php echo $ds['icon']; ?> midx-ds-icon"></i>
                     </div>
                     <div class="midx-ds-label"><?php echo $ds['label']; ?></div>
@@ -316,9 +326,9 @@ require __DIR__ . '/includes/chrome.php';
                 </div>
                 <?php else: foreach ($recentApps as $app): ?>
                 <div class="mem-app-item">
-                    <div class="mem-app-icon" style="background:<?php echo $app['service_color']; ?>;"><i class="fas <?php echo $app['service_icon']; ?>"></i></div>
+                    <div class="mem-app-icon midx-action-icon" style="--midx-action-color:<?php echo htmlspecialchars($app['service_color'], ENT_QUOTES, 'UTF-8'); ?>;"><i class="fas <?php echo $app['service_icon']; ?>"></i></div>
                     <div class="mem-app-info">
-                        <div class="mem-app-service" style="color:<?php echo $app['service_color']; ?>;"><?php echo htmlspecialchars($app['service_name']); ?></div>
+                        <div class="mem-app-service midx-stat-brand" style="--midx-action-color:<?php echo htmlspecialchars($app['service_color'], ENT_QUOTES, 'UTF-8'); ?>;color:var(--midx-action-color,var(--primary-color));"><?php echo htmlspecialchars($app['service_name']); ?></div>
                         <div class="mem-app-detail"><?php echo htmlspecialchars($app['detail'] ?: '—'); ?></div>
                         <div class="mem-app-date"><?php echo formatNepaliDate($app['created_at'], true); ?></div>
                     </div>
@@ -334,7 +344,7 @@ require __DIR__ . '/includes/chrome.php';
         <div class="mem-card">
             <div class="mem-card-header">
                 <div class="mem-card-title"><i class="fas fa-bell"></i><?php echo $_t('सूचनाहरू', 'Notifications'); ?>
-                    <?php if ($unread > 0): ?><span class="mem-notif-dot" style="position:static;"><?php echo $unread; ?></span><?php endif; ?>
+                    <?php if ($unread > 0): ?><span class="mem-notif-dot midx-notif-dot-inline"><?php echo $unread; ?></span><?php endif; ?>
                 </div>
                 <a href="<?php echo $siteUrl; ?>member/notifications.php" class="midx-link"><?php echo $_t('सबै', 'All'); ?> →</a>
             </div>
@@ -344,9 +354,9 @@ require __DIR__ . '/includes/chrome.php';
                 <?php else:
                     foreach ($notifs as $n): $ic = $iconMap[$n['type']] ?? $iconMap['info'];
                 ?>
-                <div class="mem-notif-item <?php echo !$n['is_read'] ? 'unread' : ''; ?>" onclick="markRead(<?php echo $n['id']; ?>, this)" style="border-radius:8px;">
-                    <div class="mem-notif-dot-icon" style="background:<?php echo $ic[2]; ?>;color:<?php echo $ic[1]; ?>;"><i class="<?php echo $ic[0]; ?>"></i></div>
-                    <div style="flex:1;min-width:0;">
+                <div class="mem-notif-item midx-notif-item <?php echo !$n['is_read'] ? 'unread' : ''; ?>" onclick="markRead(<?php echo $n['id']; ?>, this)">
+                    <div class="mem-notif-dot-icon midx-notif-dot-icon" style="--midx-ic-bg:<?php echo htmlspecialchars($ic[2], ENT_QUOTES, 'UTF-8'); ?>;--midx-ic-color:<?php echo htmlspecialchars($ic[1], ENT_QUOTES, 'UTF-8'); ?>;"><i class="<?php echo $ic[0]; ?>"></i></div>
+                    <div class="midx-flex-grow">
                         <div class="mem-notif-title"><?php echo htmlspecialchars($n['title']); ?></div>
                         <div class="mem-notif-msg"><?php echo htmlspecialchars(mb_strimwidth($n['message'] ?? '', 0, 80, '…')); ?></div>
                         <div class="mem-notif-time"><?php echo formatNepaliDate($n['created_at'], true); ?></div>

@@ -431,6 +431,10 @@ body {
 }
 .pw-toggle:hover { color:var(--primary-color,#1a8754); }
 .field-feedback { font-size:12px; margin-top:4px; }
+.field-feedback.is-muted{color:var(--text-light,#6b7280);}
+.field-feedback.is-ok{color:var(--primary-color);}
+.field-feedback.is-bad{color:var(--secondary-color);}
+.field-feedback.is-warn{color:var(--secondary-dark,var(--secondary-color));}
 
 /* Button */
 .submit-btn {
@@ -478,9 +482,24 @@ body {
 .foot-link { text-align:center; margin-top:10px; font-size:.78rem; color:#6b7280; }
 .foot-link a { color:var(--primary-color,#1a8754); font-weight:600; text-decoration:none; }
 .foot-link a:hover { text-decoration:underline; }
+.login-logo-fallback{display:none;margin-bottom:0;}
+.twofa-qr-wrap{margin-bottom:12px;font-size:.78rem;}
+.twofa-qr-link{color:var(--primary-color,#1a8754);font-weight:600;}
+.forgot-wrap{text-align:right;margin-bottom:6px;}
+.forgot-link{font-size:.78rem;color:var(--primary-color,#1a8754);font-weight:600;text-decoration:none;}
+.req-star{color:var(--secondary-color);}
+.kyc-note{font-size:.78rem;padding:9px 12px;margin-bottom:14px;}
+.pw-strength{margin-top:5px;font-size:12px;}
 
 /* Password strength */
 .pw-rules { margin:6px 0 0; padding-left:0; font-size:11.5px; color:#6b7280; line-height:1.7; list-style:none; }
+.pw-rules li.rule-ok{color:var(--primary-color);}
+.pw-rules li.rule-muted{color:var(--text-muted,#9ca3af);}
+.pw-strength.str-0{color:var(--text-muted,#9ca3af);}
+.pw-strength.str-1{color:var(--secondary-color);}
+.pw-strength.str-2{color:var(--secondary-dark,var(--secondary-color));}
+.pw-strength.str-3{color:var(--accent-color,#ca8a04);}
+.pw-strength.str-4{color:var(--primary-color);}
 
 @media (max-width:480px) {
     body { padding: 48px 12px 16px; justify-content: flex-start; }
@@ -506,7 +525,7 @@ body {
             <div class="card-logo-wrap">
                 <img src="<?php echo htmlspecialchars($logoSrc); ?>" alt="<?php echo htmlspecialchars($siteName); ?>"
                      onerror="this.classList.add('card-logo-hide');var f=document.getElementById('loginLogoFallback');if(f)f.style.display='grid';">
-                <div id="loginLogoFallback" class="card-logo-icon" style="display:none;margin-bottom:0" aria-hidden="true"><i class="fas fa-building-columns"></i></div>
+                <div id="loginLogoFallback" class="card-logo-icon login-logo-fallback" aria-hidden="true"><i class="fas fa-building-columns"></i></div>
             </div>
         <?php else: ?>
             <div class="card-logo-icon"><i class="fas fa-building-columns"></i></div>
@@ -554,8 +573,8 @@ body {
                     <input type="text" readonly value="<?php echo htmlspecialchars((string)($member2faPending['secret'] ?? '')); ?>">
                 </div>
                 <?php if ($member2faSetupUri !== ''): ?>
-                <div style="margin-bottom:12px;font-size:.78rem;">
-                    <a href="https://chart.googleapis.com/chart?chs=220x220&cht=qr&chl=<?php echo urlencode($member2faSetupUri); ?>" target="_blank" rel="noopener" style="color:var(--primary-color,#1a8754);font-weight:600;">QR खोल्नुहोस् (scan गर्न)</a>
+                <div class="twofa-qr-wrap">
+                    <a href="https://chart.googleapis.com/chart?chs=220x220&cht=qr&chl=<?php echo urlencode($member2faSetupUri); ?>" target="_blank" rel="noopener" class="twofa-qr-link">QR खोल्नुहोस् (scan गर्न)</a>
                 </div>
                 <?php endif; ?>
             <?php else: ?>
@@ -600,8 +619,8 @@ body {
                     <button type="button" class="pw-toggle" onclick="togglePw('loginPw',this)"><i class="fas fa-eye"></i></button>
                 </div>
             </div>
-            <div style="text-align:right;margin-bottom:6px;">
-                <a href="<?php echo $siteUrl; ?>member/password-reset-request.php" style="font-size:.78rem;color:var(--primary-color,#1a8754);font-weight:600;text-decoration:none;"><?php echo $_t('पासवर्ड बिर्सनुभयो?', 'Forgot password?'); ?></a>
+            <div class="forgot-wrap">
+                <a href="<?php echo $siteUrl; ?>member/password-reset-request.php" class="forgot-link"><?php echo $_t('पासवर्ड बिर्सनुभयो?', 'Forgot password?'); ?></a>
             </div>
             <button type="submit" class="submit-btn">
                 <i class="fas fa-sign-in-alt"></i> <?php echo $_t('लगिन गर्नुहोस्', 'Login'); ?>
@@ -627,31 +646,31 @@ body {
             <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
             <input type="hidden" name="do_register" value="1">
             <div class="field">
-                <label><?php echo $_t('सदस्यता नम्बर', 'Member Number'); ?> <span style="color:red">*</span></label>
+                <label><?php echo $_t('सदस्यता नम्बर', 'Member Number'); ?> <span class="req-star">*</span></label>
                 <input type="text" name="sadasyata_number" id="regSadasyata" placeholder="<?php echo $_t('जस्तै: १२३४', 'e.g. 1234'); ?>" required>
                 <div class="field-feedback" id="fbSadasyata"></div>
             </div>
             <div class="field">
-                <label><?php echo $_t('इमेल', 'Email'); ?> <span style="color:red">*</span></label>
+                <label><?php echo $_t('इमेल', 'Email'); ?> <span class="req-star">*</span></label>
                 <input type="email" name="email" id="regEmail" placeholder="email@example.com" required>
                 <div class="field-feedback" id="fbEmail"></div>
             </div>
             <div class="field">
-                <label><?php echo $_t('मोबाइल नम्बर', 'Mobile Number'); ?> <span style="color:red">*</span></label>
+                <label><?php echo $_t('मोबाइल नम्बर', 'Mobile Number'); ?> <span class="req-star">*</span></label>
                 <input type="tel" name="phone" id="regPhone" placeholder="98XXXXXXXX" pattern="[0-9]{10}" maxlength="10" required>
                 <div class="field-feedback" id="fbPhone"></div>
             </div>
-            <div class="alert alert-info" style="font-size:.78rem;padding:9px 12px;margin-bottom:14px;">
+            <div class="alert alert-info kyc-note">
                 <i class="fas fa-circle-info"></i>
                 नाम KYC बाट स्वतः लिइन्छ। सदस्यता नम्बर + इमेल + मोबाइल KYC सँग मिल्नुपर्छ।
             </div>
             <div class="field">
-                <label><?php echo $_t('पासवर्ड', 'Password'); ?> <span style="color:red">*</span></label>
+                <label><?php echo $_t('पासवर्ड', 'Password'); ?> <span class="req-star">*</span></label>
                 <div class="pw-wrap">
                     <input type="password" name="password" id="regPw" placeholder="<?php echo $_t('८+ अक्षर, A-Z, a-z, 0-9 सहित', '8+ chars with A-Z, a-z, 0-9'); ?>" required minlength="8">
                     <button type="button" class="pw-toggle" onclick="togglePw('regPw',this)"><i class="fas fa-eye"></i></button>
                 </div>
-                <div class="pw-strength" id="pwStrength" style="margin-top:5px;font-size:12px;"></div>
+                <div class="pw-strength" id="pwStrength"></div>
                 <ul class="pw-rules" id="pwRules">
                     <li data-rule="len">○ कम्तिमा ८ अक्षर</li>
                     <li data-rule="upper">○ १ Capital letter (A-Z)</li>
@@ -660,7 +679,7 @@ body {
                 </ul>
             </div>
             <div class="field">
-                <label><?php echo $_t('पासवर्ड पुनः', 'Confirm Password'); ?> <span style="color:red">*</span></label>
+                <label><?php echo $_t('पासवर्ड पुनः', 'Confirm Password'); ?> <span class="req-star">*</span></label>
                 <input type="password" name="confirm" id="regConfirm" placeholder="<?php echo $_t('माथिको जस्तै', 'Same as above'); ?>" required>
                 <div class="field-feedback" id="fbConfirm"></div>
             </div>
@@ -744,7 +763,8 @@ document.querySelectorAll('form').forEach(function(form){
   function setRule(name, ok){
     var li = pwRules && pwRules.querySelector('[data-rule="'+name+'"]');
     if (!li) return;
-    li.style.color = ok ? '#059669' : '#9ca3af';
+    li.classList.remove('rule-ok', 'rule-muted');
+    li.classList.add(ok ? 'rule-ok' : 'rule-muted');
     li.textContent = (ok ? '✓ ' : '○ ') + li.textContent.replace(/^[✓○]\s*/, '');
   }
   function checkPw(){
@@ -753,10 +773,10 @@ document.querySelectorAll('form').forEach(function(form){
     setRule('len', rLen); setRule('upper', rUp); setRule('lower', rLo); setRule('digit', rDi);
     var score = rLen + rUp + rLo + rDi;
     var labels = ['', 'धेरै कमजोर', 'कमजोर', 'ठीकै', 'बलियो'];
-    var colors = ['#9ca3af','#dc2626','#ea580c','#ca8a04','#059669'];
     if (pwMeter) {
       pwMeter.textContent = v ? ('Password strength: ' + labels[score]) : '';
-      pwMeter.style.color = colors[score] || '#9ca3af';
+      pwMeter.classList.remove('str-0','str-1','str-2','str-3','str-4');
+      pwMeter.classList.add('str-' + String(score));
     }
     state.pwOk = score === 4;
     refreshBtn();
@@ -767,9 +787,9 @@ document.querySelectorAll('form').forEach(function(form){
     state.confirmOk = !!match;
     if (fbConf){
       fbConf.textContent = pwConf.value ? (match ? '✓ मेल खायो' : '✗ पासवर्ड मेल खाएन') : '';
-      fbConf.style.color = match ? '#059669' : '#dc2626';
-      fbConf.style.fontSize = '12px';
-      fbConf.style.marginTop = '4px';
+      fbConf.classList.remove('is-ok','is-bad','is-muted','is-warn');
+      if (!pwConf.value) fbConf.classList.add('is-muted');
+      else fbConf.classList.add(match ? 'is-ok' : 'is-bad');
     }
     refreshBtn();
   }
@@ -786,19 +806,20 @@ document.querySelectorAll('form').forEach(function(form){
     if (field === 'phone' && !/^[0-9]{7,15}$/.test(v)) { return; }
     if (field === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { return; }
     fb.textContent = '⏳ जाँच हुँदै…';
-    fb.style.color = '#6b7280';
-    fb.style.fontSize = '12px';
-    fb.style.marginTop = '4px';
+    fb.classList.remove('is-ok','is-bad','is-muted','is-warn');
+    fb.classList.add('is-muted');
     fetch('<?php echo SITE_URL; ?>member/check-availability.php?field='+encodeURIComponent(field)+'&value='+encodeURIComponent(v))
       .then(function(r){ return r.json(); })
       .then(function(j){
         if (j && j.available) {
           fb.textContent = '✓ उपलब्ध छ';
-          fb.style.color = '#059669';
+          fb.classList.remove('is-muted','is-bad','is-warn');
+          fb.classList.add('is-ok');
           state.dupOk = true;
         } else {
           fb.textContent = '✗ ' + (j && j.message ? j.message : 'पहिले नै दर्ता भएको छ');
-          fb.style.color = '#dc2626';
+          fb.classList.remove('is-muted','is-ok','is-warn');
+          fb.classList.add('is-bad');
           state.dupOk = false;
         }
         refreshBtn();

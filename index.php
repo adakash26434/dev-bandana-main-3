@@ -967,7 +967,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
         <div class="section-header section-header-unified text-center mb-5" data-aos="fade-up">
             <div class="section-badge-wrap">
                 <!-- Gold star badge -->
-                <span class="section-badge" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;">
+                <span class="section-badge section-badge-spotlight">
                     <i class="fas fa-trophy"></i>
                     <?php echo isEnglish() ? 'Annual Spotlight' : 'वार्षिक सम्मान'; ?>
                 </span>
@@ -1083,7 +1083,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 
 /* Section background — हल्का golden tint */
 .member-spotlight-section {
-    background: linear-gradient(135deg, #fffbf0 0%, #fff8e1 50%, #fffbf0 100%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 8%, white) 0%, color-mix(in srgb, var(--secondary-color) 12%, white) 50%, color-mix(in srgb, var(--secondary-color) 8%, white) 100%);
     position: relative;
     overflow: hidden;
 }
@@ -1096,29 +1096,29 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at 30% 30%, rgba(245,158,11,0.04) 0%, transparent 60%),
-                radial-gradient(circle at 70% 70%, rgba(26,95,42,0.03) 0%, transparent 60%);
+    background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--secondary-color) 10%, transparent) 0%, transparent 60%),
+                radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--primary-color) 8%, transparent) 0%, transparent 60%);
     pointer-events: none;
 }
 
 /* Main spotlight card */
 .spotlight-card {
-    background: #fff;
+    background: white;
     border-radius: 20px;
-    box-shadow: 0 16px 48px rgba(245,158,11,0.14), 0 4px 16px rgba(0,0,0,0.06);
+    box-shadow: 0 16px 48px rgba(var(--secondary-rgb,192,57,43),0.14), 0 4px 16px rgba(0,0,0,0.06);
     overflow: hidden;
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .spotlight-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 24px 64px rgba(245,158,11,0.2), 0 8px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 24px 64px rgba(var(--secondary-rgb,192,57,43),0.2), 0 8px 24px rgba(0,0,0,0.08);
 }
 
 /* Gold top accent bar */
 .spotlight-top-bar {
     height: 6px;
-    background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b, #d97706);
+    background: linear-gradient(90deg, var(--secondary-color), color-mix(in srgb, var(--secondary-color) 70%, white), var(--secondary-color), var(--secondary-dark,var(--secondary-color)));
     background-size: 300% 100%;
     animation: shimmer-bar 3s linear infinite;
 }
@@ -1151,8 +1151,8 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    border: 5px solid #f59e0b; /* golden border */
-    box-shadow: 0 0 0 4px rgba(245,158,11,0.2), 0 8px 20px rgba(0,0,0,0.12);
+    border: 5px solid var(--secondary-color);
+    box-shadow: 0 0 0 4px rgba(var(--secondary-rgb,192,57,43),0.2), 0 8px 20px rgba(0,0,0,0.12);
     display: block;
 }
 
@@ -1160,16 +1160,16 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 18%, white), color-mix(in srgb, var(--secondary-color) 28%, white));
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 5px solid #f59e0b;
-    box-shadow: 0 0 0 4px rgba(245,158,11,0.2);
+    border: 5px solid var(--secondary-color);
+    box-shadow: 0 0 0 4px rgba(var(--secondary-rgb,192,57,43),0.2);
 }
 .spotlight-photo-placeholder i {
     font-size: 4rem;
-    color: #d97706;
+    color: var(--secondary-dark,var(--secondary-color));
     opacity: 0.6;
 }
 
@@ -1180,13 +1180,13 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg,var(--primary-color),var(--primary-light));
-    color: #fff;
+    color: var(--text-on-primary, #fff);
     font-size: 0.7rem;
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 20px;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(26,95,42,0.3);
+    box-shadow: 0 2px 8px rgba(var(--primary-rgb,26,95,42),0.3);
 }
 
 /* Info column */
@@ -1199,21 +1199,21 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 .spotlight-tag {
     display: inline-flex;
     align-items: center;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 18%, white), color-mix(in srgb, var(--secondary-color) 28%, white));
+    color: var(--secondary-dark,var(--secondary-color));
     font-size: 0.78rem;
     font-weight: 700;
     padding: 5px 12px;
     border-radius: 20px;
     margin-bottom: 10px;
-    border: 1px solid rgba(245,158,11,0.3);
+    border: 1px solid rgba(var(--secondary-rgb,192,57,43),0.3);
 }
 
 /* Member name */
 .spotlight-name {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-color,#1a202c);
     margin-bottom: 8px;
     line-height: 1.2;
 }
@@ -1227,7 +1227,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 }
 .spotlight-meta-item {
     font-size: 0.82rem;
-    color: #666;
+    color: var(--text-light,#666);
     display: flex;
     align-items: center;
     gap: 5px;
@@ -1244,32 +1244,32 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 .spotlight-achievement {
     display: inline-flex;
     align-items: center;
-    background: linear-gradient(135deg, #e8f5e9, #dcfce7);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 12%, white), color-mix(in srgb, var(--primary-color) 20%, white));
     color: var(--primary-color);
     font-size: 0.82rem;
     font-weight: 600;
     padding: 6px 14px;
     border-radius: 20px;
     margin-bottom: 14px;
-    border: 1px solid rgba(26,95,42,0.15);
+    border: 1px solid rgba(var(--primary-rgb,26,95,42),0.15);
 }
-.spotlight-achievement i { color: #f59e0b; margin-right: 5px; }
+.spotlight-achievement i { color: var(--secondary-color); margin-right: 5px; }
 
 /* Quote */
 .spotlight-quote {
-    background: linear-gradient(135deg, #fffbf0, #fef3c7);
-    border-left: 4px solid #f59e0b;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 8%, white), color-mix(in srgb, var(--secondary-color) 18%, white));
+    border-left: 4px solid var(--secondary-color);
     border-radius: 0 10px 10px 0;
     padding: 12px 16px;
     margin: 0;
     position: relative;
     font-style: italic;
-    color: #555;
+    color: var(--text-light,#555);
     font-size: 0.9rem;
     line-height: 1.6;
 }
 .spotlight-quote .fa-quote-left {
-    color: #f59e0b;
+    color: var(--secondary-color);
     font-size: 1.1rem;
     margin-right: 8px;
     opacity: 0.7;
@@ -1282,10 +1282,11 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 }
 .spotlight-stars i {
     position: absolute;
-    color: #f59e0b;
+    color: var(--secondary-color);
     opacity: 0.12;
     animation: twinkle 3s ease-in-out infinite;
 }
+.section-badge-spotlight { background:linear-gradient(135deg,var(--secondary-color),var(--secondary-dark,var(--secondary-color)));color:var(--text-on-secondary,var(--text-on-primary,#fff)); }
 .star-1 { font-size: 2rem; top: 16px; right: 24px; animation-delay: 0s; }
 .star-2 { font-size: 1rem; top: 48px; right: 56px; animation-delay: 0.8s; }
 .star-3 { font-size: 1.5rem; bottom: 20px; right: 40px; animation-delay: 1.4s; }

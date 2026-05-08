@@ -119,8 +119,20 @@ $slidersArch = $slPart['archived'];
 <?php echo adminHelpTip('यो पृष्ठबाट Homepage को Slider/Banner Images व्यवस्थापन गर्न सकिन्छ।', ['नयाँ Slider थप्न: "+" बटन थिच्नुहोस्।', 'Image size: 1920×600 pixels उपयुक्त छ।', 'Order मिलाउन: Display Order number बदल्नुहोस् (सानो number = पहिला देखिन्छ)।']); ?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
+<style>
+.sl-info-left{border-left:4px solid var(--accent-color,#17a2b8);}
+.sl-flat-top{border-top-left-radius:0!important;border-top-right-radius:0!important;}
+.sl-search-wrap{flex-wrap:wrap;}
+.sl-search-group{max-width:300px;}
+.sl-prev-img{width:110px;height:40px;object-fit:cover;border-radius:8px;border:2px solid color-mix(in srgb, var(--primary-color) 20%, white);}
+.sl-prev-empty{width:110px;height:40px;background:color-mix(in srgb, var(--primary-color) 8%, white);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.sl-inline-form{display:inline;}
+.sl-form-header{background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:var(--text-on-primary,white);}
+.sl-edit-prev{max-height:70px;border-radius:8px;border:2px solid color-mix(in srgb, var(--primary-color) 20%, white);}
+.sl-prev-upload{max-height:70px;border-radius:8px;border:2px solid var(--primary-light);}
+</style>
 
-<div class="alert alert-info mb-3" style="border-left:4px solid #17a2b8;">
+<div class="alert alert-info mb-3 sl-info-left">
     <i class="fas fa-info-circle me-2"></i>
     <strong>छवि आकार:</strong> स्लाइडर छविहरू स्वतः <strong>1920×600 pixels</strong> मा resize हुन्छ। सिफारिस: landscape (चौडा) छवि प्रयोग गर्नुहोस्।
 </div>
@@ -143,11 +155,11 @@ $slidersArch = $slPart['archived'];
 
     <!-- ══ TAB 1: सूची ══ -->
     <div class="tab-pane fade show active" id="sl-list">
-        <div class="card admin-table-card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
+        <div class="card admin-table-card sl-flat-top">
 
             <!-- खोज बक्स — client-side filter -->
-            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3" style="flex-wrap:wrap">
-                <div class="input-group input-group-sm" style="max-width:300px">
+            <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 sl-search-wrap">
+                <div class="input-group input-group-sm sl-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-table-search" placeholder="नाम, विवरण अनुसार खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -185,9 +197,9 @@ $slidersArch = $slPart['archived'];
                             <tr>
                                 <td class="ps-3">
                                     <?php if (!empty($sl['image'])): ?>
-                                    <img src="../<?php echo htmlspecialchars($sl['image']); ?>" style="width:110px;height:40px;object-fit:cover;border-radius:8px;border:2px solid #e0f0e8;">
+                                    <img src="../<?php echo htmlspecialchars($sl['image']); ?>" class="sl-prev-img">
                                     <?php else: ?>
-                                    <div style="width:110px;height:40px;background:rgba(26,95,42,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-image text-muted"></i></div>
+                                    <div class="sl-prev-empty"><i class="fas fa-image text-muted"></i></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -210,7 +222,7 @@ $slidersArch = $slPart['archived'];
                                             title="सम्पादन">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो स्लाइडर मेटाउन निश्चित हुनुहुन्छ?')">
+                                    <form method="POST" class="sl-inline-form" onsubmit="return confirm('के तपाईं यो स्लाइडर मेटाउन निश्चित हुनुहुन्छ?')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $sl['id']; ?>">
@@ -247,9 +259,9 @@ $slidersArch = $slPart['archived'];
                             <tr>
                                 <td class="ps-3">
                                     <?php if (!empty($sl['image'])): ?>
-                                    <img src="../<?php echo htmlspecialchars($sl['image']); ?>" style="width:110px;height:40px;object-fit:cover;border-radius:8px;border:2px solid #e0f0e8;">
+                                    <img src="../<?php echo htmlspecialchars($sl['image']); ?>" class="sl-prev-img">
                                     <?php else: ?>
-                                    <div style="width:110px;height:40px;background:rgba(26,95,42,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-image text-muted"></i></div>
+                                    <div class="sl-prev-empty"><i class="fas fa-image text-muted"></i></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -272,7 +284,7 @@ $slidersArch = $slPart['archived'];
                                             title="सम्पादन">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('के तपाईं यो स्लाइडर मेटाउन निश्चित हुनुहुन्छ?')">
+                                    <form method="POST" class="sl-inline-form" onsubmit="return confirm('के तपाईं यो स्लाइडर मेटाउन निश्चित हुनुहुन्छ?')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $sl['id']; ?>">
@@ -292,8 +304,8 @@ $slidersArch = $slPart['archived'];
 
     <!-- ══ TAB 2: Add / Edit Form ══ -->
     <div class="tab-pane fade" id="sl-form">
-        <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
+        <div class="card sl-flat-top">
+            <div class="card-header d-flex justify-content-between align-items-center sl-form-header">
                 <h5 class="mb-0 fw-bold" id="slFormTitle">
                     <i class="fas fa-plus-circle me-2"></i>नयाँ स्लाइडर थप्नुहोस्
                 </h5>
@@ -414,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('slf_img_required').style.display = 'none';
             var prev = document.getElementById('slf_img_prev');
             prev.innerHTML = d.image
-                ? '<img src="../' + d.image + '" style="max-height:70px;border-radius:8px;border:2px solid #e0f0e8;">'
+                ? '<img src="../' + d.image + '" class="sl-edit-prev">'
                 : '';
             document.getElementById('slf_submit').innerHTML = '<i class="fas fa-save me-2"></i>अपडेट गर्नुहोस्';
             document.getElementById('slFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>स्लाइडर सम्पादन';
@@ -429,7 +441,7 @@ function previewSliderImg(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
         reader.onload = function(e) {
-            prev.innerHTML = '<img src="' + e.target.result + '" style="max-height:70px;border-radius:8px;border:2px solid var(--primary-light);">';
+            prev.innerHTML = '<img src="' + e.target.result + '" class="sl-prev-upload">';
         };
         reader.readAsDataURL(input.files[0]);
     }

@@ -208,7 +208,7 @@ if (!$request) {
 </div>
 
 <style>
-.info-section { background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+.info-section { background: color-mix(in srgb, var(--primary-color) 8%, white); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
 .info-section h6 { color: var(--primary-color); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-color); }
 .info-section p { margin-bottom: 8px; }
 </style>

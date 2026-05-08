@@ -168,15 +168,15 @@ require_once 'includes/header.php';
 <section class="section-padding">
     <div class="container">
         <?php if ($success): ?>
-        <div class="text-center py-4 px-3 rounded-4 mb-4" style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:2px solid #c8e6c9;">
-            <div style="font-size:3rem;color:var(--primary-light);"><i class="fas fa-check-circle"></i></div>
+        <div class="text-center py-4 px-3 rounded-4 mb-4 cd-success-wrap">
+            <div class="cd-success-icon"><i class="fas fa-check-circle"></i></div>
             <h4 class="mt-2 fw-bold text-success"><?php echo isEnglish() ? 'Application Submitted Successfully!' : 'आवेदन सफलतापूर्वक पेश भयो!'; ?></h4>
             <p class="text-muted mb-3"><?php echo isEnglish() ? 'We will contact you soon.' : 'हामी चाँडै तपाईंलाई सम्पर्क गर्नेछौं।'; ?></p>
-            <div class="d-inline-block px-4 py-3 rounded-3 mb-3" style="background:#f0fff4;border:2px dashed var(--primary-light);">
+            <div class="d-inline-block px-4 py-3 rounded-3 mb-3 cd-success-track-wrap">
                 <div class="text-muted small mb-2"><?php echo isEnglish() ? 'Your Tracking ID — save this!' : 'तपाईंको Tracking ID — सुरक्षित राख्नुहोस्!'; ?></div>
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <div class="fw-bold fs-5 text-success font-monospace" id="jobTrkId"><?php echo e($successTrackingId ?? ''); ?></div>
-                    <button type="button" onclick="copyTrk('jobTrkId',this)" class="btn btn-sm btn-outline-success py-0 px-2" title="Copy" style="font-size:11px;line-height:1.8;"><i class="fas fa-copy"></i></button>
+                    <button type="button" onclick="copyTrk('jobTrkId',this)" class="btn btn-sm btn-outline-success py-0 px-2 cd-copy-btn" title="Copy"><i class="fas fa-copy"></i></button>
                 </div>
                 <div class="small text-muted"><a href="application-tracker.php" class="text-success text-decoration-none fw-semibold">यहाँ बाट</a> Application Tracker मा स्थिति हेर्नुहोस्।</div>
             </div>
@@ -487,7 +487,7 @@ require_once 'includes/header.php';
 .job-detail-card {
     background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 15px rgba(var(--primary-rgb,26,95,42),0.12);
     overflow: hidden;
     margin-bottom: 30px;
 }
@@ -524,14 +524,14 @@ require_once 'includes/header.php';
 }
 
 .job-type-badge {
-    background: rgba(255,255,255,0.2);
+    background: color-mix(in srgb, var(--text-on-primary,white) 20%, transparent);
     padding: 3px 12px;
     border-radius: 20px;
     font-size: 12px;
 }
 
 .deadline-badge {
-    background: rgba(255,255,255,0.2);
+    background: color-mix(in srgb, var(--text-on-primary,white) 20%, transparent);
     padding: 8px 15px;
     border-radius: 8px;
     font-size: 14px;
@@ -541,7 +541,7 @@ require_once 'includes/header.php';
 }
 
 .deadline-badge.expired {
-    background: rgba(220, 53, 69, 0.3);
+    background: color-mix(in srgb, var(--secondary-color) 26%, transparent);
 }
 
 .job-detail-body {
@@ -551,7 +551,7 @@ require_once 'includes/header.php';
 .job-info-row {
     display: flex;
     padding: 12px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 12%, #eee);
 }
 
 .job-info-row .label {
@@ -583,7 +583,7 @@ require_once 'includes/header.php';
 
 .job-detail-footer {
     padding: 20px 30px;
-    background: #f8f9fa;
+    background: color-mix(in srgb, var(--primary-color) 6%, #f8f9fa);
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
@@ -593,7 +593,7 @@ require_once 'includes/header.php';
 .application-form-section {
     background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 15px rgba(var(--primary-rgb,26,95,42),0.12);
     padding: 30px;
     margin-top: 30px;
 }
@@ -612,7 +612,7 @@ require_once 'includes/header.php';
 }
 
 .form-section {
-    background: #f8f9fa;
+    background: color-mix(in srgb, var(--primary-color) 6%, #f8f9fa);
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -622,7 +622,7 @@ require_once 'includes/header.php';
     color: var(--text-dark);
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 16%, #ddd);
 }
 
 /* Job Summary Sidebar */
@@ -636,7 +636,7 @@ require_once 'includes/header.php';
     display: flex;
     gap: 15px;
     padding: 15px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 12%, #eee);
 }
 
 .job-summary .summary-list li:last-child {
@@ -683,10 +683,14 @@ require_once 'includes/header.php';
     color: var(--white);
 }
 
-.share-btn.facebook { background: #1877f2; }
-.share-btn.twitter { background: #1da1f2; }
-.share-btn.linkedin { background: #0077b5; }
-.share-btn.whatsapp { background: #25d366; }
+.share-btn.facebook { background: color-mix(in srgb, var(--accent-color,#1877f2) 88%, #1877f2); }
+.share-btn.twitter { background: color-mix(in srgb, var(--accent-color,#1da1f2) 88%, #1da1f2); }
+.share-btn.linkedin { background: color-mix(in srgb, var(--primary-dark,#0077b5) 82%, #0077b5); }
+.share-btn.whatsapp { background: color-mix(in srgb, var(--primary-color,#25d366) 86%, #25d366); }
+.cd-success-wrap{background:linear-gradient(135deg,color-mix(in srgb, var(--primary-color) 14%, white),color-mix(in srgb, var(--primary-color) 9%, white));border:2px solid color-mix(in srgb, var(--primary-color) 30%, white);}
+.cd-success-icon{font-size:3rem;color:var(--primary-light);}
+.cd-success-track-wrap{background:color-mix(in srgb, var(--primary-color) 8%, white);border:2px dashed var(--primary-light);}
+.cd-copy-btn{font-size:11px;line-height:1.8;}
 
 /* Application form initially hidden */
 .application-form-section {

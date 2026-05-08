@@ -261,21 +261,17 @@ echo adminPageHeader(
 
 <div class="admin-table-card">
   <!-- ── Live Search / Filter Bar ── -->
-  <div class="ip-search-bar d-flex flex-wrap align-items-center gap-2 px-3 py-3"
-       style="border-bottom:1px solid color-mix(in srgb, var(--primary-color) 18%, #fff);background:color-mix(in srgb, var(--primary-color) 4%, #fff);">
-    <div class="input-group" style="max-width:280px;">
-      <span class="input-group-text bg-white border-end-0"
-            style="border-color:color-mix(in srgb, var(--primary-color) 32%, #fff);">
+  <div class="ip-search-bar d-flex flex-wrap align-items-center gap-2 px-3 py-3 ip-search-shell">
+    <div class="input-group ip-search-group">
+      <span class="input-group-text bg-white border-end-0 ip-search-addon">
         <i class="fas fa-search text-success"></i>
       </span>
       <input type="text" id="ipSearchFY"
-             class="form-control border-start-0"
+             class="form-control border-start-0 ip-search-input"
              placeholder="आ.व. खोज्नुहोस् (जस्तै: 2080/81)"
-             style="border-color:color-mix(in srgb, var(--primary-color) 32%, #fff);"
              autocomplete="off">
     </div>
-    <select id="ipFilterStatus" class="form-select"
-            style="max-width:160px;border-color:color-mix(in srgb, var(--primary-color) 32%, #fff);">
+    <select id="ipFilterStatus" class="form-select ip-filter-select">
       <option value="">सबै स्थिति</option>
       <option value="active">Active मात्र</option>
       <option value="inactive">Inactive मात्र</option>
@@ -285,8 +281,7 @@ echo adminPageHeader(
             title="Filter हटाउनुहोस्" style="display:none;">
       <i class="fas fa-times me-1"></i>Clear
     </button>
-    <span id="ipCountBadge" class="ms-auto badge"
-          style="background:color-mix(in srgb, var(--primary-color) 13%, #fff);color:var(--primary-color);font-size:0.78rem;padding:0.42em 0.72em;border-radius:999px;">
+    <span id="ipCountBadge" class="ms-auto badge ip-count-badge ip-count-default">
       <?php echo $totalRecords; ?> records
     </span>
   </div>
@@ -319,12 +314,12 @@ echo adminPageHeader(
           <th class="ip-col ip-col-shared">कुल सम्पत्ति</th>
           <th class="ip-col ip-col-shared">NPA %</th>
           <th class="ip-col ip-col-shared">स्थिति</th>
-          <th class="ip-col ip-col-shared" style="min-width:120px;">कार्य</th>
+          <th class="ip-col ip-col-shared ip-col-actions">कार्य</th>
         </tr>
       </thead>
       <tbody>
         <!-- no-results row: filter mismatch bhaye dekhinccha -->
-        <tr id="ipNoResults" style="display:none;" class="ip-no-results-row">
+        <tr id="ipNoResults" class="ip-no-results-row ip-hidden">
           <td colspan="11" class="text-center py-5">
             <i class="fas fa-search fa-2x text-muted mb-2 d-block"></i>
             <span class="text-muted">खोजी अनुसार कुनै record भेटिएन।</span>
@@ -448,8 +443,7 @@ echo adminPageHeader(
                        class="form-control nepali-datepicker"
                        value="' . htmlspecialchars((string)$v('report_date_bs')) . '"
                        placeholder="YYYY-MM-DD" autocomplete="off">
-                <span class="input-group-text bg-success text-white border-success ndp-trigger"
-                      style="cursor:pointer;" title="क्यालेन्डर खोल्नुहोस्">
+                <span class="input-group-text bg-success text-white border-success ndp-trigger ip-pointer" title="क्यालेन्डर खोल्नुहोस्">
                   <i class="fas fa-calendar-alt"></i>
                 </span>
               </div>
@@ -666,7 +660,7 @@ elseif (!$tableExists): ?>
   font-size: .73rem;
   letter-spacing: .25px;
   text-transform: uppercase;
-  color: #475569;
+  color: var(--text-color,#475569);
   white-space: nowrap;
 }
 #ipTable tbody td {
@@ -674,7 +668,7 @@ elseif (!$tableExists): ?>
   vertical-align: middle;
 }
 #ipTable tbody tr.ip-data-row:hover {
-  background: color-mix(in srgb, var(--primary-color) 3%, #fff);
+  background: color-mix(in srgb, var(--primary-color) 3%, white);
 }
 #ipTable .btn,
 #ipTable .btn-sm {
@@ -684,11 +678,21 @@ elseif (!$tableExists): ?>
 }
 #ipTable .d-flex.gap-1 { gap: 4px !important; }
 #ipTable .badge { font-size: .72rem; padding: .36em .62em; border-radius: 999px; }
-#ipTable .npa-good { background: color-mix(in srgb, var(--primary-color) 14%, #fff) !important; color: var(--primary-dark) !important; }
-#ipTable .npa-warning { background: color-mix(in srgb, var(--secondary-color) 16%, #fff) !important; color: var(--secondary-dark, var(--secondary-color)) !important; }
-#ipTable .npa-danger { background: color-mix(in srgb, #dc3545 14%, #fff) !important; color: #b42318 !important; }
+#ipTable .npa-good { background: color-mix(in srgb, var(--primary-color) 14%, white) !important; color: var(--primary-dark) !important; }
+#ipTable .npa-warning { background: color-mix(in srgb, var(--secondary-color) 16%, white) !important; color: var(--secondary-dark, var(--secondary-color)) !important; }
+#ipTable .npa-danger { background: color-mix(in srgb, var(--secondary-color) 18%, white) !important; color: var(--secondary-dark, var(--secondary-color)) !important; }
 .ip-search-bar .input-group-text i { font-size: 12px; }
-.form-footer { border-top: 1px solid var(--border-color, #e5e7eb); padding: 12px 16px; background: #fff; display:flex; gap:8px; align-items:center; }
+.form-footer { border-top: 1px solid var(--border-color, #e5e7eb); padding: 12px 16px; background: white; display:flex; gap:8px; align-items:center; }
+.ip-search-shell{border-bottom:1px solid color-mix(in srgb, var(--primary-color) 18%, white);background:color-mix(in srgb, var(--primary-color) 4%, white);}
+.ip-search-group{max-width:280px;}
+.ip-search-addon,.ip-search-input,.ip-filter-select{border-color:color-mix(in srgb, var(--primary-color) 32%, white);}
+.ip-filter-select{max-width:160px;}
+.ip-count-badge{font-size:.78rem;padding:.42em .72em;border-radius:999px;}
+.ip-count-default{background:color-mix(in srgb, var(--primary-color) 13%, white);color:var(--primary-color);}
+.ip-count-empty{background:color-mix(in srgb, var(--secondary-color) 16%, white);color:var(--secondary-dark,var(--secondary-color));}
+.ip-col-actions{min-width:120px;}
+.ip-hidden{display:none;}
+.ip-pointer{cursor:pointer;}
 @media (max-width: 768px) {
   #ipTable { font-size: .8rem; }
   #ipTable thead th, #ipTable tbody td { padding: 8px 8px; }
@@ -737,12 +741,12 @@ elseif (!$tableExists): ?>
         if (countBadge) {
             if (query || status) {
                 countBadge.textContent = visible + ' / ' + totalRows + ' records';
-                countBadge.style.background = visible === 0 ? 'color-mix(in srgb, #dc3545 16%, #fff)' : 'color-mix(in srgb, var(--primary-color) 13%, #fff)';
-                countBadge.style.color      = visible === 0 ? '#b42318' : 'var(--primary-color)';
+                countBadge.classList.remove('ip-count-default', 'ip-count-empty');
+                countBadge.classList.add(visible === 0 ? 'ip-count-empty' : 'ip-count-default');
             } else {
                 countBadge.textContent = totalRows + ' records';
-                countBadge.style.background = 'color-mix(in srgb, var(--primary-color) 13%, #fff)';
-                countBadge.style.color      = 'var(--primary-color)';
+                countBadge.classList.remove('ip-count-empty');
+                countBadge.classList.add('ip-count-default');
             }
         }
 
@@ -810,7 +814,7 @@ function clearIPFilter() {
     if (nr) nr.style.display = 'none';
     var cb = document.getElementById('ipCountBadge');
     var total = document.querySelectorAll('tr.ip-data-row').length;
-    if (cb) { cb.textContent = total + ' records'; cb.style.background = '#e8f5e9'; cb.style.color = 'var(--primary-color)'; }
+    if (cb) { cb.textContent = total + ' records'; cb.classList.remove('ip-count-empty'); cb.classList.add('ip-count-default'); }
     var clr = document.getElementById('ipClearFilter');
     if (clr) clr.style.display = 'none';
     if (s) s.focus();

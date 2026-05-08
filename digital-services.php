@@ -272,7 +272,7 @@ require_once 'includes/header.php';
             </div>
             <div class="col-md-3 col-6">
                 <div class="card border-0 shadow-sm text-center p-3 h-100">
-                    <div class="mb-2" style="font-size:2rem;color:#17a2b8;"><i class="fas fa-id-card"></i></div>
+                    <div class="mb-2" style="font-size:2rem;color:var(--accent-color,#17a2b8);"><i class="fas fa-id-card"></i></div>
                     <h6 class="fw-600"><?php echo isEnglish() ? '3. Get Tracking ID' : '३. Tracking ID पाउनुहोस्'; ?></h6>
                     <p class="text-muted small mb-0"><?php echo isEnglish() ? 'A unique code is issued instantly.' : 'तुरुन्तै unique code पाउनुहुन्छ।'; ?></p>
                 </div>
@@ -607,17 +607,17 @@ require_once 'includes/header.php';
     align-items: center;
     gap: 14px;
     padding: 16px 18px;
-    background: #fff;
-    border: 1.5px solid #e9ecef;
+    background: white;
+    border: 1.5px solid color-mix(in srgb, var(--primary-color) 14%, #e9ecef);
     border-radius: 14px;
     cursor: pointer;
     transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    box-shadow: 0 2px 8px rgba(var(--primary-rgb,26,95,42),.08);
 }
 .ds-service-card:hover,
 .ds-service-card:focus {
     border-color: var(--card-color, var(--primary-color));
-    box-shadow: 0 6px 20px rgba(0,0,0,.10);
+    box-shadow: 0 6px 20px rgba(var(--primary-rgb,26,95,42),.14);
     transform: translateY(-3px);
     outline: none;
 }
@@ -629,7 +629,7 @@ require_once 'includes/header.php';
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
-    background: color-mix(in srgb, var(--card-color, var(--primary-color)) 12%, #fff);
+    background: color-mix(in srgb, var(--card-color, var(--primary-color)) 12%, white);
     color: var(--card-color, var(--primary-color));
     flex-shrink: 0;
 }
@@ -639,15 +639,15 @@ require_once 'includes/header.php';
     flex-direction: column;
     text-align: left;
 }
-.ds-label strong { font-size: 0.95rem; color: #222; line-height: 1.3; }
-.ds-label small  { font-size: 0.78rem; color: #888; margin-top: 2px; }
-.ds-arrow { color: #ccc; font-size: 0.85rem; flex-shrink: 0; }
+.ds-label strong { font-size: 0.95rem; color: var(--text-color,#222); line-height: 1.3; }
+.ds-label small  { font-size: 0.78rem; color: var(--text-light,#888); margin-top: 2px; }
+.ds-arrow { color: var(--text-muted,#ccc); font-size: 0.85rem; flex-shrink: 0; }
 .ds-service-card:hover .ds-arrow { color: var(--card-color, var(--primary-color)); }
 
 /* ── Conditional field highlight box ── */
 .ds-conditional-box {
-    background: #f8fdf9;
-    border: 1px solid #c3e6cb;
+    background: color-mix(in srgb, var(--primary-color) 8%, white);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 22%, white);
     border-radius: 10px;
     padding: 16px;
     margin-bottom: 16px;
@@ -660,7 +660,7 @@ require_once 'includes/header.php';
 }
 
 /* ── req asterisk ── */
-.req { color: #dc3545; margin-left: 2px; }
+.req { color: var(--secondary-color); margin-left: 2px; }
 
 /* ── form-card-title (same as appointment.php pattern) ── */
 .form-card-title {
@@ -671,7 +671,7 @@ require_once 'includes/header.php';
     font-size: 0.95rem;
     color: var(--primary-color);
     padding-bottom: 8px;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 14%, #e9ecef);
 }
 
 /* ── Font monospace tracking ID ── */

@@ -46,10 +46,10 @@ $filtered = $activeType
 
     <!-- Intro -->
     <div class="text-center mb-5">
-        <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--primary-color),var(--primary-light));margin-bottom:16px;">
-            <i class="fas fa-handshake" style="font-size:1.6rem;color:#fff;"></i>
+        <div class="pf-hero-icon-wrap">
+            <i class="fas fa-handshake pf-hero-icon"></i>
         </div>
-        <h2 style="font-size:1.7rem;font-weight:700;color:var(--primary-color);margin-bottom:8px;">
+        <h2 class="pf-hero-title">
             <?php echo isEnglish() ? 'Member Benefits at Partner Organizations' : 'साझेदार संस्थामा सदस्यले पाउने सुविधाहरू'; ?>
         </h2>
         <p class="text-muted" style="max-width:600px;margin:0 auto;">
@@ -61,8 +61,8 @@ $filtered = $activeType
 
     <?php if (empty($facilities)): ?>
     <div class="text-center py-5">
-        <div style="font-size:4rem;color:#e9ecef;margin-bottom:16px;"><i class="fas fa-handshake"></i></div>
-        <h4 style="color:#6c757d;"><?php echo isEnglish() ? 'Coming Soon' : 'छिट्टै आउँदैछ'; ?></h4>
+        <div class="pf-empty-icon"><i class="fas fa-handshake"></i></div>
+        <h4 class="pf-empty-title"><?php echo isEnglish() ? 'Coming Soon' : 'छिट्टै आउँदैछ'; ?></h4>
         <p class="text-muted"><?php echo isEnglish() ? 'Partner facility details will be published soon.' : 'साझेदार सुविधाको विवरण छिट्टै प्रकाशित गरिनेछ।'; ?></p>
     </div>
     <?php else: ?>
@@ -88,13 +88,13 @@ $filtered = $activeType
 
     <!-- Search bar -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <div style="position:relative;max-width:320px;width:100%;">
-            <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:.85rem;"></i>
+        <div class="pf-search-wrap">
+            <i class="fas fa-search pf-search-icon"></i>
             <input type="text" id="pfSearch" placeholder="<?php echo isEnglish() ? 'Search...' : 'संस्था, स्थान, विवरण खोज्नुहोस्...'; ?>"
-                   style="width:100%;padding:9px 12px 9px 34px;border:1px solid #d1fae5;border-radius:24px;font-size:.88rem;outline:none;background:#f0fdf4;"
+                   class="pf-search-input"
                    oninput="pfSearchFn()">
         </div>
-        <div id="pfCount" class="text-muted" style="font-size:.85rem;">
+        <div id="pfCount" class="text-muted pf-count">
             <?php echo count($filtered); ?> <?php echo isEnglish() ? 'records' : 'रेकर्ड'; ?>
         </div>
     </div>
@@ -104,18 +104,18 @@ $filtered = $activeType
         <table class="pf-table" id="pfTable">
             <thead>
                 <tr>
-                    <th style="width:50px;">क्र.स.</th>
+                    <th class="pf-th-sn">क्र.स.</th>
                     <th><?php echo isEnglish() ? 'Partner Organization' : 'साझेदार संस्था'; ?></th>
                     <th><?php echo isEnglish() ? 'Location' : 'स्थान'; ?></th>
                     <th><?php echo isEnglish() ? 'Facility Type' : 'सुविधा प्रकार'; ?></th>
-                    <th style="text-align:center;"><?php echo isEnglish() ? 'Discount' : 'छुट (%)'; ?></th>
+                    <th class="pf-th-center"><?php echo isEnglish() ? 'Discount' : 'छुट (%)'; ?></th>
                     <th><?php echo isEnglish() ? 'Details' : 'विवरण'; ?></th>
                 </tr>
             </thead>
             <tbody id="pfTbody">
                 <?php $sn = 1; foreach ($filtered as $f): ?>
                 <tr>
-                    <td style="color:#6b7280;font-weight:600;"><?php echo $sn++; ?></td>
+                    <td class="pf-td-sn"><?php echo $sn++; ?></td>
                     <td>
                         <div class="pf-org-name"><?php echo htmlspecialchars($f['partner_name']); ?></div>
                     </td>
@@ -128,26 +128,26 @@ $filtered = $activeType
                     <td>
                         <?php if ($f['facility_type']): ?>
                         <span class="pf-type-badge"><?php echo htmlspecialchars($f['facility_type']); ?></span>
-                        <?php else: echo '<span style="color:#9ca3af;">—</span>'; endif; ?>
+                        <?php else: echo '<span class="pf-muted-dash">—</span>'; endif; ?>
                     </td>
-                    <td style="text-align:center;">
+                    <td class="pf-th-center">
                         <?php if ($f['discount_percent'] > 0): ?>
                         <span class="pf-discount-badge">
                             <?php echo number_format($f['discount_percent'], 0); ?>% <small>छुट</small>
                         </span>
                         <?php else: ?>
-                        <span style="color:#9ca3af;font-size:.82rem;">—</span>
+                        <span class="pf-muted-dash-sm">—</span>
                         <?php endif; ?>
                     </td>
-                    <td style="color:#374151;font-size:.88rem;">
+                    <td class="pf-td-desc">
                         <?php echo nl2br(htmlspecialchars($f['description'] ?? '—')); ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($filtered)): ?>
                 <tr id="pfNoResult">
-                    <td colspan="6" style="text-align:center;padding:40px;color:#6b7280;">
-                        <i class="fas fa-search" style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px;"></i>
+                    <td colspan="6" class="pf-no-result">
+                        <i class="fas fa-search pf-no-result-icon"></i>
                         कुनै रेकर्ड फेला परेन।
                     </td>
                 </tr>
@@ -183,17 +183,17 @@ $filtered = $activeType
     gap: 6px;
     padding: 6px 16px;
     border-radius: 20px;
-    background: #f0fdf4;
-    color: #374151;
+    background: color-mix(in srgb, var(--primary-color) 10%, white);
+    color: var(--text-color,#374151);
     text-decoration: none;
     font-size: .83rem;
     font-weight: 600;
-    border: 1.5px solid #d1fae5;
+    border: 1.5px solid color-mix(in srgb, var(--primary-color) 20%, #d1fae5);
     transition: all .15s;
 }
 .pf-filter-pill:hover, .pf-filter-pill.active {
     background: var(--primary-color);
-    color: #fff;
+    color: var(--text-on-primary,white);
     border-color: var(--primary-color);
 }
 .pf-pill-count {
@@ -203,23 +203,23 @@ $filtered = $activeType
     font-size: .75rem;
 }
 .pf-filter-pill.active .pf-pill-count { background: rgba(255,255,255,.3); }
-.pf-filter-pill:not(.active) .pf-pill-count { background: #e5e7eb; color: #6b7280; }
+.pf-filter-pill:not(.active) .pf-pill-count { background: color-mix(in srgb, var(--primary-color) 14%, #e5e7eb); color: var(--text-light,#6b7280); }
 
 .pf-table-wrap {
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);
+    box-shadow: 0 2px 12px rgba(var(--primary-rgb,26,95,42),.08);
     margin-bottom: 20px;
 }
 .pf-table {
     width: 100%;
     border-collapse: collapse;
-    background: #fff;
+    background: white;
 }
 .pf-table thead tr {
     background: linear-gradient(135deg,var(--primary-color),var(--primary-light));
-    color: #fff;
+    color: var(--text-on-primary,white);
 }
 .pf-table th {
     padding: 13px 16px;
@@ -230,11 +230,11 @@ $filtered = $activeType
     white-space: nowrap;
 }
 .pf-table tbody tr {
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f3f4f6);
     transition: background .12s;
 }
 .pf-table tbody tr:last-child { border-bottom: none; }
-.pf-table tbody tr:hover { background: #f0fdf4; }
+.pf-table tbody tr:hover { background: color-mix(in srgb, var(--primary-color) 10%, white); }
 .pf-table td { padding: 13px 16px; vertical-align: middle; font-size: .88rem; }
 
 .pf-org-name {
@@ -243,7 +243,7 @@ $filtered = $activeType
     font-size: .92rem;
 }
 .pf-location {
-    color: #6b7280;
+    color: var(--text-light,#6b7280);
     font-size: .84rem;
 }
 .pf-location i {
@@ -252,17 +252,17 @@ $filtered = $activeType
     font-size: .78rem;
 }
 .pf-type-badge {
-    background: #f0fdf4;
+    background: color-mix(in srgb, var(--primary-color) 10%, white);
     color: var(--primary-color);
-    border: 1px solid #bbf7d0;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 22%, #bbf7d0);
     border-radius: 20px;
     padding: 3px 10px;
     font-size: .78rem;
     font-weight: 700;
 }
 .pf-discount-badge {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #fff;
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark,var(--secondary-color)));
+    color: var(--text-on-secondary,var(--text-on-primary,white));
     border-radius: 20px;
     padding: 4px 12px;
     font-size: .85rem;
@@ -272,12 +272,30 @@ $filtered = $activeType
 .pf-discount-badge small { font-size: .72rem; font-weight: 600; opacity: .9; }
 
 .pf-note {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
+    background: color-mix(in srgb, var(--accent-color,#17a2b8) 10%, white);
+    border: 1px solid color-mix(in srgb, var(--accent-color,#17a2b8) 24%, #bfdbfe);
     border-radius: 10px;
     padding: 12px 18px;
     font-size: .85rem;
-    color: #1e40af;
+    color: var(--accent-color,#1e40af);
+}
+.pf-hero-icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--primary-color),var(--primary-light));margin-bottom:16px;}
+.pf-hero-icon{font-size:1.6rem;color:var(--text-on-primary,white);}
+.pf-hero-title{font-size:1.7rem;font-weight:700;color:var(--primary-color);margin-bottom:8px;}
+.pf-empty-icon{font-size:4rem;color:var(--text-muted,#e9ecef);margin-bottom:16px;}
+.pf-empty-title{color:var(--text-light,#6c757d);}
+.pf-search-wrap{position:relative;max-width:320px;width:100%;}
+.pf-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted,#9ca3af);font-size:.85rem;}
+.pf-search-input{width:100%;padding:9px 12px 9px 34px;border:1px solid color-mix(in srgb, var(--primary-color) 20%, #d1fae5);border-radius:24px;font-size:.88rem;outline:none;background:color-mix(in srgb, var(--primary-color) 10%, white);}
+.pf-count{font-size:.85rem;}
+.pf-th-sn{width:50px;}
+.pf-th-center{text-align:center;}
+.pf-td-sn{color:var(--text-light,#6b7280);font-weight:600;}
+.pf-muted-dash{color:var(--text-muted,#9ca3af);}
+.pf-muted-dash-sm{color:var(--text-muted,#9ca3af);font-size:.82rem;}
+.pf-td-desc{color:var(--text-color,#374151);font-size:.88rem;}
+.pf-no-result{text-align:center;padding:40px;color:var(--text-light,#6b7280);}
+.pf-no-result-icon{font-size:2rem;opacity:.3;display:block;margin-bottom:8px;}
     display: flex;
     align-items: flex-start;
     gap: 10px;

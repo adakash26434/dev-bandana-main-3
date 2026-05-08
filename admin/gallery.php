@@ -115,6 +115,16 @@ $flash = getFlash();
 <?php elseif ($flash && $flash['type'] === 'error'): ?>
 <div class="alert alert-danger alert-dismissible fade show mb-3"><i class="fas fa-exclamation-circle me-2"></i><?php echo $flash['message']; ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
 <?php endif; ?>
+<style>
+.gal-yt-icon{color:var(--secondary-color);}
+.gal-search-group{max-width:300px;}
+.gal-thumb{width:100%;height:130px;object-fit:cover;border-radius:10px;}
+.gal-inline-form{display:inline;}
+.gal-upload-drop{border:2px dashed var(--primary-light);border-radius:12px;background:color-mix(in srgb, var(--primary-color) 6%, white);cursor:pointer;}
+.gal-video-head{background:linear-gradient(135deg,var(--secondary-dark,var(--secondary-color)),var(--secondary-color));color:var(--text-on-secondary,var(--text-on-primary,white));}
+.gal-hover-shadow{box-shadow:0 8px 24px rgba(var(--primary-rgb,26,95,42),.22);}
+.gal-hover-overlay{background:linear-gradient(transparent, rgba(var(--primary-rgb,26,95,42),.86));}
+</style>
 
 <ul class="nav nav-tabs admin-nav-tabs mb-3">
     <li class="nav-item">
@@ -124,7 +134,7 @@ $flash = getFlash();
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#gal-photo" id="gal-photo-tab"><i class="fas fa-camera me-2"></i>फोटो अपलोड</button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#gal-video"><i class="fab fa-youtube me-2" style="color:#ff0000;"></i>भिडियो थप्नुहोस्</button>
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#gal-video"><i class="fab fa-youtube me-2 gal-yt-icon"></i>भिडियो थप्नुहोस्</button>
     </li>
 </ul>
 
@@ -132,7 +142,7 @@ $flash = getFlash();
     <!-- GALLERY GRID TAB -->
     <div class="tab-pane fade show active" id="gal-list">
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3">
-                <div class="input-group input-group-sm" style="max-width:300px">
+                <div class="input-group input-group-sm gal-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" class="form-control border-start-0 admin-gallery-search" placeholder="शीर्षक वा वर्गले खोज्नुहोस्..." autocomplete="off">
                 </div>
@@ -147,7 +157,7 @@ $flash = getFlash();
                 <?php else: ?>
                 <div class="row g-3">
                     <?php foreach ($images as $img): ?>
-                    <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 gallery-card-wrap">
                         <div class="gallery-card position-relative">
                             <?php
                             $isVideo = ($img['media_type'] ?? 'photo') === 'video';
@@ -155,10 +165,9 @@ $flash = getFlash();
                                 ? ($img['thumbnail'] ?? 'assets/images/video-placeholder.png')
                                 : ('../' . $img['image']);
                             ?>
-                            <img src="<?php echo htmlspecialchars($thumbSrc); ?>" loading="lazy" alt="<?php echo htmlspecialchars($img['title']); ?>"
-                                 style="width:100%;height:130px;object-fit:cover;border-radius:10px;">
+                            <img src="<?php echo htmlspecialchars($thumbSrc); ?>" loading="lazy" alt="<?php echo htmlspecialchars($img['title']); ?>" class="gal-thumb">
                             <?php if ($isVideo): ?>
-                            <div class="position-absolute top-50 start-50 translate-middle" style="pointer-events:none;">
+                            <div class="position-absolute top-50 start-50 translate-middle pe-none">
                                 <i class="fab fa-youtube fa-2x text-danger opacity-75"></i>
                             </div>
                             <?php endif; ?>
@@ -169,7 +178,7 @@ $flash = getFlash();
                                        target="_blank" class="btn btn-sm btn-info" title="हेर्नुहोस्">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <form method="POST" style="display:inline" onsubmit="return confirm('यो फोटो/भिडियो मेटाउने हो?')">
+                                    <form method="POST" class="gal-inline-form" onsubmit="return confirm('यो फोटो/भिडियो मेटाउने हो?')">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo (int)$img['id']; ?>">
                                         <?php echo csrfField(); ?>
@@ -220,7 +229,7 @@ $flash = getFlash();
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold text-success"><i class="fas fa-images me-1"></i>तस्विरहरू छान्नुहोस् <span class="text-danger">*</span></label>
-                            <div class="upload-drop-zone p-4 text-center border-2 border-dashed" style="border:2px dashed var(--primary-light);border-radius:12px;background:rgba(40,167,69,.04);cursor:pointer;"
+                            <div class="upload-drop-zone p-4 text-center border-2 border-dashed gal-upload-drop"
                                  onclick="document.getElementById('gal_files').click()">
                                 <i class="fas fa-cloud-upload-alt fa-3x text-success mb-2"></i>
                                 <p class="mb-1 fw-semibold text-success">क्लिक गरी वा drag-drop गरी फोटो छान्नुहोस्</p>
@@ -244,7 +253,7 @@ $flash = getFlash();
     <!-- VIDEO UPLOAD TAB -->
     <div class="tab-pane fade" id="gal-video">
         <div class="card admin-table-card">
-            <div class="card-header" style="background:linear-gradient(135deg,#cc0000,#ff4444);color:#fff;">
+            <div class="card-header gal-video-head">
                 <h5><i class="fab fa-youtube me-2"></i>YouTube भिडियो थप्नुहोस्</h5>
             </div>
             <div class="card-body p-4">
@@ -286,10 +295,11 @@ $flash = getFlash();
 <style>
 /* Gallery card hover effect — ग्यालरी कार्ड hover effect */
 .gallery-card { border-radius: 10px; overflow: hidden; position: relative; transition: transform .2s; }
-.gallery-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+.gallery-card:hover { transform: translateY(-4px); }
+.gallery-card:hover { box-shadow: 0 8px 24px rgba(var(--primary-rgb,26,95,42),.22); }
 .gallery-hover-overlay {
     position: absolute; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,.8));
+    background: linear-gradient(transparent, rgba(var(--primary-rgb,26,95,42),.86));
     padding: 30px 8px 8px; opacity: 0; transition: opacity .3s;
 }
 .gallery-card:hover .gallery-hover-overlay { opacity: 1; }
