@@ -350,9 +350,11 @@ if (is_array($admin2faPending) && (($admin2faPending['mode'] ?? '') === 'setup')
 }
 
 $siteName = function_exists('getSetting') ? getSetting('site_name', 'आकाश सहकारी') : 'आकाश सहकारी';
-$logoPath = function_exists('getSetting')
-    ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
-    : 'assets/images/logo.png';
+$logoPath = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath('assets/images/logo.png'))
+    : (function_exists('getSetting')
+        ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
+        : 'assets/images/logo.png');
 $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . ltrim($logoPath,'/')) : '';
 
 $licExpiredLogin = function_exists('site_license_expired') && site_license_expired();
