@@ -12729,15 +12729,15 @@ input[readonly].nepali-datepicker:hover,
 
 /* Final compact override for homepage notices */
 .rates-notices-section .notices-box-enhanced .notice-item-enhanced .notice-content h6 {
-    font-size: 0.78rem !important;
-    line-height: 1.12 !important;
+    font-size: 0.72rem !important;
+    line-height: 1.02 !important;
     margin: 0 0 4px !important;
     font-weight: 600 !important;
 }
 
 .rates-notices-section .notices-box-enhanced .notice-item-enhanced .notice-content .notice-meta {
-    font-size: 0.66rem !important;
-    line-height: 1.05 !important;
+    font-size: 0.60rem !important;
+    line-height: 1 !important;
 }
 
 .notices-box-enhanced .notices-footer {
