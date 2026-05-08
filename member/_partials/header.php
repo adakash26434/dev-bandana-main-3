@@ -5,13 +5,24 @@
  * dropdown menu repositioned so it never overlays the logo or
  * the internet-banking icon on mobile.
  */
-$page_title = $page_title ?? 'सदस्य पोर्टल';
+$memberLang = function_exists('getCurrentLang') ? getCurrentLang() : 'np';
+$memberIsEnglish = ($memberLang === 'en');
+$memberT = static function (string $np, string $en) use ($memberIsEnglish): string {
+  return $memberIsEnglish ? $en : $np;
+};
+$page_title = $page_title ?? $memberT('सदस्य पोर्टल', 'Member Portal');
 $siteName   = function_exists('getSetting') ? getSetting('site_name', 'सहकारी') : 'सहकारी';
+$memberLangQuery = $_GET;
+$memberLangQuery['lang'] = $memberIsEnglish ? 'np' : 'en';
+$memberLangToggleUrl = strtok($_SERVER['REQUEST_URI'] ?? '', '?') . '?' . http_build_query($memberLangQuery);
+$memberLangBadge = $memberIsEnglish ? 'EN' : 'ने';
 
 // Dynamic logo — admin settings बाट
-$_mpLogoRaw = function_exists('getSetting')
-    ? trim((string) getSetting('site_logo', getSetting('logo', '')))
-    : '';
+$_mpLogoRaw = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath(''))
+    : (function_exists('getSetting')
+        ? trim((string) getSetting('site_logo', getSetting('logo', '')))
+        : '');
 $_mpLogoSrc = '';
 if ($_mpLogoRaw !== '') {
     $_mpLogoSrc = (preg_match('#^https?://#i', $_mpLogoRaw))
@@ -50,7 +61,7 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="<?= $memberIsEnglish ? 'en' : 'ne' ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -124,7 +135,10 @@ try {
     </span>
   </a>
   <div class="mp-actions">
-    <a href="/member/notifications.php" class="mp-action-btn" aria-label="सूचना"><i class="fas fa-bell"></i></a>
+    <a href="<?= htmlspecialchars($memberLangToggleUrl, ENT_QUOTES, 'UTF-8') ?>" class="mp-action-btn" aria-label="<?= htmlspecialchars($memberT('भाषा परिवर्तन', 'Switch Language')) ?>" title="<?= htmlspecialchars($memberT('भाषा परिवर्तन', 'Switch Language')) ?>">
+      <small style="font-size:11px;font-weight:800;line-height:1;"><?= htmlspecialchars($memberLangBadge) ?></small>
+    </a>
+    <a href="/member/notifications.php" class="mp-action-btn" aria-label="<?= htmlspecialchars($memberT('सूचना', 'Notifications')) ?>"><i class="fas fa-bell"></i></a>
     <span class="mp-user-chip">
       <?php if ($memberPhotoUrl !== ''): ?>
         <img src="<?= htmlspecialchars($memberPhotoUrl) ?>" class="mp-user-avatar" alt="Member"
@@ -133,9 +147,9 @@ try {
       <?php else: ?>
         <i class="fas fa-user-circle"></i>
       <?php endif; ?>
-      <?= htmlspecialchars($_SESSION['member_name'] ?? 'सदस्य') ?>
+      <?= htmlspecialchars($_SESSION['member_name'] ?? $memberT('सदस्य', 'Member')) ?>
     </span>
-    <a href="/member/logout.php" class="mp-action-btn" aria-label="लगआउट"><i class="fas fa-right-from-bracket"></i></a>
+    <a href="/member/logout.php" class="mp-action-btn" aria-label="<?= htmlspecialchars($memberT('लगआउट', 'Logout')) ?>"><i class="fas fa-right-from-bracket"></i></a>
   </div>
 </header>
 

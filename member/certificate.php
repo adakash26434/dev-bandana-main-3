@@ -10,6 +10,9 @@ memberSecurityHeaders();
 $db  = getDB();
 $mem = currentMember();
 if (!$mem) { header('Location: login.php?msg=session_expired'); exit; }
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $memberId = (int)$mem['id'];
 
@@ -54,7 +57,9 @@ $siteNameEn  = getSetting('site_name_en', 'Cooperative');
 $sitePhone   = getSetting('phone', '');
 $siteEmail   = getSetting('email', '');
 $siteAddress = getSetting('address', '');
-$siteLogo    = getSetting('site_logo', getSetting('logo', 'assets/images/logo.png'));
+$siteLogo    = function_exists('getLocalizedLogoPath')
+    ? getLocalizedLogoPath('assets/images/logo.png')
+    : getSetting('site_logo', getSetting('logo', 'assets/images/logo.png'));
 $primaryColor= getSetting('primary_color', '#1a5f2a');
 
 /* Photo URL */
@@ -72,7 +77,7 @@ $issueDate  = $approvedDate ? date('Y F d', strtotime($approvedDate)) : date('Y 
 $issueDateNp= $approvedDate ? date('Y-m-d', strtotime($approvedDate)) : date('Y-m-d');
 $logoUrl    = SITE_URL . ltrim($siteLogo, '/');
 
-$pageTitle = 'सदस्यता प्रमाणपत्र — ' . $siteName;
+$pageTitle = $_t('सदस्यता प्रमाणपत्र', 'Membership Certificate') . ' — ' . $siteName;
 $extraHead = <<<HTML
 <style>
 @media print {
@@ -123,14 +128,14 @@ HTML;
   <!-- Action buttons (hidden on print) -->
   <div class="cert-noprint" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
     <h1 style="font-size:1.15rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0;">
-      <i class="fas fa-certificate" style="margin-right:8px;"></i>सदस्यता प्रमाणपत्र
+      <i class="fas fa-certificate" style="margin-right:8px;"></i><?php echo $_t('सदस्यता प्रमाणपत्र', 'Membership Certificate'); ?>
     </h1>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button onclick="window.print()" style="padding:9px 20px;background:var(--primary-color,#1a8754);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
         <i class="fas fa-print"></i> Print / PDF
       </button>
       <a href="id-card.php" style="padding:9px 20px;background:#fff;color:var(--primary-color,#1a8754);border:2px solid var(--primary-color,#1a8754);border-radius:8px;font-size:.88rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;">
-        <i class="fas fa-id-card"></i> ID Card
+        <i class="fas fa-id-card"></i> <?php echo $_t('पहिचान कार्ड', 'ID Card'); ?>
       </a>
     </div>
   </div>
@@ -138,7 +143,7 @@ HTML;
   <?php if (!$fullName || !$sadasyata): ?>
   <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;font-size:.88rem;color:var(--secondary-dark,#922b21);margin-bottom:16px;display:flex;gap:8px;align-items:center;" class="cert-noprint">
     <i class="fas fa-triangle-exclamation"></i>
-    <div>तपाईंको KYC अनुमोदन भएको छैन। KYC approve भएपछि मात्र पूर्ण प्रमाणपत्र उपलब्ध हुनेछ।</div>
+    <div><?php echo $_t('तपाईंको KYC अनुमोदन भएको छैन। KYC approve भएपछि मात्र पूर्ण प्रमाणपत्र उपलब्ध हुनेछ।', 'Your KYC is not approved yet. Full certificate will be available only after KYC approval.'); ?></div>
   </div>
   <?php endif; ?>
 
@@ -168,13 +173,15 @@ HTML;
     <!-- Body -->
     <div class="cert-body" style="position:relative;z-index:1;">
       <div class="cert-title">
-        <h2>सदस्यता प्रमाणपत्र</h2>
+        <h2><?php echo $_t('सदस्यता प्रमाणपत्र', 'Membership Certificate'); ?></h2>
         <p>MEMBERSHIP CERTIFICATE</p>
       </div>
 
       <div style="text-align:center;font-size:.88rem;color:#4b5563;margin-bottom:18px;line-height:1.6;">
-        यसद्वारा प्रमाणित गरिन्छ कि तल उल्लिखित व्यक्ति <strong><?= htmlspecialchars($siteName) ?></strong> को
-        <?= $accountType ? htmlspecialchars($accountType) . ' ' : '' ?>सदस्य हुनुहुन्छ।
+        <?php echo $_t('यसद्वारा प्रमाणित गरिन्छ कि तल उल्लिखित व्यक्ति', 'This is to certify that the person mentioned below is a'); ?>
+        <strong><?= htmlspecialchars($siteName) ?></strong>
+        <?php echo $_t('को', 'of'); ?>
+        <?= $accountType ? htmlspecialchars($accountType) . ' ' : '' ?><?php echo $_t('सदस्य हुनुहुन्छ।', 'member.'); ?>
       </div>
 
       <div class="cert-member-row">
@@ -187,39 +194,39 @@ HTML;
         </div>
         <div class="cert-details">
           <div class="cert-field">
-            <span class="cert-field-label">पूरा नाम</span>
+            <span class="cert-field-label"><?php echo $_t('पूरा नाम', 'Full Name'); ?></span>
             <span class="cert-field-value"><?= htmlspecialchars($fullName ?: '—') ?></span>
           </div>
           <div class="cert-field">
-            <span class="cert-field-label">सदस्यता नम्बर</span>
+            <span class="cert-field-label"><?php echo $_t('सदस्यता नम्बर', 'Membership Number'); ?></span>
             <span class="cert-field-value" style="font-family:monospace;color:var(--primary-color,#1a5f2a);"><?= htmlspecialchars($sadasyata ?: '—') ?></span>
           </div>
           <?php if ($fatherName): ?>
           <div class="cert-field">
-            <span class="cert-field-label">बुबाको नाम</span>
+            <span class="cert-field-label"><?php echo $_t('बुबाको नाम', "Father's Name"); ?></span>
             <span class="cert-field-value"><?= htmlspecialchars($fatherName) ?></span>
           </div>
           <?php endif; ?>
           <?php if ($dob): ?>
           <div class="cert-field">
-            <span class="cert-field-label">जन्म मिति</span>
+            <span class="cert-field-label"><?php echo $_t('जन्म मिति', 'Date of Birth'); ?></span>
             <span class="cert-field-value"><?= htmlspecialchars($dob) ?></span>
           </div>
           <?php endif; ?>
           <?php if ($address): ?>
           <div class="cert-field">
-            <span class="cert-field-label">स्थायी ठेगाना</span>
+            <span class="cert-field-label"><?php echo $_t('स्थायी ठेगाना', 'Permanent Address'); ?></span>
             <span class="cert-field-value"><?= htmlspecialchars($address) ?></span>
           </div>
           <?php endif; ?>
           <?php if ($citizenship): ?>
           <div class="cert-field">
-            <span class="cert-field-label">नागरिकता नम्बर</span>
+            <span class="cert-field-label"><?php echo $_t('नागरिकता नम्बर', 'Citizenship Number'); ?></span>
             <span class="cert-field-value"><?= htmlspecialchars($citizenship) ?></span>
           </div>
           <?php endif; ?>
           <div class="cert-field">
-            <span class="cert-field-label">सदस्य भएको मिति</span>
+            <span class="cert-field-label"><?php echo $_t('सदस्य भएको मिति', 'Member Since'); ?></span>
             <span class="cert-field-value"><?= htmlspecialchars($issueDateNp) ?></span>
           </div>
         </div>
@@ -229,15 +236,15 @@ HTML;
     <!-- Footer -->
     <div class="cert-footer">
       <div>
-        <div class="cert-seal"><?= htmlspecialchars(mb_substr($siteName,0,12)) ?><br>सहकारी<br>छाप</div>
+        <div class="cert-seal"><?= htmlspecialchars(mb_substr($siteName,0,12)) ?><br><?php echo $_t('सहकारी', 'Co-op'); ?><br><?php echo $_t('छाप', 'Seal'); ?></div>
       </div>
       <div style="flex:1;text-align:center;">
-        <div style="font-size:.75rem;color:#9ca3af;margin-bottom:4px;">जारी मिति: <?= htmlspecialchars($issueDateNp) ?></div>
+        <div style="font-size:.75rem;color:#9ca3af;margin-bottom:4px;"><?php echo $_t('जारी मिति', 'Issued Date'); ?>: <?= htmlspecialchars($issueDateNp) ?></div>
         <?php if ($sitePhone): ?>
         <div style="font-size:.72rem;color:#9ca3af;"><i class="fas fa-phone" style="margin-right:3px;"></i><?= htmlspecialchars($sitePhone) ?></div>
         <?php endif; ?>
         <div style="margin-top:8px;">
-          <div class="cert-sign-line">अध्यक्ष / Chairman</div>
+          <div class="cert-sign-line"><?php echo $_t('अध्यक्ष', 'Chairperson'); ?></div>
         </div>
       </div>
       <div style="text-align:center;">
@@ -249,7 +256,7 @@ HTML;
 
   <div class="cert-noprint" style="text-align:center;margin-top:16px;font-size:.8rem;color:#9ca3af;">
     <i class="fas fa-info-circle" style="margin-right:4px;"></i>
-    Print / PDF download को लागि माथिको "Print / PDF" button थिच्नुहोस्। Browser मा "Save as PDF" option छान्नुहोस्।
+    <?php echo $_t('Print / PDF download को लागि माथिको "Print / PDF" button थिच्नुहोस्। Browser मा "Save as PDF" option छान्नुहोस्।', 'To print or download PDF, click the "Print / PDF" button above and choose "Save as PDF" in browser.'); ?>
   </div>
 
 </div>

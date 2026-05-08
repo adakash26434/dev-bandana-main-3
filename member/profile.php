@@ -200,7 +200,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_password'])) {
 
 $siteName  = getSetting('site_name', 'आकाश सहकारी');
 $siteUrl   = SITE_URL;
-$pageTitle = 'मेरो प्रोफाइल — ' . $siteName;
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle = $_t('मेरो प्रोफाइल', 'My Profile') . ' — ' . $siteName;
 
 $profileKycCapture = false;
 if ($kycRow) {
@@ -229,9 +232,9 @@ $kymStatusClassMap = [
     'rejected' => 'mem-kym-pill--bad',
 ];
 $kymStatusLabelMap = [
-    'approved' => 'अनुमोदित',
-    'pending' => 'प्रक्रियामा',
-    'rejected' => 'अस्वीकृत',
+    'approved' => $_t('अनुमोदित', 'Approved'),
+    'pending' => $_t('प्रक्रियामा', 'In Progress'),
+    'rejected' => $_t('अस्वीकृत', 'Rejected'),
 ];
 $kymStatusIconMap = [
     'approved' => 'fa-circle-check',
@@ -239,7 +242,7 @@ $kymStatusIconMap = [
     'rejected' => 'fa-circle-xmark',
 ];
 $kymStatusClass = $kymStatusClassMap[$kymStatusKey] ?? 'mem-kym-pill--muted';
-$kymStatusLabel = $kymStatusLabelMap[$kymStatusKey] ?? 'दर्ता नभएको';
+$kymStatusLabel = $kymStatusLabelMap[$kymStatusKey] ?? $_t('दर्ता नभएको', 'Not Submitted');
 $kymStatusIcon = $kymStatusIconMap[$kymStatusKey] ?? 'fa-circle-question';
 $kymDobKr = $kycRow ?? [];
 $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
@@ -250,15 +253,15 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
     <?php if ($success): ?><div class="mem-alert mem-alert-success"><i class="fas fa-circle-check"></i><?php echo htmlspecialchars($success); ?></div><?php endif; ?>
 
     <div class="mem-profile-tab-shell">
-        <div class="mem-profile-tab-rail" role="tablist" aria-label="Profile sections">
+        <div class="mem-profile-tab-rail" role="tablist" aria-label="<?php echo $_t('प्रोफाइल सेक्सनहरू', 'Profile sections'); ?>">
             <button type="button" role="tab" class="mem-profile-tab active" id="tabBtnProfile" aria-selected="true">
-                <span class="mem-profile-tab-ic"><i class="fas fa-user"></i></span><span>क. प्रोफाइल</span>
+                <span class="mem-profile-tab-ic"><i class="fas fa-user"></i></span><span><?php echo $_t('क. प्रोफाइल', 'A. Profile'); ?></span>
             </button>
             <button type="button" role="tab" class="mem-profile-tab" id="tabBtnSecurity" aria-selected="false">
-                <span class="mem-profile-tab-ic"><i class="fas fa-lock"></i></span><span>ख. Account / Security</span>
+                <span class="mem-profile-tab-ic"><i class="fas fa-lock"></i></span><span><?php echo $_t('ख. खाता / सुरक्षा', 'B. Account / Security'); ?></span>
             </button>
             <button type="button" role="tab" class="mem-profile-tab" id="tabBtnKyc" aria-selected="false">
-                <span class="mem-profile-tab-ic"><i class="fas fa-id-card"></i></span><span>ग. KYC विवरण</span>
+                <span class="mem-profile-tab-ic"><i class="fas fa-id-card"></i></span><span><?php echo $_t('ग. KYC विवरण', 'C. KYC Details'); ?></span>
             </button>
         </div>
     </div>
@@ -271,12 +274,12 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
                 <div class="mem-kym-heading">
                     <span class="mem-kym-heading-icon"><i class="fas fa-user-circle"></i></span>
                     <div>
-                        <div class="mem-kym-heading-title">KYM Summary</div>
-                        <div class="mem-kym-heading-sub">प्रोफाइल — तपाईंको दर्ता विवरण</div>
+                        <div class="mem-kym-heading-title"><?php echo $_t('KYM सारांश', 'KYM Summary'); ?></div>
+                        <div class="mem-kym-heading-sub"><?php echo $_t('प्रोफाइल — तपाईंको दर्ता विवरण', 'Profile — your registration details'); ?></div>
                     </div>
                 </div>
                 <a href="<?php echo htmlspecialchars($kycEditUrl); ?>" class="mem-kym-cta">
-                    <i class="fas fa-pen-to-square"></i><span>पूर्ण KYM फारम भर्नुहोस् / अपडेट गर्नुहोस्</span>
+                    <i class="fas fa-pen-to-square"></i><span><?php echo $_t('पूर्ण KYM फारम भर्नुहोस् / अपडेट गर्नुहोस्', 'Open / update full KYM form'); ?></span>
                 </a>
             </div>
             <div class="mem-card-body mem-kym-body">

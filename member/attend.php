@@ -11,6 +11,9 @@ memberSecurityHeaders();
 $db  = getDB();
 $mem = currentMember();
 if (!$mem) { header('Location: login.php?msg=session_expired'); exit; }
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $memberId   = (int)$mem['id'];
 $memEmail   = trim((string)($mem['email'] ?? ''));
@@ -37,7 +40,7 @@ $checkInMsg = '';
 $checkInErr = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'checkin') {
     if (!verifyCSRFToken()) {
-        $checkInErr = 'सुरक्षा जाँच असफल।';
+        $checkInErr = $_t('सुरक्षा जाँच असफल।', 'Security check failed.');
     } else {
         $progId = (int)($_POST['program_id'] ?? 0);
         if ($progId > 0) {
@@ -47,27 +50,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
                 $prog->execute([$progId]);
                 $progRow = $prog->fetch(PDO::FETCH_ASSOC);
                 if (!$progRow || !$progRow['is_active']) {
-                    $checkInErr = 'यो कार्यक्रम उपलब्ध छैन।';
+                    $checkInErr = $_t('यो कार्यक्रम उपलब्ध छैन।', 'This program is not available.');
                 } else {
                     /* Check duplicate */
                     $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
                     $dup->execute([$memberId, $progId]);
                     if ($dup->fetchColumn()) {
-                        $checkInErr = 'तपाईं यो कार्यक्रममा पहिल्यै check-in हुनुभएको छ।';
+                        $checkInErr = $_t('तपाईं यो कार्यक्रममा पहिल्यै check-in हुनुभएको छ।', 'You are already checked in for this program.');
                     } else {
                         $ins = $db->prepare("INSERT INTO member_program_attendance
                             (member_id, member_card_no, program_id, program_title, source, verified_by_ip)
                             VALUES (?,?,?,?,?,?)");
                         $ins->execute([$memberId, $memCard, $progId, $progRow['title'], 'member_portal', $_SERVER['REMOTE_ADDR'] ?? '']);
-                        $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" मा उपस्थिति दर्ता भयो!';
+                        $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा उपस्थिति दर्ता भयो!', 'attendance recorded successfully!');
                     }
                 }
             } catch (Throwable $e) {
                 $sqlState = ($e instanceof PDOException) ? (string)$e->getCode() : '';
                 if ($sqlState === '23000' || str_contains($e->getMessage(), 'Duplicate') || str_contains($e->getMessage(), 'uniq_member_program')) {
-                    $checkInErr = 'तपाईं यो कार्यक्रममा पहिल्यै check-in हुनुभएको छ।';
+                    $checkInErr = $_t('तपाईं यो कार्यक्रममा पहिल्यै check-in हुनुभएको छ।', 'You are already checked in for this program.');
                 } else {
-                    $checkInErr = 'Check-in गर्न समस्या भयो।';
+                    $checkInErr = $_t('Check-in गर्न समस्या भयो।', 'Failed to check in.');
                     error_log('[attend checkin] ' . $e->getMessage());
                 }
             }
@@ -92,14 +95,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'prere
                             (member_id, member_card_no, member_name, phone, email, program_id, program_title, event_date, source)
                             VALUES (?,?,?,?,?,?,?,?,?)");
                         $ins->execute([$memberId, $memCard, $memName, $memPhone, $memEmail, $progId, $progRow['title'], $progRow['event_date'], 'member_portal']);
-                        $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" मा pre-registration सफल भयो!';
+                        $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा pre-registration सफल भयो!', 'pre-registration successful!');
                     } else {
-                        $checkInErr = 'तपाईं पहिल्यै register हुनुभएको छ।';
+                        $checkInErr = $_t('तपाईं पहिल्यै register हुनुभएको छ।', 'You are already registered.');
                     }
                 } else {
-                    $checkInErr = 'Pre-registration खुला छैन।';
+                    $checkInErr = $_t('Pre-registration खुला छैन।', 'Pre-registration is not open.');
                 }
-            } catch (Throwable $e) { $checkInErr = 'Register गर्न समस्या।'; }
+            } catch (Throwable $e) { $checkInErr = $_t('Register गर्न समस्या।', 'Registration failed.'); }
         }
     }
 }
@@ -146,7 +149,7 @@ if ($qrProgramRow && ($_GET['auto'] ?? '') === '1' && $_SERVER['REQUEST_METHOD']
         $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
         $dup->execute([$memberId, $qpid]);
         if ($dup->fetchColumn()) {
-            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" मा तपाईंको उपस्थिति पहिल्यै दर्ता छ।';
+            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा तपाईंको उपस्थिति पहिल्यै दर्ता छ।', 'attendance is already recorded.');
         } else {
             $ins = $db->prepare("INSERT INTO member_program_attendance
                 (member_id, member_card_no, program_id, program_title, source, verified_by_ip)
@@ -159,7 +162,7 @@ if ($qrProgramRow && ($_GET['auto'] ?? '') === '1' && $_SERVER['REQUEST_METHOD']
                 'member_qr_scan_auto',
                 $_SERVER['REMOTE_ADDR'] ?? ''
             ]);
-            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" मा उपस्थिति स्वतः दर्ता भयो!';
+            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा उपस्थिति स्वतः दर्ता भयो!', 'attendance auto-recorded successfully!');
             $qrAlreadyAttended = true;
             // local list पनि update (same request मा badge/count सही देखियोस्)
             array_unshift($myAttendance, [
@@ -172,10 +175,10 @@ if ($qrProgramRow && ($_GET['auto'] ?? '') === '1' && $_SERVER['REQUEST_METHOD']
     } catch (Throwable $e) {
         $sqlState = ($e instanceof PDOException) ? (string)$e->getCode() : '';
         if ($sqlState === '23000' || str_contains($e->getMessage(), 'Duplicate') || str_contains($e->getMessage(), 'uniq_member_program')) {
-            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" मा तपाईंको उपस्थिति पहिल्यै दर्ता छ।';
+            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा तपाईंको उपस्थिति पहिल्यै दर्ता छ।', 'attendance is already recorded.');
             $qrAlreadyAttended = true;
         } else {
-            $checkInErr = 'QR check-in स्वतः दर्ता गर्न समस्या भयो।';
+            $checkInErr = $_t('QR check-in स्वतः दर्ता गर्न समस्या भयो।', 'Failed to auto check-in from QR.');
             error_log('[attend auto qr checkin] ' . $e->getMessage());
         }
     }
@@ -205,7 +208,7 @@ try {
 $siteUrl   = SITE_URL;
 $memberQr  = 'https://api.qrserver.com/v1/create-qr-code/?data=' . urlencode($siteUrl . 'verify.php?id=' . urlencode($memCard)) . '&size=140x140&margin=4';
 $siteName  = getSetting('site_name', 'सहकारी');
-$pageTitle = 'कार्यक्रम उपस्थिति — ' . $siteName;
+$pageTitle = $_t('कार्यक्रम उपस्थिति', 'Program Attendance') . ' — ' . $siteName;
 $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">';
 
 $extraHead = <<<HTML
@@ -233,13 +236,12 @@ HTML;
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
     <h1 style="font-size:1.25rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0;">
-      <i class="fas fa-calendar-check" style="margin-right:8px;"></i>कार्यक्रम उपस्थिति
+      <i class="fas fa-calendar-check" style="margin-right:8px;"></i><?php echo $_t('कार्यक्रम उपस्थिति', 'Program Attendance'); ?>
     </h1>
-    <div class="att-badge"><i class="fas fa-check-double"></i> <?= count($myAttendance) ?> कार्यक्रम उपस्थित</div>
+    <div class="att-badge"><i class="fas fa-check-double"></i> <?= count($myAttendance) ?> <?php echo $_t('कार्यक्रम उपस्थित', 'programs attended'); ?></div>
   </div>
   <p style="font-size:.78rem;color:#64748b;line-height:1.5;margin:0 0 16px;padding:10px 12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
-    <strong>QR</strong> ले कार्यक्रम स्थलमा उपस्थित भइसकेपछि दर्ता गर्नुहोस् (मोबाइल फुटरको <strong>स्क्यान</strong> वा बाहिरबाट QR खोलेर पनि) — Admin को attendance सूची र तलको <strong>उपस्थिति इतिहास</strong>मा थपिन्छ।
-    <strong>Pre-register</strong> भन्दा फरक: pre-reg = अगाडि नाम दर्ता मात्र; <strong>गणना बढाउने</strong> check-in (QR वा आजको मितिमा बटन) हो।
+    <?php echo $_t('<strong>QR</strong> ले कार्यक्रम स्थलमा उपस्थित भइसकेपछि दर्ता गर्नुहोस् (मोबाइल फुटरको <strong>स्क्यान</strong> वा बाहिरबाट QR खोलेर पनि) — Admin को attendance सूची र तलको <strong>उपस्थिति इतिहास</strong>मा थपिन्छ। <strong>Pre-register</strong> भन्दा फरक: pre-reg = अगाडि नाम दर्ता मात्र; <strong>गणना बढाउने</strong> check-in (QR वा आजको मितिमा बटन) हो।', 'Use <strong>QR</strong> check-in only when you are at the event venue (from mobile footer <strong>Scan</strong> or opening QR link). It appears in admin attendance and your <strong>attendance history</strong>. Different from <strong>Pre-register</strong>: pre-reg only reserves name; check-in increases attended count.'); ?>
   </p>
 
   <?php if ($checkInMsg): ?>
@@ -258,7 +260,7 @@ HTML;
     <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">
       <div style="width:48px;height:48px;border-radius:12px;background:var(--primary-color,#1a8754);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;"><i class="fas fa-qrcode"></i></div>
       <div style="flex:1;min-width:200px;">
-        <div style="font-size:.72rem;font-weight:800;color:#047857;text-transform:uppercase;letter-spacing:.04em;">स्थल उपस्थिति — कार्यक्रम QR</div>
+        <div style="font-size:.72rem;font-weight:800;color:#047857;text-transform:uppercase;letter-spacing:.04em;"><?php echo $_t('स्थल उपस्थिति — कार्यक्रम QR', 'Venue Attendance — Program QR'); ?></div>
         <div style="font-size:1rem;font-weight:800;color:#064e3b;margin-top:4px;"><?= htmlspecialchars($qrProgramRow['title']) ?></div>
         <?php if (!empty($qrProgramRow['event_date']) || !empty($qrProgramRow['event_time']) || !empty($qrProgramRow['location'])): ?>
         <div style="font-size:.78rem;color:#047857;margin-top:6px;">
@@ -267,16 +269,16 @@ HTML;
           <?php if (!empty($qrProgramRow['location'])): ?><br><i class="fas fa-location-dot me-1"></i><?= htmlspecialchars($qrProgramRow['location']) ?><?php endif; ?>
         </div>
         <?php endif; ?>
-        <p style="font-size:.75rem;color:#065f46;margin:10px 0 0;line-height:1.45;">कार्यक्रम स्थलमा हुनुहुन्छ भने मात्र थिच्नुहोस्। <strong><?= htmlspecialchars($memName) ?></strong> को विवरण (KYC/कार्ड) Admin attendance र तपाईंको <strong>उपस्थिति इतिहास</strong>मा जान्छ — उपस्थित कार्यक्रमको संख्या <strong>१ ले बढ्छ</strong>।</p>
+        <p style="font-size:.75rem;color:#065f46;margin:10px 0 0;line-height:1.45;"><?php echo $_t('कार्यक्रम स्थलमा हुनुहुन्छ भने मात्र थिच्नुहोस्।', 'Press only if you are at the event venue.'); ?> <strong><?= htmlspecialchars($memName) ?></strong> <?php echo $_t('को विवरण (KYC/कार्ड) Admin attendance र तपाईंको', 'details (KYC/card) go to admin attendance and your'); ?> <strong><?php echo $_t('उपस्थिति इतिहास', 'attendance history'); ?></strong><?php echo $_t('मा जान्छ — उपस्थित कार्यक्रमको संख्या', ' — attended program count increases by'); ?> <strong>1</strong>.</p>
       </div>
       <div style="flex-shrink:0;width:100%;max-width:220px;">
         <?php if ($qrAlreadyAttended): ?>
-        <div class="att-badge" style="width:100%;justify-content:center;"><i class="fas fa-circle-check"></i> उपस्थित भइसकेको</div>
+        <div class="att-badge" style="width:100%;justify-content:center;"><i class="fas fa-circle-check"></i> <?php echo $_t('उपस्थित भइसकेको', 'Already Attended'); ?></div>
         <?php else: ?>
         <form method="POST" style="margin:0;">
           <?= $csrfField ?><input type="hidden" name="action" value="checkin"><input type="hidden" name="program_id" value="<?= (int)$qrProgramRow['id'] ?>">
           <button type="submit" style="width:100%;padding:12px 16px;background:var(--primary-color,#1a8754);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:800;cursor:pointer;">
-            <i class="fas fa-user-check me-2"></i>यही कार्यक्रममा Check-in
+            <i class="fas fa-user-check me-2"></i><?php echo $_t('यही कार्यक्रममा Check-in', 'Check-in to this Program'); ?>
           </button>
         </form>
         <?php endif; ?>
@@ -285,7 +287,7 @@ HTML;
   </div>
   <?php elseif ($qrToken !== ''): ?>
   <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px 14px;color:#92400e;font-size:.85rem;margin-bottom:14px;">
-    <i class="fas fa-triangle-exclamation me-2"></i>यो QR मान्य छैन वा कार्यक्रम निष्क्रिय छ।
+    <i class="fas fa-triangle-exclamation me-2"></i><?php echo $_t('यो QR मान्य छैन वा कार्यक्रम निष्क्रिय छ।', 'This QR is invalid or the program is inactive.'); ?>
   </div>
   <?php endif; ?>
 

@@ -18,6 +18,9 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/card-verify-helpers.php';
 require_once __DIR__ . '/includes/program-tables.php';
 require_once __DIR__ . '/includes/member-partner-services-tables.php';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $pdo = getDB();
 ensureProgramTables($pdo);
@@ -77,14 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $memberIdInput = trim((string)($_POST['member_id_input'] ?? ''));
         $note = trim((string)($_POST['prereg_note'] ?? ''));
         if ($programId <= 0 || $memberIdInput === '') {
-            $preregError = 'कृपया कार्यक्रम र सदस्यता नं. दुवै भर्नुहोस्।';
+            $preregError = $_t('कृपया कार्यक्रम र सदस्यता नं. दुवै भर्नुहोस्।', 'Please fill both program and member number.');
         } else {
             try {
                 $pst = $pdo->prepare("SELECT id, title, pre_registration_open, is_active FROM upcoming_programs WHERE id=? LIMIT 1");
                 $pst->execute([$programId]);
                 $pg = $pst->fetch(PDO::FETCH_ASSOC) ?: null;
                 if (!$pg || (int)$pg['is_active'] !== 1 || (int)$pg['pre_registration_open'] !== 1) {
-                    $preregError = 'यो कार्यक्रमको pre-registration अहिले खुला छैन।';
+                    $preregError = $_t('यो कार्यक्रमको pre-registration अहिले खुला छैन।', 'Pre-registration is currently closed for this program.');
                 } else {
                     $mst = $pdo->prepare("SELECT m.id, m.name, m.phone, m.sadasyata_number, m.member_card_no, m.kyc_application_id, m.approval_status, m.is_active
                                           FROM members m
@@ -93,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $mst->execute([$memberIdInput, $memberIdInput, (int)$memberIdInput]);
                     $member = $mst->fetch(PDO::FETCH_ASSOC) ?: null;
                     if (!$member || (string)($member['approval_status'] ?? '') !== 'approved' || (int)($member['is_active'] ?? 0) !== 1) {
-                        $preregError = 'Not member. कृपया पहिला सदस्य बन्नुहोस्।';
+                        $preregError = $_t('Not member. कृपया पहिला सदस्य बन्नुहोस्।', 'Not a member. Please become a member first.');
                     } else {
                         $kycOk = false;
                         if (!empty($member['kyc_application_id'])) {
@@ -106,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $kycOk = (bool)$kst->fetchColumn();
                         }
                         if (!$kycOk) {
-                            $preregError = 'Not member. कृपया पहिला सदस्य बन्नुहोस्।';
+                            $preregError = $_t('Not member. कृपया पहिला सदस्य बन्नुहोस्।', 'Not a member. Please become a member first.');
                         } else {
                             $chk = $pdo->prepare("SELECT id FROM member_program_preregistrations WHERE member_id=? AND program_id=? LIMIT 1");
                             $chk->execute([(int)$member['id'], $programId]);
@@ -132,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             } catch (\Throwable $e) {
-                $preregError = 'Pre-registration सुरक्षित गर्न समस्या भयो।';
+                $preregError = $_t('Pre-registration सुरक्षित गर्न समस्या भयो।', 'Could not save pre-registration.');
                 error_log('program prereg insert: ' . $e->getMessage());
             }
         }
@@ -170,13 +173,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle  = 'सदस्य प्रमाणीकरण — Member Verify';
+$pageTitle  = $_t('सदस्य प्रमाणीकरण — Member Verify', 'Member Verification');
 $siteName   = defined('SITE_URL') ? SITE_URL : '/';
 $cardPrefix = function_exists('getCardPrefix') ? getCardPrefix() : 'AKS';
 $coopPhone = function_exists('getSetting') ? getSetting('phone', getSetting('mobile', '01-XXXXXXX')) : '01-XXXXXXX';
 $coopWebsite = function_exists('getSetting') ? trim((string)getSetting('site_url', (defined('SITE_URL') ? SITE_URL : ''))) : (defined('SITE_URL') ? SITE_URL : '');
 $coopWebsite = preg_replace('#^https?://#i', '', rtrim((string)$coopWebsite, '/'));
-$coopLogo = function_exists('getSetting') ? trim((string)getSetting('site_logo', getSetting('logo', ''))) : '';
+$coopLogo = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath(''))
+    : (function_exists('getSetting') ? trim((string)getSetting('site_logo', getSetting('logo', ''))) : '');
 
 /* DOCUMENT_ROOT बाट photo URL build गर्ने helper */
 $photoUrl = '';
@@ -216,13 +221,13 @@ if ($result && !empty($result['ok'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= htmlspecialchars($pageTitle) ?></title>
-<meta name="description" content="Member ID card सत्यता check गर्नुहोस्। Verification Code र CVV राखेर सक्रिय सदस्य हो/होइन प्रमाणित गर्नुहोस्।">
+<meta name="description" content="<?php echo htmlspecialchars($_t('Member ID card सत्यता check गर्नुहोस्। Verification Code र CVV राखेर सक्रिय सदस्य हो/होइन प्रमाणित गर्नुहोस्।', 'Check Member ID card authenticity. Verify active membership using Verification Code and CVV.'), ENT_QUOTES, 'UTF-8'); ?>">
 <?php if (function_exists('seo_canonical_url')): ?>
 <link rel="canonical" href="<?= htmlspecialchars(seo_canonical_url(), ENT_QUOTES, 'UTF-8') ?>">
 <?php endif; ?>
@@ -411,7 +416,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 <body class="auth-portal-page verify-auth-page">
 <div class="vp-outer">
 
-    <a href="<?php echo SITE_URL; ?>" class="page-back"><i class="fas fa-arrow-left"></i> मुख्य पृष्ठ</a>
+    <a href="<?php echo SITE_URL; ?>" class="page-back"><i class="fas fa-arrow-left"></i> <?php echo $_t('मुख्य पृष्ठ', 'Home'); ?></a>
 
     <?php
     $v7vLogoAlt = function_exists('getSetting') ? getSetting('site_name','सहकारी') : 'सहकारी';
@@ -444,7 +449,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
       <div class="vp-result-ok">
         <article class="vp-idcard" aria-label="प्रमाणित सदस्य परिचय">
           <div class="vp-idcard-shine" aria-hidden="true"></div>
-          <div class="vp-idcard-ribbon" aria-hidden="true"><span>सक्रिय सदस्य</span></div>
+          <div class="vp-idcard-ribbon" aria-hidden="true"><span><?php echo $_t('सक्रिय सदस्य', 'Active Member'); ?></span></div>
           <header class="vp-idcard-head">
             <div class="vp-idcard-head-brand">
               <?php if ($vpLogoSrc): ?>
@@ -454,12 +459,12 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
               <?php endif; ?>
               <div class="vp-idcard-head-text">
                 <div class="vp-idcard-org"><?= htmlspecialchars($v7vSiteName) ?></div>
-                <div class="vp-idcard-sub">Member verification · सार्वजनिक प्रमाणीकरण</div>
+                <div class="vp-idcard-sub"><?php echo $_t('Member verification · सार्वजनिक प्रमाणीकरण', 'Member verification · Public verification'); ?></div>
               </div>
             </div>
-            <div class="vp-idcard-seal" title="सत्यता प्रमाणित">
+            <div class="vp-idcard-seal" title="<?php echo $_t('सत्यता प्रमाणित', 'Verified'); ?>">
               <i class="fas fa-shield-halved" aria-hidden="true"></i>
-              <span>प्रमाणित</span>
+              <span><?php echo $_t('प्रमाणित', 'Verified'); ?></span>
             </div>
           </header>
           <div class="vp-idcard-body">
@@ -471,23 +476,23 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
               <div class="vp-idcard-chip" aria-hidden="true"></div>
             </div>
             <div class="vp-idcard-info">
-              <p class="vp-idcard-status"><i class="fas fa-circle-check" aria-hidden="true"></i> सत्यता प्रमाणित — सक्रिय सदस्य</p>
+              <p class="vp-idcard-status"><i class="fas fa-circle-check" aria-hidden="true"></i> <?php echo $_t('सत्यता प्रमाणित — सक्रिय सदस्य', 'Verified — Active Member'); ?></p>
               <h2 class="vp-idcard-name"><?= htmlspecialchars($result['member']['full_name']) ?></h2>
               <div class="vp-idcard-mid">
-                <span class="vp-idcard-mid-label">सदस्यता नं.</span>
+                <span class="vp-idcard-mid-label"><?php echo $_t('सदस्यता नं.', 'Member No.'); ?></span>
                 <span class="vp-idcard-mid-num"><?= htmlspecialchars($result['member']['member_id']) ?></span>
               </div>
               <dl class="vp-idcard-rows">
                 <div class="vp-idcard-row">
-                  <dt>बुबाको नाम</dt>
+                  <dt><?php echo $_t('बुबाको नाम', "Father's Name"); ?></dt>
                   <dd><?= htmlspecialchars($result['member']['father_name'] ?? '—') ?></dd>
                 </div>
                 <div class="vp-idcard-row">
-                  <dt>मोबाइल</dt>
+                  <dt><?php echo $_t('मोबाइल', 'Mobile'); ?></dt>
                   <dd><?= htmlspecialchars($result['member']['mobile'] ?? '—') ?></dd>
                 </div>
                 <div class="vp-idcard-row vp-idcard-row--full">
-                  <dt>इमेल</dt>
+                  <dt><?php echo $_t('इमेल', 'Email'); ?></dt>
                   <dd><?= htmlspecialchars($result['member']['email'] ?? '—') ?></dd>
                 </div>
               </dl>
@@ -495,7 +500,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
           </div>
           <footer class="vp-idcard-foot">
             <span class="vp-idcard-foot-org"><?= htmlspecialchars($v7vSiteName) ?></span>
-            <span class="vp-idcard-foot-meta">सम्पर्क <?= htmlspecialchars($coopPhone) ?> · <?= htmlspecialchars($coopWebsite !== '' ? $coopWebsite : '—') ?></span>
+            <span class="vp-idcard-foot-meta"><?php echo $_t('सम्पर्क', 'Contact'); ?> <?= htmlspecialchars($coopPhone) ?> · <?= htmlspecialchars($coopWebsite !== '' ? $coopWebsite : '—') ?></span>
           </footer>
         </article>
       </div>
@@ -505,11 +510,11 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
           <div class="vp-ok-head" style="margin:0;font-size:14px;">
             <i class="fas fa-floppy-disk"></i>
             <?php if ($programAlreadyRegistered): ?>
-              यो सदस्यको यो कार्यक्रममा पहिल्यै Registration भइसकेको छ।
+              <?php echo $_t('यो सदस्यको यो कार्यक्रममा पहिल्यै Registration भइसकेको छ।', 'This member is already registered for this program.'); ?>
             <?php elseif ($programSaved): ?>
-              कार्यक्रम उपस्थिति रेकर्ड सुरक्षित भयो — धन्यवाद।
+              <?php echo $_t('कार्यक्रम उपस्थिति रेकर्ड सुरक्षित भयो — धन्यवाद।', 'Program attendance record saved — thank you.'); ?>
             <?php else: ?>
-              सेवा रेकर्ड सुरक्षित भयो — धन्यवाद।
+              <?php echo $_t('सेवा रेकर्ड सुरक्षित भयो — धन्यवाद।', 'Service record saved — thank you.'); ?>
             <?php endif; ?>
           </div>
         </div>
@@ -517,8 +522,8 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 
       <div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px 14px 16px;margin-bottom:18px;">
         <div class="vp-mini-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-          <button type="button" class="vp-mini-tab is-active" data-target="vpPaneService">साझेदार सेवा रेकर्ड</button>
-          <button type="button" class="vp-mini-tab" data-target="vpPaneProgram">कार्यक्रम उपस्थिति</button>
+          <button type="button" class="vp-mini-tab is-active" data-target="vpPaneService"><?php echo $_t('साझेदार सेवा रेकर्ड', 'Partner Service Record'); ?></button>
+          <button type="button" class="vp-mini-tab" data-target="vpPaneProgram"><?php echo $_t('कार्यक्रम उपस्थिति', 'Program Attendance'); ?></button>
         </div>
 
         <div id="vpPaneService" class="vp-mini-pane">
@@ -531,42 +536,42 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
             <input type="hidden" name="member_card_no" value="<?= htmlspecialchars($result['member']['member_id'] ?? '') ?>">
 
             <div class="vp-field" style="margin-bottom:10px;">
-              <label>साझेदार संस्था चयन गर्नुहोस्</label>
+              <label><?php echo $_t('साझेदार संस्था चयन गर्नुहोस्', 'Select Partner Organization'); ?></label>
               <select name="partner_id" id="partnerSel" class="vp-field-input" style="width:100%;padding:11px 12px;border:1.5px solid #d1d5db;border-radius:9px;font-family:inherit;font-size:14px;">
-                <option value="0">— चयन गर्नुहोस् वा तल नाम लेख्नुहोस् —</option>
+                <option value="0"><?php echo $_t('— चयन गर्नुहोस् वा तल नाम लेख्नुहोस् —', '— Select or type name below —'); ?></option>
                 <?php foreach ($partners as $p): ?>
                   <option value="<?= (int)$p['id'] ?>" data-name="<?= htmlspecialchars($p['partner_name']) ?>"><?= htmlspecialchars($p['partner_name']) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
             <div class="vp-field" style="margin-bottom:10px;">
-              <label>संस्थाको नाम (custom)</label>
-              <input type="text" name="partner_name" id="partnerName" placeholder="उदाहरण: आकाश हस्पिटल" required readonly>
+              <label><?php echo $_t('संस्थाको नाम (custom)', 'Organization Name (custom)'); ?></label>
+              <input type="text" name="partner_name" id="partnerName" placeholder="<?php echo $_t('उदाहरण: आकाश हस्पिटल', 'Example: Aakash Hospital'); ?>" required readonly>
             </div>
             <div class="vp-field" style="margin-bottom:10px;">
-              <label>लिएको सेवा (के सेवा?)</label>
-              <input type="text" name="service_name" id="serviceName" maxlength="255" placeholder="उदाहरण: OPD Discount / Lab / Banking Service" required>
+              <label><?php echo $_t('लिएको सेवा (के सेवा?)', 'Service Used'); ?></label>
+              <input type="text" name="service_name" id="serviceName" maxlength="255" placeholder="<?php echo $_t('उदाहरण: OPD Discount / Lab / Banking Service', 'Example: OPD Discount / Lab / Banking Service'); ?>" required>
             </div>
             <div class="vp-field" style="margin-bottom:10px;">
-              <label>सेवा लिनुभयो?</label>
+              <label><?php echo $_t('सेवा लिनुभयो?', 'Service Taken?'); ?></label>
               <div style="display:flex;gap:14px;font-size:14px;color:#374151;">
-                <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="service_taken" value="yes" checked> हो</label>
-                <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="service_taken" value="no"> होइन</label>
+                <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="service_taken" value="yes" checked> <?php echo $_t('हो', 'Yes'); ?></label>
+                <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="service_taken" value="no"> <?php echo $_t('होइन', 'No'); ?></label>
               </div>
             </div>
             <div class="vp-field" style="margin-bottom:14px;">
-              <label>नोट / सेवा विवरण (वैकल्पिक)</label>
-              <input type="text" name="service_note" maxlength="500" placeholder="उदाहरण: OPD discount 10%">
+              <label><?php echo $_t('नोट / सेवा विवरण (वैकल्पिक)', 'Note / Service Detail (optional)'); ?></label>
+              <input type="text" name="service_note" maxlength="500" placeholder="<?php echo $_t('उदाहरण: OPD discount 10%', 'Example: OPD discount 10%'); ?>">
             </div>
             <button type="submit" class="vp-btn" style="padding:11px;">
-              <i class="fas fa-floppy-disk"></i> सेवा रेकर्ड सुरक्षित गर्नुहोस्
+              <i class="fas fa-floppy-disk"></i> <?php echo $_t('सेवा रेकर्ड सुरक्षित गर्नुहोस्', 'Save Service Record'); ?>
             </button>
           </form>
         </div>
 
         <div id="vpPaneProgram" class="vp-mini-pane" style="display:none;">
           <?php if (empty($activePrograms)): ?>
-            <div class="hint" style="font-size:13px;">हाल सक्रिय कार्यक्रम उपलब्ध छैन।</div>
+            <div class="hint" style="font-size:13px;"><?php echo $_t('हाल सक्रिय कार्यक्रम उपलब्ध छैन।', 'No active program available right now.'); ?></div>
           <?php else: ?>
           <form method="POST" autocomplete="off" class="needs-validation" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generateCSRFToken()) ?>">
@@ -576,9 +581,9 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
             <input type="hidden" name="member_id" value="<?= (int)($result['member']['id'] ?? 0) ?>">
             <input type="hidden" name="member_card_no" value="<?= htmlspecialchars($result['member']['member_id'] ?? '') ?>">
             <div class="vp-field" style="margin-bottom:10px;">
-              <label>सक्रिय कार्यक्रम छान्नुहोस्</label>
+              <label><?php echo $_t('सक्रिय कार्यक्रम छान्नुहोस्', 'Select Active Program'); ?></label>
               <select name="program_id" id="programSel" required style="width:100%;padding:11px 12px;border:1.5px solid #d1d5db;border-radius:9px;font-family:inherit;font-size:14px;">
-                <option value="">— कार्यक्रम चयन गर्नुहोस् —</option>
+                <option value=""><?php echo $_t('— कार्यक्रम चयन गर्नुहोस् —', '— Select Program —'); ?></option>
                 <?php foreach ($activePrograms as $pg): ?>
                   <option value="<?= (int)$pg['id'] ?>" data-title="<?= htmlspecialchars($pg['title']) ?>">
                     <?= htmlspecialchars($pg['title']) ?>
@@ -591,15 +596,15 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
             </div>
             <div class="vp-field" style="margin-bottom:10px;">
               <label style="display:inline-flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;">
-                <input type="checkbox" name="is_priority" value="1"> यो कार्यक्रम प्राथमिकता हो
+                <input type="checkbox" name="is_priority" value="1"> <?php echo $_t('यो कार्यक्रम प्राथमिकता हो', 'This is a priority program'); ?>
               </label>
             </div>
             <div class="vp-field" style="margin-bottom:14px;">
-              <label>टिप्पणी (वैकल्पिक)</label>
-              <input type="text" name="attendance_note" maxlength="500" placeholder="उदाहरण: वार्षिक साधारण सभा उपस्थित">
+              <label><?php echo $_t('टिप्पणी (वैकल्पिक)', 'Comment (optional)'); ?></label>
+              <input type="text" name="attendance_note" maxlength="500" placeholder="<?php echo $_t('उदाहरण: वार्षिक साधारण सभा उपस्थित', 'Example: Attended annual general meeting'); ?>">
             </div>
             <button type="submit" class="vp-btn" style="padding:11px;">
-              <i class="fas fa-user-check"></i> उपस्थिति सुरक्षित गर्नुहोस्
+              <i class="fas fa-user-check"></i> <?php echo $_t('उपस्थिति सुरक्षित गर्नुहोस्', 'Save Attendance'); ?>
             </button>
           </form>
           <?php endif; ?>
@@ -616,8 +621,8 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     <div class="verify-form-card">
       <div class="verify-form-card__head">
         <div class="vp-icon"><i class="fas fa-id-card-clip"></i></div>
-        <h1>सदस्य प्रमाणीकरण</h1>
-        <p class="vp-sub">ID Card को <b>Verification Code / Card Number</b> र <b>4-अङ्कको CVV</b> राखेर सदस्य सत्यता जाँच गर्नुहोस्।</p>
+        <h1><?php echo $_t('सदस्य प्रमाणीकरण', 'Member Verification'); ?></h1>
+        <p class="vp-sub"><?php echo $_t('ID Card को <b>Verification Code / Card Number</b> र <b>4-अङ्कको CVV</b> राखेर सदस्य सत्यता जाँच गर्नुहोस्।', 'Enter <b>Verification Code / Card Number</b> and <b>4-digit CVV</b> to verify member authenticity.'); ?></p>
       </div>
       <div class="verify-form-card__body">
       <form method="POST" autocomplete="off" novalidate class="needs-validation">
@@ -627,28 +632,28 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
           <input type="text" id="code" name="code" required maxlength="20"
                  placeholder="<?= htmlspecialchars($cardPrefix) ?>-XXXX-XXXX वा <?= htmlspecialchars($cardPrefix) ?>-2026-00001"
                  value="<?= htmlspecialchars($code) ?>">
-          <div class="hint">Code वा Card Number दुवै मान्य छन्।</div>
+          <div class="hint"><?php echo $_t('Code वा Card Number दुवै मान्य छन्।', 'Both code and card number are valid.'); ?></div>
           <div class="hint" id="codeLiveHint" style="color:var(--secondary-dark, var(--primary-dark, #0f766e));font-weight:600;"></div>
         </div>
 
         <div class="vp-field">
-          <label for="cvv">CVV (4 अङ्क)</label>
+          <label for="cvv"><?php echo $_t('CVV (4 अङ्क)', 'CVV (4 digits)'); ?></label>
           <input type="text" id="cvv" name="cvv" required inputmode="numeric"
                  pattern="[0-9]{4}" maxlength="4" placeholder="••••"
                  value="<?= htmlspecialchars($cvv) ?>">
-          <div class="hint">कार्डको पछाडि वा कुनामा छापिएको गोप्य 4 अङ्क</div>
+          <div class="hint"><?php echo $_t('कार्डको पछाडि वा कुनामा छापिएको गोप्य 4 अङ्क', 'Secret 4 digits printed on back/corner of card'); ?></div>
         </div>
 
         <button type="submit" class="vp-btn">
-          <i class="fas fa-shield-halved"></i> सदस्य प्रमाणित गर्नुहोस्
+          <i class="fas fa-shield-halved"></i> <?php echo $_t('सदस्य प्रमाणित गर्नुहोस्', 'Verify Member'); ?>
         </button>
       </form>
       </div>
     </div>
 
     <div class="vp-help">
-      🔒 तपाईंको प्रत्येक प्रयास log गरिन्छ। Card अरूलाई share नगर्नुहोस्।<br>
-      समस्या भए कार्यालयमा सम्पर्क गर्नुहोस्।
+      🔒 <?php echo $_t('तपाईंको प्रत्येक प्रयास log गरिन्छ। Card अरूलाई share नगर्नुहोस्।', 'Every attempt is logged. Do not share card details with others.'); ?><br>
+      <?php echo $_t('समस्या भए कार्यालयमा सम्पर्क गर्नुहोस्।', 'If you face issues, contact office.'); ?>
     </div>
   </div>
 </div>
@@ -673,7 +678,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     } else if (looksLikeVerify) {
       codeLiveHint.textContent = 'Verification Code format detected';
     } else {
-      codeLiveHint.textContent = 'Format: PREFIX-XXXX-XXXX वा PREFIX-YYYY-NNNNN';
+      codeLiveHint.textContent = <?php echo json_encode($_t('Format: PREFIX-XXXX-XXXX वा PREFIX-YYYY-NNNNN', 'Format: PREFIX-XXXX-XXXX or PREFIX-YYYY-NNNNN')); ?>;
     }
   }
 
@@ -681,7 +686,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
     e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
     updateCodeHint(e.target.value);
   });
-  if (!codeInput.value) codeInput.placeholder = (CARD_PREFIX || 'AKS') + '-XXXX-XXXX वा ' + (CARD_PREFIX || 'AKS') + '-2026-00001';
+  if (!codeInput.value) codeInput.placeholder = (CARD_PREFIX || 'AKS') + '-XXXX-XXXX' + <?php echo json_encode($_t(' वा ', ' or ')); ?> + (CARD_PREFIX || 'AKS') + '-2026-00001';
   updateCodeHint(codeInput.value);
 
   // CVV digits only

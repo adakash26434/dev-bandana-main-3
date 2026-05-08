@@ -5,9 +5,18 @@
  * (.htaccess: ErrorDocument 500 /500.php)
  */
 http_response_code(500);
+if (!function_exists('isEnglish')) {
+    function isEnglish(): bool {
+        $lang = strtolower((string)($_GET['lang'] ?? $_COOKIE['lang'] ?? 'ne'));
+        return $lang === 'en';
+    }
+}
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 /* config.php load नभए पनि standalone देखाउने */
-$siteName = 'सहकारी संस्था';
+$siteName = $_t('सहकारी संस्था', 'Cooperative');
 $siteUrl  = '/';
 if (file_exists(__DIR__ . '/includes/config.php')) {
     /* silent — config पनि fail हुन सक्छ */
@@ -18,12 +27,12 @@ if (file_exists(__DIR__ . '/includes/config.php')) {
     } catch (Throwable $t) { /* silent */ }
 }
 ?><!DOCTYPE html>
-<html lang="ne">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Server Error — <?php echo htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8'); ?></title>
+<title><?php echo htmlspecialchars($_t('सर्भर त्रुटि', 'Server Error'), ENT_QUOTES, 'UTF-8'); ?> — <?php echo htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8'); ?></title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -40,19 +49,19 @@ if (file_exists(__DIR__ . '/includes/config.php')) {
     <div class="err-icon"><i class="fas fa-triangle-exclamation"></i></div>
     <h2 class="fw-bold mb-2">Server Error</h2>
     <p class="text-muted mb-4">
-        माफ गर्नुहोस् — केही गलत भयो।<br>
-        <small>हाम्रो टोली यो समस्या हल गर्दैछ। कृपया थोरै पछि पुनः प्रयास गर्नुहोस्।</small>
+        <?php echo $_t('माफ गर्नुहोस् — केही गलत भयो।', 'Sorry — something went wrong.'); ?><br>
+        <small><?php echo $_t('हाम्रो टोली यो समस्या हल गर्दैछ। कृपया थोरै पछि पुनः प्रयास गर्नुहोस्।', 'Our team is working on this issue. Please try again in a while.'); ?></small>
     </p>
     <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
         <a href="<?php echo htmlspecialchars($siteUrl, ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary px-4">
-            <i class="fas fa-home me-2"></i>गृहपृष्ठमा जानुहोस्
+            <i class="fas fa-home me-2"></i><?php echo $_t('गृहपृष्ठमा जानुहोस्', 'Go to Homepage'); ?>
         </a>
         <button onclick="location.reload()" class="btn btn-outline-secondary px-4">
-            <i class="fas fa-rotate me-2"></i>पुनः प्रयास गर्नुहोस्
+            <i class="fas fa-rotate me-2"></i><?php echo $_t('पुनः प्रयास गर्नुहोस्', 'Try Again'); ?>
         </button>
     </div>
     <p class="text-muted small mt-4 mb-0">
-        समस्या जारी रहे कृपया हामीलाई सम्पर्क गर्नुहोस्।
+        <?php echo $_t('समस्या जारी रहे कृपया हामीलाई सम्पर्क गर्नुहोस्।', 'If the problem persists, please contact us.'); ?>
     </p>
 </div>
 </body>

@@ -3,7 +3,10 @@
  * एप सुविधाहरू व्यवस्थापन — App Features Management
  * Tab UI: सूची + Add/Edit form (modal popup हटाइएको)
  */
-$pageTitle = 'एप सुविधाहरू';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle = $__t('एप सुविधाहरू', 'App Features');
 require_once '../includes/config.php';
 if (!isAdminLoggedIn()) redirect(ADMIN_URL . 'index.php');
 
@@ -55,10 +58,10 @@ $flash = getFlash();
 ?>
 
 <?php echo adminPageHeader(
-    'एप सुविधाहरू',
+    $__t('एप सुविधाहरू', 'App Features'),
     'fa-mobile-alt',
-    'मोबाइल एपमा देखिने सुविधाहरू।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($features) . ' सुविधाहरू</span>'
+    $__t('मोबाइल एपमा देखिने सुविधाहरू।', 'Features shown in mobile app.'),
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>' . $__t('जम्मा', 'Total') . ': ' . count($features) . ' ' . $__t('सुविधाहरू', 'features') . '</span>'
 ); ?>
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
@@ -66,13 +69,13 @@ $flash = getFlash();
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#feat-list" id="feat-list-btn">
-            <i class="fas fa-list me-2"></i>सुविधा सूची
+            <i class="fas fa-list me-2"></i><?php echo $__t('सुविधा सूची', 'Feature List'); ?>
             <span class="badge bg-success ms-1"><?php echo count($features); ?></span>
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#feat-form" id="feat-form-btn">
-            <i class="fas fa-plus-circle me-2"></i><span id="featFormTabLabel">नयाँ थप्नुहोस्</span>
+            <i class="fas fa-plus-circle me-2"></i><span id="featFormTabLabel"><?php echo $__t('नयाँ थप्नुहोस्', 'Add New'); ?></span>
         </button>
     </li>
 </ul>
@@ -87,20 +90,20 @@ $flash = getFlash();
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th class="ps-3" width="60">आइकन</th>
-                                <th>शीर्षक</th>
-                                <th>विवरण</th>
-                                <th width="80" class="text-center">क्रम</th>
+                                <th class="ps-3" width="60"><?php echo $__t('आइकन', 'Icon'); ?></th>
+                                <th><?php echo $__t('शीर्षक', 'Title'); ?></th>
+                                <th><?php echo $__t('विवरण', 'Description'); ?></th>
+                                <th width="80" class="text-center"><?php echo $__t('क्रम', 'Order'); ?></th>
                                 <th width="80" class="text-center">New</th>
-                                <th width="90" class="text-center">स्थिति</th>
-                                <th width="140" class="text-center">कार्य</th>
+                                <th width="90" class="text-center"><?php echo $__t('स्थिति', 'Status'); ?></th>
+                                <th width="140" class="text-center"><?php echo $__t('कार्य', 'Actions'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($features)): ?>
                             <tr><td colspan="7" class="text-center py-5 text-muted">
                                 <i class="fas fa-mobile-alt fa-3x mb-2 d-block opacity-25"></i>
-                                कुनै सुविधा छैन।
+                                <?php echo $__t('कुनै सुविधा छैन।', 'No features found.'); ?>
                             </td></tr>
                             <?php endif; ?>
                             <?php foreach ($features as $f): ?>
@@ -162,10 +165,10 @@ $flash = getFlash();
         <div class="card" style="border-top-left-radius:0!important;border-top-right-radius:0!important;">
             <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:#fff;">
                 <h5 class="mb-0 fw-bold" id="featFormTitle">
-                    <i class="fas fa-plus-circle me-2"></i>नयाँ सुविधा थप्नुहोस्
+                    <i class="fas fa-plus-circle me-2"></i><?php echo $__t('नयाँ सुविधा थप्नुहोस्', 'Add New Feature'); ?>
                 </h5>
                 <button type="button" class="btn btn-light btn-sm" id="btnCancelFeat">
-                    <i class="fas fa-arrow-left me-1"></i>सूचीमा फर्कनुहोस्
+                    <i class="fas fa-arrow-left me-1"></i><?php echo $__t('सूचीमा फर्कनुहोस्', 'Back to List'); ?>
                 </button>
             </div>
             <div class="card-body p-4">
@@ -176,15 +179,15 @@ $flash = getFlash();
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold text-success">शीर्षक (नेपाली) <span class="text-danger">*</span></label>
-                            <input type="text" name="title_np" id="fef_title_np" class="form-control admin-fancy-input" required placeholder="सुविधाको नाम नेपालीमा">
+                            <label class="form-label fw-semibold text-success"><?php echo $__t('शीर्षक (नेपाली)', 'Title (Nepali)'); ?> <span class="text-danger">*</span></label>
+                            <input type="text" name="title_np" id="fef_title_np" class="form-control admin-fancy-input" required placeholder="<?php echo $__t('सुविधाको नाम नेपालीमा', 'Feature name in Nepali'); ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold text-success">Title (English)</label>
                             <input type="text" name="title" id="fef_title" class="form-control admin-fancy-input" placeholder="Feature name in English">
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold text-success">Font Awesome आइकन</label>
+                            <label class="form-label fw-semibold text-success"><?php echo $__t('Font Awesome आइकन', 'Font Awesome Icon'); ?></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-success text-white" id="fefIconPrev"><i class="fas fa-star"></i></span>
                                 <input type="text" name="icon" id="fef_icon" class="form-control admin-fancy-input"
@@ -193,27 +196,27 @@ $flash = getFlash();
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold text-success">विवरण (नेपाली)</label>
-                            <textarea name="description_np" id="fef_desc_np" class="form-control admin-fancy-input" rows="3" placeholder="सुविधाको विवरण नेपालीमा..."></textarea>
+                            <label class="form-label fw-semibold text-success"><?php echo $__t('विवरण (नेपाली)', 'Description (Nepali)'); ?></label>
+                            <textarea name="description_np" id="fef_desc_np" class="form-control admin-fancy-input" rows="3" placeholder="<?php echo $__t('सुविधाको विवरण नेपालीमा...', 'Feature description in Nepali...'); ?>"></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold text-success">Description (English)</label>
                             <textarea name="description" id="fef_desc" class="form-control admin-fancy-input" rows="3" placeholder="Feature description in English..."></textarea>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold text-success">क्रम</label>
+                            <label class="form-label fw-semibold text-success"><?php echo $__t('क्रम', 'Order'); ?></label>
                             <input type="number" name="sort_order" id="fef_order" class="form-control admin-fancy-input" value="0" min="0">
                         </div>
                         <div class="col-md-4 d-flex align-items-end pb-1">
                             <div class="form-check form-switch fs-5">
                                 <input class="form-check-input" type="checkbox" name="is_new" id="fef_is_new">
-                                <label class="form-check-label fw-semibold" for="fef_is_new">New Badge देखाउने</label>
+                                <label class="form-check-label fw-semibold" for="fef_is_new"><?php echo $__t('New Badge देखाउने', 'Show New Badge'); ?></label>
                             </div>
                         </div>
                         <div class="col-md-4 d-flex align-items-end pb-1">
                             <div class="form-check form-switch fs-5">
                                 <input class="form-check-input" type="checkbox" name="is_active" id="fef_active" checked>
-                                <label class="form-check-label fw-semibold" for="fef_active">सक्रिय</label>
+                                <label class="form-check-label fw-semibold" for="fef_active"><?php echo $__t('सक्रिय', 'Active'); ?></label>
                             </div>
                         </div>
                     </div>
@@ -221,10 +224,10 @@ $flash = getFlash();
                     <hr class="my-4">
                     <div class="d-flex gap-3">
                         <button type="submit" id="fef_submit" class="btn btn-success px-5 fw-semibold">
-                            <i class="fas fa-plus-circle me-2"></i>थप्नुहोस्
+                            <i class="fas fa-plus-circle me-2"></i><?php echo $__t('थप्नुहोस्', 'Add'); ?>
                         </button>
                         <button type="button" id="fef_cancel2" class="btn btn-outline-secondary px-4">
-                            <i class="fas fa-times me-1"></i>रद्द
+                            <i class="fas fa-times me-1"></i><?php echo $__t('रद्द', 'Cancel'); ?>
                         </button>
                     </div>
                 </form>
@@ -255,9 +258,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('fef_is_new').checked = false;
         document.getElementById('fef_active').checked = true;
         document.getElementById('fefIconPrev').innerHTML = '<i class="fas fa-star"></i>';
-        document.getElementById('fef_submit').innerHTML = '<i class="fas fa-plus-circle me-2"></i>थप्नुहोस्';
-        document.getElementById('featFormTitle').innerHTML = '<i class="fas fa-plus-circle me-2"></i>नयाँ सुविधा थप्नुहोस्';
-        document.getElementById('featFormTabLabel').textContent = 'नयाँ थप्नुहोस्';
+        document.getElementById('fef_submit').innerHTML = '<i class="fas fa-plus-circle me-2"></i><?php echo $__t('थप्नुहोस्', 'Add'); ?>';
+        document.getElementById('featFormTitle').innerHTML = '<i class="fas fa-plus-circle me-2"></i><?php echo $__t('नयाँ सुविधा थप्नुहोस्', 'Add New Feature'); ?>';
+        document.getElementById('featFormTabLabel').textContent = '<?php echo $__t('नयाँ थप्नुहोस्', 'Add New'); ?>';
     }
 
     document.getElementById('btnAddFeature')?.addEventListener('click', function() { clearForm(); switchToForm(); });
@@ -281,9 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('fef_is_new').checked = d.isNew === '1';
             document.getElementById('fef_active').checked = d.active === '1';
             document.getElementById('fefIconPrev').innerHTML = '<i class="' + (d.icon || 'fas fa-star') + '"></i>';
-            document.getElementById('fef_submit').innerHTML = '<i class="fas fa-save me-2"></i>अपडेट गर्नुहोस्';
-            document.getElementById('featFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i>एप सुविधा सम्पादन';
-            document.getElementById('featFormTabLabel').textContent = 'सम्पादन';
+            document.getElementById('fef_submit').innerHTML = '<i class="fas fa-save me-2"></i><?php echo $__t('अपडेट गर्नुहोस्', 'Update'); ?>';
+            document.getElementById('featFormTitle').innerHTML = '<i class="fas fa-edit me-2"></i><?php echo $__t('एप सुविधा सम्पादन', 'Edit App Feature'); ?>';
+            document.getElementById('featFormTabLabel').textContent = '<?php echo $__t('सम्पादन', 'Edit'); ?>';
             switchToForm();
         });
     });

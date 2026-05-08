@@ -6,6 +6,9 @@
  */
 require_once 'includes/config.php';
 require_once 'includes/ensure-tables.php';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $token = trim(preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['token'] ?? ''));
 $db    = null;
@@ -30,10 +33,10 @@ if ($db && $token) {
         $st = $db->prepare("SELECT * FROM upcoming_programs WHERE qr_token=? AND is_active=1 LIMIT 1");
         $st->execute([$token]);
         $prog = $st->fetch(PDO::FETCH_ASSOC) ?: null;
-        if (!$prog) $err = 'यो QR code मान्य छैन वा कार्यक्रम समाप्त भयो।';
-    } catch (Throwable $e) { $err = 'कार्यक्रम लोड गर्न सकिएन।'; }
+        if (!$prog) $err = $_t('यो QR code मान्य छैन वा कार्यक्रम समाप्त भयो।', 'This QR code is invalid or the program has ended.');
+    } catch (Throwable $e) { $err = $_t('कार्यक्रम लोड गर्न सकिएन।', 'Could not load program.'); }
 } elseif (!$token) {
-    $err = 'QR code token आवश्यक छ।';
+    $err = $_t('QR code token आवश्यक छ।', 'QR code token is required.');
 }
 
 /* ── Check if member is already logged in via member portal session ── */
@@ -113,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                         $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
                         $dup->execute([$mId, (int)$prog['id']]);
                         if ($dup->fetchColumn()) {
-                            $alreadyDone = true; $memName = $mNm; $memCard = $mCard; $memberId = $mId;
+                    $alreadyDone = true; $memName = $mNm; $memCard = $mCard; $memberId = $mId;
                         } elseif ($memberId && $mId === $memberId) {
                             /* आफै लगइन भएको सदस्यले manual फारम प्रयोग — तुरुन्त दर्ता */
                             $ins = $db->prepare("INSERT INTO member_program_attendance
@@ -126,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                             $pend = $db->prepare("SELECT id FROM member_program_attendance_requests WHERE member_id=? AND program_id=? AND status='pending' LIMIT 1");
                             $pend->execute([$mId, (int)$prog['id']]);
                             if ($pend->fetchColumn()) {
-                                $err = 'तपाईंको उपस्थिति अनुरोध पहिले नै Admin सामु प्रक्रियामा छ। स्वीकृत भएपछि सूचीमा देखिनेछ।';
+                                $err = $_t('तपाईंको उपस्थिति अनुरोध पहिले नै Admin सामु प्रक्रियामा छ। स्वीकृत भएपछि सूचीमा देखिनेछ।', 'Your attendance request is already pending with admin. It will appear in the list after approval.');
                             } else {
                                 $ins = $db->prepare("INSERT INTO member_program_attendance_requests
                                     (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
@@ -147,24 +150,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                             }
                         }
                     }
-                } catch (Throwable $e) { $err = 'Check-in गर्न समस्या भयो।'; error_log('[attend] ' . $e->getMessage()); }
+                } catch (Throwable $e) { $err = $_t('Check-in गर्न समस्या भयो।', 'There was a problem checking in.'); error_log('[attend] ' . $e->getMessage()); }
             }
         }
     }
 }
 
-$siteName     = function_exists('getSetting') ? getSetting('site_name', 'सहकारी') : 'सहकारी';
+$siteName     = function_exists('getSetting') ? getSetting('site_name', $_t('सहकारी', 'Cooperative')) : $_t('सहकारी', 'Cooperative');
 $primaryColor = function_exists('getSetting') ? getSetting('primary_color', '#1a5f2a') : '#1a5f2a';
 $siteLogo     = function_exists('getSetting') ? getSetting('site_logo', 'assets/images/logo.png') : 'assets/images/logo.png';
 $csrfField    = function_exists('generateCSRFToken') ? '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">' : '';
 $evDate       = $prog ? ($prog['event_date'] ? date('Y F d', strtotime($prog['event_date'])) : '') : '';
 ?>
 <!DOCTYPE html>
-<html lang="ne" dir="ltr">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QR Attendance — <?= htmlspecialchars($siteName) ?></title>
+<title><?php echo htmlspecialchars($_t('QR उपस्थिति', 'QR Attendance')); ?> — <?= htmlspecialchars($siteName) ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -213,7 +216,7 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
     <?php elseif ($requestSubmitted && $prog): ?>
     <div style="text-align:center;padding:8px 0;">
       <div class="success-icon" style="background:#fffbeb;border-color:#fcd34d;"><i class="fas fa-hourglass-half" style="color:#b45309;"></i></div>
-      <h2 style="font-size:1.15rem;font-weight:800;color:#92400e;margin-bottom:8px;">अनुरोध पठाइयो</h2>
+      <h2 style="font-size:1.15rem;font-weight:800;color:#92400e;margin-bottom:8px;"><?php echo $_t('अनुरोध पठाइयो', 'Request Sent'); ?></h2>
       <p style="font-size:.88rem;color:#6b7280;margin-bottom:12px;">
         <?= htmlspecialchars($memName ?: 'सदस्य') ?><?php if ($memCard): ?> (<?= htmlspecialchars($memCard) ?>)<?php endif; ?> — <strong><?= htmlspecialchars($prog['title']) ?></strong>
       </p>
@@ -224,7 +227,7 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
     <?php elseif ($done): ?>
     <div style="text-align:center;padding:8px 0;">
       <div class="success-icon"><i class="fas fa-check"></i></div>
-      <h2 style="font-size:1.2rem;font-weight:800;color:#166534;margin-bottom:6px;">उपस्थिति दर्ता भयो!</h2>
+      <h2 style="font-size:1.2rem;font-weight:800;color:#166534;margin-bottom:6px;"><?php echo $_t('उपस्थिति दर्ता भयो!', 'Attendance Recorded!'); ?></h2>
       <p style="font-size:.88rem;color:#6b7280;margin-bottom:16px;">
         <?= htmlspecialchars($memName ?: 'सदस्य') ?><?php if ($memCard): ?> (<?= htmlspecialchars($memCard) ?>)<?php endif; ?> — <strong><?= htmlspecialchars($prog['title']) ?></strong>
       </p>
@@ -235,44 +238,55 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
     <?php elseif ($alreadyDone && $prog): ?>
     <div style="text-align:center;padding:8px 0;">
       <div class="success-icon" style="background:#eff6ff;border-color:#bfdbfe;"><i class="fas fa-bookmark" style="color:#1565c0;"></i></div>
-      <h2 style="font-size:1.1rem;font-weight:800;color:#1565c0;margin-bottom:6px;">पहिल्यै Check-in भइसक्यो</h2>
-      <p style="font-size:.85rem;color:#6b7280;">तपाईं यो कार्यक्रममा पहिल्यै उपस्थित दर्ता हुनुभएको छ।</p>
+      <h2 style="font-size:1.1rem;font-weight:800;color:#1565c0;margin-bottom:6px;"><?php echo $_t('पहिल्यै Check-in भइसक्यो', 'Already Checked In'); ?></h2>
+      <p style="font-size:.85rem;color:#6b7280;"><?php echo $_t('तपाईं यो कार्यक्रममा पहिल्यै उपस्थित दर्ता हुनुभएको छ।', 'You are already marked present for this program.'); ?></p>
     </div>
     <?php elseif ($prog): ?>
       <div class="info-box" style="background:#f0fdf4;border-color:#86efac;color:#166534;">
         <i class="fas fa-circle-info" style="flex-shrink:0;"></i>
         <div style="text-align:left;line-height:1.5;">
-          <strong>कार्यक्रम उपस्थिति QR:</strong> सदस्यले <strong>स्थलमा उपस्थित भइसकेपछि</strong> मोबाइलबाट Member Portal खोली scan गर्दा दर्ता हुन्छ — Admin को attendance सूची र सदस्यको उपस्थिति इतिहासमा जान्छ, <strong>जति कार्यक्रममा check-in, त्यति नै गणना बढ्छ</strong>।
-          (Pre-registration भन्दा फरक — त्यो अगाडि नाम दर्ता मात्र हो।)
-          <br><span style="opacity:.95;font-size:.9em;"><strong>मोबाइल छैन?</strong> तल सदस्यता/फोन भरेर <strong>उपस्थिति अनुरोध</strong> पठाउनुहोस् — Admin ले स्वीकृत गरेपछि मात्र सूचीमा आउँछ।</span>
-          <br><span style="opacity:.9;font-size:.9em;">थप कडा जाँच: Staff <strong>कार्ड + CVV</strong> verify।</span>
+          <strong><?php echo $_t('कार्यक्रम उपस्थिति QR:', 'Program Attendance QR:'); ?></strong>
+          <?php echo $_t('सदस्यले स्थलमा उपस्थित भइसकेपछि मोबाइलबाट Member Portal खोली scan गर्दा दर्ता हुन्छ — Admin को attendance सूची र सदस्यको उपस्थिति इतिहासमा जान्छ, जति कार्यक्रममा check-in, त्यति नै गणना बढ्छ।', 'After arriving at the venue, members can scan from Member Portal on mobile to register attendance — it appears in admin attendance list and member attendance history, and the count increases per check-in.'); ?>
+          <br>
+          <span style="opacity:.95;font-size:.9em;">
+            <?php echo $_t('(Pre-registration भन्दा फरक — त्यो अगाडि नाम दर्ता मात्र हो।)', '(Different from pre-registration — that is only early name registration.)'); ?>
+          </span>
+          <br>
+          <span style="opacity:.95;font-size:.9em;">
+            <strong><?php echo $_t('मोबाइल छैन?', 'No mobile phone?'); ?></strong>
+            <?php echo $_t('तल सदस्यता/फोन भरेर उपस्थिति अनुरोध पठाउनुहोस् — Admin ले स्वीकृत गरेपछि मात्र सूचीमा आउँछ।', 'Fill member number/phone below and send attendance request — it appears in list only after admin approval.'); ?>
+          </span>
+          <br>
+          <span style="opacity:.9;font-size:.9em;">
+            <?php echo $_t('थप कडा जाँच: Staff कार्ड + CVV verify।', 'Extra strict check: Staff verifies card + CVV.'); ?>
+          </span>
         </div>
       </div>
       <?php if ($memberId): ?>
       <!-- Logged-in: one-click check-in -->
       <div class="info-box">
         <i class="fas fa-user-check" style="flex-shrink:0;"></i>
-        <div>तपाईं <strong><?= htmlspecialchars($memName ?: 'Member') ?></strong> को रूपमा login हुनुभएको छ।</div>
+        <div><?php echo $_t('तपाईं', 'You are logged in as'); ?> <strong><?= htmlspecialchars($memName ?: 'Member') ?></strong><?php echo $_t(' को रूपमा login हुनुभएको छ।', '.'); ?></div>
       </div>
       <form method="POST">
         <?= $csrfField ?><input type="hidden" name="action" value="checkin_logged">
-        <button type="submit" class="btn-primary"><i class="fas fa-user-check"></i> उपस्थिति दिनुहोस्</button>
+        <button type="submit" class="btn-primary"><i class="fas fa-user-check"></i> <?php echo $_t('उपस्थिति दिनुहोस्', 'Mark Attendance'); ?></button>
       </form>
-      <div class="divider"><span>वा</span></div>
+      <div class="divider"><span><?php echo $_t('वा', 'or'); ?></span></div>
       <?php endif; ?>
 
       <!-- Manual check-in form -->
       <form method="POST" id="manualForm" <?= $memberId ? 'style="display:none;"' : '' ?>>
         <?= $csrfField ?><input type="hidden" name="action" value="checkin_manual">
         <div class="form-group">
-          <label><i class="fas fa-id-card" style="margin-right:4px;color:<?= htmlspecialchars($primaryColor) ?>;"></i>सदस्यता नम्बर</label>
-          <input type="text" name="member_card" class="form-control" placeholder="जस्तै: A-001, SA-2025-001">
+          <label><i class="fas fa-id-card" style="margin-right:4px;color:<?= htmlspecialchars($primaryColor) ?>;"></i><?php echo $_t('सदस्यता नम्बर', 'Member Number'); ?></label>
+          <input type="text" name="member_card" class="form-control" placeholder="<?php echo $_t('जस्तै: A-001, SA-2025-001', 'e.g. A-001, SA-2025-001'); ?>">
         </div>
         <div class="form-group">
-          <label><i class="fas fa-phone" style="margin-right:4px;color:<?= htmlspecialchars($primaryColor) ?>;"></i>फोन नम्बर</label>
+          <label><i class="fas fa-phone" style="margin-right:4px;color:<?= htmlspecialchars($primaryColor) ?>;"></i><?php echo $_t('फोन नम्बर', 'Phone Number'); ?></label>
           <input type="text" name="phone" class="form-control" placeholder="9XXXXXXXXX">
         </div>
-        <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> उपस्थिति अनुरोध पठाउनुहोस्</button>
+        <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> <?php echo $_t('उपस्थिति अनुरोध पठाउनुहोस्', 'Send Attendance Request'); ?></button>
       </form>
 
       <?php if ($memberId): ?>
@@ -290,13 +304,13 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,#f0f9f2,#e
       <?php if (!$memberId && $prog && $token): ?>
       <div style="margin-bottom:10px;">
         <a href="<?= htmlspecialchars($loginNext) ?>" class="btn-primary" style="text-decoration:none;display:inline-flex;width:auto;padding:10px 16px;font-size:.9rem;">
-          <i class="fas fa-right-to-bracket"></i> Member Portal मा लगिन गरेर Check-in
+          <i class="fas fa-right-to-bracket"></i> <?php echo $_t('Member Portal मा लगिन गरेर Check-in', 'Login to Member Portal and Check-in'); ?>
         </a>
       </div>
       <?php endif; ?>
       <a href="<?= htmlspecialchars(SITE_URL) ?>"><i class="fas fa-home" style="margin-right:4px;"></i><?= htmlspecialchars($siteName) ?></a>
       &nbsp;·&nbsp;
-      <a href="<?= htmlspecialchars(SITE_URL) ?>member/"><i class="fas fa-user" style="margin-right:4px;"></i>Member Portal</a>
+      <a href="<?= htmlspecialchars(SITE_URL) ?>member/"><i class="fas fa-user" style="margin-right:4px;"></i><?php echo $_t('सदस्य पोर्टल', 'Member Portal'); ?></a>
     </div>
   </div>
 </div>

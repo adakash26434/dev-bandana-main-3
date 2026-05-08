@@ -1,5 +1,8 @@
 <?php
-$pageTitle = 'प्रतिवेदन व्यवस्थापन';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle = $__t('प्रतिवेदन व्यवस्थापन', 'Reports Management');
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 
@@ -138,7 +141,7 @@ function getReportTypeLabel($type) {
 ?>
 
 <?php
-echo adminPageHeader('प्रतिवेदन व्यवस्थापन', 'fa-file-alt', 'वार्षिक प्रतिवेदन र दस्तावेजहरू व्यवस्थापन गर्नुहोस्');
+echo adminPageHeader($__t('प्रतिवेदन व्यवस्थापन', 'Reports Management'), 'fa-file-alt', $__t('वार्षिक प्रतिवेदन र दस्तावेजहरू व्यवस्थापन गर्नुहोस्', 'Manage annual reports and documents'));
 $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['message']);
 ?>
 <div class="container-fluid py-4">
@@ -151,7 +154,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-header">
-                    <h5><?php echo $editReport ? 'प्रतिवेदन सम्पादन' : 'नयाँ प्रतिवेदन थप्नुहोस्'; ?></h5>
+                    <h5><?php echo $editReport ? $__t('प्रतिवेदन सम्पादन', 'Edit Report') : $__t('नयाँ प्रतिवेदन थप्नुहोस्', 'Add New Report'); ?></h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data" id="reportForm" class="needs-validation" novalidate>
@@ -163,25 +166,25 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                         <?php endif; ?>
 
                         <div class="mb-3">
-                            <label class="form-label">प्रतिवेदन प्रकार *</label>
+                            <label class="form-label"><?php echo $__t('प्रतिवेदन प्रकार', 'Report Type'); ?> *</label>
                             <select name="report_type" id="reportType" class="form-select" required>
-                                <option value="">-- छान्नुहोस् --</option>
-                                <option value="monthly" <?php echo ($editReport['report_type'] ?? '') === 'monthly' ? 'selected' : ''; ?>>मासिक प्रतिवेदन</option>
-                                <option value="quarterly" <?php echo ($editReport['report_type'] ?? '') === 'quarterly' ? 'selected' : ''; ?>>त्रैमासिक प्रतिवेदन</option>
-                                <option value="progress" <?php echo ($editReport['report_type'] ?? '') === 'progress' ? 'selected' : ''; ?>>प्रगति प्रतिवेदन</option>
-                                <option value="annual" <?php echo ($editReport['report_type'] ?? '') === 'annual' ? 'selected' : ''; ?>>वार्षिक प्रतिवेदन</option>
-                                <option value="financial" <?php echo ($editReport['report_type'] ?? '') === 'financial' ? 'selected' : ''; ?>>वित्तीय विवरण</option>
-                                <option value="audit" <?php echo ($editReport['report_type'] ?? '') === 'audit' ? 'selected' : ''; ?>>लेखापरीक्षण प्रतिवेदन</option>
-                                <option value="agm" <?php echo ($editReport['report_type'] ?? '') === 'agm' ? 'selected' : ''; ?>>साधारण सभा प्रतिवेदन</option>
-                                <option value="other" <?php echo ($editReport['report_type'] ?? '') === 'other' ? 'selected' : ''; ?>>अन्य</option>
+                                <option value="">-- <?php echo $__t('छान्नुहोस्', 'Select'); ?> --</option>
+                                <option value="monthly" <?php echo ($editReport['report_type'] ?? '') === 'monthly' ? 'selected' : ''; ?>><?php echo $__t('मासिक प्रतिवेदन','Monthly Report'); ?></option>
+                                <option value="quarterly" <?php echo ($editReport['report_type'] ?? '') === 'quarterly' ? 'selected' : ''; ?>><?php echo $__t('त्रैमासिक प्रतिवेदन','Quarterly Report'); ?></option>
+                                <option value="progress" <?php echo ($editReport['report_type'] ?? '') === 'progress' ? 'selected' : ''; ?>><?php echo $__t('प्रगति प्रतिवेदन','Progress Report'); ?></option>
+                                <option value="annual" <?php echo ($editReport['report_type'] ?? '') === 'annual' ? 'selected' : ''; ?>><?php echo $__t('वार्षिक प्रतिवेदन','Annual Report'); ?></option>
+                                <option value="financial" <?php echo ($editReport['report_type'] ?? '') === 'financial' ? 'selected' : ''; ?>><?php echo $__t('वित्तीय विवरण','Financial Statement'); ?></option>
+                                <option value="audit" <?php echo ($editReport['report_type'] ?? '') === 'audit' ? 'selected' : ''; ?>><?php echo $__t('लेखापरीक्षण प्रतिवेदन','Audit Report'); ?></option>
+                                <option value="agm" <?php echo ($editReport['report_type'] ?? '') === 'agm' ? 'selected' : ''; ?>><?php echo $__t('साधारण सभा प्रतिवेदन','AGM Report'); ?></option>
+                                <option value="other" <?php echo ($editReport['report_type'] ?? '') === 'other' ? 'selected' : ''; ?>><?php echo $__t('अन्य','Other'); ?></option>
                             </select>
                         </div>
 
                         <!-- Month selection (for monthly reports) -->
                         <div class="mb-3 <?php echo ($editReport['report_type'] ?? '') === 'monthly' ? '' : 'd-none'; ?>" id="monthField">
-                            <label class="form-label">महिना *</label>
+                            <label class="form-label"><?php echo $__t('महिना', 'Month'); ?> *</label>
                             <select name="report_month" class="form-select">
-                                <option value="">-- महिना छान्नुहोस् --</option>
+                                <option value="">-- <?php echo $__t('महिना छान्नुहोस्', 'Select month'); ?> --</option>
                                 <?php foreach ($nepaliMonths as $key => $month): ?>
                                 <option value="<?php echo $key; ?>" <?php echo ($editReport['report_month'] ?? '') === $key ? 'selected' : ''; ?>>
                                     <?php echo $month; ?>
@@ -192,9 +195,9 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
 
                         <!-- Quarter selection (for quarterly reports) -->
                         <div class="mb-3 <?php echo ($editReport['report_type'] ?? '') === 'quarterly' ? '' : 'd-none'; ?>" id="quarterField">
-                            <label class="form-label">त्रैमास *</label>
+                            <label class="form-label"><?php echo $__t('त्रैमास', 'Quarter'); ?> *</label>
                             <select name="report_quarter" class="form-select">
-                                <option value="">-- त्रैमास छान्नुहोस् --</option>
+                                <option value="">-- <?php echo $__t('त्रैमास छान्नुहोस्', 'Select quarter'); ?> --</option>
                                 <?php foreach ($quarters as $key => $quarter): ?>
                                 <option value="<?php echo $key; ?>" <?php echo ($editReport['report_quarter'] ?? '') === $key ? 'selected' : ''; ?>>
                                     <?php echo $quarter; ?>
@@ -209,43 +212,43 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">शीर्षक (नेपाली)</label>
+                            <label class="form-label"><?php echo $__t('शीर्षक (नेपाली)', 'Title (Nepali)'); ?></label>
                             <input type="text" name="title_np" class="form-control" value="<?php echo $editReport['title_np'] ?? ''; ?>">
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">आर्थिक वर्ष *</label>
+                                <label class="form-label"><?php echo $__t('आर्थिक वर्ष', 'Fiscal Year'); ?> *</label>
                                 <select name="report_year" class="form-select" required>
-                          <option value="">-- आर्थिक वर्ष छान्नुहोस् --</option>
+                          <option value="">-- <?php echo $__t('आर्थिक वर्ष छान्नुहोस्', 'Select fiscal year'); ?> --</option>
                           <?php echo getBSFiscalYears($editReport['report_year'] ?? ''); ?>
                       </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">क्रम</label>
+                                <label class="form-label"><?php echo $__t('क्रम', 'Order'); ?></label>
                                 <input type="number" name="display_order" class="form-control" value="<?php echo $editReport['display_order'] ?? 0; ?>">
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">फाइल (PDF)</label>
+                            <label class="form-label"><?php echo $__t('फाइल (PDF)', 'File (PDF)'); ?></label>
                             <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx">
                             <?php if (!empty($editReport['file_path'])): ?>
-                            <small class="text-muted">हालको: <?php echo basename($editReport['file_path']); ?></small>
+                            <small class="text-muted"><?php echo $__t('हालको', 'Current'); ?>: <?php echo basename($editReport['file_path']); ?></small>
                             <?php endif; ?>
                         </div>
 
                         <div class="mb-3 form-check">
                             <input type="checkbox" name="is_active" class="form-check-input" id="isActive"
                                    <?php echo ($editReport['is_active'] ?? 1) ? 'checked' : ''; ?>>
-                            <label class="form-check-label" for="isActive">सक्रिय</label>
+                            <label class="form-check-label" for="isActive"><?php echo $__t('सक्रिय', 'Active'); ?></label>
                         </div>
 
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> <?php echo $editReport ? 'अपडेट गर्नुहोस्' : 'थप्नुहोस्'; ?>
+                            <i class="fas fa-save"></i> <?php echo $editReport ? $__t('अपडेट गर्नुहोस्', 'Update') : $__t('थप्नुहोस्', 'Add'); ?>
                         </button>
                         <?php if ($editReport): ?>
-                        <a href="reports.php" class="btn btn-secondary">रद्द गर्नुहोस्</a>
+                        <a href="reports.php" class="btn btn-secondary"><?php echo $__t('रद्द गर्नुहोस्', 'Cancel'); ?></a>
                         <?php endif; ?>
                     </form>
                 </div>
@@ -256,13 +259,13 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
         <div class="col-lg-7">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">प्रतिवेदन सूची</h5>
+                    <h5 class="mb-0"><?php echo $__t('प्रतिवेदन सूची', 'Report List'); ?></h5>
                     <div class="filter-buttons">
-                        <a href="?type=all" class="btn btn-sm <?php echo $filterType === 'all' ? 'btn-primary' : 'btn-outline-secondary'; ?>">सबै</a>
-                        <a href="?type=monthly" class="btn btn-sm <?php echo $filterType === 'monthly' ? 'btn-primary' : 'btn-outline-secondary'; ?>">मासिक</a>
-                        <a href="?type=quarterly" class="btn btn-sm <?php echo $filterType === 'quarterly' ? 'btn-primary' : 'btn-outline-secondary'; ?>">त्रैमासिक</a>
-                        <a href="?type=progress" class="btn btn-sm <?php echo $filterType === 'progress' ? 'btn-primary' : 'btn-outline-secondary'; ?>">प्रगति</a>
-                        <a href="?type=annual" class="btn btn-sm <?php echo $filterType === 'annual' ? 'btn-primary' : 'btn-outline-secondary'; ?>">वार्षिक</a>
+                        <a href="?type=all" class="btn btn-sm <?php echo $filterType === 'all' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('सबै', 'All'); ?></a>
+                        <a href="?type=monthly" class="btn btn-sm <?php echo $filterType === 'monthly' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('मासिक', 'Monthly'); ?></a>
+                        <a href="?type=quarterly" class="btn btn-sm <?php echo $filterType === 'quarterly' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('त्रैमासिक', 'Quarterly'); ?></a>
+                        <a href="?type=progress" class="btn btn-sm <?php echo $filterType === 'progress' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('प्रगति', 'Progress'); ?></a>
+                        <a href="?type=annual" class="btn btn-sm <?php echo $filterType === 'annual' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('वार्षिक', 'Annual'); ?></a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -271,10 +274,10 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                             <thead>
                                 <tr>
                                     <th>शीर्षक</th>
-                                    <th>प्रकार</th>
-                                    <th>अवधि</th>
-                                    <th>स्थिति</th>
-                                    <th>कार्य</th>
+                                    <th><?php echo $__t('प्रकार','Type'); ?></th>
+                                    <th><?php echo $__t('अवधि','Period'); ?></th>
+                                    <th><?php echo $__t('स्थिति','Status'); ?></th>
+                                    <th><?php echo $__t('कार्य','Actions'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -310,18 +313,18 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                                     </td>
                                     <td>
                                         <?php if ($report['file_path']): ?>
-                                        <a href="../<?php echo $report['file_path']; ?>" class="btn btn-sm btn-success" target="_blank" title="हेर्नुहोस्">
+                                        <a href="../<?php echo $report['file_path']; ?>" class="btn btn-sm btn-success" target="_blank" title="<?php echo $__t('हेर्नुहोस्','View'); ?>">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <?php endif; ?>
-                                        <a href="?edit=<?php echo $report['id']; ?>" class="btn btn-sm btn-primary" title="सम्पादन">
+                                        <a href="?edit=<?php echo $report['id']; ?>" class="btn btn-sm btn-primary" title="<?php echo $__t('सम्पादन','Edit'); ?>">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं निश्चित हुनुहुन्छ?')">
+                                        <form method="POST" class="svc-inline-form" onsubmit="return confirm('<?php echo $__t('के तपाईं निश्चित हुनुहुन्छ?', 'Are you sure?'); ?>')">
                                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
     <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?php echo $report['id']; ?>">
-                                            <button type="submit" class="btn btn-sm btn-danger" title="मेटाउनुहोस्">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="<?php echo $__t('मेटाउनुहोस्','Delete'); ?>">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -329,7 +332,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                                 </tr>
                                 <?php endforeach; ?>
                                 <?php if (empty($reports)): ?>
-                                <tr><td colspan="5" class="text-center">कुनै प्रतिवेदन छैन</td></tr>
+                                <tr><td colspan="5" class="text-center"><?php echo $__t('कुनै प्रतिवेदन छैन','No reports found'); ?></td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>

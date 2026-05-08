@@ -13,9 +13,11 @@ $page_icon  = $page_icon  ?? 'fa-gauge';
 $base       = '/admin';
 
 // Dynamic logo — admin settings बाट
-$_apLogoRaw = function_exists('getSetting')
-    ? trim((string) getSetting('site_logo', getSetting('logo', '')))
-    : '';
+$_apLogoRaw = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath(''))
+    : (function_exists('getSetting')
+        ? trim((string) getSetting('site_logo', getSetting('logo', '')))
+        : '');
 $_apLogoSrc = '';
 if ($_apLogoRaw !== '') {
     $_apLogoSrc = (preg_match('#^https?://#i', $_apLogoRaw))

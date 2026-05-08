@@ -13,6 +13,9 @@ $mem      = currentMember();
 $memEmail = trim((string)($mem['email'] ?? ''));
 $memPhone = trim((string)($mem['phone'] ?? ''));
 $memberId = $mem['id'];
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 /* KYC-linked source priority (profile/dashboard/id-card जस्तै) */
 try {
@@ -100,15 +103,16 @@ if ($viewId > 0 && $viewTbl !== '') {
 
 $siteName = getSetting('site_name', 'आकाश सहकारी');
 $siteUrl  = SITE_URL;
-$pageTitle = 'Application Tracker — ' . $siteName;
+$pageTitle = $_t('आवेदन ट्र्याकर', 'Application Tracker') . ' — ' . $siteName;
 
 /* Timeline steps */
 function timelineSteps($status) {
+    global $_t;
     $steps = [
-        ['key' => 'pending',      'label' => 'दर्ता'],
-        ['key' => 'under_review', 'label' => 'समीक्षा'],
-        ['key' => 'approved',     'label' => 'स्वीकृत'],
-        ['key' => 'completed',    'label' => 'सम्पन्न'],
+        ['key' => 'pending',      'label' => $_t('दर्ता', 'Submitted')],
+        ['key' => 'under_review', 'label' => $_t('समीक्षा', 'Review')],
+        ['key' => 'approved',     'label' => $_t('स्वीकृत', 'Approved')],
+        ['key' => 'completed',    'label' => $_t('सम्पन्न', 'Completed')],
     ];
     $rejected = $status === 'rejected';
     $cur = memberStatusSteps($status);
@@ -133,8 +137,8 @@ require __DIR__ . '/includes/chrome.php';
     <?php if ($viewApp): ?>
     <div class="mem-card" style="margin-bottom:20px;">
         <div class="mem-card-header">
-            <div class="mem-card-title"><i class="fas fa-file-alt"></i>आवेदन विवरण</div>
-            <a href="<?php echo $siteUrl; ?>member/tracker.php" style="font-size:0.8rem;color:var(--mem-primary);font-weight:700;text-decoration:none;">← पछाडि</a>
+            <div class="mem-card-title"><i class="fas fa-file-alt"></i><?php echo $_t('आवेदन विवरण', 'Application Details'); ?></div>
+            <a href="<?php echo $siteUrl; ?>member/tracker.php" style="font-size:0.8rem;color:var(--mem-primary);font-weight:700;text-decoration:none;">← <?php echo $_t('पछाडि', 'Back'); ?></a>
         </div>
         <div class="mem-card-body">
             <!-- Tracking ID -->
@@ -144,7 +148,7 @@ require __DIR__ . '/includes/chrome.php';
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span class="mem-tracking-id" id="trkId"><?php echo htmlspecialchars($viewApp['tracking_id']); ?></span>
                     <button onclick="copyTrk('trkId',this)" class="mem-topbar-btn" style="background:var(--primary-color);border:none;font-size:0.72rem;padding:5px 12px;cursor:pointer;">
-                        <i class="fas fa-copy me-1"></i>Copy
+                        <i class="fas fa-copy me-1"></i><?php echo $_t('कपी', 'Copy'); ?>
                     </button>
                 </div>
             </div>
@@ -164,7 +168,7 @@ require __DIR__ . '/includes/chrome.php';
             ?>
             <div style="margin:14px 0 6px;background:#f0fdf4;border:1.5px solid var(--primary-light,#2e8b4a);border-radius:12px;padding:14px 16px;">
                 <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--primary-dark,#144a21);font-size:.92rem;margin-bottom:8px;">
-                    <i class="fas fa-comment-dots"></i> Admin बाट प्रतिक्रिया
+                    <i class="fas fa-comment-dots"></i> <?php echo $_t('Admin बाट प्रतिक्रिया', 'Response from Admin'); ?>
                     <?php if (!empty($viewApp['resolved_at'])): ?>
                     <span style="margin-left:auto;font-size:.7rem;font-weight:600;color:var(--primary-dark,#144a21);background:#fff;padding:2px 8px;border-radius:999px;">
                         <?php echo formatNepaliDate($viewApp['resolved_at'], true); ?>
@@ -179,7 +183,7 @@ require __DIR__ . '/includes/chrome.php';
                 <?php if ($hasAttach): ?>
                 <div style="margin-top:10px;">
                     <a href="<?php echo htmlspecialchars($siteUrl . ltrim($viewApp['admin_attachment'],'/')); ?>" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--primary-dark,#144a21);border:1px solid var(--primary-light,#2e8b4a);padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:700;text-decoration:none;">
-                        <i class="fas fa-paperclip"></i> संलग्न फाइल हेर्नुहोस्
+                        <i class="fas fa-paperclip"></i> <?php echo $_t('संलग्न फाइल हेर्नुहोस्', 'View Attachment'); ?>
                     </a>
                 </div>
                 <?php endif; ?>
@@ -226,12 +230,12 @@ require __DIR__ . '/includes/chrome.php';
     <!-- Filter bar -->
     <div class="mem-card">
         <div class="mem-card-header">
-            <div class="mem-card-title"><i class="fas fa-clock-rotate-left"></i>मेरा सबै आवेदनहरू (<?php echo count($apps); ?>)</div>
+            <div class="mem-card-title"><i class="fas fa-clock-rotate-left"></i><?php echo $_t('मेरा सबै आवेदनहरू', 'All My Applications'); ?> (<?php echo count($apps); ?>)</div>
         </div>
         <div class="mem-card-body" style="padding-bottom:8px;">
             <!-- Filter chips -->
             <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">
-                <?php $filters = ['all'=>'सबै','appointment'=>'भेटघाट','kyc'=>'KYC','loan'=>'ऋण','account'=>'खाता','grievance'=>'गुनासो','welfare'=>'कल्याण','job'=>'जागिर']; ?>
+                <?php $filters = ['all'=>$_t('सबै','All'),'appointment'=>$_t('भेटघाट','Appointment'),'kyc'=>'KYC','loan'=>$_t('ऋण','Loan'),'account'=>$_t('खाता','Account'),'grievance'=>$_t('गुनासो','Grievance'),'welfare'=>$_t('कल्याण','Welfare'),'job'=>$_t('जागिर','Job')]; ?>
                 <?php foreach ($filters as $fk => $fl): ?>
                 <a href="?filter=<?php echo $fk; ?>&q=<?php echo urlencode($q); ?>" style="padding:5px 13px;border-radius:20px;font-size:0.75rem;font-weight:700;text-decoration:none;border:1.5px solid <?php echo $filter===$fk ? 'var(--mem-primary)' : '#e5e7eb'; ?>;background:<?php echo $filter===$fk ? 'var(--mem-primary)' : '#fff'; ?>;color:<?php echo $filter===$fk ? '#fff' : '#6b7280'; ?>;">
                     <?php echo $fl; ?>
@@ -240,8 +244,8 @@ require __DIR__ . '/includes/chrome.php';
             </div>
             <form method="GET" style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
                 <input type="hidden" name="filter" value="<?php echo htmlspecialchars($filter); ?>">
-                <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="Tracking ID, सेवा, विवरणबाट खोज्नुहोस्..." style="flex:1;min-width:0;border:1px solid #d1d5db;border-radius:8px;padding:7px 10px;font-size:.8rem;">
-                <button type="submit" style="padding:7px 12px;border:none;border-radius:8px;background:var(--mem-primary);color:#fff;font-size:.78rem;font-weight:700;"><i class="fas fa-search me-1"></i>खोज</button>
+                <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="<?php echo $_t('Tracking ID, सेवा, विवरणबाट खोज्नुहोस्...', 'Search by tracking ID, service or details...'); ?>" style="flex:1;min-width:0;border:1px solid #d1d5db;border-radius:8px;padding:7px 10px;font-size:.8rem;">
+                <button type="submit" style="padding:7px 12px;border:none;border-radius:8px;background:var(--mem-primary);color:#fff;font-size:.78rem;font-weight:700;"><i class="fas fa-search me-1"></i><?php echo $_t('खोज', 'Search'); ?></button>
                 <?php if ($q !== ''): ?>
                 <a href="?filter=<?php echo urlencode($filter); ?>" style="padding:7px 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#6b7280;font-size:.78rem;font-weight:700;text-decoration:none;">Reset</a>
                 <?php endif; ?>
@@ -251,7 +255,7 @@ require __DIR__ . '/includes/chrome.php';
             <?php if (empty($apps)): ?>
             <div class="mem-empty">
                 <span class="mem-empty-icon">📭</span>
-                <div>यस श्रेणीमा कुनै आवेदन छैन।</div>
+                <div><?php echo $_t('यस श्रेणीमा कुनै आवेदन छैन।', 'No applications in this category.'); ?></div>
             </div>
             <?php else: ?>
             <?php foreach ($apps as $app): ?>
@@ -282,12 +286,12 @@ require __DIR__ . '/includes/chrome.php';
                     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
                         <a href="?view=<?php echo (int)$app['id']; ?>&tbl=<?php echo htmlspecialchars($app['_table']); ?>&filter=<?php echo htmlspecialchars($filter); ?>&q=<?php echo urlencode($q); ?>"
                            class="btn" style="padding:7px 14px;background:var(--mem-primary);color:#fff;border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;border:none;">
-                            <i class="fas fa-eye me-1"></i>विस्तृत हेर्नुहोस्
+                            <i class="fas fa-eye me-1"></i><?php echo $_t('विस्तृत हेर्नुहोस्', 'View Details'); ?>
                         </a>
                         <?php if ($app['tracking_id']): ?>
                         <a href="<?php echo $siteUrl; ?>application-tracker.php?tracking_id=<?php echo urlencode($app['tracking_id']); ?>"
                            target="_blank" style="padding:7px 14px;background:#f0fdf4;color:var(--mem-primary);border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;border:1px solid var(--mem-primary);">
-                            <i class="fas fa-search-location me-1"></i>Public Tracker
+                            <i class="fas fa-search-location me-1"></i><?php echo $_t('पब्लिक ट्र्याकर', 'Public Tracker'); ?>
                         </a>
                         <?php endif; ?>
                     </div>

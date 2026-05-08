@@ -12,6 +12,9 @@ memberSecurityHeaders();
 $db  = getDB();
 $mem = currentMember();
 if (!$mem) { header('Location: login.php?msg=session_expired'); exit; }
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $memberId = (int)$mem['id'];
 $memEmail = trim((string)($mem['email'] ?? ''));
@@ -53,9 +56,9 @@ $errorMsg   = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submit_claim') {
     if (!verifyCSRFToken()) {
-        $errorMsg = 'सुरक्षा जाँच असफल। पुनः प्रयास गर्नुहोस्।';
+        $errorMsg = $_t('सुरक्षा जाँच असफल। पुनः प्रयास गर्नुहोस्।', 'Security check failed. Please try again.');
     } elseif (!checkRateLimit('welfare_portal_' . $memberId, 5, 3600)) {
-        $errorMsg = 'धेरै अनुरोधहरू भए। १ घण्टापछि पुनः प्रयास गर्नुहोस्।';
+        $errorMsg = $_t('धेरै अनुरोधहरू भए। १ घण्टापछि पुनः प्रयास गर्नुहोस्।', 'Too many requests. Please try again after 1 hour.');
     } else {
         $claimType  = trim($_POST['claim_type'] ?? '');
         $desc       = trim(substr($_POST['description'] ?? '', 0, 4000));
@@ -75,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
 
         $validTypes = ['maternity','death','insurance','medical','accident','other'];
         if (!in_array($claimType, $validTypes, true)) {
-            $errorMsg = 'दाबी प्रकार छान्नुहोस्।';
+            $errorMsg = $_t('दाबी प्रकार छान्नुहोस्।', 'Please select claim type.');
         } else {
             try {
                 $submit = submitWelfareClaimUnified($db, [
@@ -102,9 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
                     'insurer_name' => $insurerNm ?: null,
                 ], $_FILES);
                 $trackingId = $submit['tracking_id'];
-                $successMsg = "दाबी सफलतापूर्वक दर्ता भयो! Tracking ID: <strong>$trackingId</strong> — Admin ले समीक्षा गरेपछि सूचित गरिनेछ।";
+                $successMsg = isEnglish()
+                    ? "Claim submitted successfully! Tracking ID: <strong>$trackingId</strong> — You will be notified after admin review."
+                    : "दाबी सफलतापूर्वक दर्ता भयो! Tracking ID: <strong>$trackingId</strong> — Admin ले समीक्षा गरेपछि सूचित गरिनेछ।";
             } catch (Throwable $e) {
-                $errorMsg = 'दाबी दर्ता गर्न समस्या भयो। पुनः प्रयास गर्नुहोस्।';
+                $errorMsg = $_t('दाबी दर्ता गर्न समस्या भयो। पुनः प्रयास गर्नुहोस्।', 'Failed to submit claim. Please try again.');
                 error_log('[welfare portal] ' . $e->getMessage());
             }
         }
@@ -124,17 +129,17 @@ try {
 } catch (Throwable $e) { $myClaims = []; }
 
 $siteName  = getSetting('site_name', 'सहकारी');
-$pageTitle = 'कल्याण दाबी — ' . $siteName;
+$pageTitle = ($_t('कल्याण दाबी', 'Welfare Claims')) . ' — ' . $siteName;
 $activeTab = empty($myClaims) ? 'new' : ((!empty($_GET['new']) || !empty($successMsg)) ? 'new' : 'history');
 $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">';
 
 $statusLabels = [
-    'pending'      => ['label' => 'पर्खाइमा',   'color' => '#d97706', 'bg' => '#fffbeb', 'icon' => 'fa-clock'],
-    'under_review' => ['label' => 'समीक्षामा',  'color' => 'var(--secondary-color,#c0392b)', 'bg' => '#fef2f2', 'icon' => 'fa-magnifying-glass'],
-    'approved'     => ['label' => 'स्वीकृत',    'color' => '#16a34a', 'bg' => '#f0fdf4', 'icon' => 'fa-circle-check'],
-    'rejected'     => ['label' => 'अस्वीकृत',   'color' => '#dc2626', 'bg' => '#fef2f2', 'icon' => 'fa-circle-xmark'],
-    'paid'         => ['label' => 'भुक्तानी भयो','color' => 'var(--secondary-dark,#922b21)','bg' => '#fef2f2', 'icon' => 'fa-money-bill'],
-    'completed'    => ['label' => 'सम्पन्न',     'color' => '#0f766e', 'bg' => '#f0fdfa', 'icon' => 'fa-flag-checkered'],
+    'pending'      => ['label' => $_t('पर्खाइमा','Pending'),   'color' => '#d97706', 'bg' => '#fffbeb', 'icon' => 'fa-clock'],
+    'under_review' => ['label' => $_t('समीक्षामा','Under Review'),  'color' => 'var(--secondary-color,#c0392b)', 'bg' => '#fef2f2', 'icon' => 'fa-magnifying-glass'],
+    'approved'     => ['label' => $_t('स्वीकृत','Approved'),    'color' => '#16a34a', 'bg' => '#f0fdf4', 'icon' => 'fa-circle-check'],
+    'rejected'     => ['label' => $_t('अस्वीकृत','Rejected'),   'color' => '#dc2626', 'bg' => '#fef2f2', 'icon' => 'fa-circle-xmark'],
+    'paid'         => ['label' => $_t('भुक्तानी भयो','Paid'),'color' => 'var(--secondary-dark,#922b21)','bg' => '#fef2f2', 'icon' => 'fa-money-bill'],
+    'completed'    => ['label' => $_t('सम्पन्न','Completed'),     'color' => '#0f766e', 'bg' => '#f0fdfa', 'icon' => 'fa-flag-checkered'],
 ];
 $extraHead = <<<HTML
 <style>
@@ -186,11 +191,11 @@ HTML;
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
     <h1 style="font-size:1.25rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0;">
-      <i class="fas fa-heart-pulse" style="margin-right:8px;"></i>कल्याण दाबी
+      <i class="fas fa-heart-pulse" style="margin-right:8px;"></i><?php echo $_t('कल्याण दाबी', 'Welfare Claims'); ?>
     </h1>
     <div style="display:flex;gap:8px;">
       <a href="tracker.php?filter=welfare" style="font-size:.8rem;color:var(--primary-color,#1a8754);text-decoration:none;">
-        <i class="fas fa-magnifying-glass-chart"></i> Tracker मा हेर्नुहोस्
+        <i class="fas fa-magnifying-glass-chart"></i> <?php echo $_t('Tracker मा हेर्नुहोस्', 'Open in Tracker'); ?>
       </a>
     </div>
   </div>
@@ -205,10 +210,10 @@ HTML;
   <!-- Tabs -->
   <div class="wf-tabs">
     <button class="wf-tab <?= $activeTab==='history'?'active':'' ?>" onclick="showTab(this,'history')">
-      <i class="fas fa-list" style="margin-right:6px;"></i>मेरा दाबीहरू (<?= count($myClaims) ?>)
+      <i class="fas fa-list" style="margin-right:6px;"></i><?php echo $_t('मेरा दाबीहरू', 'My Claims'); ?> (<?= count($myClaims) ?>)
     </button>
     <button class="wf-tab <?= $activeTab==='new'?'active':'' ?>" onclick="showTab(this,'new')" id="tabNew">
-      <i class="fas fa-plus-circle" style="margin-right:6px;"></i>नयाँ दाबी
+      <i class="fas fa-plus-circle" style="margin-right:6px;"></i><?php echo $_t('नयाँ दाबी', 'New Claim'); ?>
     </button>
   </div>
 
@@ -217,18 +222,18 @@ HTML;
     <?php if (empty($myClaims)): ?>
     <div class="empty-state">
       <i class="fas fa-heart"></i>
-      <div style="font-size:1rem;font-weight:600;color:#6b7280;margin-bottom:6px;">कुनै दाबी छैन</div>
-      <div style="font-size:.85rem;">नयाँ कल्याण दाबी दर्ता गर्न "नयाँ दाबी" tab खोल्नुहोस्।</div>
+      <div style="font-size:1rem;font-weight:600;color:#6b7280;margin-bottom:6px;"><?php echo $_t('कुनै दाबी छैन', 'No claims found'); ?></div>
+      <div style="font-size:.85rem;"><?php echo $_t('नयाँ कल्याण दाबी दर्ता गर्न "नयाँ दाबी" tab खोल्नुहोस्।', 'Open "New Claim" tab to submit a welfare claim.'); ?></div>
     </div>
     <?php else: ?>
     <?php foreach ($myClaims as $cl):
         $st = $cl['status'] ?? 'pending';
         $info = $statusLabels[$st] ?? $statusLabels['pending'];
         $tSteps = [
-            ['key'=>'pending',       'label'=>'दर्ता'],
-            ['key'=>'under_review',  'label'=>'समीक्षा'],
-            ['key'=>'approved',      'label'=>'स्वीकृत'],
-            ['key'=>'completed',     'label'=>'सम्पन्न'],
+            ['key'=>'pending',       'label'=>$_t('दर्ता','Submitted')],
+            ['key'=>'under_review',  'label'=>$_t('समीक्षा','Review')],
+            ['key'=>'approved',      'label'=>$_t('स्वीकृत','Approved')],
+            ['key'=>'completed',     'label'=>$_t('सम्पन्न','Completed')],
         ];
         $tOrder = ['pending'=>0,'under_review'=>1,'approved'=>2,'paid'=>3,'completed'=>4,'rejected'=>1];
         $curIdx = $tOrder[$st] ?? 0;
@@ -350,7 +355,7 @@ HTML;
           <div class="form-row cols2">
             <div class="form-group" style="margin-bottom:0;"><label>मृत्यु हुने व्यक्तिको नाम</label><input name="deceased_name" type="text" class="form-control" placeholder="पूरा नाम"></div>
             <div class="form-group" style="margin-bottom:0;"><label>नाता</label><input name="deceased_relation" type="text" class="form-control" placeholder="जस्तै: आफ्नो, श्रीमती"></div>
-            <div class="form-group" style="margin-bottom:0;"><label>मृत्यु मिति</label><input name="death_date" type="text" class="form-control" placeholder="YYYY-MM-DD"></div>
+            <div class="form-group" style="margin-bottom:0;"><label><?php echo $_t('मृत्यु मिति', 'Date of Death'); ?></label><input name="death_date" type="date" class="form-control" data-calendar="ad"></div>
           </div>
         </div>
       </div>
@@ -360,7 +365,7 @@ HTML;
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:14px;">
           <div style="font-size:.8rem;font-weight:700;color:#16a34a;margin-bottom:10px;"><i class="fas fa-baby" style="margin-right:5px;"></i>सुत्केरी विवरण</div>
           <div class="form-row cols2">
-            <div class="form-group" style="margin-bottom:0;"><label>सुत्केरी मिति</label><input name="delivery_date" type="text" class="form-control" placeholder="YYYY-MM-DD"></div>
+            <div class="form-group" style="margin-bottom:0;"><label><?php echo $_t('सुत्केरी मिति', 'Delivery Date'); ?></label><input name="delivery_date" type="date" class="form-control" data-calendar="ad"></div>
             <div class="form-group" style="margin-bottom:0;"><label>अस्पताल / क्लिनिकको नाम</label><input name="hospital_name" type="text" class="form-control" placeholder="अस्पतालको नाम"></div>
           </div>
         </div>
@@ -372,7 +377,7 @@ HTML;
           <div style="font-size:.8rem;font-weight:700;color:var(--secondary-color,#c0392b);margin-bottom:10px;"><i class="fas fa-stethoscope" style="margin-right:5px;"></i>उपचार विवरण</div>
           <div class="form-row cols2">
             <div class="form-group" style="margin-bottom:0;"><label>रोग / चोट विवरण</label><input name="disease_illness" type="text" class="form-control" placeholder="संक्षिप्त विवरण"></div>
-            <div class="form-group" style="margin-bottom:0;"><label>उपचार मिति</label><input name="treatment_date" type="text" class="form-control" placeholder="YYYY-MM-DD"></div>
+            <div class="form-group" style="margin-bottom:0;"><label><?php echo $_t('उपचार मिति', 'Treatment Date'); ?></label><input name="treatment_date" type="date" class="form-control" data-calendar="ad"></div>
             <div class="form-group" style="margin-bottom:0;"><label>अस्पताल / क्लिनिक</label><input name="hospital_clinic" type="text" class="form-control" placeholder="अस्पतालको नाम"></div>
           </div>
         </div>

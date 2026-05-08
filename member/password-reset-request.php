@@ -10,6 +10,9 @@ define('MEMBER_PORTAL', true);
 /* v2: bootstrap ले config + member-auth + global error guard load गर्छ */
 require_once __DIR__ . '/_bootstrap.php';
 if (file_exists(__DIR__ . '/../includes/notifications.php')) require_once __DIR__ . '/../includes/notifications.php';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 memberSecurityHeaders();
 
@@ -20,12 +23,12 @@ if (isset($_SESSION['member_id'])) {
 $step     = intval($_SESSION['pr_step'] ?? 1);
 $error    = '';
 $success  = '';
-$siteName = getSetting('site_name', 'आकाश सहकारी');
+$siteName = getSetting('site_name', $_t('आकाश सहकारी', 'Aakash Cooperative'));
 $smsEnabled = getSetting('notify_sms_enabled','0')==='1' && getSetting('notify_sms_token','')!=='';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /* CSRF guard — token provided by csrfField() in every form */
-    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) { $error = 'सुरक्षा जाँच असफल। पेज refresh गरेर पुनः प्रयास गर्नुहोस्।'; }
+    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) { $error = $_t('सुरक्षा जाँच असफल। पेज refresh गरेर पुनः प्रयास गर्नुहोस्।', 'Security check failed. Please refresh and try again.'); }
     $action = empty($error) ? ($_POST['action'] ?? '') : '';
 
     /* ── Step 1: Find member & send OTP ── */
@@ -33,11 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $identifier = trim($_POST['identifier'] ?? '');
         $channel    = in_array($_POST['channel'] ?? '', ['sms','email']) ? $_POST['channel'] : 'auto';
         if (!$identifier) {
-            $error = 'Email वा Sadasyata Number लेख्नुहोस्।';
+            $error = $_t('Email वा Sadasyata Number लेख्नुहोस्।', 'Please enter email or member number.');
         } else {
             $member = findMemberForReset($identifier);
             if (!$member) {
-                $error = 'यो email वा sadasyata number मा कुनै खाता भेटिएन।';
+                $error = $_t('यो email वा sadasyata number मा कुनै खाता भेटिएन।', 'No account found for this email or member number.');
             } else {
                 $result = dispatchOTP($member, $channel);
                 if ($result['sent']) {
@@ -46,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['pr_sent_to']   = $result['sent_to'];
                     $_SESSION['pr_step']      = 2;
                     $step    = 2;
-                    $success = "OTP पठाइयो — " . htmlspecialchars($result['sent_to']) . " मा।";
+                    $success = $_t("OTP पठाइयो — ", "OTP sent to ") . htmlspecialchars($result['sent_to']) . '.';
                 } elseif ($result['channel'] === 'none') {
-                    $error = 'SMS/Email gateway configure भएको छैन। Admin लाई request पठाउनुहोस्।';
+                    $error = $_t('SMS/Email gateway configure भएको छैन। Admin लाई request पठाउनुहोस्।', 'SMS/Email gateway is not configured. Please send admin request.');
                 } else {
-                    $error = 'OTP पठाउन सकिएन। केही समय पछि पुनः प्रयास गर्नुहोस्।';
+                    $error = $_t('OTP पठाउन सकिएन। केही समय पछि पुनः प्रयास गर्नुहोस्।', 'Could not send OTP. Please try again later.');
                 }
             }
         }
@@ -60,16 +63,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif ($action === 'verify_otp') {
         $memberId = intval($_SESSION['pr_member_id'] ?? 0);
         $otp      = trim($_POST['otp'] ?? '');
-        if (!$memberId) { $error = 'Session expired. फेरि सुरु गर्नुहोस्।'; $step = 1; }
-        elseif (!preg_match('/^\d{6}$/', $otp)) { $error = 'OTP 6 अंकको हुनुपर्छ।'; }
+        if (!$memberId) { $error = $_t('Session expired. फेरि सुरु गर्नुहोस्।', 'Session expired. Start again.'); $step = 1; }
+        elseif (!preg_match('/^\d{6}$/', $otp)) { $error = $_t('OTP 6 अंकको हुनुपर्छ।', 'OTP must be 6 digits.'); }
         else {
             if (verifyOTP($memberId, $otp)) {
                 $_SESSION['pr_otp_ok'] = true;
                 $_SESSION['pr_step']   = 3;
                 $step    = 3;
-                $success = 'OTP verified! अब नयाँ पासवर्ड राख्नुहोस्।';
+                $success = $_t('OTP verified! अब नयाँ पासवर्ड राख्नुहोस्।', 'OTP verified! Now set your new password.');
             } else {
-                $error = 'OTP गलत वा expire भयो।';
+                $error = $_t('OTP गलत वा expire भयो।', 'OTP is invalid or expired.');
             }
         }
     }
@@ -84,9 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Session expired.'; $step = 1;
             unset($_SESSION['pr_member_id'],$_SESSION['pr_otp_ok'],$_SESSION['pr_step']);
         } elseif (strlen($pass1) < 6) {
-            $error = 'पासवर्ड कम्तिमा 6 अक्षरको हुनुपर्छ।'; $step = 3;
+            $error = $_t('पासवर्ड कम्तिमा 6 अक्षरको हुनुपर्छ।', 'Password must be at least 6 characters.'); $step = 3;
         } elseif ($pass1 !== $pass2) {
-            $error = 'दुवै पासवर्ड मेल खाएनन्।'; $step = 3;
+            $error = $_t('दुवै पासवर्ड मेल खाएनन्।', 'Passwords do not match.'); $step = 3;
         } else {
             $db   = getDB();
             $hash = password_hash($pass1, PASSWORD_DEFAULT);
@@ -109,8 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($member) {
                 $result = dispatchOTP($member, $channel);
                 $step   = 2; $_SESSION['pr_step'] = 2;
-                if ($result['sent']) $success = 'OTP फेरि पठाइयो।';
-                else $error = 'OTP पठाउन सकिएन।';
+                if ($result['sent']) $success = $_t('OTP फेरि पठाइयो।', 'OTP resent.');
+                else $error = $_t('OTP पठाउन सकिएन।', 'Could not send OTP.');
             }
         }
     }
@@ -118,10 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /* ── Admin Fallback: SMS/Email नभएमा admin लाई manual reset request पठाउने ── */
     elseif ($action === 'admin_fallback') {
         $identifier = trim($_POST['identifier'] ?? '');
-        if (!$identifier) { $error = 'Email वा Sadasyata Number लेख्नुहोस्।'; }
+        if (!$identifier) { $error = $_t('Email वा Sadasyata Number लेख्नुहोस्।', 'Please enter email or member number.'); }
         else {
             $member = findMemberForReset($identifier);
-            if (!$member) { $error = 'यो email वा sadasyata number मा कुनै खाता भेटिएन।'; }
+            if (!$member) { $error = $_t('यो email वा sadasyata number मा कुनै खाता भेटिएन।', 'No account found for this email or member number.'); }
             else {
                 $r = memberRequestPasswordReset($member['id']);
                 if (!empty($r['success'])) {
@@ -129,10 +132,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (function_exists('notifyAdminOfPasswordResetRequest')) {
                         try { notifyAdminOfPasswordResetRequest($member); } catch (\Throwable $e) {}
                     }
-                    $success = 'तपाईंको पासवर्ड Reset अनुरोध Admin लाई पठाइयो। Admin ले प्रक्रिया गरेपछि कार्यालयबाट सम्पर्क हुनेछ।';
+                    $success = $_t('तपाईंको पासवर्ड Reset अनुरोध Admin लाई पठाइयो। Admin ले प्रक्रिया गरेपछि कार्यालयबाट सम्पर्क हुनेछ।', 'Your password reset request has been sent to admin. Office will contact you after processing.');
                     $step = 'done';
                 } elseif (!empty($r['error'])) { $error = $r['error']; }
-                else { $error = 'अनुरोध पठाउन सकिएन। पछि पुनः प्रयास गर्नुहोस्।'; }
+                else { $error = $_t('अनुरोध पठाउन सकिएन। पछि पुनः प्रयास गर्नुहोस्।', 'Request could not be sent. Please try again later.'); }
             }
         }
     }
@@ -148,11 +151,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (!$step) $step = intval($_SESSION['pr_step'] ?? 1);
 ?>
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>पासवर्ड रिसेट — <?php echo htmlspecialchars($siteName); ?></title>
+<title><?php echo htmlspecialchars($_t('पासवर्ड रिसेट', 'Password Reset')); ?> — <?php echo htmlspecialchars($siteName); ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <?php memberHeadAssets(); ?>
@@ -177,8 +180,8 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
 <div class="card">
   <div class="card-header">
     <div style="font-size:2rem;margin-bottom:6px;"><i class="fas fa-shield-alt"></i></div>
-    <h4>पासवर्ड रिसेट</h4>
-    <p class="mb-0 mt-1 opacity-75 small"><?php echo htmlspecialchars($siteName); ?> — Member Portal</p>
+    <h4><?php echo $_t('पासवर्ड रिसेट', 'Password Reset'); ?></h4>
+    <p class="mb-0 mt-1 opacity-75 small"><?php echo htmlspecialchars($siteName); ?> — <?php echo $_t('सदस्य पोर्टल', 'Member Portal'); ?></p>
   </div>
   <div class="card-body p-4">
 
@@ -195,12 +198,12 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
       <div class="step-dot <?php echo $step>=2 ? ($step>2?'done':'active') : ''; ?>"></div>
       <div class="step-dot <?php echo $step>=3 ? ($step>3?'done':'active') : ''; ?>"></div>
     </div>
-    <p class="text-muted small mb-3">
+      <p class="text-muted small mb-3">
       <?php echo $step==1
-        ? '<i class="fas fa-search me-1"></i>चरण १: खाता पहिचान'
+        ? '<i class="fas fa-search me-1"></i>' . $_t('चरण १: खाता पहिचान', 'Step 1: Identify account')
         : ($step==2
-          ? '<i class="fas fa-key me-1"></i>चरण २: OTP Verify'
-          : '<i class="fas fa-lock me-1"></i>चरण ३: नयाँ पासवर्ड'); ?>
+          ? '<i class="fas fa-key me-1"></i>' . $_t('चरण २: OTP Verify', 'Step 2: OTP Verify')
+          : '<i class="fas fa-lock me-1"></i>' . $_t('चरण ३: नयाँ पासवर्ड', 'Step 3: New Password')); ?>
     </p>
     <?php endif; ?>
 
@@ -209,15 +212,15 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
       <?php echo csrfField(); ?>
       <input type="hidden" name="action" value="send_otp">
       <div class="mb-3">
-        <label class="form-label fw-semibold small">Email वा Sadasyata Number <span class="text-danger">*</span></label>
+        <label class="form-label fw-semibold small"><?php echo $_t('Email वा Sadasyata Number', 'Email or Member Number'); ?> <span class="text-danger">*</span></label>
         <input type="text" name="identifier" class="form-control"
                placeholder="example@email.com वा MEM-2081-001"
                value="<?php echo htmlspecialchars($_POST['identifier'] ?? ''); ?>" required autofocus>
-        <div class="form-text">Register गर्दा प्रयोग गरेको email वा सदस्यता नम्बर।</div>
+        <div class="form-text"><?php echo $_t('Register गर्दा प्रयोग गरेको email वा सदस्यता नम्बर।', 'Use the email or member number used during registration.'); ?></div>
       </div>
       <?php if ($smsEnabled): ?>
       <div class="mb-4">
-        <label class="form-label fw-semibold small">OTP कहाँ पठाउने?</label>
+        <label class="form-label fw-semibold small"><?php echo $_t('OTP कहाँ पठाउने?', 'Where to send OTP?'); ?></label>
         <div class="d-flex gap-2">
           <div class="flex-1 channel-opt" style="flex:1">
             <input type="radio" name="channel" id="ch_sms" value="sms" checked>
@@ -239,14 +242,14 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
       <input type="hidden" name="channel" value="email">
       <?php endif; ?>
       <button class="btn btn-g w-100 py-2 fw-semibold">
-        <i class="fas fa-paper-plane me-2"></i>OTP पठाउनुहोस्
+        <i class="fas fa-paper-plane me-2"></i><?php echo $_t('OTP पठाउनुहोस्', 'Send OTP'); ?>
       </button>
     </form>
 
     <!-- Admin Fallback: SMS/Email नभएमा वा OTP नआएमा -->
     <div class="text-center mt-3 pt-3 border-top">
-      <p class="text-muted small mb-2">OTP प्राप्त भएन वा SMS/Email सेवा छैन?</p>
-      <form method="POST" novalidate class="needs-validation" onsubmit="return confirm('Admin लाई पासवर्ड Reset अनुरोध पठाउने? (कार्यालयबाट सम्पर्क हुनेछ)');" style="display:inline;">
+      <p class="text-muted small mb-2"><?php echo $_t('OTP प्राप्त भएन वा SMS/Email सेवा छैन?', 'Did not receive OTP or SMS/Email service unavailable?'); ?></p>
+      <form method="POST" novalidate class="needs-validation" onsubmit="return confirm('<?php echo $_t('Admin लाई पासवर्ड Reset अनुरोध पठाउने? (कार्यालयबाट सम्पर्क हुनेछ)', 'Send password reset request to admin? (Office will contact you)'); ?>');" style="display:inline;">
       <?php echo csrfField(); ?>
         <input type="hidden" name="action" value="admin_fallback">
         <input type="hidden" name="identifier" value="<?php echo htmlspecialchars($_POST['identifier'] ?? ''); ?>">
@@ -254,15 +257,15 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
           <i class="fas fa-user-shield me-1"></i>Admin लाई अनुरोध पठाउनुहोस्
         </button>
       </form>
-      <div class="form-text mt-2">माथि email/sadasyata नम्बर भर्नुहोस्, अनि यो button थिच्नुहोस्।</div>
+      <div class="form-text mt-2"><?php echo $_t('माथि email/sadasyata नम्बर भर्नुहोस्, अनि यो button थिच्नुहोस्।', 'Fill email/member number above and click this button.'); ?></div>
     </div>
 
     <?php elseif ($step === 'done'): ?>
     <div class="text-center py-3">
       <div style="font-size:3rem;color:#16a34a;"><i class="fas fa-check-circle"></i></div>
-      <h5 class="mt-2">अनुरोध सफलतापूर्वक पठाइयो!</h5>
+      <h5 class="mt-2"><?php echo $_t('अनुरोध सफलतापूर्वक पठाइयो!', 'Request sent successfully!'); ?></h5>
       <p class="text-muted small">Admin ले तपाईंको अनुरोध समीक्षा गर्नेछन्। नयाँ पासवर्द कार्यालयबाट प्राप्त गर्न सकिन्छ।</p>
-      <a href="login.php" class="btn btn-g mt-2"><i class="fas fa-sign-in-alt me-1"></i>Login मा फर्कनुहोस्</a>
+      <a href="login.php" class="btn btn-g mt-2"><i class="fas fa-sign-in-alt me-1"></i><?php echo $_t('Login मा फर्कनुहोस्', 'Back to Login'); ?></a>
     </div>
 
     <?php elseif ($step == 2): /* ═══ STEP 2 ═══ */ ?>
@@ -295,32 +298,32 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
       <form method="POST" novalidate class="needs-validation" class="flex-1">
       <?php echo csrfField(); ?>
         <input type="hidden" name="action" value="cancel">
-        <button class="btn btn-outline-danger btn-sm w-100">रद्द गर्नुहोस्</button>
+        <button class="btn btn-outline-danger btn-sm w-100"><?php echo $_t('रद्द गर्नुहोस्', 'Cancel'); ?></button>
       </form>
     </div>
 
     <?php elseif ($step == 3): /* ═══ STEP 3 ═══ */ ?>
     <div class="alert alert-success border-0 small py-2 text-center">
-      <i class="fas fa-check-circle me-1"></i>OTP verified! अब नयाँ पासवर्ड राख्नुहोस्।
+      <i class="fas fa-check-circle me-1"></i><?php echo $_t('OTP verified! अब नयाँ पासवर्ड राख्नुहोस्।', 'OTP verified! Now set your new password.'); ?>
     </div>
     <form method="POST" novalidate class="needs-validation" autocomplete="off">
       <?php echo csrfField(); ?>
       <input type="hidden" name="action" value="set_password">
       <div class="mb-3">
-        <label class="form-label fw-semibold small">नयाँ पासवर्ड <span class="text-danger">*</span></label>
+        <label class="form-label fw-semibold small"><?php echo $_t('नयाँ पासवर्ड', 'New Password'); ?> <span class="text-danger">*</span></label>
         <div class="input-group">
           <input type="password" name="password" id="pw1" class="form-control"
-                 placeholder="कम्तिमा 6 अक्षर" minlength="6" required autofocus>
+                 placeholder="<?php echo $_t('कम्तिमा 6 अक्षर', 'At least 6 characters'); ?>" minlength="6" required autofocus>
           <button type="button" class="btn btn-outline-secondary" onclick="tpw('pw1')">
             <i class="fas fa-eye"></i>
           </button>
         </div>
       </div>
       <div class="mb-4">
-        <label class="form-label fw-semibold small">पासवर्ड पुष्टि गर्नुहोस् <span class="text-danger">*</span></label>
+        <label class="form-label fw-semibold small"><?php echo $_t('पासवर्ड पुष्टि गर्नुहोस्', 'Confirm Password'); ?> <span class="text-danger">*</span></label>
         <div class="input-group">
           <input type="password" name="password_confirm" id="pw2" class="form-control"
-                 placeholder="फेरि लेख्नुहोस्" minlength="6" required>
+                 placeholder="<?php echo $_t('फेरि लेख्नुहोस्', 'Enter again'); ?>" minlength="6" required>
           <button type="button" class="btn btn-outline-secondary" onclick="tpw('pw2')">
             <i class="fas fa-eye"></i>
           </button>
@@ -334,10 +337,10 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
     <?php elseif ($step === 'done'): /* ═══ DONE ═══ */ ?>
     <div class="text-center py-4">
       <div style="font-size:3.5rem;color:#22c55e"><i class="fas fa-check-circle"></i></div>
-      <h5 class="mt-3 fw-bold">पासवर्ड सफलतापूर्वक परिवर्तन!</h5>
-      <p class="text-muted small mt-2">तपाईं अब नयाँ पासवर्डले login गर्न सक्नुहुन्छ।</p>
+      <h5 class="mt-3 fw-bold"><?php echo $_t('पासवर्ड सफलतापूर्वक परिवर्तन!', 'Password changed successfully!'); ?></h5>
+      <p class="text-muted small mt-2"><?php echo $_t('तपाईं अब नयाँ पासवर्डले login गर्न सक्नुहुन्छ।', 'You can now login with your new password.'); ?></p>
       <a href="login.php" class="btn btn-g px-4 py-2 fw-semibold mt-2">
-        <i class="fas fa-sign-in-alt me-2"></i>Login गर्नुहोस्
+        <i class="fas fa-sign-in-alt me-2"></i><?php echo $_t('Login गर्नुहोस्', 'Login'); ?>
       </a>
     </div>
     <?php endif; ?>
@@ -345,7 +348,7 @@ body{background:linear-gradient(135deg,var(--bg-muted,#e8f5e9),var(--bg-soft,#f0
     <?php if ($step == 1 || $step == 2): ?>
     <div class="text-center mt-4 pt-3 border-top">
       <a href="login.php" class="text-success text-decoration-none small">
-        <i class="fas fa-arrow-left me-1"></i>Login पेजमा फर्कनुहोस्
+        <i class="fas fa-arrow-left me-1"></i><?php echo $_t('Login पेजमा फर्कनुहोस्', 'Back to login page'); ?>
       </a>
     </div>
     <?php endif; ?>

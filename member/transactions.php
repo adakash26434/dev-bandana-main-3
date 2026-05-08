@@ -17,6 +17,9 @@ $offset  = ($page - 1) * $perPage;
 $filter  = in_array($_GET['type'] ?? '', ['credit','debit','']) ? ($_GET['type'] ?? '') : '';
 
 $pageTitle = isEnglish() ? 'Transaction History' : 'कारोबार विवरण';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 ?>
 <?php require __DIR__ . '/includes/chrome.php'; ?>
 
@@ -30,12 +33,12 @@ $pageTitle = isEnglish() ? 'Transaction History' : 'कारोबार वि
       <?php echo isEnglish() ? 'Transaction History' : 'कारोबार विवरण'; ?>
     </h1>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <a href="?type=" class="btn btn-sm <?php echo $filter==='' ? 'btn-success' : 'btn-outline-secondary'; ?>">सबै</a>
+      <a href="?type=" class="btn btn-sm <?php echo $filter==='' ? 'btn-success' : 'btn-outline-secondary'; ?>"><?php echo $_t('सबै', 'All'); ?></a>
       <a href="?type=credit" class="btn btn-sm <?php echo $filter==='credit' ? 'btn-success' : 'btn-outline-secondary'; ?>">
-        <i class="fas fa-arrow-down me-1"></i>जम्मा
+        <i class="fas fa-arrow-down me-1"></i><?php echo $_t('जम्मा', 'Credit'); ?>
       </a>
       <a href="?type=debit" class="btn btn-sm <?php echo $filter==='debit' ? 'btn-danger' : 'btn-outline-secondary'; ?>">
-        <i class="fas fa-arrow-up me-1"></i>झिकेको
+        <i class="fas fa-arrow-up me-1"></i><?php echo $_t('झिकेको', 'Debit'); ?>
       </a>
     </div>
   </div>
@@ -69,19 +72,19 @@ $pageTitle = isEnglish() ? 'Transaction History' : 'कारोबार वि
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;text-align:center;">
       <div style="font-size:1.1rem;font-weight:700;color:#16a34a;"><?php echo formatNepaliCurrency((float)$totalCredit); ?></div>
-      <div style="font-size:12px;color:#15803d;margin-top:4px;"><i class="fas fa-arrow-down me-1"></i>जम्मा</div>
+      <div style="font-size:12px;color:#15803d;margin-top:4px;"><i class="fas fa-arrow-down me-1"></i><?php echo $_t('जम्मा', 'Credit'); ?></div>
     </div>
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;text-align:center;">
       <div style="font-size:1.1rem;font-weight:700;color:#dc2626;"><?php echo formatNepaliCurrency((float)$totalDebit); ?></div>
-      <div style="font-size:12px;color:#b91c1c;margin-top:4px;"><i class="fas fa-arrow-up me-1"></i>झिकेको</div>
+      <div style="font-size:12px;color:#b91c1c;margin-top:4px;"><i class="fas fa-arrow-up me-1"></i><?php echo $_t('झिकेको', 'Debit'); ?></div>
     </div>
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;text-align:center;">
       <div style="font-size:1.1rem;font-weight:700;color:var(--secondary-color,#c0392b);"><?php echo formatNepaliCurrency((float)$totalCredit - (float)$totalDebit); ?></div>
-      <div style="font-size:12px;color:var(--secondary-dark,#922b21);margin-top:4px;"><i class="fas fa-wallet me-1"></i>ब्यालेन्स</div>
+      <div style="font-size:12px;color:var(--secondary-dark,#922b21);margin-top:4px;"><i class="fas fa-wallet me-1"></i><?php echo $_t('ब्यालेन्स', 'Balance'); ?></div>
     </div>
     <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:10px;padding:16px;text-align:center;">
       <div style="font-size:1.1rem;font-weight:700;color:#374151;"><?php echo toNepaliNumeral($totalCount); ?></div>
-      <div style="font-size:12px;color:#6b7280;margin-top:4px;"><i class="fas fa-list me-1"></i>जम्मा कारोबार</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px;"><i class="fas fa-list me-1"></i><?php echo $_t('जम्मा कारोबार', 'Total Transactions'); ?></div>
     </div>
   </div>
 
@@ -99,10 +102,10 @@ $pageTitle = isEnglish() ? 'Transaction History' : 'कारोबार वि
       <table style="width:100%;border-collapse:collapse;">
         <thead>
           <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb;">
-            <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:#374151;white-space:nowrap;">मिति</th>
-            <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:#374151;">विवरण</th>
-            <th style="padding:12px 16px;text-align:right;font-size:12px;font-weight:600;color:#374151;white-space:nowrap;">रकम (रु.)</th>
-            <th style="padding:12px 8px;text-align:center;font-size:12px;font-weight:600;color:#374151;">प्रकार</th>
+            <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:#374151;white-space:nowrap;"><?php echo $_t('मिति', 'Date'); ?></th>
+            <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:#374151;"><?php echo $_t('विवरण', 'Description'); ?></th>
+            <th style="padding:12px 16px;text-align:right;font-size:12px;font-weight:600;color:#374151;white-space:nowrap;"><?php echo $_t('रकम (रु.)', 'Amount'); ?></th>
+            <th style="padding:12px 8px;text-align:center;font-size:12px;font-weight:600;color:#374151;"><?php echo $_t('प्रकार', 'Type'); ?></th>
           </tr>
         </thead>
         <tbody>
@@ -115,7 +118,7 @@ $pageTitle = isEnglish() ? 'Transaction History' : 'कारोबार वि
             <td style="padding:12px 16px;font-size:13px;color:#111827;">
               <?php echo htmlspecialchars($tx['description'] ?? $tx['remarks'] ?? '—'); ?>
               <?php if (!empty($tx['reference_no'])): ?>
-              <br><small style="color:#9ca3af;">Ref: <?php echo htmlspecialchars($tx['reference_no']); ?></small>
+              <br><small style="color:#9ca3af;"><?php echo $_t('रेफ:', 'Ref:'); ?> <?php echo htmlspecialchars($tx['reference_no']); ?></small>
               <?php endif; ?>
             </td>
             <td style="padding:12px 16px;text-align:right;font-size:14px;font-weight:700;white-space:nowrap;
@@ -125,11 +128,11 @@ $pageTitle = isEnglish() ? 'Transaction History' : 'कारोबार वि
             <td style="padding:12px 8px;text-align:center;">
               <?php if ($isCredit): ?>
               <span style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;">
-                <i class="fas fa-arrow-down" style="font-size:9px;"></i> जम्मा
+                <i class="fas fa-arrow-down" style="font-size:9px;"></i> <?php echo $_t('जम्मा', 'Credit'); ?>
               </span>
               <?php else: ?>
               <span style="display:inline-flex;align-items:center;gap:4px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;">
-                <i class="fas fa-arrow-up" style="font-size:9px;"></i> झिकेको
+                <i class="fas fa-arrow-up" style="font-size:9px;"></i> <?php echo $_t('झिकेको', 'Debit'); ?>
               </span>
               <?php endif; ?>
             </td>

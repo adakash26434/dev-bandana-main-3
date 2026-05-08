@@ -10,6 +10,9 @@ memberSecurityHeaders();
 $db  = getDB();
 $mem = currentMember();
 if (!$mem) { header('Location: login.php?msg=session_expired'); exit; }
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $memberId = (int)$mem['id'];
 $memEmail = trim((string)($mem['email'] ?? ''));
@@ -45,13 +48,13 @@ $rBranch    = trim((string)($kycRow['branch'] ?? ''));
 
 /* Service type options with target table/purpose */
 $serviceTypes = [
-    'appointment'       => ['label' => '📅 भेटघाट — शाखा भ्रमण / भेट माग्ने',      'table' => 'appointments', 'purpose' => 'other'],
-    'loan_inquiry'      => ['label' => '💰 ऋण जानकारी — कर्जा सम्बन्धी सोधपुछ', 'table' => 'appointments', 'purpose' => 'loan_inquiry'],
-    'account_info'      => ['label' => '🏦 खाता जानकारी — बचत खाता सम्बन्धी',   'table' => 'appointments', 'purpose' => 'account_inquiry'],
-    'welfare_inquiry'   => ['label' => '❤️ कल्याण सोधपुछ — सुविधा जानकारी',    'table' => 'appointments', 'purpose' => 'other'],
-    'document_request'  => ['label' => '📄 कागजात माग — NOC, Statement आदि',   'table' => 'appointments', 'purpose' => 'other'],
-    'grievance'         => ['label' => '📣 गुनासो — समस्या दर्ता गर्ने',         'table' => 'grievances',   'purpose' => 'other'],
-    'general'           => ['label' => '💬 सामान्य सोधपुछ',                       'table' => 'appointments', 'purpose' => 'other'],
+    'appointment'       => ['label' => $_t('📅 भेटघाट — शाखा भ्रमण / भेट माग्ने','📅 Appointment — Branch visit request'),      'table' => 'appointments', 'purpose' => 'other'],
+    'loan_inquiry'      => ['label' => $_t('💰 ऋण जानकारी — कर्जा सम्बन्धी सोधपुछ','💰 Loan Inquiry — Ask about loans'), 'table' => 'appointments', 'purpose' => 'loan_inquiry'],
+    'account_info'      => ['label' => $_t('🏦 खाता जानकारी — बचत खाता सम्बन्धी','🏦 Account Info — Savings account related'),   'table' => 'appointments', 'purpose' => 'account_inquiry'],
+    'welfare_inquiry'   => ['label' => $_t('❤️ कल्याण सोधपुछ — सुविधा जानकारी','❤️ Welfare Inquiry — Benefit information'),    'table' => 'appointments', 'purpose' => 'other'],
+    'document_request'  => ['label' => $_t('📄 कागजात माग — NOC, Statement आदि','📄 Document Request — NOC, Statement etc.'),   'table' => 'appointments', 'purpose' => 'other'],
+    'grievance'         => ['label' => $_t('📣 गुनासो — समस्या दर्ता गर्ने','📣 Grievance — Register a problem'),         'table' => 'grievances',   'purpose' => 'other'],
+    'general'           => ['label' => $_t('💬 सामान्य सोधपुछ','💬 General Inquiry'),                       'table' => 'appointments', 'purpose' => 'other'],
 ];
 
 $successMsg = '';
@@ -61,9 +64,9 @@ $submitted  = [];
 /* ── Handle POST ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submit') {
     if (!verifyCSRFToken()) {
-        $errorMsg = 'सुरक्षा जाँच असफल।';
+        $errorMsg = $_t('सुरक्षा जाँच असफल।', 'Security check failed.');
     } elseif (!checkRateLimit('svcreq_' . $memberId, 10, 3600)) {
-        $errorMsg = 'धेरै अनुरोध भए। १ घण्टापछि पुनः प्रयास गर्नुहोस्।';
+        $errorMsg = $_t('धेरै अनुरोध भए। १ घण्टापछि पुनः प्रयास गर्नुहोस्।', 'Too many requests. Please try again after 1 hour.');
     } else {
         $svcType    = trim($_POST['service_type'] ?? '');
         $message    = trim(substr($_POST['message'] ?? '', 0, 2000));
@@ -72,9 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
         $branch     = trim(substr($_POST['branch'] ?? '', 0, 80)) ?: $rBranch;
 
         if (!isset($serviceTypes[$svcType])) {
-            $errorMsg = 'सेवा प्रकार छान्नुहोस्।';
+            $errorMsg = $_t('सेवा प्रकार छान्नुहोस्।', 'Please select service type.');
         } elseif (!$message) {
-            $errorMsg = 'सन्देश / विवरण अनिवार्य छ।';
+            $errorMsg = $_t('सन्देश / विवरण अनिवार्य छ।', 'Message/description is required.');
         } else {
             $svc       = $serviceTypes[$svcType];
             $trackingId = 'REQ-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid($memberId,true)),0,6));
@@ -98,9 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
                         VALUES (?,?,?,?,?,?,?,?,?,?,'pending',NOW())");
                     $ins->execute([$trackingId, $memName, $rPhone, $rEmail, $memSadasyata, $effectiveDate, $effectiveTime, $corePurpose, $detailText, $branch]);
                 }
-                $successMsg = "अनुरोध दर्ता भयो! Tracking ID: <strong>$trackingId</strong> — Admin ले confirm गरेपछि सूचित गरिनेछ।";
+                $successMsg = isEnglish()
+                    ? "Request submitted! Tracking ID: <strong>$trackingId</strong> — You will be notified after admin confirmation."
+                    : "अनुरोध दर्ता भयो! Tracking ID: <strong>$trackingId</strong> — Admin ले confirm गरेपछि सूचित गरिनेछ।";
             } catch (Throwable $e) {
-                $errorMsg = 'दर्ता गर्न समस्या भयो। पुनः प्रयास गर्नुहोस्।';
+                $errorMsg = $_t('दर्ता गर्न समस्या भयो। पुनः प्रयास गर्नुहोस्।', 'Failed to submit. Please try again.');
                 error_log('[service-request] ' . $e->getMessage());
             }
         }
@@ -122,7 +127,7 @@ try {
 } catch (Throwable $e) { $recentReqs = []; }
 
 $siteName  = getSetting('site_name', 'सहकारी');
-$pageTitle = 'सेवा अनुरोध — ' . $siteName;
+$pageTitle = $_t('सेवा अनुरोध', 'Service Request') . ' — ' . $siteName;
 $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">';
 
 $statusColors = [
@@ -158,13 +163,13 @@ HTML;
 <div class="mp-container">
 
   <h1 style="font-size:1.25rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0 0 16px;">
-    <i class="fas fa-concierge-bell" style="margin-right:8px;"></i>सेवा अनुरोध
+    <i class="fas fa-concierge-bell" style="margin-right:8px;"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?>
   </h1>
 
   <?php if ($successMsg): ?>
   <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;color:#166534;font-size:.9rem;margin-bottom:16px;">
     <i class="fas fa-circle-check" style="margin-right:8px;"></i><?= $successMsg ?>
-    <div style="margin-top:10px;"><a href="tracker.php" style="color:var(--primary-color,#1a8754);font-weight:700;">Tracker मा हेर्नुहोस् →</a></div>
+    <div style="margin-top:10px;"><a href="tracker.php" style="color:var(--primary-color,#1a8754);font-weight:700;"><?php echo $_t('Tracker मा हेर्नुहोस्', 'Open in Tracker'); ?> →</a></div>
   </div>
   <?php endif; ?>
   <?php if ($errorMsg): ?>
@@ -175,7 +180,7 @@ HTML;
 
   <div class="sr-info-bar">
     <i class="fas fa-magic-wand-sparkles" style="flex-shrink:0;"></i>
-    <div>तपाईंको नाम, फोन, email — <strong>profile बाट auto-fill</strong> भएको छ। सेवा प्रकार र सन्देश मात्र भर्नुहोस्।</div>
+    <div><?php echo $_t('तपाईंको नाम, फोन, email — <strong>profile बाट auto-fill</strong> भएको छ। सेवा प्रकार र सन्देश मात्र भर्नुहोस्।', 'Your name, phone and email are <strong>auto-filled from profile</strong>. Only select service type and message.'); ?></div>
   </div>
 
   <form method="POST">
@@ -184,22 +189,22 @@ HTML;
 
     <!-- Pre-filled info -->
     <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:18px;">
-      <div style="font-size:.75rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">तपाईंको जानकारी (Auto-filled)</div>
+      <div style="font-size:.75rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;"><?php echo $_t('तपाईंको जानकारी (Auto-filled)', 'Your Information (Auto-filled)'); ?></div>
       <div class="form-row2">
         <div class="form-group" style="margin-bottom:8px;">
-          <label>नाम</label>
+          <label><?php echo $_t('नाम', 'Name'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($memName) ?>" readonly>
         </div>
         <div class="form-group" style="margin-bottom:8px;">
-          <label>सदस्यता नम्बर</label>
+          <label><?php echo $_t('सदस्यता नम्बर', 'Membership Number'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($memSadasyata) ?>" readonly>
         </div>
         <div class="form-group" style="margin-bottom:0;">
-          <label>फोन</label>
+          <label><?php echo $_t('फोन', 'Phone'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($rPhone) ?>" readonly>
         </div>
         <div class="form-group" style="margin-bottom:0;">
-          <label>Email</label>
+          <label><?php echo $_t('इमेल', 'Email'); ?></label>
           <input type="text" class="form-control" value="<?= htmlspecialchars($rEmail) ?>" readonly>
         </div>
       </div>
@@ -207,9 +212,9 @@ HTML;
 
     <!-- Service type -->
     <div class="form-group">
-      <label>सेवा प्रकार छान्नुहोस् <span style="color:#dc2626;">*</span></label>
+      <label><?php echo $_t('सेवा प्रकार छान्नुहोस्', 'Select Service Type'); ?> <span style="color:#dc2626;">*</span></label>
       <select name="service_type" class="form-control" required>
-        <option value="">— सेवा छान्नुहोस् —</option>
+        <option value="">— <?php echo $_t('सेवा छान्नुहोस्', 'Select service'); ?> —</option>
         <?php foreach ($serviceTypes as $key => $svc): ?>
         <option value="<?= $key ?>"><?= $svc['label'] ?></option>
         <?php endforeach; ?>
@@ -218,13 +223,13 @@ HTML;
 
     <div class="form-row2">
       <div class="form-group">
-        <label><i class="fas fa-calendar" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i>मनपर्ने मिति (Optional)</label>
+        <label><i class="fas fa-calendar" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i><?php echo $_t('मनपर्ने मिति (Optional)', 'Preferred Date (Optional)'); ?></label>
         <input type="date" name="preferred_date" class="form-control" min="<?= date('Y-m-d') ?>">
       </div>
       <div class="form-group">
-        <label><i class="fas fa-clock" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i>मनपर्ने समय</label>
+        <label><i class="fas fa-clock" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i><?php echo $_t('मनपर्ने समय', 'Preferred Time'); ?></label>
         <select name="preferred_time" class="form-control">
-          <option value="">— समय छान्नुहोस् —</option>
+          <option value="">— <?php echo $_t('समय छान्नुहोस्', 'Select time'); ?> —</option>
           <option>10:00 AM - 11:00 AM</option>
           <option>11:00 AM - 12:00 PM</option>
           <option>1:00 PM - 2:00 PM</option>
@@ -235,17 +240,17 @@ HTML;
     </div>
 
     <div class="form-group">
-      <label><i class="fas fa-building" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i>शाखा</label>
-      <input type="text" name="branch" class="form-control" value="<?= htmlspecialchars($rBranch) ?>" placeholder="जस्तै: प्रधान कार्यालय">
+      <label><i class="fas fa-building" style="margin-right:4px;color:var(--primary-color,#1a8754);"></i><?php echo $_t('शाखा', 'Branch'); ?></label>
+      <input type="text" name="branch" class="form-control" value="<?= htmlspecialchars($rBranch) ?>" placeholder="<?php echo $_t('जस्तै: प्रधान कार्यालय', 'e.g., Head Office'); ?>">
     </div>
 
     <div class="form-group">
-      <label>विस्तृत सन्देश <span style="color:#dc2626;">*</span></label>
-      <textarea name="message" class="form-control" rows="4" required placeholder="तपाईंको अनुरोधको पूरा विवरण लेख्नुहोस्..."></textarea>
+      <label><?php echo $_t('विस्तृत सन्देश', 'Detailed Message'); ?> <span style="color:#dc2626;">*</span></label>
+      <textarea name="message" class="form-control" rows="4" required placeholder="<?php echo $_t('तपाईंको अनुरोधको पूरा विवरण लेख्नुहोस्...', 'Write full details of your request...'); ?>"></textarea>
     </div>
 
     <button type="submit" style="width:100%;padding:12px;background:var(--primary-color,#1a8754);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-      <i class="fas fa-paper-plane"></i> अनुरोध पठाउनुहोस्
+      <i class="fas fa-paper-plane"></i> <?php echo $_t('अनुरोध पठाउनुहोस्', 'Submit Request'); ?>
     </button>
   </form>
 
@@ -253,7 +258,7 @@ HTML;
   <?php if (!empty($recentReqs)): ?>
   <div style="margin-top:24px;">
     <div style="font-size:.8rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">
-      <i class="fas fa-history" style="margin-right:4px;"></i>हालसालैका अनुरोधहरू
+      <i class="fas fa-history" style="margin-right:4px;"></i><?php echo $_t('हालसालैका अनुरोधहरू', 'Recent Requests'); ?>
     </div>
     <?php foreach ($recentReqs as $rq):
         $stColor = $statusColors[$rq['status']] ?? '#9ca3af';

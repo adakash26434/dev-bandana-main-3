@@ -6,6 +6,9 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/../includes/totp-2fa.php';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 memberSecurityHeaders();
 
@@ -24,16 +27,16 @@ $info    = '';
 /* ── POST: Login ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_login'])) {
     if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
-        $error = 'Security error. Page refresh गर्नुहोस्।';
+        $error = $_t('Security error. Page refresh गर्नुहोस्।', 'Security error. Please refresh the page.');
     } else {
         $loginId  = trim($_POST['login_id'] ?? '');
         $password = $_POST['password'] ?? '';
         if (!$loginId || !$password) {
-            $error = 'इमेल/सदस्यता नम्बर र पासवर्ड आवश्यक छ।';
+            $error = $_t('इमेल/सदस्यता नम्बर र पासवर्ड आवश्यक छ।', 'Email/member number and password are required.');
         } elseif (function_exists('checkLoginAttempts') && !checkLoginAttempts($loginId, $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0')) {
-            $error = 'धेरै पटक गलत प्रयास भयो। कृपया १५ मिनेट पछि पुनः प्रयास गर्नुहोस्।';
+            $error = $_t('धेरै पटक गलत प्रयास भयो। कृपया १५ मिनेट पछि पुनः प्रयास गर्नुहोस्।', 'Too many failed attempts. Please try again after 15 minutes.');
         } elseif (function_exists('checkRateLimit') && !checkRateLimit('member_login_pw', 5, 900)) {
-            $error = 'धेरै पटक प्रयास भयो। कृपया केही समय पछि पुनः प्रयास गर्नुहोस्।';
+            $error = $_t('धेरै पटक प्रयास भयो। कृपया केही समय पछि पुनः प्रयास गर्नुहोस्।', 'Too many attempts. Please try again later.');
         } else {
             $res = memberLogin($loginId, $password, true);
             $ipLogin = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
@@ -52,14 +55,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_login'])) {
                     $info = 'pending';
                 } elseif ($res['error'] === 'rejected') {
                     $info  = 'rejected';
-                    $error = '❌ तपाईंको दर्ता अस्वीकृत भएको छ।' .
-                             (!empty($res['reason']) ? ' कारण: ' . htmlspecialchars($res['reason']) : '') .
-                             ' थप जानकारीका लागि कार्यालयमा सम्पर्क गर्नुहोस्।';
+                    $error = $_t('❌ तपाईंको दर्ता अस्वीकृत भएको छ।', '❌ Your registration has been rejected.')
+                           . (!empty($res['reason']) ? ($_t(' कारण: ', ' Reason: ') . htmlspecialchars($res['reason'])) : '')
+                           . $_t(' थप जानकारीका लागि कार्यालयमा सम्पर्क गर्नुहोस्।', ' Please contact office for more details.');
                 } elseif ($res['error'] === 'renewal_required') {
                     /* Issue #3: 5-year card म्याद सकियो */
                     $info  = 'renewal';
-                    $error = '🔄 तपाईंको Member Card को ५ बर्षे म्याद सकिएको छ। '
-                           . 'कार्यालयमा सम्पर्क गरी renew गर्नुहोस् — Admin ले approve गरेपछि feri active हुनेछ।';
+                    $error = $_t('🔄 तपाईंको Member Card को ५ बर्षे म्याद सकिएको छ। कार्यालयमा सम्पर्क गरी renew गर्नुहोस् — Admin ले approve गरेपछि feri active हुनेछ।', '🔄 Your member card has expired after 5 years. Please contact office for renewal — it will be active again after admin approval.');
                 } else {
                     $error = htmlspecialchars($res['error']);
                 }
@@ -111,11 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_login'])) {
 /* ── POST: Member 2FA verify/setup ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_member_2fa'])) {
     if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
-        $error = 'Security error. Page refresh गर्नुहोस्।';
+        $error = $_t('Security error. Page refresh गर्नुहोस्।', 'Security error. Please refresh the page.');
     } else {
         $pending = $_SESSION['member_2fa_pending'] ?? null;
         if (!is_array($pending) || empty($pending['id'])) {
-            $error = '2FA session समाप्त भयो। पुन: login गर्नुहोस्।';
+            $error = $_t('2FA session समाप्त भयो। पुन: login गर्नुहोस्।', '2FA session expired. Please login again.');
         } else {
             try {
                 $db = getDB();
@@ -123,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_member_2fa'])) {
                 $st->execute([(int)$pending['id']]);
                 $m = $st->fetch(PDO::FETCH_ASSOC) ?: null;
                 if (!$m) {
-                    $error = 'Member account भेटिएन।';
+                    $error = $_t('Member account भेटिएन।', 'Member account not found.');
                 } else {
                     $code = trim((string)($_POST['twofa_code'] ?? ''));
                     $mode = (string)($pending['mode'] ?? 'verify');
@@ -131,9 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_member_2fa'])) {
                     if ($mode === 'setup') {
                         $secret = trim((string)($pending['secret'] ?? ''));
                         if ($secret === '') {
-                            $error = '2FA setup secret भेटिएन।';
+                            $error = $_t('2FA setup secret भेटिएन।', '2FA setup secret not found.');
                         } elseif (!twoFaVerifyCode($secret, $code, 1)) {
-                            $error = '2FA code मिलेन। फेरि प्रयास गर्नुहोस्।';
+                            $error = $_t('2FA code मिलेन। फेरि प्रयास गर्नुहोस्।', '2FA code did not match. Please try again.');
                         } else {
                             $bk = twoFaGenerateBackupCodes(8);
                             $db->prepare("UPDATE members SET twofa_enabled=1, twofa_secret=?, twofa_backup_codes=?, twofa_enabled_at=NOW() WHERE id=?")
@@ -155,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_member_2fa'])) {
                                 $ok = true;
                             }
                         }
-                        if (!$ok) $error = '2FA code वा backup code मिलेन।';
+                        if (!$ok) $error = $_t('2FA code वा backup code मिलेन।', '2FA code or backup code did not match.');
                     }
 
                     if ($ok) {
@@ -170,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_member_2fa'])) {
                     }
                 }
             } catch (Throwable $e) {
-                $error = '2FA verify गर्दा त्रुटि भयो।';
+                $error = $_t('2FA verify गर्दा त्रुटि भयो।', 'An error occurred while verifying 2FA.');
             }
         }
     }
@@ -179,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_member_2fa'])) {
 /* ── POST: Register ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_register'])) {
     if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
-        $error = 'Security error. Page refresh गर्नुहोस्।';
+        $error = $_t('Security error. Page refresh गर्नुहोस्।', 'Security error. Please refresh the page.');
         $tab   = 'register';
     } else {
         $name      = '';
@@ -191,15 +193,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_register'])) {
         $tab       = 'register';
 
         if (!$sadasyata) {
-            $error = 'सदस्यता नम्बर अनिवार्य छ।';
+            $error = $_t('सदस्यता नम्बर अनिवार्य छ।', 'Member number is required.');
         } elseif (!$email || !$phone) {
-            $error = 'दर्ताका लागि इमेल र मोबाइल दुवै अनिवार्य छन्।';
+            $error = $_t('दर्ताका लागि इमेल र मोबाइल दुवै अनिवार्य छन्।', 'Both email and mobile are required for registration.');
         } elseif ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = 'मान्य इमेल ठेगाना राख्नुहोस्।';
+            $error = $_t('मान्य इमेल ठेगाना राख्नुहोस्।', 'Please enter a valid email address.');
         } elseif ($phone && !preg_match('/^[0-9]{7,15}$/', $phone)) {
-            $error = 'मान्य मोबाइल नम्बर राख्नुहोस्।';
+            $error = $_t('मान्य मोबाइल नम्बर राख्नुहोस्।', 'Please enter a valid mobile number.');
         } elseif (strlen($password) < 8) {
-            $error = 'पासवर्ड कम्तिमा ८ अक्षरको हुनुपर्छ।';
+            $error = $_t('पासवर्ड कम्तिमा ८ अक्षरको हुनुपर्छ।', 'Password must be at least 8 characters.');
         } elseif (!preg_match('/[A-Z]/', $password)) {
             $error = 'पासवर्डमा कम्तिमा एउटा Capital letter (A-Z) हुनुपर्छ।';
         } elseif (!preg_match('/[a-z]/', $password)) {
@@ -207,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_register'])) {
         } elseif (!preg_match('/[0-9]/', $password)) {
             $error = 'पासवर्डमा कम्तिमा एउटा digit (0-9) हुनुपर्छ।';
         } elseif ($password !== $confirm) {
-            $error = 'दुवै पासवर्ड मेल खाएनन्।';
+            $error = $_t('दुवै पासवर्ड मेल खाएनन्।', 'Passwords do not match.');
         } else {
             $db = getDB();
             $kycMatched = false;
@@ -222,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_register'])) {
                 }
 
                 if ($memberIdCol === '') {
-                    $error = 'KYC schema मा Member ID field छैन। Admin ले DB setup/migration चलाउनुहोस्।';
+                    $error = $_t('KYC schema मा Member ID field छैन। Admin ले DB setup/migration चलाउनुहोस्।', 'KYC schema is missing member ID field. Please ask admin to run DB setup/migration.');
                 }
 
                 $kycSql = "SELECT id, full_name, email, mobile, status FROM kyc_applications
@@ -243,31 +245,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_register'])) {
                 $kycMatched = false;
             }
             if (!$kycMatched) {
-                $error = 'KYC रेकर्ड फेला परेन। सदस्यता नम्बर + इमेल + मोबाइल KYC विवरणसँग मिलेको छैन।';
+                $error = $_t('KYC रेकर्ड फेला परेन। सदस्यता नम्बर + इमेल + मोबाइल KYC विवरणसँग मिलेको छैन।', 'KYC record not found. Member number + email + mobile do not match KYC details.');
             } elseif (($kycRow['status'] ?? '') === 'rejected') {
-                $error = 'तपाईंको KYC अस्वीकृत छ। कृपया सहकारीमा सम्पर्क गरी KYC अपडेट गर्नुहोस्।';
+                $error = $_t('तपाईंको KYC अस्वीकृत छ। कृपया सहकारीमा सम्पर्क गरी KYC अपडेट गर्नुहोस्।', 'Your KYC is rejected. Please contact cooperative and update KYC.');
             }
             if (!$error && $kycRow) {
                 // Signup data KYC बाट नै लिने — duplicate typing हटाउने
                 $name  = trim($kycRow['full_name'] ?? '');
                 $email = strtolower(trim($kycRow['email'] ?? $email));
                 $phone = preg_replace('/[^0-9]/', '', (string)($kycRow['mobile'] ?? $phone));
-                if ($name === '') $error = 'KYC record मा नाम खाली छ। कृपया KYC update गर्नुहोस्।';
+                if ($name === '') $error = $_t('KYC record मा नाम खाली छ। कृपया KYC update गर्नुहोस्।', 'Name is empty in KYC record. Please update KYC.');
             }
             if ($email) {
                 $chk = $db->prepare("SELECT id FROM members WHERE email=? LIMIT 1");
                 $chk->execute([$email]);
-                if ($chk->fetch()) $error = 'यो इमेल पहिले नै दर्ता भएको छ।';
+                if ($chk->fetch()) $error = $_t('यो इमेल पहिले नै दर्ता भएको छ।', 'This email is already registered.');
             }
             if (!$error && $phone) {
                 $chk2 = $db->prepare("SELECT id FROM members WHERE phone=? LIMIT 1");
                 $chk2->execute([$phone]);
-                if ($chk2->fetch()) $error = 'यो मोबाइल नम्बर पहिले नै दर्ता भएको छ।';
+                if ($chk2->fetch()) $error = $_t('यो मोबाइल नम्बर पहिले नै दर्ता भएको छ।', 'This mobile number is already registered.');
             }
             if (!$error) {
                 $chkS = $db->prepare("SELECT id FROM members WHERE sadasyata_number=? AND sadasyata_number!='' LIMIT 1");
                 $chkS->execute([$sadasyata]);
-                if ($chkS->fetch()) $error = 'यो सदस्यता नम्बर पहिले नै दर्ता भएको छ।';
+                if ($chkS->fetch()) $error = $_t('यो सदस्यता नम्बर पहिले नै दर्ता भएको छ।', 'This member number is already registered.');
             }
         }
 
@@ -277,15 +279,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['do_register'])) {
                 $error = htmlspecialchars($res['error']);
             } else {
                 $tab     = 'login';
-                $success = '✅ दर्ता सफल! KYC विवरणबाट प्रोफाइल स्वतः ल्याइयो। Admin अनुमोदनपछि लगिन गर्न सक्नुहुन्छ।';
+                $success = $_t('✅ दर्ता सफल! KYC विवरणबाट प्रोफाइल स्वतः ल्याइयो। Admin अनुमोदनपछि लगिन गर्न सक्नुहुन्छ।', '✅ Registration successful! Profile was auto-filled from KYC. You can login after admin approval.');
             }
         }
     }
 }
 
-$siteName  = getSetting('site_name', 'आकाश बचत तथा ऋण सहकारी संस्था');
+$siteName  = getSetting('site_name', $_t('आकाश बचत तथा ऋण सहकारी संस्था', 'Aakash Savings and Credit Cooperative'));
 $siteUrl   = SITE_URL;
-$logoPath  = trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')));
+$logoPath  = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath('assets/images/logo.png'))
+    : trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')));
 $googleUrl = function_exists('googleOAuthUrl')   ? googleOAuthUrl()   : '';
 $fbUrl     = function_exists('facebookOAuthUrl') ? facebookOAuthUrl() : '';
 $csrf      = generateCSRFToken();
@@ -304,11 +308,11 @@ if ($logoPath) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="ne" dir="ltr">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Member Login — <?php echo htmlspecialchars($siteName); ?></title>
+<title><?php echo htmlspecialchars($_t('सदस्य लगिन', 'Member Login')); ?> — <?php echo htmlspecialchars($siteName); ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php memberHeadAssets(); ?>
 <?php @require_once __DIR__ . '/../assets/css/_color-vars.php'; ?>
@@ -492,7 +496,7 @@ body {
 <body class="auth-portal-page">
 
 <a href="<?php echo $siteUrl; ?>" class="page-back">
-    <i class="fas fa-arrow-left"></i> गृहपृष्ठ
+    <i class="fas fa-arrow-left"></i> <?php echo $_t('गृहपृष्ठ', 'Homepage'); ?>
 </a>
 
 <div class="auth-card">
@@ -507,17 +511,17 @@ body {
         <?php else: ?>
             <div class="card-logo-icon"><i class="fas fa-building-columns"></i></div>
         <?php endif; ?>
-        <span class="card-portal-label"><i class="fas fa-user-circle"></i>&nbsp;सदस्य पोर्टल</span>
+        <span class="card-portal-label"><i class="fas fa-user-circle"></i>&nbsp;<?php echo $_t('सदस्य पोर्टल', 'Member Portal'); ?></span>
     </div>
 
     <div class="card-body">
         <div class="card-title">
-            <?php echo $tab === 'register' ? 'नयाँ खाता खोल्नुहोस्' : 'सदस्य लगिन'; ?>
+            <?php echo $tab === 'register' ? $_t('नयाँ खाता खोल्नुहोस्', 'Create New Account') : $_t('सदस्य लगिन', 'Member Login'); ?>
         </div>
         <div class="card-sub">
             <?php echo $tab === 'register'
-                ? 'सदस्यता नम्बर सहित दर्ता गर्नुहोस् — Admin अनुमोदन पछि लगिन सक्नुहुन्छ।'
-                : 'इमेल वा सदस्यता नम्बर बाट लगिन गर्नुहोस्।'; ?>
+                ? $_t('सदस्यता नम्बर सहित दर्ता गर्नुहोस् — Admin अनुमोदन पछि लगिन सक्नुहुन्छ।', 'Register with member number — you can login after admin approval.')
+                : $_t('इमेल वा सदस्यता नम्बर बाट लगिन गर्नुहोस्।', 'Login with email or member number.'); ?>
         </div>
 
         <?php if ($error): ?>
@@ -528,8 +532,8 @@ body {
         <?php endif; ?>
         <?php if ($info === 'pending'): ?>
             <div class="alert alert-warning">
-                <i class="fas fa-clock"></i> <strong>अनुमोदन प्रतीक्षामा!</strong>&nbsp;
-                तपाईंको खाता Admin को समीक्षामा छ। स्वीकृत भएपछि सूचना पठाइनेछ।
+                <i class="fas fa-clock"></i> <strong><?php echo $_t('अनुमोदन प्रतीक्षामा!', 'Pending Approval!'); ?></strong>&nbsp;
+                <?php echo $_t('तपाईंको खाता Admin को समीक्षामा छ। स्वीकृत भएपछि सूचना पठाइनेछ।', 'Your account is under admin review. You will be notified after approval.'); ?>
             </div>
         <?php endif; ?>
         <?php if ($info === 'twofa_setup_required'): ?>
@@ -573,11 +577,11 @@ body {
         <?php else: ?>
 
         <div class="tabs">
-            <button class="tab-btn <?php echo $tab==='login'?'active':''; ?>" onclick="switchTab('login')">
-                <i class="fas fa-sign-in-alt"></i> लगिन
+                <button class="tab-btn <?php echo $tab==='login'?'active':''; ?>" onclick="switchTab('login')">
+                <i class="fas fa-sign-in-alt"></i> <?php echo $_t('लगिन', 'Login'); ?>
             </button>
-            <button class="tab-btn <?php echo $tab==='register'?'active':''; ?>" onclick="switchTab('register')">
-                <i class="fas fa-user-plus"></i> दर्ता
+                <button class="tab-btn <?php echo $tab==='register'?'active':''; ?>" onclick="switchTab('register')">
+                <i class="fas fa-user-plus"></i> <?php echo $_t('दर्ता', 'Register'); ?>
             </button>
         </div>
 
@@ -586,24 +590,24 @@ body {
             <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
             <input type="hidden" name="do_login" value="1">
             <div class="field">
-                <label>इमेल वा सदस्यता नम्बर</label>
-                <input type="text" name="login_id" placeholder="email@example.com वा १२३४५" required autofocus>
+                <label><?php echo $_t('इमेल वा सदस्यता नम्बर', 'Email or Member Number'); ?></label>
+                <input type="text" name="login_id" placeholder="<?php echo $_t('email@example.com वा १२३४५', 'email@example.com or 12345'); ?>" required autofocus>
             </div>
             <div class="field">
-                <label>पासवर्ड</label>
+                <label><?php echo $_t('पासवर्ड', 'Password'); ?></label>
                 <div class="pw-wrap">
                     <input type="password" name="password" id="loginPw" placeholder="••••••••" required>
                     <button type="button" class="pw-toggle" onclick="togglePw('loginPw',this)"><i class="fas fa-eye"></i></button>
                 </div>
             </div>
             <div style="text-align:right;margin-bottom:6px;">
-                <a href="<?php echo $siteUrl; ?>member/password-reset-request.php" style="font-size:.78rem;color:var(--primary-color,#1a8754);font-weight:600;text-decoration:none;">पासवर्ड बिर्सनुभयो?</a>
+                <a href="<?php echo $siteUrl; ?>member/password-reset-request.php" style="font-size:.78rem;color:var(--primary-color,#1a8754);font-weight:600;text-decoration:none;"><?php echo $_t('पासवर्ड बिर्सनुभयो?', 'Forgot password?'); ?></a>
             </div>
             <button type="submit" class="submit-btn">
-                <i class="fas fa-sign-in-alt"></i> लगिन गर्नुहोस्
+                <i class="fas fa-sign-in-alt"></i> <?php echo $_t('लगिन गर्नुहोस्', 'Login'); ?>
             </button>
             <?php if ($googleUrl || $fbUrl): ?>
-            <div class="oauth-divider">वा यसबाट लगिन</div>
+            <div class="oauth-divider"><?php echo $_t('वा यसबाट लगिन', 'Or login with'); ?></div>
             <div class="oauth-row">
                 <?php if ($googleUrl): ?>
                 <a href="<?php echo htmlspecialchars($googleUrl); ?>" class="oauth-btn"><i class="fab fa-google google"></i> Google</a>
@@ -614,7 +618,7 @@ body {
             </div>
             <?php endif; ?>
             <div class="foot-link">
-                खाता छैन? <a href="#" onclick="switchTab('register');return false;">दर्ता गर्नुहोस्</a>
+                <?php echo $_t('खाता छैन?', "Don't have an account?"); ?> <a href="#" onclick="switchTab('register');return false;"><?php echo $_t('दर्ता गर्नुहोस्', 'Register'); ?></a>
             </div>
         </form>
 
@@ -623,17 +627,17 @@ body {
             <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
             <input type="hidden" name="do_register" value="1">
             <div class="field">
-                <label>सदस्यता नम्बर <span style="color:red">*</span></label>
-                <input type="text" name="sadasyata_number" id="regSadasyata" placeholder="जस्तै: १२३४" required>
+                <label><?php echo $_t('सदस्यता नम्बर', 'Member Number'); ?> <span style="color:red">*</span></label>
+                <input type="text" name="sadasyata_number" id="regSadasyata" placeholder="<?php echo $_t('जस्तै: १२३४', 'e.g. 1234'); ?>" required>
                 <div class="field-feedback" id="fbSadasyata"></div>
             </div>
             <div class="field">
-                <label>इमेल <span style="color:red">*</span></label>
+                <label><?php echo $_t('इमेल', 'Email'); ?> <span style="color:red">*</span></label>
                 <input type="email" name="email" id="regEmail" placeholder="email@example.com" required>
                 <div class="field-feedback" id="fbEmail"></div>
             </div>
             <div class="field">
-                <label>मोबाइल नम्बर <span style="color:red">*</span></label>
+                <label><?php echo $_t('मोबाइल नम्बर', 'Mobile Number'); ?> <span style="color:red">*</span></label>
                 <input type="tel" name="phone" id="regPhone" placeholder="98XXXXXXXX" pattern="[0-9]{10}" maxlength="10" required>
                 <div class="field-feedback" id="fbPhone"></div>
             </div>
@@ -642,9 +646,9 @@ body {
                 नाम KYC बाट स्वतः लिइन्छ। सदस्यता नम्बर + इमेल + मोबाइल KYC सँग मिल्नुपर्छ।
             </div>
             <div class="field">
-                <label>पासवर्ड <span style="color:red">*</span></label>
+                <label><?php echo $_t('पासवर्ड', 'Password'); ?> <span style="color:red">*</span></label>
                 <div class="pw-wrap">
-                    <input type="password" name="password" id="regPw" placeholder="८+ अक्षर, A-Z, a-z, 0-9 सहित" required minlength="8">
+                    <input type="password" name="password" id="regPw" placeholder="<?php echo $_t('८+ अक्षर, A-Z, a-z, 0-9 सहित', '8+ chars with A-Z, a-z, 0-9'); ?>" required minlength="8">
                     <button type="button" class="pw-toggle" onclick="togglePw('regPw',this)"><i class="fas fa-eye"></i></button>
                 </div>
                 <div class="pw-strength" id="pwStrength" style="margin-top:5px;font-size:12px;"></div>
@@ -656,15 +660,15 @@ body {
                 </ul>
             </div>
             <div class="field">
-                <label>पासवर्ड पुनः <span style="color:red">*</span></label>
-                <input type="password" name="confirm" id="regConfirm" placeholder="माथिको जस्तै" required>
+                <label><?php echo $_t('पासवर्ड पुनः', 'Confirm Password'); ?> <span style="color:red">*</span></label>
+                <input type="password" name="confirm" id="regConfirm" placeholder="<?php echo $_t('माथिको जस्तै', 'Same as above'); ?>" required>
                 <div class="field-feedback" id="fbConfirm"></div>
             </div>
             <button type="submit" class="submit-btn" id="regSubmitBtn">
-                <i class="fas fa-user-plus"></i> दर्ता गर्नुहोस्
+                <i class="fas fa-user-plus"></i> <?php echo $_t('दर्ता गर्नुहोस्', 'Register'); ?>
             </button>
             <div class="foot-link">
-                पहिले नै दर्ता? <a href="#" onclick="switchTab('login');return false;">लगिन गर्नुहोस्</a>
+                <?php echo $_t('पहिले नै दर्ता?', 'Already registered?'); ?> <a href="#" onclick="switchTab('login');return false;"><?php echo $_t('लगिन गर्नुहोस्', 'Login'); ?></a>
             </div>
         </form>
 

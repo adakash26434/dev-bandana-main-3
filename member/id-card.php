@@ -15,6 +15,9 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 requireMemberLogin();
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $mid = $_SESSION['member_id'] ?? '';
 if ($mid === '') {
@@ -237,7 +240,7 @@ $photo = (!empty($me['photo_path']) && $docRoot && file_exists($docRoot . '/' . 
        ? '/' . ltrim($me['photo_path'], '/')
        : '/member/assets/photo-placeholder.svg';
 
-$pageTitle = 'डिजिटल ID कार्ड';
+$pageTitle = $_t('डिजिटल ID कार्ड', 'Digital ID Card');
 require __DIR__ . '/includes/chrome.php';
 
 /* ─── Card metadata ─── */
@@ -274,45 +277,45 @@ if ($cardLogoRaw !== '') {
 
 <div class="idcard-page">
   <div class="idcard-actions">
-    <a href="/member/index.php" class="idcard-btn idcard-btn-ghost"><i class="fas fa-arrow-left"></i> Dashboard</a>
-    <button type="button" id="idcardFlipBtn" class="idcard-btn idcard-btn-ghost"><i class="fas fa-arrows-rotate"></i> Flip Card</button>
-    <button type="button" onclick="window.print()" class="idcard-btn idcard-btn-primary"><i class="fas fa-print"></i> Print / Download</button>
+    <a href="/member/index.php" class="idcard-btn idcard-btn-ghost"><i class="fas fa-arrow-left"></i> <?php echo $_t('ड्यासबोर्ड', 'Dashboard'); ?></a>
+    <button type="button" id="idcardFlipBtn" class="idcard-btn idcard-btn-ghost"><i class="fas fa-arrows-rotate"></i> <?php echo $_t('कार्ड उल्ट्याउनुहोस्', 'Flip Card'); ?></button>
+    <button type="button" onclick="window.print()" class="idcard-btn idcard-btn-primary"><i class="fas fa-print"></i> <?php echo $_t('प्रिन्ट / डाउनलोड', 'Print / Download'); ?></button>
   </div>
   <div style="max-width:440px;margin:0 auto 10px;padding:8px 12px;background:#faf5ff;border:1px solid #ddd6fe;border-radius:10px;color:#5b21b6;font-size:13px;">
-    <i class="fas fa-star me-1"></i><b>Program Rating:</b> <?php echo $cardStarHtml; ?>
+    <i class="fas fa-star me-1"></i><b><?php echo $_t('कार्यक्रम रेटिङ', 'Program Rating'); ?>:</b> <?php echo $cardStarHtml; ?>
     <span style="color:#6b7280;">(<?php echo (int)$cardProgramAttended; ?>/<?php echo max(1, (int)$cardProgramEligible); ?>)</span>
   </div>
 
   <?php if ($isExpired): ?>
   <div style="max-width:440px;margin:0 auto 14px;padding:12px 14px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:10px;color:#78350f;font-size:13px;line-height:1.5;">
     <i class="fas fa-triangle-exclamation"></i>
-    <b>तपाईंको ID Card को म्याद सकिएको छ।</b>
-    कृपया कार्यालयमा सम्पर्क गरी कार्ड renew गर्नुहोस् — Admin ले approve गरेपछि feri active हुनेछ।
+    <b><?php echo $_t('तपाईंको ID Card को म्याद सकिएको छ।', 'Your ID card has expired.'); ?></b>
+    <?php echo $_t('कृपया कार्यालयमा सम्पर्क गरी कार्ड renew गर्नुहोस् — Admin ले approve गरेपछि feri active हुनेछ।', 'Please contact office to renew it. It will be active again after admin approval.'); ?>
   </div>
   <?php elseif ($daysLeft <= 60): ?>
   <div style="max-width:440px;margin:0 auto 14px;padding:10px 14px;background:#fffbeb;border:1px solid #fbbf24;border-radius:8px;color:#92400e;font-size:12.5px;">
     <i class="fas fa-clock"></i>
-    Card म्याद <?= $daysLeft ?> दिनमा सकिँदैछ। समयमै renew गर्नुहोस्।
+    <?php echo $_t('कार्ड म्याद', 'Card validity'); ?> <?= $daysLeft ?> <?php echo $_t('दिनमा सकिँदैछ। समयमै renew गर्नुहोस्।', 'days remaining. Please renew on time.'); ?>
   </div>
   <?php endif; ?>
   <?php if (($me['card_status'] ?? 'active') === 'locked'): ?>
   <div style="max-width:440px;margin:0 auto 14px;padding:12px 14px;background:linear-gradient(135deg,#fef2f2,#fee2e2);border:2px solid #ef4444;border-radius:10px;color:#7f1d1d;font-size:13px;line-height:1.6;">
     <i class="fas fa-lock"></i>
-    <b>यो कार्ड 5+ गलत verify प्रयासका कारण LOCK भएको छ।</b>
-    कृपया admin/office बाट unlock गराउनुहोस्।
+    <b><?php echo $_t('यो कार्ड 5+ गलत verify प्रयासका कारण LOCK भएको छ।', 'This card is locked due to 5+ failed verification attempts.'); ?></b>
+    <?php echo $_t('कृपया admin/office बाट unlock गराउनुहोस्।', 'Please request unlock from admin/office.'); ?>
     <?php if (!empty($_GET['unlock_requested']) || !empty($me['unlock_requested'])): ?>
-      <div style="margin-top:8px;font-weight:600;">✅ Unlock request पठाइएको छ।</div>
+      <div style="margin-top:8px;font-weight:600;">✅ <?php echo $_t('Unlock request पठाइएको छ।', 'Unlock request submitted.'); ?></div>
     <?php endif; ?>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
       <form method="POST" style="margin:0;">
         <input type="hidden" name="action" value="request_unlock">
         <input type="hidden" name="card_id" value="<?php echo (int)($me['card_row_id'] ?? 0); ?>">
         <button type="submit" class="idcard-btn idcard-btn-ghost" style="flex:0 0 auto;border-color:#ef4444;color:#991b1b;">
-          <i class="fas fa-unlock-keyhole"></i> Unlock Request
+          <i class="fas fa-unlock-keyhole"></i> <?php echo $_t('अनलक अनुरोध', 'Unlock Request'); ?>
         </button>
       </form>
       <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', (string)$cardPhone)); ?>" class="idcard-btn idcard-btn-primary" style="flex:0 0 auto;">
-        <i class="fas fa-phone"></i> Office Call
+        <i class="fas fa-phone"></i> <?php echo $_t('कार्यालय कल', 'Office Call'); ?>
       </a>
     </div>
   </div>
@@ -364,8 +367,8 @@ if ($cardLogoRaw !== '') {
         </div>
 
         <div class="idcard-id-row">
-          <span class="idcard-status"><i class="fas fa-circle-check"></i> सक्रिय</span>
-          <span class="idcard-mid-no">सदस्यता&nbsp;नं: <b><?= htmlspecialchars($me['member_id'] ?: ('M-' . str_pad((string) $me['id'], 5, '0', STR_PAD_LEFT))) ?></b></span>
+          <span class="idcard-status"><i class="fas fa-circle-check"></i> <?php echo $_t('सक्रिय', 'Active'); ?></span>
+          <span class="idcard-mid-no"><?php echo $_t('सदस्यता नं', 'Member No'); ?>: <b><?= htmlspecialchars($me['member_id'] ?: ('M-' . str_pad((string) $me['id'], 5, '0', STR_PAD_LEFT))) ?></b></span>
         </div>
       </div>
 
@@ -389,8 +392,8 @@ if ($cardLogoRaw !== '') {
           <?php endif; ?>
 
           <div class="idcard-back-note">
-            यो कार्ड सहकारीको सम्पत्ति हो। हराएमा वा चोरी भएमा तुरुन्तै कार्यालयलाई सूचित गर्नुहोस्।<br>
-            <b>CVV कसैलाई नदेखाउनुहोस् —</b> verify पोर्टलमा मात्र प्रयोग गर्नुहोस्।
+            <?php echo $_t('यो कार्ड सहकारीको सम्पत्ति हो। हराएमा वा चोरी भएमा तुरुन्तै कार्यालयलाई सूचित गर्नुहोस्।', 'This card is property of the cooperative. Report immediately if lost or stolen.'); ?><br>
+            <b><?php echo $_t('CVV कसैलाई नदेखाउनुहोस् —', 'Do not share CVV —'); ?></b> <?php echo $_t('verify पोर्टलमा मात्र प्रयोग गर्नुहोस्।', 'use it only in verification portal.'); ?>
           </div>
           <div class="idcard-back-foot">
             <span><i class="fas fa-phone"></i> <?= htmlspecialchars($cardPhone) ?></span>
@@ -405,11 +408,11 @@ if ($cardLogoRaw !== '') {
   <!-- Details list below card -->
   <div class="idcard-details">
     <div class="idcard-detail"><div class="dl">CARD NUMBER</div><div class="dv code"><?= htmlspecialchars($cn) ?></div></div>
-    <div class="idcard-detail"><div class="dl">जारी मिति</div><div class="dv"><?= date('Y-m-d', $issuedTs) ?></div></div>
-    <div class="idcard-detail"><div class="dl">म्याद सकिने मिति</div><div class="dv" style="<?= $isExpired ? 'color:#b91c1c;' : '' ?>"><?= date('Y-m-d', $expiryTs) ?><?= $isExpired ? ' (Expired)' : '' ?></div></div>
-    <div class="idcard-detail"><div class="dl">मोबाइल</div><div class="dv"><?= htmlspecialchars($me['mobile'] ?: '-') ?></div></div>
-    <div class="idcard-detail"><div class="dl">इमेल</div><div class="dv"><?= htmlspecialchars($me['email'] ?: '-') ?></div></div>
-    <div class="idcard-detail" style="grid-column: 1/-1;"><div class="dl">ठेगाना</div><div class="dv"><?= htmlspecialchars($me['address'] ?: '-') ?></div></div>
+    <div class="idcard-detail"><div class="dl"><?php echo $_t('जारी मिति', 'Issued Date'); ?></div><div class="dv"><?= date('Y-m-d', $issuedTs) ?></div></div>
+    <div class="idcard-detail"><div class="dl"><?php echo $_t('म्याद सकिने मिति', 'Expiry Date'); ?></div><div class="dv" style="<?= $isExpired ? 'color:#b91c1c;' : '' ?>"><?= date('Y-m-d', $expiryTs) ?><?= $isExpired ? ($_t(' (म्याद सकिएको)', ' (Expired)')) : '' ?></div></div>
+    <div class="idcard-detail"><div class="dl"><?php echo $_t('मोबाइल', 'Mobile'); ?></div><div class="dv"><?= htmlspecialchars($me['mobile'] ?: '-') ?></div></div>
+    <div class="idcard-detail"><div class="dl"><?php echo $_t('इमेल', 'Email'); ?></div><div class="dv"><?= htmlspecialchars($me['email'] ?: '-') ?></div></div>
+    <div class="idcard-detail" style="grid-column: 1/-1;"><div class="dl"><?php echo $_t('ठेगाना', 'Address'); ?></div><div class="dv"><?= htmlspecialchars($me['address'] ?: '-') ?></div></div>
 
     <?php if ($vCode || $cvv): ?>
     <div class="idcard-detail" style="grid-column: 1/-1; background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-color: #10b981;">
@@ -417,10 +420,10 @@ if ($cardLogoRaw !== '') {
       <div class="dv code" style="color:#065f46; font-size:16px;"><?= htmlspecialchars($vCode) ?></div>
     </div>
     <div class="idcard-detail" style="grid-column: 1/-1; background:#fef9c3; border-color:#eab308;">
-      <div class="dl" style="color:#854d0e;"><i class="fas fa-eye-slash"></i> CVV (गोप्य 4 अङ्क)</div>
+      <div class="dl" style="color:#854d0e;"><i class="fas fa-eye-slash"></i> CVV <?php echo $_t('(गोप्य 4 अङ्क)', '(secret 4 digits)'); ?></div>
       <div class="dv code" style="color:#713f12; font-size:18px; letter-spacing:.3em;"><?= htmlspecialchars($cvv) ?></div>
       <div style="font-size:11px; color:#854d0e; margin-top:6px; line-height:1.5;">
-        ⚠ यो CVV कसैलाई share नगर्नुहोस्। यो र Verification Code राखेर मात्र अरूले तपाईंको सदस्यता verify गर्न सक्छन्।
+        ⚠ <?php echo $_t('यो CVV कसैलाई share नगर्नुहोस्। यो र Verification Code राखेर मात्र अरूले तपाईंको सदस्यता verify गर्न सक्छन्।', 'Do not share this CVV. Only CVV + verification code can verify your membership.'); ?>
       </div>
     </div>
     <?php endif; ?>
@@ -430,10 +433,9 @@ if ($cardLogoRaw !== '') {
   <div class="idcard-verify-help">
     <div class="vh-icon"><i class="fas fa-circle-info"></i></div>
     <div>
-      <div class="vh-title">हस्पिटल/पसलमा discount लिँदा सत्यता कसरी देखाउने?</div>
+      <div class="vh-title"><?php echo $_t('हस्पिटल/पसलमा discount लिँदा सत्यता कसरी देखाउने?', 'How to show verification at hospital/shop discount?'); ?></div>
       <div class="vh-text">
-        उनीहरूलाई <b><?= htmlspecialchars(($cardWebsite ?: 'website') . '/verify.php') ?></b> मा गएर
-        Verification Code र CVV राख्न भन्नुहोस् — तुरुन्तै तपाईंको name, photo र active status देखिन्छ।
+        <?php echo $_t('उनीहरूलाई', 'Ask them to open'); ?> <b><?= htmlspecialchars(($cardWebsite ?: 'website') . '/verify.php') ?></b> <?php echo $_t('मा गएर Verification Code र CVV राख्न भन्नुहोस् — तुरुन्तै तपाईंको name, photo र active status देखिन्छ।', 'and enter verification code + CVV. Your name, photo and active status appear instantly.'); ?>
       </div>
     </div>
   </div>

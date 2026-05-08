@@ -5,8 +5,11 @@
  * + Sadasya Anurodh (member request) badge.
  */
 require_once __DIR__ . '/_bootstrap.php';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
-$pageTitle   = 'ड्यासबोर्ड';
+$pageTitle   = $__t('ड्यासबोर्ड', 'Dashboard');
 $currentPage = 'dashboard';
 
 require_once 'includes/admin-header.php';
@@ -142,7 +145,7 @@ try {
           ORDER BY category, sort_order, site_name"
     )->fetchAll(PDO::FETCH_ASSOC);
 } catch (Throwable $e) {
-    $credsError = 'Smart Credential table अहिले उपलब्ध छैन — DB Setup चलाउनुहोस्।';
+    $credsError = $__t('Smart Credential table अहिले उपलब्ध छैन — DB Setup चलाउनुहोस्।', 'Smart Credential table is not available now — run DB Setup.');
 }
 
 /* Pending member requests preview (for Sadasya Anurodh badge area) */
@@ -224,11 +227,11 @@ try {
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
   <h1 class="dash-title-main">
-    <i class="fas fa-gauge"></i> Office Dashboard
+    <i class="fas fa-gauge"></i> <?php echo $__t('कार्यालय ड्यासबोर्ड', 'Office Dashboard'); ?>
   </h1>
   <div class="d-flex gap-2 flex-wrap">
     <a href="member-online-portal.php?status=pending" class="btn btn-outline-warning btn-sm position-relative">
-      <i class="fas fa-user-clock"></i> सदस्य अनुरोध
+      <i class="fas fa-user-clock"></i> <?php echo $__t('सदस्य अनुरोध', 'Member Requests'); ?>
       <?php if ($sadasyaBadge > 0): ?>
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           <?= $sadasyaBadge ?>
@@ -236,7 +239,7 @@ try {
       <?php endif; ?>
     </a>
     <a href="settings.php" class="btn btn-outline-secondary btn-sm">
-      <i class="fas fa-cog"></i> सेटिङ
+      <i class="fas fa-cog"></i> <?php echo $__t('सेटिङ', 'Settings'); ?>
     </a>
   </div>
 </div>
@@ -244,21 +247,21 @@ try {
 <!-- ===== TABS ===== -->
 <div class="ds-tabs" role="tablist">
   <button type="button" class="ds-tab active" data-tab="office" role="tab">
-    <i class="fas fa-gauge-high"></i> Office Dashboard
+    <i class="fas fa-gauge-high"></i> <?php echo $__t('कार्यालय ड्यासबोर्ड', 'Office Dashboard'); ?>
   </button>
   <button type="button" class="ds-tab" data-tab="creds" role="tab">
-    <i class="fas fa-key"></i> Smart Credential Manager
+    <i class="fas fa-key"></i> <?php echo $__t('स्मार्ट क्रेडेन्सियल म्यानेजर', 'Smart Credential Manager'); ?>
   </button>
   <button type="button" class="ds-tab" data-tab="requests" role="tab">
-    <i class="fas fa-user-clock"></i> सदस्य अनुरोध
+    <i class="fas fa-user-clock"></i> <?php echo $__t('सदस्य अनुरोध', 'Member Requests'); ?>
     <?php if ($sadasyaBadge > 0): ?><span class="badge-pill"><?= $sadasyaBadge ?></span><?php endif; ?>
   </button>
   <button type="button" class="ds-tab" data-tab="welfare" role="tab">
-    <i class="fas fa-hand-holding-heart"></i> कल्याण दाबी
+    <i class="fas fa-hand-holding-heart"></i> <?php echo $__t('कल्याण दाबी', 'Welfare Claims'); ?>
     <?php if ($welfareBadge > 0): ?><span class="badge-pill"><?= $welfareBadge ?></span><?php endif; ?>
   </button>
   <button type="button" class="ds-tab" data-tab="programs" role="tab">
-    <i class="fas fa-clipboard-check"></i> कार्यक्रम उपस्थिति
+    <i class="fas fa-clipboard-check"></i> <?php echo $__t('कार्यक्रम उपस्थिति', 'Program Attendance'); ?>
     <?php if ($dashPendingAttendanceReq > 0): ?><span class="badge-pill"><?= (int)$dashPendingAttendanceReq ?></span><?php endif; ?>
   </button>
 </div>
@@ -269,13 +272,13 @@ try {
     <div class="col-12 col-sm-6 col-lg-3">
       <a href="members.php" class="ds-card">
         <div class="ds-icon"><i class="fas fa-users"></i></div>
-        <div><div class="ds-val"><?= $stats['members'] ?></div><div class="ds-lbl">सक्रिय सदस्य</div></div>
+        <div><div class="ds-val"><?= $stats['members'] ?></div><div class="ds-lbl"><?php echo $__t('सक्रिय सदस्य', 'Active Members'); ?></div></div>
       </a>
     </div>
     <div class="col-12 col-sm-6 col-lg-3">
       <a href="kyc-applications.php?status=pending" class="ds-card">
         <div class="ds-icon warn"><i class="fas fa-id-card-clip"></i></div>
-        <div><div class="ds-val"><?= $stats['pending'] ?></div><div class="ds-lbl">पेन्डिङ/अपूर्ण KYC</div></div>
+        <div><div class="ds-val"><?= $stats['pending'] ?></div><div class="ds-lbl"><?php echo $__t('पेन्डिङ/अपूर्ण KYC', 'Pending/Incomplete KYC'); ?></div></div>
       </a>
     </div>
     <div class="col-12 col-sm-6 col-lg-3">
@@ -287,13 +290,13 @@ try {
     <div class="col-12 col-sm-6 col-lg-3">
       <a href="loan-applications.php" class="ds-card">
         <div class="ds-icon info"><i class="fas fa-coins"></i></div>
-        <div><div class="ds-val"><?= $stats['loans'] ?></div><div class="ds-lbl">पेन्डिङ ऋण</div></div>
+        <div><div class="ds-val"><?= $stats['loans'] ?></div><div class="ds-lbl"><?php echo $__t('पेन्डिङ ऋण', 'Pending Loans'); ?></div></div>
       </a>
     </div>
     <div class="col-12 col-sm-6 col-lg-3">
       <a href="notices.php" class="ds-card">
         <div class="ds-icon alt"><i class="fas fa-bullhorn"></i></div>
-        <div><div class="ds-val"><?= $stats['notices'] ?></div><div class="ds-lbl">प्रकाशित सूचना</div></div>
+        <div><div class="ds-val"><?= $stats['notices'] ?></div><div class="ds-lbl"><?php echo $__t('प्रकाशित सूचना', 'Published Notices'); ?></div></div>
       </a>
     </div>
     <div class="col-12 col-sm-6 col-lg-3">
@@ -309,25 +312,25 @@ try {
   </div>
 
   <div class="ds-section">
-    <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+    <h2><i class="fas fa-bolt"></i> <?php echo $__t('छिटो कार्यहरू', 'Quick Actions'); ?></h2>
     <div class="d-flex flex-wrap gap-2">
-      <a href="kyc-applications.php" class="btn btn-success btn-sm"><i class="fas fa-id-card-clip"></i> KYC आवेदन</a>
-      <a href="members.php" class="btn btn-outline-success btn-sm"><i class="fas fa-user-plus"></i> सदस्य</a>
-      <a href="notices.php" class="btn btn-outline-success btn-sm"><i class="fas fa-bullhorn"></i> सूचना</a>
-      <a href="loan-applications.php" class="btn btn-outline-success btn-sm"><i class="fas fa-coins"></i> ऋण</a>
-      <a href="reports.php" class="btn btn-outline-success btn-sm"><i class="fas fa-chart-line"></i> रिपोर्ट</a>
-      <a href="programs.php" class="btn btn-outline-success btn-sm"><i class="fas fa-calendar-plus"></i> कार्यक्रम</a>
-      <a href="program-attendance.php" class="btn btn-outline-success btn-sm"><i class="fas fa-clipboard-check"></i> उपस्थिति रिपोर्ट</a>
-      <a href="../verify.php" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-shield-halved"></i> Member Verify</a>
+      <a href="kyc-applications.php" class="btn btn-success btn-sm"><i class="fas fa-id-card-clip"></i> <?php echo $__t('KYC आवेदन', 'KYC Applications'); ?></a>
+      <a href="members.php" class="btn btn-outline-success btn-sm"><i class="fas fa-user-plus"></i> <?php echo $__t('सदस्य', 'Members'); ?></a>
+      <a href="notices.php" class="btn btn-outline-success btn-sm"><i class="fas fa-bullhorn"></i> <?php echo $__t('सूचना', 'Notices'); ?></a>
+      <a href="loan-applications.php" class="btn btn-outline-success btn-sm"><i class="fas fa-coins"></i> <?php echo $__t('ऋण', 'Loans'); ?></a>
+      <a href="reports.php" class="btn btn-outline-success btn-sm"><i class="fas fa-chart-line"></i> <?php echo $__t('रिपोर्ट', 'Reports'); ?></a>
+      <a href="programs.php" class="btn btn-outline-success btn-sm"><i class="fas fa-calendar-plus"></i> <?php echo $__t('कार्यक्रम', 'Programs'); ?></a>
+      <a href="program-attendance.php" class="btn btn-outline-success btn-sm"><i class="fas fa-clipboard-check"></i> <?php echo $__t('उपस्थिति रिपोर्ट', 'Attendance Report'); ?></a>
+      <a href="../verify.php" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-shield-halved"></i> <?php echo $__t('सदस्य प्रमाणीकरण', 'Member Verify'); ?></a>
     </div>
   </div>
 
   <div class="ds-section">
-    <h2><i class="fas fa-clock-rotate-left"></i> हालैको गतिविधि</h2>
+    <h2><i class="fas fa-clock-rotate-left"></i> <?php echo $__t('हालैको गतिविधि', 'Recent Activity'); ?></h2>
     <?php if (empty($log)): ?>
       <div class="text-center py-4 dash-muted-block">
         <div class="dash-empty-icon-lg"><i class="fas fa-inbox"></i></div>
-        <div>हाल कुनै गतिविधि छैन।</div>
+        <div><?php echo $__t('हाल कुनै गतिविधि छैन।', 'No recent activity.'); ?></div>
       </div>
     <?php else: ?>
       <div class="list-group list-group-flush">
@@ -353,9 +356,9 @@ try {
 <div class="ds-pane" id="pane-creds">
   <div class="ds-section ds-no-top-gap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 class="dash-section-title"><i class="fas fa-key"></i> Smart Credential Manager</h2>
+      <h2 class="dash-section-title"><i class="fas fa-key"></i> <?php echo $__t('स्मार्ट क्रेडेन्सियल म्यानेजर', 'Smart Credential Manager'); ?></h2>
       <a href="credentials.php" class="btn btn-success btn-sm">
-        <i class="fas fa-arrow-up-right-from-square"></i> पूरै पेज खोल्नुहोस्
+        <i class="fas fa-arrow-up-right-from-square"></i> <?php echo $__t('पूरै पेज खोल्नुहोस्', 'Open Full Page'); ?>
       </a>
     </div>
 
@@ -364,9 +367,9 @@ try {
     <?php elseif (empty($creds)): ?>
       <div class="text-center py-5 dash-muted-block">
         <div class="dash-empty-icon-xl"><i class="fas fa-key"></i></div>
-        <div>अहिलेसम्म कुनै credential save गरिएको छैन।</div>
+        <div><?php echo $__t('अहिलेसम्म कुनै credential save गरिएको छैन।', 'No credentials saved yet.'); ?></div>
         <a href="credentials.php" class="btn btn-success btn-sm mt-3">
-          <i class="fas fa-plus"></i> नयाँ Credential थप्नुहोस्
+          <i class="fas fa-plus"></i> <?php echo $__t('नयाँ Credential थप्नुहोस्', 'Add New Credential'); ?>
         </a>
       </div>
     <?php else: ?>
@@ -393,10 +396,10 @@ try {
             </div>
             <div class="cred-actions">
               <a href="<?= htmlspecialchars($c['site_url']) ?>" target="_blank" rel="noopener" class="cred-btn">
-                <i class="fas fa-up-right-from-square"></i> Open
+                <i class="fas fa-up-right-from-square"></i> <?php echo $__t('खोल्नुहोस्', 'Open'); ?>
               </a>
               <a href="credentials.php#cred-<?= (int)$c['id'] ?>" class="cred-btn">
-                <i class="fas fa-eye"></i> Details
+                <i class="fas fa-eye"></i> <?php echo $__t('विवरण', 'Details'); ?>
               </a>
             </div>
           </div>

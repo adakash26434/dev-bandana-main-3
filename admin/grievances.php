@@ -5,7 +5,10 @@
  * feedbacks.php जस्तै full-page detail/edit view।
  * Modal हटाइयो — ?view=ID बाट detail page खुल्छ।
  */
-$pageTitle   = 'गुनासो व्यवस्थापन';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle   = $__t('गुनासो व्यवस्थापन', 'Grievance Management');
 $currentPage = 'grievances';
 require_once '../includes/config.php';
 
@@ -68,9 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } catch (Exception $e) {}
 
-            setFlash('success', 'गुनासो अपडेट भयो।');
+            setFlash('success', $__t('गुनासो अपडेट भयो।', 'Grievance updated.'));
         } catch (Exception $e) {
-            setFlash('error', 'त्रुटि भयो: ' . $e->getMessage());
+            setFlash('error', $__t('त्रुटि भयो', 'An error occurred') . ': ' . $e->getMessage());
         }
         redirect('grievances.php' . ($id ? '?view=' . $id : ''));
     }
@@ -87,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (file_exists($fp)) @unlink($fp);
             }
             $db->prepare("UPDATE grievances SET admin_attachment='' WHERE id=?")->execute([$id]);
-            setFlash('success', 'फाइल हटाइयो।');
+            setFlash('success', $__t('फाइल हटाइयो।', 'File removed.'));
         } catch (Exception $e) {}
         redirect('grievances.php?view=' . $id);
     }
@@ -96,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $id = (int)$_POST['id'];
         $db->prepare("DELETE FROM grievances WHERE id=?")->execute([$id]);
-        setFlash('success', 'गुनासो मेटाइयो।');
+        setFlash('success', $__t('गुनासो मेटाइयो।', 'Grievance deleted.'));
         redirect('grievances.php');
     }
 
@@ -107,8 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $qst = in_array($_POST['quick_resolve_status'] ?? '', $allowed) ? $_POST['quick_resolve_status'] : 'resolved';
         try {
             $db->prepare("UPDATE grievances SET status=? WHERE id=?")->execute([$qst, $qid]);
-            setFlash('success', 'गुनासो स्थिति परिवर्तन गरियो।');
-        } catch (Exception $e) { setFlash('error', 'त्रुटि भयो।'); }
+            setFlash('success', $__t('गुनासो स्थिति परिवर्तन गरियो।', 'Grievance status changed.'));
+        } catch (Exception $e) { setFlash('error', $__t('त्रुटि भयो।', 'An error occurred.')); }
         $gStatuses = ['pending', 'in_progress', 'resolved', 'closed'];
         $redSt = $_GET['status'] ?? '';
         if ($redSt !== '' && !in_array($redSt, $gStatuses, true)) {
@@ -160,7 +163,12 @@ if (isset($_GET['view'])) {
 }
 
 /* ── Helpers ── */
-$statusLabel = ['pending' => 'पेन्डिङ', 'in_progress' => 'प्रक्रियामा', 'resolved' => 'समाधान', 'closed' => 'बन्द'];
+$statusLabel = [
+    'pending'     => $__t('पेन्डिङ', 'Pending'),
+    'in_progress' => $__t('प्रक्रियामा', 'In Progress'),
+    'resolved'    => $__t('समाधान', 'Resolved'),
+    'closed'      => $__t('बन्द', 'Closed')
+];
 $statusClass = ['pending' => 'warning', 'in_progress' => 'info', 'resolved' => 'success', 'closed' => 'secondary'];
 $catLabels   = ['service' => 'सेवा', 'staff' => 'कर्मचारी', 'loan' => 'ऋण', 'account' => 'खाता', 'branch' => 'शाखा', 'other' => 'अन्य'];
 
@@ -177,19 +185,19 @@ function grvAttachName($path) { return basename($path ?: ''); }
 if ($viewGrv) {
     $trackId = $viewGrv['tracking_id'] ?? 'GRV-' . str_pad($viewGrv['id'], 6, '0', STR_PAD_LEFT);
     echo adminPageHeader(
-        'गुनासो विवरण',
+        $__t('गुनासो विवरण', 'Grievance Details'),
         'fa-exclamation-circle',
         'Tracking: ' . $trackId,
-        adminBackBtn('grievances.php', 'गुनासो सूचीमा फर्किनुहोस्')
+        adminBackBtn('grievances.php', $__t('गुनासो सूचीमा फर्किनुहोस्', 'Back to grievance list'))
     );
 } else {
     echo adminPageHeader(
-        'गुनासो व्यवस्थापन',
+        $__t('गुनासो व्यवस्थापन', 'Grievance Management'),
         'fa-exclamation-circle',
-        'सदस्यहरूद्वारा पेश गरिएका गुनासो — स्थिति अपडेट, Admin प्रतिक्रिया र Document।',
-        adminStatLink('?status=pending',  'danger',  'पेन्डिङ', $counts['pending'])
+        $__t('सदस्यहरूद्वारा पेश गरिएका गुनासो — स्थिति अपडेट, Admin प्रतिक्रिया र Document।', 'Manage member grievances with status updates, admin response, and documents.'),
+        adminStatLink('?status=pending',  'danger',  $__t('पेन्डिङ', 'Pending'), $counts['pending'])
         . ' '
-        . adminStatLink('grievances.php', 'secondary', 'जम्मा', $total)
+        . adminStatLink('grievances.php', 'secondary', $__t('जम्मा', 'Total'), $total)
     );
 } ?>
 
@@ -209,7 +217,7 @@ if ($viewGrv):
 <div class="card shadow-sm mb-4">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
-            <i class="fas fa-exclamation-circle me-2"></i>गुनासो विवरण
+            <i class="fas fa-exclamation-circle me-2"></i><?php echo $__t('गुनासो विवरण', 'Grievance Details'); ?>
             <code class="grv-track-code">
                 <?php echo htmlspecialchars($trackId); ?>
             </code>
@@ -223,32 +231,32 @@ if ($viewGrv):
             <!-- ── LEFT: Member Info + Message + Previous Response ── -->
             <div class="col-lg-5">
                 <div class="adm-info-group">
-                    <div class="adm-info-group-header"><i class="fas fa-user"></i>गुनासोकर्ताको जानकारी</div>
+                    <div class="adm-info-group-header"><i class="fas fa-user"></i><?php echo $__t('गुनासोकर्ताको जानकारी', 'Complainant Information'); ?></div>
                     <table class="table adm-detail-table">
                         <?php if (!$viewGrv['is_anonymous']): ?>
-                        <tr><th>नाम</th>
+                        <tr><th><?php echo $__t('नाम', 'Name'); ?></th>
                             <td><strong><?php echo htmlspecialchars($viewGrv['name'] ?? '—'); ?></strong></td></tr>
-                        <tr><th>फोन</th>
+                        <tr><th><?php echo $__t('फोन', 'Phone'); ?></th>
                             <td><a href="tel:<?php echo htmlspecialchars($viewGrv['phone'] ?? ''); ?>" class="text-decoration-none fw-semibold"><?php echo htmlspecialchars($viewGrv['phone'] ?? '—'); ?></a></td></tr>
-                        <tr><th>इमेल</th>
+                        <tr><th><?php echo $__t('इमेल', 'Email'); ?></th>
                             <td><?php echo $viewGrv['email'] ? '<a href="mailto:'.htmlspecialchars($viewGrv['email']).'" class="text-decoration-none">'.htmlspecialchars($viewGrv['email']).'</a>' : '—'; ?></td></tr>
-                        <tr><th>सदस्य नं.</th>
+                        <tr><th><?php echo $__t('सदस्य नं.', 'Member ID'); ?></th>
                             <td><?php echo $viewGrv['member_id'] ? '<span class="badge bg-success-subtle text-success-emphasis fw-semibold px-2">'.htmlspecialchars($viewGrv['member_id']).'</span>' : '<span class="text-muted">—</span>'; ?></td></tr>
                         <?php else: ?>
                         <tr><td colspan="2" class="text-center text-muted fst-italic py-2">
-                            <i class="fas fa-user-secret me-1"></i>गुप्त पहिचान (Anonymous)
+                            <i class="fas fa-user-secret me-1"></i><?php echo $__t('गुप्त पहिचान (Anonymous)', 'Anonymous Identity'); ?>
                         </td></tr>
                         <?php endif; ?>
-                        <tr><th>वर्ग</th>
+                        <tr><th><?php echo $__t('वर्ग', 'Category'); ?></th>
                             <td><?php echo htmlspecialchars($catTxt); ?></td></tr>
                         <tr><th>Tracking ID</th>
                             <td><code class="text-success fw-bold"><?php echo htmlspecialchars($viewGrv['tracking_id'] ?? '—'); ?></code></td></tr>
-                        <tr><th>दर्ता मिति</th>
+                        <tr><th><?php echo $__t('दर्ता मिति', 'Created Date'); ?></th>
                             <td><?php echo isset($viewGrv['created_at']) ? formatNepaliDate($viewGrv['created_at'], true) : '—'; ?></td></tr>
-                        <tr><th>अवस्था</th>
+                        <tr><th><?php echo $__t('अवस्था', 'Status'); ?></th>
                             <td><?php echo grvBadge($viewGrv['status'], $sl, $sc); ?></td></tr>
                         <?php if ($viewGrv['resolved_at']): ?>
-                        <tr><th>समाधान मिति</th>
+                        <tr><th><?php echo $__t('समाधान मिति', 'Resolved Date'); ?></th>
                             <td><?php echo formatNepaliDate($viewGrv['resolved_at'], true); ?></td></tr>
                         <?php endif; ?>
                     </table>
@@ -256,7 +264,7 @@ if ($viewGrv):
 
                 <?php if (!empty($viewGrv['subject'])): ?>
                 <div class="adm-info-group">
-                    <div class="adm-info-group-header"><i class="fas fa-tag"></i>विषय</div>
+                    <div class="adm-info-group-header"><i class="fas fa-tag"></i><?php echo $__t('विषय', 'Subject'); ?></div>
                     <div class="p-3 fw-semibold grv-subject-box">
                         <?php echo htmlspecialchars($viewGrv['subject']); ?>
                     </div>
@@ -264,7 +272,7 @@ if ($viewGrv):
                 <?php endif; ?>
 
                 <div class="adm-info-group">
-                    <div class="adm-info-group-header"><i class="fas fa-comment-dots"></i>गुनासोको विस्तृत विवरण</div>
+                    <div class="adm-info-group-header"><i class="fas fa-comment-dots"></i><?php echo $__t('गुनासोको विस्तृत विवरण', 'Detailed Description'); ?></div>
                     <div class="p-3 grv-desc-box">
                         <?php echo nl2br(htmlspecialchars($viewGrv['description'] ?? '—')); ?>
                     </div>
@@ -300,7 +308,7 @@ if ($viewGrv):
                            class="btn btn-sm btn-outline-primary" target="_blank" download>
                             <i class="fas fa-download me-1"></i>Download
                         </a>
-                        <form method="POST" class="d-inline" onsubmit="return confirm('फाइल हटाउने?')">
+                        <form method="POST" class="d-inline" onsubmit="return confirm('<?php echo $__t('फाइल हटाउने?', 'Remove this file?'); ?>')">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="remove_attachment" value="1">
                             <input type="hidden" name="id" value="<?php echo $viewGrv['id']; ?>">
@@ -315,7 +323,7 @@ if ($viewGrv):
             <div class="col-lg-7">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header gradient-card-header py-2">
-                        <i class="fas fa-edit me-2"></i>स्थिति अपडेट / प्रतिक्रिया / Note / Document
+                        <i class="fas fa-edit me-2"></i><?php echo $__t('स्थिति अपडेट / प्रतिक्रिया / Note / Document', 'Status Update / Response / Note / Document'); ?>
                     </div>
                     <div class="card-body">
                         <form method="POST" enctype="multipart/form-data">
@@ -380,7 +388,7 @@ if ($viewGrv):
                             <!-- Submit -->
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary px-4">
-                                    <i class="fas fa-save me-1"></i>अपडेट गर्नुहोस्
+                                    <i class="fas fa-save me-1"></i><?php echo $__t('अपडेट गर्नुहोस्', 'Update'); ?>
                                 </button>
                                 <a href="grievances.php" class="btn btn-outline-secondary">
                                     <i class="fas fa-arrow-left me-1"></i>सूचीमा फर्किनुहोस्
@@ -390,7 +398,7 @@ if ($viewGrv):
 
                         <!-- Delete button — separate form -->
                         <hr class="my-3">
-                        <form method="POST" onsubmit="return confirm('के तपाईं यो गुनासो स्थायी रूपले मेटाउन निश्चित हुनुहुन्छ?')">
+                        <form method="POST" onsubmit="return confirm('<?php echo $__t('के तपाईं यो गुनासो स्थायी रूपले मेटाउन निश्चित हुनुहुन्छ?', 'Are you sure you want to permanently delete this grievance?'); ?>')">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="delete" value="1">
                             <input type="hidden" name="id" value="<?php echo $viewGrv['id']; ?>">
@@ -413,27 +421,27 @@ if ($viewGrv):
     <a href="grievances.php" class="stat-mini <?php echo $statusFilter===''?'active-filter':''; ?>">
         <div class="sm-icon ic-total"><i class="fas fa-list"></i></div>
         <div class="sm-val"><?php echo $total; ?></div>
-        <div class="sm-lbl">जम्मा गुनासो</div>
+        <div class="sm-lbl"><?php echo $__t('जम्मा गुनासो', 'Total Grievances'); ?></div>
     </a>
     <a href="?status=pending" class="stat-mini <?php echo $statusFilter==='pending'?'active-filter':''; ?>">
         <div class="sm-icon ic-pending"><i class="fas fa-clock"></i></div>
         <div class="sm-val"><?php echo $counts['pending']; ?></div>
-        <div class="sm-lbl">पेन्डिङ</div>
+        <div class="sm-lbl"><?php echo $__t('पेन्डिङ', 'Pending'); ?></div>
     </a>
     <a href="?status=in_progress" class="stat-mini <?php echo $statusFilter==='in_progress'?'active-filter':''; ?>">
         <div class="sm-icon ic-process"><i class="fas fa-spinner"></i></div>
         <div class="sm-val"><?php echo $counts['in_progress']; ?></div>
-        <div class="sm-lbl">प्रक्रियामा</div>
+        <div class="sm-lbl"><?php echo $__t('प्रक्रियामा', 'In Progress'); ?></div>
     </a>
     <a href="?status=resolved" class="stat-mini <?php echo $statusFilter==='resolved'?'active-filter':''; ?>">
         <div class="sm-icon ic-resolved"><i class="fas fa-check-circle"></i></div>
         <div class="sm-val"><?php echo $counts['resolved']; ?></div>
-        <div class="sm-lbl">समाधान</div>
+        <div class="sm-lbl"><?php echo $__t('समाधान', 'Resolved'); ?></div>
     </a>
     <a href="?status=closed" class="stat-mini <?php echo $statusFilter==='closed'?'active-filter':''; ?>">
         <div class="sm-icon ic-anon"><i class="fas fa-lock"></i></div>
         <div class="sm-val"><?php echo $counts['closed']; ?></div>
-        <div class="sm-lbl">बन्द</div>
+        <div class="sm-lbl"><?php echo $__t('बन्द', 'Closed'); ?></div>
     </a>
 </div>
 
@@ -441,26 +449,26 @@ if ($viewGrv):
 <div class="adm-filter-bar no-print">
     <form method="GET" class="row g-2 align-items-end">
         <div class="col-md-3 col-6">
-            <label>स्थिति</label>
+            <label><?php echo $__t('स्थिति', 'Status'); ?></label>
             <select name="status" id="qf_grv_status" class="form-select form-select-sm">
-                <option value="">सबै स्थिति</option>
-                <option value="pending"     <?php echo $statusFilter==='pending'?'selected':''; ?>>⏳ पेन्डिङ</option>
-                <option value="in_progress" <?php echo $statusFilter==='in_progress'?'selected':''; ?>>🔄 प्रक्रियामा</option>
-                <option value="resolved"    <?php echo $statusFilter==='resolved'?'selected':''; ?>>✅ समाधान</option>
-                <option value="closed"      <?php echo $statusFilter==='closed'?'selected':''; ?>>🔒 बन्द</option>
+                <option value=""><?php echo $__t('सबै स्थिति', 'All Status'); ?></option>
+                <option value="pending"     <?php echo $statusFilter==='pending'?'selected':''; ?>>⏳ <?php echo $__t('पेन्डिङ', 'Pending'); ?></option>
+                <option value="in_progress" <?php echo $statusFilter==='in_progress'?'selected':''; ?>>🔄 <?php echo $__t('प्रक्रियामा', 'In Progress'); ?></option>
+                <option value="resolved"    <?php echo $statusFilter==='resolved'?'selected':''; ?>>✅ <?php echo $__t('समाधान', 'Resolved'); ?></option>
+                <option value="closed"      <?php echo $statusFilter==='closed'?'selected':''; ?>>🔒 <?php echo $__t('बन्द', 'Closed'); ?></option>
             </select>
         </div>
         <div class="col-md-7 col-12">
-            <label>खोज्नुहोस्</label>
+            <label><?php echo $__t('खोज्नुहोस्', 'Search'); ?></label>
             <div class="input-group input-group-sm">
                 <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
                 <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($search); ?>"
-                       placeholder="नाम, फोन, इमेल, Tracking ID, विषय...">
+                       placeholder="<?php echo $__t('नाम, फोन, इमेल, Tracking ID, विषय...', 'name, phone, email, Tracking ID, subject...'); ?>">
                 <?php if ($search): ?><a href="?status=<?php echo urlencode($statusFilter); ?>" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times"></i></a><?php endif; ?>
             </div>
         </div>
         <div class="col-md-2 col-6">
-            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i>खोज</button>
+            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i><?php echo $__t('खोज', 'Search'); ?></button>
         </div>
     </form>
     <script>document.getElementById('qf_grv_status').addEventListener('change',function(){this.closest('form').submit();});</script>
@@ -469,25 +477,25 @@ if ($viewGrv):
 <!-- ── Grievances Table ── -->
 <div class="card border-0 shadow-sm grv-table-card">
     <div class="tbl-header-bar no-print">
-        <h6><i class="fas fa-exclamation-circle me-2 grv-note-icon"></i>गुनासो सूची</h6>
-        <span class="result-count-badge"><?php echo count($grievances); ?> गुनासो</span>
+        <h6><i class="fas fa-exclamation-circle me-2 grv-note-icon"></i><?php echo $__t('गुनासो सूची', 'Grievance List'); ?></h6>
+        <span class="result-count-badge"><?php echo count($grievances); ?> <?php echo $__t('गुनासो', 'grievances'); ?></span>
     </div>
     <div class="table-responsive">
         <table class="table-hover table app-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th class="grv-person-col">व्यक्ति</th>
-                    <th>विषय</th>
-                    <th>वर्ग</th>
+                    <th class="grv-person-col"><?php echo $__t('व्यक्ति', 'Person'); ?></th>
+                    <th><?php echo $__t('विषय', 'Subject'); ?></th>
+                    <th><?php echo $__t('वर्ग', 'Category'); ?></th>
                     <th>Tracking ID</th>
-                    <th>मिति</th>
-                    <th>स्थिति</th>
-                    <th class="no-print">कार्यहरू</th>
+                    <th><?php echo $__t('मिति', 'Date'); ?></th>
+                    <th><?php echo $__t('स्थिति', 'Status'); ?></th>
+                    <th class="no-print"><?php echo $__t('कार्यहरू', 'Actions'); ?></th>
                 </tr>
             </thead>
             <tbody>
             <?php if (empty($grievances)): ?>
-            <tr class="no-results-row"><td colspan="7"><i class="fas fa-inbox fa-2x d-block mb-2"></i>कुनै गुनासो फेला परेन।</td></tr>
+            <tr class="no-results-row"><td colspan="7"><i class="fas fa-inbox fa-2x d-block mb-2"></i><?php echo $__t('कुनै गुनासो फेला परेन।', 'No grievances found.'); ?></td></tr>
             <?php else: foreach ($grievances as $grv):
                 $tId = $grv['tracking_id'] ?? 'GRV-' . str_pad($grv['id'], 6, '0', STR_PAD_LEFT);
                 $initLetter = $grv['is_anonymous'] ? '?' : mb_strtoupper(mb_substr($grv['name'] ?? 'G', 0, 1));
@@ -518,14 +526,14 @@ if ($viewGrv):
                 <td><span class="badge-status badge-<?php echo htmlspecialchars($grv['status']); ?>"><?php echo $statusLabel[$grv['status']] ?? $grv['status']; ?></span></td>
                 <td class="no-print">
                     <div class="d-flex gap-1 flex-wrap">
-                        <a href="grievances.php?view=<?php echo $grv['id']; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="विस्तृत / अपडेट"><i class="fas fa-eye"></i></a>
+                        <a href="grievances.php?view=<?php echo $grv['id']; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="<?php echo $__t('विस्तृत / अपडेट', 'Details / Update'); ?>"><i class="fas fa-eye"></i></a>
                         <?php if ($grv['status'] === 'pending' || $grv['status'] === 'in_progress'): ?>
-                        <form method="POST" class="qaction-form" onsubmit="return confirm('यो गुनासो समाधान भएको मान्नुहुन्छ?')">
+                        <form method="POST" class="qaction-form" onsubmit="return confirm('<?php echo $__t('यो गुनासो समाधान भएको मान्नुहुन्छ?', 'Mark this grievance as resolved?'); ?>')">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="quick_resolve" value="1">
                             <input type="hidden" name="quick_id" value="<?php echo $grv['id']; ?>">
                             <input type="hidden" name="quick_resolve_status" value="resolved">
-                            <button type="submit" class="btn-qresolve"><i class="fas fa-check me-1"></i>समाधान</button>
+                            <button type="submit" class="btn-qresolve"><i class="fas fa-check me-1"></i><?php echo $__t('समाधान', 'Resolve'); ?></button>
                         </form>
                         <?php endif; ?>
                     </div>

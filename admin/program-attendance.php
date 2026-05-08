@@ -1,5 +1,8 @@
 <?php
-$pageTitle = 'कार्यक्रम उपस्थिति रिपोर्ट';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle = $__t('कार्यक्रम उपस्थिति रिपोर्ट', 'Program Attendance Report');
 $currentPage = 'program-attendance';
 /* CSV export अघि HTML नछापियोस् — नत्र Excel मा पूरै page source “code” जस्तो देखिन्छ */
 if (!ob_get_level()) {
@@ -496,19 +499,19 @@ $totalAttendance = $totalFiltered;
 $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER BY is_active DESC, COALESCE(event_date,'9999-12-31') ASC, id DESC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <div class="container-fluid py-3">
-<?php echo adminPageHeader('कार्यक्रम उपस्थिति रिपोर्ट', 'fa-clipboard-check', 'कार्यक्रम छानेर pre-registration र उपस्थिति हेर्नुहोस्। लामो सूचीको लागि कार्यक्रम व्यवस्थापनमा सक्रिय/निष्क्रिय छुट्याउनुहोस्।',
-    '<a class="btn btn-outline-primary btn-sm" href="programs.php"><i class="fas fa-calendar-plus me-1"></i>कार्यक्रम व्यवस्थापन</a>'); ?>
+<?php echo adminPageHeader($__t('कार्यक्रम उपस्थिति रिपोर्ट', 'Program Attendance Report'), 'fa-clipboard-check', $__t('कार्यक्रम छानेर pre-registration र उपस्थिति हेर्नुहोस्। लामो सूचीको लागि कार्यक्रम व्यवस्थापनमा सक्रिय/निष्क्रिय छुट्याउनुहोस्।', 'Select a program to view pre-registrations and attendance. For long lists, separate active/inactive from program management.'),
+    '<a class="btn btn-outline-primary btn-sm" href="programs.php"><i class="fas fa-calendar-plus me-1"></i>' . $__t('कार्यक्रम व्यवस्थापन', 'Program Management') . '</a>'); ?>
 <?php if ($f = getFlash()): ?><div class="mb-3"><?php echo adminAlert($f['type'], $f['message']); ?></div><?php endif; ?>
 
 <div class="card admin-table-card mb-3">
   <div class="card-body">
     <form class="row g-2 align-items-end" method="get" action="program-attendance.php">
-      <div class="col-md-3"><label class="form-label small mb-1">कार्यक्रम</label><select name="program_id" class="form-select"><option value="0">सबै कार्यक्रम</option><?php foreach ($programs as $p): ?><?php
+      <div class="col-md-3"><label class="form-label small mb-1"><?php echo $__t('कार्यक्रम','Program'); ?></label><select name="program_id" class="form-select"><option value="0"><?php echo $__t('सबै कार्यक्रम','All Programs'); ?></option><?php foreach ($programs as $p): ?><?php
           $pTitle = (string)($p['title'] ?? '');
           $pInactive = isset($p['is_active']) && (int)$p['is_active'] !== 1;
           $pLabel = $pTitle . ($pInactive ? ' (निष्क्रिय)' : '');
       ?><option value="<?php echo (int)$p['id']; ?>" <?php echo $programId === (int)$p['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($pLabel); ?></option><?php endforeach; ?></select></div>
-      <div class="col-md-3"><label class="form-label small mb-1">खोज (नाम / सदस्य नं. / कार्यक्रम)</label><input name="q" class="form-control" value="<?php echo htmlspecialchars($q); ?>" placeholder="खोज…"></div>
+      <div class="col-md-3"><label class="form-label small mb-1"><?php echo $__t('खोज (नाम / सदस्य नं. / कार्यक्रम)', 'Search (name / member no. / program)'); ?></label><input name="q" class="form-control" value="<?php echo htmlspecialchars($q); ?>" placeholder="<?php echo $__t('खोज…', 'Search...'); ?>"></div>
       <div class="col-md-2"><label class="form-label small mb-1">देखि</label><input type="date" name="date_from" class="form-control" value="<?php echo htmlspecialchars($dateFrom); ?>"></div>
       <div class="col-md-2"><label class="form-label small mb-1">सम्म</label><input type="date" name="date_to" class="form-control" value="<?php echo htmlspecialchars($dateTo); ?>"></div>
       <div class="col-md-2">
@@ -522,21 +525,21 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
         </label>
       </div>
       <div class="col-12 col-md-10 d-flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-primary"><i class="fas fa-search me-1"></i>Filter</button>
-        <a href="program-attendance.php?<?php echo htmlspecialchars(http_build_query(array_merge($paQuery, ['export' => 1])), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-success"><i class="fas fa-file-excel me-1"></i>Excel/CSV (सबै फिल्टर)</a>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search me-1"></i><?php echo $__t('फिल्टर', 'Filter'); ?></button>
+        <a href="program-attendance.php?<?php echo htmlspecialchars(http_build_query(array_merge($paQuery, ['export' => 1])), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-success"><i class="fas fa-file-excel me-1"></i>Excel/CSV (<?php echo $__t('सबै फिल्टर', 'all filters'); ?>)</a>
         <a href="program-attendance.php?<?php echo htmlspecialchars(http_build_query(array_merge($paQuery, ['export' => 'prereg'])), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-outline-primary"><i class="fas fa-user-plus me-1"></i>Pre-Reg CSV</a>
         <?php if ($paQuery !== []): ?><a href="program-attendance.php" class="btn btn-outline-secondary">Reset</a><?php endif; ?>
       </div>
     </form>
-    <p class="small text-muted mb-0 mt-2">उपस्थिति तालिका <?php echo (int)$perPage; ?>/पृष्ठ। KPI र चार्ट हालको फिल्टरको <strong>जम्मा</strong> डाटामा आधारित छन्।</p>
+    <p class="small text-muted mb-0 mt-2"><?php echo $__t('उपस्थिति तालिका', 'Attendance table'); ?> <?php echo (int)$perPage; ?>/<?php echo $__t('पृष्ठ', 'page'); ?>. KPI <?php echo $__t('र चार्ट हालको फिल्टरको', 'and charts are based on'); ?> <strong><?php echo $__t('जम्मा', 'total'); ?></strong> <?php echo $__t('डाटामा आधारित छन्।', 'filtered data.'); ?></p>
   </div>
 </div>
 
 <div class="row g-3 mb-3">
-  <div class="col-md-3"><div class="card admin-table-card"><div class="card-body py-3"><div class="small text-muted">कुल उपस्थिति</div><div class="h4 mb-0 text-primary"><?php echo (int)$totalAttendance; ?></div></div></div></div>
+  <div class="col-md-3"><div class="card admin-table-card"><div class="card-body py-3"><div class="small text-muted"><?php echo $__t('कुल उपस्थिति','Total Attendance'); ?></div><div class="h4 mb-0 text-primary"><?php echo (int)$totalAttendance; ?></div></div></div></div>
   <div class="col-md-3"><div class="card admin-table-card"><div class="card-body py-3"><div class="small text-muted">Unique सदस्य</div><div class="h4 mb-0 text-success"><?php echo (int)$uniqueMembers; ?></div></div></div></div>
   <div class="col-md-3"><div class="card admin-table-card"><div class="card-body py-3"><div class="small text-muted">Priority मार्क</div><div class="h4 mb-0 text-warning"><?php echo (int)$priorityCount; ?></div></div></div></div>
-  <div class="col-md-3"><div class="card admin-table-card"><div class="card-body py-3"><div class="small text-muted">कार्यक्रम संख्या</div><div class="h4 mb-0 text-info"><?php echo (int)$distinctProgramCount; ?></div></div></div></div>
+  <div class="col-md-3"><div class="card admin-table-card"><div class="card-body py-3"><div class="small text-muted"><?php echo $__t('कार्यक्रम संख्या','Program Count'); ?></div><div class="h4 mb-0 text-info"><?php echo (int)$distinctProgramCount; ?></div></div></div></div>
 </div>
 
 <div class="row g-3 mb-3">
@@ -585,7 +588,7 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
   <div class="tab-pane fade show active" id="pa-pane-req" role="tabpanel" aria-labelledby="pa-tab-req">
 <div class="card admin-table-card mb-3 border-warning" style="border-width:2px;">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <h6 class="mb-0"><i class="fas fa-hourglass-half text-warning me-2"></i>उपस्थिति अनुरोध (QR / मोबाइल बिना)</h6>
+    <h6 class="mb-0"><i class="fas fa-hourglass-half text-warning me-2"></i><?php echo $__t('उपस्थिति अनुरोध (QR / मोबाइल बिना)', 'Attendance Requests (without QR/mobile)'); ?></h6>
     <span class="badge bg-warning text-dark">Pending <?php echo (int)$reqPendingCount; ?></span>
   </div>
   <div class="card-body py-2 small text-muted border-bottom">
@@ -596,10 +599,10 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
   </div>
   <div class="table-responsive">
     <table class="table table-hover table-sm align-middle mb-0">
-      <thead><tr><th>कार्यक्रम</th><th>मिति / स्थान</th><th>सदस्य</th><th>सदस्य नं.</th><th>फोन</th><th>अनुरोध समय</th><th>कार्य</th></tr></thead>
+      <thead><tr><th><?php echo $__t('कार्यक्रम','Program'); ?></th><th><?php echo $__t('मिति / स्थान','Date / Location'); ?></th><th><?php echo $__t('सदस्य','Member'); ?></th><th><?php echo $__t('सदस्य नं.','Member No.'); ?></th><th><?php echo $__t('फोन','Phone'); ?></th><th><?php echo $__t('अनुरोध समय','Request Time'); ?></th><th><?php echo $__t('कार्य','Actions'); ?></th></tr></thead>
       <tbody>
       <?php if (empty($reqRows)): ?>
-      <tr><td colspan="7" class="text-center text-muted py-3">कुनै pending अनुरोध छैन।</td></tr>
+      <tr><td colspan="7" class="text-center text-muted py-3"><?php echo $__t('कुनै pending अनुरोध छैन।', 'No pending requests.'); ?></td></tr>
       <?php endif; ?>
       <?php foreach ($reqRows as $rx): ?>
       <?php
@@ -615,18 +618,18 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
         <td class="small"><?php echo htmlspecialchars($rx['requested_at'] ?? ''); ?></td>
         <td>
           <div class="d-flex flex-wrap gap-1">
-            <form method="POST" class="d-inline" onsubmit="return confirm('यो सदस्यलाई उपस्थिति सूचीमा थप्ने? स्थलमा उपस्थिति पुष्टि भइसकेको हो?');">
+            <form method="POST" class="d-inline" onsubmit="return confirm('<?php echo $__t('यो सदस्यलाई उपस्थिति सूचीमा थप्ने? स्थलमा उपस्थिति पुष्टि भइसकेको हो?', 'Add this member to attendance list? Is physical attendance confirmed?'); ?>');">
               <?php echo csrfField(); ?>
               <input type="hidden" name="action" value="approve_attendance_request">
               <input type="hidden" name="request_id" value="<?php echo (int)$rx['id']; ?>">
-              <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check me-1"></i>स्वीकृत</button>
+              <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check me-1"></i><?php echo $__t('स्वीकृत','Approve'); ?></button>
             </form>
-            <form method="POST" class="d-inline-flex align-items-center gap-1 flex-wrap" onsubmit="return confirm('अनुरोध अस्वीकृत गर्ने?');">
+            <form method="POST" class="d-inline-flex align-items-center gap-1 flex-wrap" onsubmit="return confirm('<?php echo $__t('अनुरोध अस्वीकृत गर्ने?', 'Reject this request?'); ?>');">
               <?php echo csrfField(); ?>
               <input type="hidden" name="action" value="reject_attendance_request">
               <input type="hidden" name="request_id" value="<?php echo (int)$rx['id']; ?>">
               <input type="text" name="reject_note" class="form-control form-control-sm" style="min-width:120px;max-width:180px;" placeholder="कारण (वैकल्पिक)">
-              <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-times me-1"></i>अस्वीकृत</button>
+              <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-times me-1"></i><?php echo $__t('अस्वीकृत','Reject'); ?></button>
             </form>
           </div>
         </td>
@@ -641,7 +644,7 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
   <div class="tab-pane fade" id="pa-pane-att" role="tabpanel" aria-labelledby="pa-tab-att">
 <div class="card admin-table-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <h6 class="mb-0"><i class="fas fa-list me-2"></i>उपस्थिति सूची</h6>
+    <h6 class="mb-0"><i class="fas fa-list me-2"></i><?php echo $__t('उपस्थिति सूची','Attendance List'); ?></h6>
     <?php if ($totalFiltered > 0): ?><span class="badge bg-secondary"><?php echo (int)$totalFiltered; ?> रेकर्ड (फिल्टर)</span><?php endif; ?>
   </div>
   <div class="table-responsive">
@@ -676,8 +679,8 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
             return 'program-attendance.php?' . http_build_query($q);
         };
       ?>
-      <?php if ($page > 1): ?><a class="btn btn-sm btn-outline-secondary" href="<?php echo htmlspecialchars($mkPageUrl($page - 1), ENT_QUOTES, 'UTF-8'); ?>">अघिल्लो</a><?php endif; ?>
-      <?php if ($page < $totalPages): ?><a class="btn btn-sm btn-outline-secondary" href="<?php echo htmlspecialchars($mkPageUrl($page + 1), ENT_QUOTES, 'UTF-8'); ?>">अर्को</a><?php endif; ?>
+      <?php if ($page > 1): ?><a class="btn btn-sm btn-outline-secondary" href="<?php echo htmlspecialchars($mkPageUrl($page - 1), ENT_QUOTES, 'UTF-8'); ?>"><?php echo $__t('अघिल्लो','Previous'); ?></a><?php endif; ?>
+      <?php if ($page < $totalPages): ?><a class="btn btn-sm btn-outline-secondary" href="<?php echo htmlspecialchars($mkPageUrl($page + 1), ENT_QUOTES, 'UTF-8'); ?>"><?php echo $__t('अर्को','Next'); ?></a><?php endif; ?>
     </nav>
   </div>
   <?php endif; ?>

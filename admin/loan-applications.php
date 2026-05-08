@@ -5,7 +5,10 @@
  * feedbacks.php pattern: ?view=ID → full-page detail + edit form।
  * Modal पूर्ण रूपले हटाइयो।
  */
-$pageTitle   = 'ऋण आवेदन व्यवस्थापन';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle   = $__t('ऋण आवेदन व्यवस्थापन', 'Loan Applications');
 $currentPage = 'loans';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
@@ -45,9 +48,9 @@ if (isset($_POST['update_status'])) {
                     $status, $remarks, $nData['tracking_id'] ?? '');
             }
         } catch (Exception $e) {}
-        setFlash('success', 'स्थिति अपडेट गरियो।');
+        setFlash('success', $__t('स्थिति अपडेट गरियो।', 'Status updated.'));
     } catch (Exception $e) {
-        setFlash('error', 'त्रुटि भयो।');
+        setFlash('error', $__t('त्रुटि भयो।', 'An error occurred.'));
     }
     redirect('loan-applications.php' . ($id ? '?view=' . $id : ''));
 }
@@ -55,7 +58,7 @@ if (isset($_POST['update_status'])) {
 /* ─── Delete ─── */
 if (isset($_POST['delete'])) {
     $id = (int)($_POST['delete_id'] ?? 0);
-    try { $db->prepare("DELETE FROM loan_applications WHERE id=?")->execute([$id]); setFlash('success', 'आवेदन मेटाइयो।'); } catch (Exception $e) {}
+    try { $db->prepare("DELETE FROM loan_applications WHERE id=?")->execute([$id]); setFlash('success', $__t('आवेदन मेटाइयो।', 'Application deleted.')); } catch (Exception $e) {}
     redirect('loan-applications.php');
 }
 
@@ -71,8 +74,8 @@ if (isset($_POST['quick_status'])) {
             $nr->execute([$qid]); $nd = $nr->fetch();
             if ($nd) sendMemberStatusUpdate('loan', $nd['email']??'', $nd['mobile']??'', $nd['full_name']??'', $qst, '', $nd['tracking_id']??'');
         } catch (Exception $e) {}
-        setFlash('success', 'स्थिति परिवर्तन गरियो।');
-    } catch (Exception $e) { setFlash('error', 'त्रुटि भयो।'); }
+        setFlash('success', $__t('स्थिति परिवर्तन गरियो।', 'Status changed.'));
+    } catch (Exception $e) { setFlash('error', $__t('त्रुटि भयो।', 'An error occurred.')); }
     $redLoanSt = $_GET['status'] ?? '';
     if ($redLoanSt !== '' && !in_array($redLoanSt, $loanListStatuses, true)) {
         $redLoanSt = '';
@@ -122,22 +125,28 @@ if (isset($_GET['view'])) {
     $s = $db->prepare("SELECT * FROM loan_applications WHERE id=?");
     $s->execute([(int)$_GET['view']]);
     $viewApp = $s->fetch();
-    if (!$viewApp) { setFlash('error', 'आवेदन फेला परेन।'); redirect('loan-applications.php'); }
+    if (!$viewApp) { setFlash('error', $__t('आवेदन फेला परेन।', 'Application not found.')); redirect('loan-applications.php'); }
 }
 
-$statusLabel = ['pending'=>'पेन्डिङ','processing'=>'प्रक्रियामा','approved'=>'स्वीकृत','rejected'=>'अस्वीकृत','disbursed'=>'वितरित'];
+$statusLabel = [
+    'pending'    => $__t('पेन्डिङ', 'Pending'),
+    'processing' => $__t('प्रक्रियामा', 'Processing'),
+    'approved'   => $__t('स्वीकृत', 'Approved'),
+    'rejected'   => $__t('अस्वीकृत', 'Rejected'),
+    'disbursed'  => $__t('वितरित', 'Disbursed')
+];
 $statusClass = ['pending'=>'warning','processing'=>'info','approved'=>'success','rejected'=>'danger','disbursed'=>'primary'];
 
 /* ─── Page Header ─── */
 if ($viewApp) {
     $trackId = $viewApp['tracking_id'] ?? 'LOAN-' . str_pad($viewApp['id'], 6, '0', STR_PAD_LEFT);
-    echo adminPageHeader('ऋण आवेदन विवरण', 'fa-hand-holding-usd',
+    echo adminPageHeader($__t('ऋण आवेदन विवरण', 'Loan Application Details'), 'fa-hand-holding-usd',
         'Tracking: ' . $trackId,
-        adminBackBtn('loan-applications.php', 'ऋण सूचीमा फर्किनुहोस्'));
+        adminBackBtn('loan-applications.php', $__t('ऋण सूचीमा फर्किनुहोस्', 'Back to loan list')));
 } else {
-    echo adminPageHeader('ऋण आवेदन व्यवस्थापन', 'fa-hand-holding-usd',
-        'सदस्यहरूको ऋण आवेदनहरू — समीक्षा, स्थिति अपडेट र Approval',
-        adminStatLink('?status=pending', 'danger', 'पेन्डिङ', $pendingCount));
+    echo adminPageHeader($__t('ऋण आवेदन व्यवस्थापन', 'Loan Applications'), 'fa-hand-holding-usd',
+        $__t('सदस्यहरूको ऋण आवेदनहरू — समीक्षा, स्थिति अपडेट र Approval', 'Review, approve, and update status of member loan applications'),
+        adminStatLink('?status=pending', 'danger', $__t('पेन्डिङ', 'Pending'), $pendingCount));
 }
 
 $flash = getFlash(); if ($flash) echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']);
@@ -153,7 +162,7 @@ if ($viewApp):
 <div class="card shadow-sm mb-4">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
-            <i class="fas fa-hand-holding-usd me-2"></i>ऋण आवेदन विवरण
+            <i class="fas fa-hand-holding-usd me-2"></i><?php echo $__t('ऋण आवेदन विवरण', 'Loan Application Details'); ?>
             <code class="apt-track-chip">
                 <?php echo htmlspecialchars($trackId); ?>
             </code>
@@ -168,15 +177,15 @@ if ($viewApp):
 
                 <!-- आवेदकको जानकारी -->
                 <div class="adm-info-group">
-                <div class="adm-info-group-header"><i class="fas fa-user"></i>आवेदकको जानकारी</div>
+                <div class="adm-info-group-header"><i class="fas fa-user"></i><?php echo $__t('आवेदकको जानकारी', 'Applicant Information'); ?></div>
                 <table class="table adm-detail-table">
-                    <tr><th>पूरा नाम</th><td><strong><?php echo htmlspecialchars($viewApp['full_name'] ?? '—'); ?></strong></td></tr>
-                    <tr><th>सदस्य नं.</th><td><?php echo htmlspecialchars($viewApp['member_id'] ?: '—'); ?></td></tr>
-                    <tr><th>मोबाइल</th><td><?php echo htmlspecialchars($viewApp['mobile'] ?? '—'); ?></td></tr>
-                    <tr><th>इमेल</th><td><?php echo htmlspecialchars($viewApp['email'] ?: '—'); ?></td></tr>
-                    <tr><th>नागरिकता नं.</th><td><?php echo htmlspecialchars($viewApp['citizenship_no'] ?: '—'); ?></td></tr>
-                    <tr><th>ठेगाना</th><td><?php echo htmlspecialchars($viewApp['address'] ?: '—'); ?></td></tr>
-                    <tr><th>दर्ता मिति</th><td><?php echo formatNepaliDate($viewApp['created_at'], true); ?></td></tr>
+                    <tr><th><?php echo $__t('पूरा नाम', 'Full Name'); ?></th><td><strong><?php echo htmlspecialchars($viewApp['full_name'] ?? '—'); ?></strong></td></tr>
+                    <tr><th><?php echo $__t('सदस्य नं.', 'Member ID'); ?></th><td><?php echo htmlspecialchars($viewApp['member_id'] ?: '—'); ?></td></tr>
+                    <tr><th><?php echo $__t('मोबाइल', 'Mobile'); ?></th><td><?php echo htmlspecialchars($viewApp['mobile'] ?? '—'); ?></td></tr>
+                    <tr><th><?php echo $__t('इमेल', 'Email'); ?></th><td><?php echo htmlspecialchars($viewApp['email'] ?: '—'); ?></td></tr>
+                    <tr><th><?php echo $__t('नागरिकता नं.', 'Citizenship No.'); ?></th><td><?php echo htmlspecialchars($viewApp['citizenship_no'] ?: '—'); ?></td></tr>
+                    <tr><th><?php echo $__t('ठेगाना', 'Address'); ?></th><td><?php echo htmlspecialchars($viewApp['address'] ?: '—'); ?></td></tr>
+                    <tr><th><?php echo $__t('दर्ता मिति', 'Created Date'); ?></th><td><?php echo formatNepaliDate($viewApp['created_at'], true); ?></td></tr>
                 </table>
 
                 </div>
@@ -272,7 +281,7 @@ if ($viewApp):
             <div class="col-lg-5">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header gradient-card-header py-2">
-                        <i class="fas fa-edit me-2"></i>स्थिति अपडेट / Admin टिप्पणी / Document
+                        <i class="fas fa-edit me-2"></i><?php echo $__t('स्थिति अपडेट / Admin टिप्पणी / Document', 'Status Update / Admin Remarks / Document'); ?>
                     </div>
                     <div class="card-body">
                         <form method="POST" enctype="multipart/form-data">
@@ -281,7 +290,7 @@ if ($viewApp):
                             <input type="hidden" name="id" value="<?php echo $viewApp['id']; ?>">
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold"><i class="fas fa-circle-dot me-1"></i>अवस्था</label>
+                                <label class="form-label fw-semibold"><i class="fas fa-circle-dot me-1"></i><?php echo $__t('अवस्था', 'Status'); ?></label>
                                 <select name="status" class="form-select">
                                     <?php foreach ($statusLabel as $v => $l): ?>
                                     <option value="<?php echo $v; ?>" <?php echo $viewApp['status']===$v?'selected':''; ?>><?php echo $l; ?></option>
@@ -291,46 +300,46 @@ if ($viewApp):
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">
-                                    <i class="fas fa-reply me-1 text-success"></i>Admin टिप्पणी/कैफियत
+                                    <i class="fas fa-reply me-1 text-success"></i><?php echo $__t('Admin टिप्पणी/कैफियत', 'Admin Remarks'); ?>
                                 </label>
                                 <textarea name="remarks" class="form-control" rows="4"
-                                    placeholder="स्वीकृति/अस्वीकृतिको कारण, सर्तहरू..."
+                                    placeholder="<?php echo $__t('स्वीकृति/अस्वीकृतिको कारण, सर्तहरू...', 'Reason for approval/rejection, conditions...'); ?>"
                                 ><?php echo htmlspecialchars($viewApp['remarks'] ?? ''); ?></textarea>
                             </div>
 
                             <!-- Admin ले approval letter वा rejection notice attach गर्न सक्छ -->
                             <div class="mb-4">
                                 <label class="form-label fw-semibold">
-                                    <i class="fas fa-paperclip me-1 text-primary"></i>Document संलग्न गर्नुहोस्
+                                    <i class="fas fa-paperclip me-1 text-primary"></i><?php echo $__t('Document संलग्न गर्नुहोस्', 'Attach Document'); ?>
                                     <span class="text-muted fw-normal small">— PDF, Word, Image (max 5MB)</span>
                                 </label>
                                 <input type="file" name="admin_attachment" class="form-control"
                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                                 <?php if (!empty($viewApp['admin_attachment'])): ?>
                                 <div class="form-text text-primary mt-1">
-                                    <i class="fas fa-info-circle me-1"></i>हाल: <strong><?php echo htmlspecialchars(basename($viewApp['admin_attachment'])); ?></strong>
+                                    <i class="fas fa-info-circle me-1"></i><?php echo $__t('हाल', 'Current'); ?>: <strong><?php echo htmlspecialchars(basename($viewApp['admin_attachment'])); ?></strong>
                                 </div>
                                 <?php endif; ?>
                             </div>
 
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary px-4">
-                                    <i class="fas fa-save me-1"></i>अपडेट गर्नुहोस्
+                                    <i class="fas fa-save me-1"></i><?php echo $__t('अपडेट गर्नुहोस्', 'Update'); ?>
                                 </button>
                                 <a href="loan-applications.php" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left me-1"></i>सूचीमा
+                                    <i class="fas fa-arrow-left me-1"></i><?php echo $__t('सूचीमा', 'Back to list'); ?>
                                 </a>
                             </div>
                         </form>
 
                         <hr class="my-3">
                         <form method="POST"
-                              onsubmit="return confirm('के तपाईं यो ऋण आवेदन स्थायी रूपले मेटाउन निश्चित हुनुहुन्छ?')">
+                              onsubmit="return confirm('<?php echo $__t('के तपाईं यो ऋण आवेदन स्थायी रूपले मेटाउन निश्चित हुनुहुन्छ?', 'Are you sure you want to permanently delete this loan application?'); ?>')">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="delete" value="1">
                             <input type="hidden" name="delete_id" value="<?php echo $viewApp['id']; ?>">
                             <button type="submit" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-trash me-1"></i>यो आवेदन मेटाउनुहोस्
+                                <i class="fas fa-trash me-1"></i><?php echo $__t('यो आवेदन मेटाउनुहोस्', 'Delete this application'); ?>
                             </button>
                         </form>
                     </div>
@@ -340,7 +349,7 @@ if ($viewApp):
                 <div class="card mt-3 bg-light border-0">
                     <div class="card-body py-3 text-center">
                         <div class="fs-5 fw-bold text-primary">रू. <?php echo number_format((float)($viewApp['loan_amount'] ?? 0)); ?></div>
-                        <div class="small text-muted">माग गरिएको ऋण रकम</div>
+                        <div class="small text-muted"><?php echo $__t('माग गरिएको ऋण रकम', 'Requested Loan Amount'); ?></div>
                         <hr class="my-2">
                         <div class="small text-muted">
                             <i class="fas fa-calendar me-1"></i>
@@ -363,32 +372,32 @@ if ($viewApp):
     <a href="loan-applications.php" class="stat-mini <?php echo $status_filter===''?'active-filter':''; ?>">
         <div class="sm-icon ic-total"><i class="fas fa-file-alt"></i></div>
         <div class="sm-val"><?php echo $total; ?></div>
-        <div class="sm-lbl">जम्मा आवेदन</div>
+        <div class="sm-lbl"><?php echo $__t('जम्मा आवेदन', 'Total Applications'); ?></div>
     </a>
     <a href="?status=pending" class="stat-mini <?php echo $status_filter==='pending'?'active-filter':''; ?>">
         <div class="sm-icon ic-pending"><i class="fas fa-clock"></i></div>
         <div class="sm-val"><?php echo $pendingCount; ?></div>
-        <div class="sm-lbl">पेन्डिङ</div>
+        <div class="sm-lbl"><?php echo $__t('पेन्डिङ', 'Pending'); ?></div>
     </a>
     <a href="?status=processing" class="stat-mini <?php echo $status_filter==='processing'?'active-filter':''; ?>">
         <div class="sm-icon ic-process"><i class="fas fa-spinner"></i></div>
         <div class="sm-val"><?php echo $processingCount; ?></div>
-        <div class="sm-lbl">प्रक्रियामा</div>
+        <div class="sm-lbl"><?php echo $__t('प्रक्रियामा', 'Processing'); ?></div>
     </a>
     <a href="?status=approved" class="stat-mini <?php echo $status_filter==='approved'?'active-filter':''; ?>">
         <div class="sm-icon ic-approved"><i class="fas fa-check-circle"></i></div>
         <div class="sm-val"><?php echo $approvedCount; ?></div>
-        <div class="sm-lbl">स्वीकृत</div>
+        <div class="sm-lbl"><?php echo $__t('स्वीकृत', 'Approved'); ?></div>
     </a>
     <a href="?status=rejected" class="stat-mini <?php echo $status_filter==='rejected'?'active-filter':''; ?>">
         <div class="sm-icon ic-rejected"><i class="fas fa-times-circle"></i></div>
         <div class="sm-val"><?php echo $rejectedCount; ?></div>
-        <div class="sm-lbl">अस्वीकृत</div>
+        <div class="sm-lbl"><?php echo $__t('अस्वीकृत', 'Rejected'); ?></div>
     </a>
     <div class="stat-mini loan-stat-static">
         <div class="sm-icon ic-amount"><i class="fas fa-rupee-sign"></i></div>
         <div class="sm-val loan-stat-amount"><?php echo number_format((float)$totalAmount/100000,2); ?>L</div>
-        <div class="sm-lbl">पेन्डिङ रकम</div>
+        <div class="sm-lbl"><?php echo $__t('पेन्डिङ रकम', 'Pending Amount'); ?></div>
     </div>
 </div>
 
@@ -396,29 +405,29 @@ if ($viewApp):
 <div class="adm-filter-bar no-print">
     <form method="GET" class="row g-2 align-items-end">
         <div class="col-md-3 col-6">
-            <label>स्थिति</label>
+            <label><?php echo $__t('स्थिति', 'Status'); ?></label>
             <select name="status" id="qf_status" class="form-select form-select-sm">
-                <option value="">सबै स्थिति</option>
-                <option value="pending"    <?php echo $status_filter==='pending'?'selected':''; ?>>⏳ पेन्डिङ</option>
-                <option value="processing" <?php echo $status_filter==='processing'?'selected':''; ?>>🔄 प्रक्रियामा</option>
-                <option value="approved"   <?php echo $status_filter==='approved'?'selected':''; ?>>✅ स्वीकृत</option>
-                <option value="rejected"   <?php echo $status_filter==='rejected'?'selected':''; ?>>❌ अस्वीकृत</option>
-                <option value="disbursed"  <?php echo $status_filter==='disbursed'?'selected':''; ?>>💰 वितरित</option>
+                <option value=""><?php echo $__t('सबै स्थिति', 'All Status'); ?></option>
+                <option value="pending"    <?php echo $status_filter==='pending'?'selected':''; ?>>⏳ <?php echo $__t('पेन्डिङ', 'Pending'); ?></option>
+                <option value="processing" <?php echo $status_filter==='processing'?'selected':''; ?>>🔄 <?php echo $__t('प्रक्रियामा', 'Processing'); ?></option>
+                <option value="approved"   <?php echo $status_filter==='approved'?'selected':''; ?>>✅ <?php echo $__t('स्वीकृत', 'Approved'); ?></option>
+                <option value="rejected"   <?php echo $status_filter==='rejected'?'selected':''; ?>>❌ <?php echo $__t('अस्वीकृत', 'Rejected'); ?></option>
+                <option value="disbursed"  <?php echo $status_filter==='disbursed'?'selected':''; ?>>💰 <?php echo $__t('वितरित', 'Disbursed'); ?></option>
             </select>
         </div>
         <div class="col-md-6 col-12">
-            <label>खोज्नुहोस्</label>
+            <label><?php echo $__t('खोज्नुहोस्', 'Search'); ?></label>
             <div class="input-group input-group-sm">
                 <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
                 <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($search); ?>"
-                       placeholder="नाम, मोबाइल, Tracking ID, नागरिकता नं., ऋण प्रकार...">
+                       placeholder="<?php echo $__t('नाम, मोबाइल, Tracking ID, नागरिकता नं., ऋण प्रकार...', 'name, mobile, Tracking ID, citizenship no., loan type...'); ?>">
                 <?php if ($search): ?>
-                <a href="?status=<?php echo urlencode($status_filter); ?>" class="btn btn-outline-secondary btn-sm" title="खोज हटाउनुहोस्"><i class="fas fa-times"></i></a>
+                <a href="?status=<?php echo urlencode($status_filter); ?>" class="btn btn-outline-secondary btn-sm" title="<?php echo $__t('खोज हटाउनुहोस्', 'Clear search'); ?>"><i class="fas fa-times"></i></a>
                 <?php endif; ?>
             </div>
         </div>
         <div class="col-md-2 col-6">
-            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i>खोज</button>
+            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i><?php echo $__t('खोज', 'Search'); ?></button>
         </div>
         <div class="col-md-1 col-6 text-end">
             <a href="?<?php echo http_build_query(['status'=>$status_filter,'search'=>$search,'export'=>'csv']); ?>" class="btn-csv no-print" title="CSV Export"><i class="fas fa-file-csv"></i> CSV</a>
@@ -430,26 +439,26 @@ if ($viewApp):
 <!-- ── Application Table ── -->
 <div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
-        <h6><i class="fas fa-hand-holding-usd me-2 text-success"></i>ऋण आवेदन सूची</h6>
-        <span class="result-count-badge"><?php echo $total; ?> आवेदन<?php echo $search ? ' — "'.htmlspecialchars($search).'" खोज' : ''; ?></span>
+        <h6><i class="fas fa-hand-holding-usd me-2 text-success"></i><?php echo $__t('ऋण आवेदन सूची', 'Loan Application List'); ?></h6>
+        <span class="result-count-badge"><?php echo $total; ?> <?php echo $__t('आवेदन', 'applications'); ?><?php echo $search ? ' — "'.htmlspecialchars($search).'" '.($__t('खोज', 'search')) : ''; ?></span>
     </div>
     <div class="table-responsive">
         <table class="table-hover table app-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th class="acc-col-applicant">आवेदक</th>
-                    <th>सम्पर्क</th>
-                    <th>ऋण विवरण</th>
-                    <th>रकम</th>
+                    <th class="acc-col-applicant"><?php echo $__t('आवेदक', 'Applicant'); ?></th>
+                    <th><?php echo $__t('सम्पर्क', 'Contact'); ?></th>
+                    <th><?php echo $__t('ऋण विवरण', 'Loan Details'); ?></th>
+                    <th><?php echo $__t('रकम', 'Amount'); ?></th>
                     <th>Tracking ID</th>
-                    <th>दर्ता मिति</th>
-                    <th>स्थिति</th>
-                    <th class="no-print">कार्यहरू</th>
+                    <th><?php echo $__t('दर्ता मिति', 'Created Date'); ?></th>
+                    <th><?php echo $__t('स्थिति', 'Status'); ?></th>
+                    <th class="no-print"><?php echo $__t('कार्यहरू', 'Actions'); ?></th>
                 </tr>
             </thead>
             <tbody>
             <?php if (empty($applications)): ?>
-            <tr class="no-results-row"><td colspan="8"><i class="fas fa-inbox fa-2x d-block mb-2"></i>कुनै आवेदन फेला परेन।</td></tr>
+            <tr class="no-results-row"><td colspan="8"><i class="fas fa-inbox fa-2x d-block mb-2"></i><?php echo $__t('कुनै आवेदन फेला परेन।', 'No applications found.'); ?></td></tr>
             <?php else: foreach ($applications as $app):
                 $trackId = $app['tracking_id'] ?: 'LNP-' . str_pad($app['id'], 6, '0', STR_PAD_LEFT);
                 $initLetter = mb_strtoupper(mb_substr($app['full_name'] ?? 'A', 0, 1));
@@ -461,7 +470,7 @@ if ($viewApp):
                         <div>
                             <div class="cell-main"><?php echo htmlspecialchars($app['full_name']); ?></div>
                             <?php if ($app['member_id']): ?>
-                            <div class="cell-sub">सदस्य: <?php echo htmlspecialchars($app['member_id']); ?></div>
+                            <div class="cell-sub"><?php echo $__t('सदस्य', 'Member'); ?>: <?php echo htmlspecialchars($app['member_id']); ?></div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -472,7 +481,7 @@ if ($viewApp):
                 </td>
                 <td>
                     <div class="cell-main"><?php echo htmlspecialchars($app['loan_type']); ?></div>
-                    <div class="cell-sub"><?php echo $app['loan_tenure'] ? htmlspecialchars($app['loan_tenure']).' महिना' : ''; ?><?php echo $app['collateral_type'] ? ' · '.htmlspecialchars($app['collateral_type']) : ''; ?></div>
+                    <div class="cell-sub"><?php echo $app['loan_tenure'] ? htmlspecialchars($app['loan_tenure']).' '.$__t('महिना', 'months') : ''; ?><?php echo $app['collateral_type'] ? ' · '.htmlspecialchars($app['collateral_type']) : ''; ?></div>
                 </td>
                 <td class="amount-cell">रू.<?php echo number_format((float)$app['loan_amount']); ?></td>
                 <td><span class="track-badge"><?php echo htmlspecialchars($trackId); ?></span></td>
@@ -484,23 +493,23 @@ if ($viewApp):
                 </td>
                 <td class="no-print">
                     <div class="d-flex gap-1 flex-wrap align-items-center">
-                        <a href="loan-applications.php?view=<?php echo $app['id']; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="विस्तृत हेर्नुहोस्">
+                        <a href="loan-applications.php?view=<?php echo $app['id']; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="<?php echo $__t('विस्तृत हेर्नुहोस्', 'View details'); ?>">
                             <i class="fas fa-eye"></i>
                         </a>
                         <?php if ($app['status'] === 'pending' || $app['status'] === 'processing'): ?>
-                        <form method="POST" class="qaction-form" onsubmit="return confirm('यो आवेदन स्वीकृत गर्नुहुन्छ?')">
+                        <form method="POST" class="qaction-form" onsubmit="return confirm('<?php echo $__t('यो आवेदन स्वीकृत गर्नुहुन्छ?', 'Approve this application?'); ?>')">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="quick_status" value="1">
                             <input type="hidden" name="quick_id" value="<?php echo $app['id']; ?>">
                             <input type="hidden" name="quick_status_val" value="approved">
-                            <button type="submit" class="btn-qapprove"><i class="fas fa-check me-1"></i>स्वीकृत</button>
+                            <button type="submit" class="btn-qapprove"><i class="fas fa-check me-1"></i><?php echo $__t('स्वीकृत', 'Approve'); ?></button>
                         </form>
-                        <form method="POST" class="qaction-form" onsubmit="return confirm('यो आवेदन अस्वीकृत गर्नुहुन्छ?')">
+                        <form method="POST" class="qaction-form" onsubmit="return confirm('<?php echo $__t('यो आवेदन अस्वीकृत गर्नुहुन्छ?', 'Reject this application?'); ?>')">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="quick_status" value="1">
                             <input type="hidden" name="quick_id" value="<?php echo $app['id']; ?>">
                             <input type="hidden" name="quick_status_val" value="rejected">
-                            <button type="submit" class="btn-qreject"><i class="fas fa-times me-1"></i>अस्वीकृत</button>
+                            <button type="submit" class="btn-qreject"><i class="fas fa-times me-1"></i><?php echo $__t('अस्वीकृत', 'Reject'); ?></button>
                         </form>
                         <?php endif; ?>
                     </div>
@@ -518,7 +527,7 @@ if ($viewApp):
             $prevPage = $page > 1 ? $page - 1 : null;
             $nextPage = $page < $totalPages ? $page + 1 : null;
             ?>
-            <a href="?<?php echo http_build_query(array_merge($qs,['page'=>1])); ?>" class="<?php echo $page==1?'disabled':''; ?>" title="पहिलो"><i class="fas fa-angle-double-left"></i></a>
+            <a href="?<?php echo http_build_query(array_merge($qs,['page'=>1])); ?>" class="<?php echo $page==1?'disabled':''; ?>" title="<?php echo $__t('पहिलो', 'First'); ?>"><i class="fas fa-angle-double-left"></i></a>
             <a href="<?php echo $prevPage ? '?'.http_build_query(array_merge($qs,['page'=>$prevPage])) : '#'; ?>" class="<?php echo !$prevPage?'disabled':''; ?>"><i class="fas fa-angle-left"></i></a>
             <?php
             $start = max(1, $page - 2); $end = min($totalPages, $page + 2);
@@ -530,8 +539,8 @@ if ($viewApp):
             <a href="?<?php echo http_build_query(array_merge($qs,['page'=>$i])); ?>"><?php echo $i; ?></a>
             <?php endif; endfor; ?>
             <a href="<?php echo $nextPage ? '?'.http_build_query(array_merge($qs,['page'=>$nextPage])) : '#'; ?>" class="<?php echo !$nextPage?'disabled':''; ?>"><i class="fas fa-angle-right"></i></a>
-            <a href="?<?php echo http_build_query(array_merge($qs,['page'=>$totalPages])); ?>" class="<?php echo $page==$totalPages?'disabled':''; ?>" title="अन्तिम"><i class="fas fa-angle-double-right"></i></a>
-            <span class="acc-page-meta"><?php echo $page; ?>/<?php echo $totalPages; ?> पेज · <?php echo $total; ?> रेकर्ड</span>
+            <a href="?<?php echo http_build_query(array_merge($qs,['page'=>$totalPages])); ?>" class="<?php echo $page==$totalPages?'disabled':''; ?>" title="<?php echo $__t('अन्तिम', 'Last'); ?>"><i class="fas fa-angle-double-right"></i></a>
+            <span class="acc-page-meta"><?php echo $page; ?>/<?php echo $totalPages; ?> <?php echo $__t('पेज', 'pages'); ?> · <?php echo $total; ?> <?php echo $__t('रेकर्ड', 'records'); ?></span>
         </div>
     </div>
     <?php endif; ?>

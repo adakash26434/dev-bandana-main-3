@@ -8,6 +8,9 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/../includes/election-tables.php';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 requireMemberLogin();
 memberSecurityHeaders();
 
@@ -30,7 +33,7 @@ if ($cycleId > 0) {
     if ($cycle) $cycleId = (int)$cycle['id'];
 }
 
-$pageTitle = 'मतदान — ' . ($cycle['title_np'] ?? 'निर्वाचन');
+$pageTitle = $_t('मतदान', 'Voting') . ' — ' . ($cycle['title_np'] ?? $_t('निर्वाचन', 'Election'));
 $_active = 'election';
 
 $flash = '';
@@ -59,11 +62,11 @@ if ($cycle && !empty($cycle['vote_end_at'])) {
 /* Submit handle */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submit_vote' && $cycle) {
     if (!verifyCSRFToken()) {
-        $flash = 'सुरक्षा जाँच असफल।'; $flashType = 'danger';
+        $flash = $_t('सुरक्षा जाँच असफल।', 'Security check failed.'); $flashType = 'danger';
     } elseif ($alreadyVoted) {
-        $flash = 'तपाईंले पहिल्यै मतदान गरिसक्नु भएको छ।'; $flashType = 'warning';
+        $flash = $_t('तपाईंले पहिल्यै मतदान गरिसक्नु भएको छ।', 'You have already voted.'); $flashType = 'warning';
     } elseif (!$votingOpen) {
-        $flash = 'मतदान समय बाहिर छ।'; $flashType = 'warning';
+        $flash = $_t('मतदान समय बाहिर छ।', 'Voting is closed for this time window.'); $flashType = 'warning';
     } else {
         $picks = $_POST['picks'] ?? [];   /* picks[position_id] = [candidate_id,...] */
         if (!is_array($picks)) $picks = [];
@@ -95,16 +98,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
             }
             $db->commit();
             $alreadyVoted = true;
-            $flash = 'तपाईंको मत सफलतापूर्वक रेकर्ड भयो। धन्यवाद!';
+            $flash = $_t('तपाईंको मत सफलतापूर्वक रेकर्ड भयो। धन्यवाद!', 'Your vote has been recorded successfully. Thank you!');
             $flashType = 'success';
         } catch (Throwable $e) {
             if ($db->inTransaction()) $db->rollBack();
             $sqlState = ($e instanceof PDOException) ? ($e->getCode() ?: '') : '';
             if ($sqlState === '23000' || str_contains($e->getMessage(), 'uniq_cycle_member') || str_contains($e->getMessage(), 'Duplicate')) {
                 $alreadyVoted = true;
-                $flash = 'तपाईंले पहिल्यै मतदान गरिसक्नु भएको छ।'; $flashType = 'warning';
+                $flash = $_t('तपाईंले पहिल्यै मतदान गरिसक्नु भएको छ।', 'You have already voted.'); $flashType = 'warning';
             } else {
-                $flash = 'त्रुटि: ' . $e->getMessage(); $flashType = 'danger';
+                $flash = $_t('त्रुटि', 'Error') . ': ' . $e->getMessage(); $flashType = 'danger';
             }
         }
     }
@@ -130,7 +133,7 @@ if ($cycle) {
         foreach ($positions as $pp) {
             $key = (int)($pp['committee_type_id'] ?? 0);
             if (!isset($samitiGroups[$key])) {
-                $samitiGroups[$key] = ['name' => $pp['ctype_np'] ?: 'अन्य', 'positions' => []];
+                $samitiGroups[$key] = ['name' => $pp['ctype_np'] ?: $_t('अन्य', 'Other'), 'positions' => []];
             }
             $samitiGroups[$key]['positions'][] = $pp;
         }
@@ -167,8 +170,8 @@ require __DIR__ . '/includes/chrome.php';
 <main class="mp-main py-4">
 <div class="mp-container mp-container-medium">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h1 class="h4 mb-0"><i class="fas fa-check-to-slot me-2"></i>मतदान</h1>
-        <?php if ($cycle): ?><span class="badge bg-light text-dark border">कुल मतदाता: <?php echo $totalVoters; ?></span><?php endif; ?>
+        <h1 class="h4 mb-0"><i class="fas fa-check-to-slot me-2"></i><?php echo $_t('मतदान', 'Voting'); ?></h1>
+        <?php if ($cycle): ?><span class="badge bg-light text-dark border"><?php echo $_t('कुल मतदाता', 'Total Voters'); ?>: <?php echo $totalVoters; ?></span><?php endif; ?>
     </div>
 
     <?php if ($flash): ?>
@@ -176,28 +179,28 @@ require __DIR__ . '/includes/chrome.php';
     <?php endif; ?>
 
     <?php if (!$cycle): ?>
-        <div class="alert alert-info">कुनै सक्रिय निर्वाचन छैन।</div>
+        <div class="alert alert-info"><?php echo $_t('कुनै सक्रिय निर्वाचन छैन।', 'No active election found.'); ?></div>
     <?php else: ?>
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
                 <div class="vote-cycle-head">
                     <h2 class="h5 mb-1"><?php echo htmlspecialchars($cycle['title_np']); ?></h2>
                     <?php if (!empty($cycle['period_label'])): ?>
-                        <span class="vote-cycle-tenure"><i class="fas fa-calendar-alt me-1"></i>कार्यकाल: <?php echo htmlspecialchars((string)$cycle['period_label']); ?></span>
+                        <span class="vote-cycle-tenure"><i class="fas fa-calendar-alt me-1"></i><?php echo $_t('कार्यकाल', 'Tenure'); ?>: <?php echo htmlspecialchars((string)$cycle['period_label']); ?></span>
                     <?php endif; ?>
                 </div>
                 <?php if (!empty($cycle['vote_start_at'])): ?>
-                    <div class="small mt-1"><i class="fas fa-clock me-1"></i><?php echo htmlspecialchars((string)$cycle['vote_start_at']); ?> देखि <?php echo htmlspecialchars((string)$cycle['vote_end_at']); ?> सम्म (नेपाल समय)</div>
+                    <div class="small mt-1"><i class="fas fa-clock me-1"></i><?php echo htmlspecialchars((string)$cycle['vote_start_at']); ?> <?php echo $_t('देखि', 'to'); ?> <?php echo htmlspecialchars((string)$cycle['vote_end_at']); ?> <?php echo $_t('सम्म (नेपाल समय)', '(Nepal Time)'); ?></div>
                 <?php endif; ?>
                 <div class="mt-2">
                     <?php if ($alreadyVoted): ?>
-                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>मत दिइसकिएको छ</span>
+                        <span class="badge bg-success"><i class="fas fa-check me-1"></i><?php echo $_t('मत दिइसकिएको छ', 'Vote already submitted'); ?></span>
                     <?php elseif ($votingOpen): ?>
-                        <span class="badge bg-success">मतदान खुला छ</span>
+                        <span class="badge bg-success"><?php echo $_t('मतदान खुला छ', 'Voting is open'); ?></span>
                     <?php elseif (!empty($cycle['voting_enabled'])): ?>
-                        <span class="badge bg-warning text-dark">समय बाहिर</span>
+                        <span class="badge bg-warning text-dark"><?php echo $_t('समय बाहिर', 'Outside time window'); ?></span>
                     <?php else: ?>
-                        <span class="badge bg-secondary">मतदान बन्द</span>
+                        <span class="badge bg-secondary"><?php echo $_t('मतदान बन्द', 'Voting closed'); ?></span>
                     <?php endif; ?>
                 </div>
                 <?php if (!$alreadyVoted && !empty($cycle['vote_start_at']) && !empty($cycle['vote_end_at'])): ?>
@@ -244,11 +247,11 @@ require __DIR__ . '/includes/chrome.php';
                         <div class="card mb-3 shadow-sm">
                             <div class="card-header d-flex justify-content-between flex-wrap">
                                 <h6 class="mb-0"><i class="fas fa-briefcase me-1"></i><?php echo htmlspecialchars($pos['title_np']); ?></h6>
-                                <span class="badge bg-info text-dark">अधिकतम मत: <?php echo $maxV; ?></span>
+                                <span class="badge bg-info text-dark"><?php echo $_t('अधिकतम मत', 'Max Votes'); ?>: <?php echo $maxV; ?></span>
                             </div>
                             <div class="card-body">
                                 <?php if (empty($list)): ?>
-                                    <div class="text-muted small">यस पदमा उम्मेदवार छैन।</div>
+                                    <div class="text-muted small"><?php echo $_t('यस पदमा उम्मेदवार छैन।', 'No candidates for this position.'); ?></div>
                                 <?php else: ?>
                                 <div class="row g-3" data-position="<?php echo (int)$pos['id']; ?>" data-max="<?php echo $maxV; ?>">
                                     <?php foreach ($list as $cd): $cnt = $tally[(int)$cd['id']] ?? 0; $maxT = max(1, !empty($tally) ? max($tally) : 1); ?>
@@ -268,7 +271,7 @@ require __DIR__ . '/includes/chrome.php';
                                                     <div class="small text-muted mt-1"><?php echo nl2br(htmlspecialchars(mb_substr($cd['bio_np'], 0, 120))); ?><?php echo mb_strlen($cd['bio_np']) > 120 ? '…' : ''; ?></div>
                                                 <?php endif; ?>
                                                 <?php if ($resultsVisible): ?>
-                                                <div class="small text-muted mt-2">हालसम्म मत: <strong><?php echo $cnt; ?></strong>
+                                                <div class="small text-muted mt-2"><?php echo $_t('हालसम्म मत', 'Votes so far'); ?>: <strong><?php echo $cnt; ?></strong>
                                                     <div class="tally-bar"><div style="width:<?php echo round($cnt/$maxT*100); ?>%"></div></div>
                                                 </div>
                                                 <?php endif; ?>
@@ -286,7 +289,7 @@ require __DIR__ . '/includes/chrome.php';
 
             <?php if ($canVoteNow): ?>
                 <div class="d-flex justify-content-end gap-2 mb-5">
-                    <button type="button" class="btn btn-primary btn-lg" id="reviewBtn"><i class="fas fa-eye me-1"></i>समीक्षा र पुष्टि</button>
+                    <button type="button" class="btn btn-primary btn-lg" id="reviewBtn"><i class="fas fa-eye me-1"></i><?php echo $_t('समीक्षा र पुष्टि', 'Review & Confirm'); ?></button>
                 </div>
             <?php endif; ?>
 
@@ -294,12 +297,12 @@ require __DIR__ . '/includes/chrome.php';
             <div class="modal fade" id="confirmModal" tabindex="-1">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header"><h5 class="modal-title"><i class="fas fa-clipboard-check me-2"></i>पुष्टि गर्नुहोस्</h5>
+                        <div class="modal-header"><h5 class="modal-title"><i class="fas fa-clipboard-check me-2"></i><?php echo $_t('पुष्टि गर्नुहोस्', 'Confirm'); ?></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                         <div class="modal-body" id="confirmBody"></div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">सच्याउनुहोस्</button>
-                            <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>मत दर्ज गर्नुहोस्</button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><?php echo $_t('सच्याउनुहोस्', 'Edit'); ?></button>
+                            <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i><?php echo $_t('मत दर्ज गर्नुहोस्', 'Submit Vote'); ?></button>
                         </div>
                     </div>
                 </div>
@@ -317,14 +320,14 @@ require __DIR__ . '/includes/chrome.php';
                     var checked = g.querySelectorAll('.vote-input:checked');
                     if (checked.length > max) {
                         e.target.checked = false;
-                        alert('यस पदमा अधिकतम ' + max + ' मत मात्र दिन सकिन्छ।');
+                        alert('<?php echo addslashes($_t('यस पदमा अधिकतम', 'You can cast maximum')); ?> ' + max + ' <?php echo addslashes($_t('मत मात्र दिन सकिन्छ।', 'votes for this position.')); ?>');
                     }
                     g.querySelectorAll('.vote-card').forEach(function(c){ c.classList.remove('selected'); });
                     g.querySelectorAll('.vote-input:checked').forEach(function(i){ i.closest('.vote-card').classList.add('selected'); });
                 });
             });
             document.getElementById('reviewBtn').addEventListener('click', function(){
-                var html = '<p class="small text-muted">तल देखाइएका उम्मेदवारहरूलाई मत दिनुभएको हो? पुष्टि पछि सच्याउन मिल्दैन।</p><ul class="list-group">';
+                var html = '<p class="small text-muted"><?php echo addslashes($_t('तल देखाइएका उम्मेदवारहरूलाई मत दिनुभएको हो? पुष्टि पछि सच्याउन मिल्दैन।', 'Are you sure you want to vote for the candidates below? You cannot edit after confirmation.')); ?></p><ul class="list-group">';
                 var any = false;
                 document.querySelectorAll('[data-position]').forEach(function(g){
                     var posTitle = g.closest('.card').querySelector('.card-header h6').innerText;
@@ -332,10 +335,10 @@ require __DIR__ . '/includes/chrome.php';
                     var names = [];
                     checked.forEach(function(i){ names.push(i.closest('.vote-card').querySelector('strong').innerText); });
                     if (names.length) any = true;
-                    html += '<li class="list-group-item"><strong>' + posTitle + ':</strong> ' + (names.length ? names.join(', ') : '<em class="text-muted">कोही छानिएको छैन</em>') + '</li>';
+                    html += '<li class="list-group-item"><strong>' + posTitle + ':</strong> ' + (names.length ? names.join(', ') : '<em class="text-muted"><?php echo addslashes($_t('कोही छानिएको छैन', 'No one selected')); ?></em>') + '</li>';
                 });
                 html += '</ul>';
-                if (!any) { alert('कम्तिमा एक उम्मेदवार छान्नुहोस्।'); return; }
+                if (!any) { alert('<?php echo addslashes($_t('कम्तिमा एक उम्मेदवार छान्नुहोस्।', 'Please select at least one candidate.')); ?>'); return; }
                 document.getElementById('confirmBody').innerHTML = html;
                 new bootstrap.Modal(document.getElementById('confirmModal')).show();
             });
@@ -344,7 +347,7 @@ require __DIR__ . '/includes/chrome.php';
         <?php endif; ?>
 
         <?php if ($resultsVisible): ?>
-            <h2 class="h6 mb-3"><i class="fas fa-chart-bar me-2"></i>हालको परिणाम (live)</h2>
+            <h2 class="h6 mb-3"><i class="fas fa-chart-bar me-2"></i><?php echo $_t('हालको परिणाम (live)', 'Current Results (Live)'); ?></h2>
             <?php foreach ($positions as $pos): $list = $candByPos[(int)$pos['id']] ?? [];
                   usort($list, fn($a,$b) => ($tally[(int)$b['id']]??0) - ($tally[(int)$a['id']]??0));
                   $maxT = max(1, !empty($tally) ? max($tally) : 1); ?>
@@ -363,7 +366,7 @@ require __DIR__ . '/includes/chrome.php';
                                 <div class="fw-bold"><?php echo $cnt; ?></div>
                             </div>
                         <?php endforeach; ?>
-                        <?php if (empty($list)): ?><div class="text-muted small">उम्मेदवार छैन।</div><?php endif; ?>
+                        <?php if (empty($list)): ?><div class="text-muted small"><?php echo $_t('उम्मेदवार छैन।', 'No candidates.'); ?></div><?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -373,7 +376,7 @@ require __DIR__ . '/includes/chrome.php';
             </div>
         <?php endif; ?>
         <?php else: ?>
-            <div class="alert alert-info">यस निर्वाचनका लागि उम्मेदवार/पदहरू अझै प्रकाशित गरिएको छैन।</div>
+            <div class="alert alert-info"><?php echo $_t('यस निर्वाचनका लागि उम्मेदवार/पदहरू अझै प्रकाशित गरिएको छैन।', 'Candidates/positions are not published for this election yet.'); ?></div>
         <?php endif; ?>
     <?php endif; ?>
 </div>
@@ -420,11 +423,11 @@ require __DIR__ . '/includes/chrome.php';
     function tick() {
         var now = new Date();
         if (now < start) {
-            el.innerHTML = '<i class="fas fa-hourglass-start me-1"></i> मतदान सुरु हुन बाँकी: <strong>' + fmt(start - now) + '</strong>';
+            el.innerHTML = '<i class="fas fa-hourglass-start me-1"></i> <?php echo addslashes($_t('मतदान सुरु हुन बाँकी', 'Voting starts in')); ?>: <strong>' + fmt(start - now) + '</strong>';
         } else if (now <= end) {
-            el.innerHTML = '<i class="fas fa-hourglass-half me-1"></i> मतदान बन्द हुन बाँकी: <strong>' + fmt(end - now) + '</strong>';
+            el.innerHTML = '<i class="fas fa-hourglass-half me-1"></i> <?php echo addslashes($_t('मतदान बन्द हुन बाँकी', 'Voting ends in')); ?>: <strong>' + fmt(end - now) + '</strong>';
         } else {
-            el.innerHTML = '<i class="fas fa-hourglass-end me-1"></i> मतदान समय समाप्त भयो।';
+            el.innerHTML = '<i class="fas fa-hourglass-end me-1"></i> <?php echo addslashes($_t('मतदान समय समाप्त भयो।', 'Voting time has ended.')); ?>';
             clearInterval(timer);
         }
     }

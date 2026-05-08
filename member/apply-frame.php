@@ -6,47 +6,50 @@
 require_once __DIR__ . '/_bootstrap.php';
 requireMemberLogin();
 memberSecurityHeaders();
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $frames = [
     'appointment' => [
         'path' => 'appointment.php',
-        'title' => 'भेटघाट बुक गर्नुहोस्',
-        'hint' => 'तलको फारममा तपाईंको प्रोफाइल/KYC बाट विवरण auto-fill हुनेछ। मिति र उद्देश्य भर्नुहोस्।',
+        'title' => $_t('भेटघाट बुक गर्नुहोस्', 'Book Appointment'),
+        'hint' => $_t('तलको फारममा तपाईंको प्रोफाइल/KYC बाट विवरण auto-fill हुनेछ। मिति र उद्देश्य भर्नुहोस्।', 'Your profile/KYC details will auto-fill below. Fill date and purpose.'),
     ],
     'kyc' => [
         'path' => 'online-kyc.php',
-        'title' => 'KYC दर्ता / अपडेट',
-        'hint' => 'अनलाइन KYC फारम — लगिन सत्र प्रयोग भइरहेको छ।',
+        'title' => $_t('KYC दर्ता / अपडेट', 'KYC Register / Update'),
+        'hint' => $_t('अनलाइन KYC फारम — लगिन सत्र प्रयोग भइरहेको छ।', 'Online KYC form using your current login session.'),
     ],
     'loan' => [
         'path' => 'loan-apply.php',
-        'title' => 'ऋण आवेदन',
-        'hint' => 'सदस्य प्रोफाइल अनुसार नाम, सम्पर्क आदि भरिनेछन्। ऋण विवरण मात्र थप्नुहोस्।',
+        'title' => $_t('ऋण आवेदन', 'Loan Application'),
+        'hint' => $_t('सदस्य प्रोफाइल अनुसार नाम, सम्पर्क आदि भरिनेछन्। ऋण विवरण मात्र थप्नुहोस्।', 'Name/contact will auto-fill from profile. Add loan details only.'),
     ],
     'account' => [
         'path' => 'online-account.php',
-        'title' => 'खाता खोल्ने आवेदन',
-        'hint' => 'व्यक्तिगत विवरण प्रोफाइलबाट लिइन्छ। खाता प्रकार र अन्य विवरण भर्नुहोस्।',
+        'title' => $_t('खाता खोल्ने आवेदन', 'Open Account Application'),
+        'hint' => $_t('व्यक्तिगत विवरण प्रोफाइलबाट लिइन्छ। खाता प्रकार र अन्य विवरण भर्नुहोस्।', 'Personal details come from profile. Fill account type and other details.'),
     ],
     'digital' => [
         'path' => 'digital-services.php',
-        'title' => 'डिजिटल सेवा अनुरोध',
-        'hint' => 'डिजिटल सेवा छानेर विवरण पठाउनुहोस्।',
+        'title' => $_t('डिजिटल सेवा अनुरोध', 'Digital Service Request'),
+        'hint' => $_t('डिजिटल सेवा छानेर विवरण पठाउनुहोस्।', 'Choose digital service and submit details.'),
     ],
     'grievance' => [
         'path' => 'grievance.php',
-        'title' => 'गुनासो दर्ता',
-        'hint' => 'सम्पर्क विवरण प्रोफाइलबाट भरिनेछ। गुनासो विवरण लेख्नुहोस्।',
+        'title' => $_t('गुनासो दर्ता', 'Submit Grievance'),
+        'hint' => $_t('सम्पर्क विवरण प्रोफाइलबाट भरिनेछ। गुनासो विवरण लेख्नुहोस्।', 'Contact details auto-fill from profile. Write grievance details.'),
     ],
     'career' => [
         'path' => 'career.php',
-        'title' => 'रोजगार / जागिर',
-        'hint' => 'खुला पदहरू र आवेदन यही फ्रेमभित्र।',
+        'title' => $_t('रोजगार / जागिर', 'Career / Job'),
+        'hint' => $_t('खुला पदहरू र आवेदन यही फ्रेमभित्र।', 'Open vacancies and applications are available in this frame.'),
     ],
     'emi' => [
         'path' => 'emi-calculator.php',
-        'title' => 'EMI गणना',
-        'hint' => 'किस्ता क्यालकुलेटर — सार्वजनिक उपकरण।',
+        'title' => $_t('EMI गणना', 'EMI Calculator'),
+        'hint' => $_t('किस्ता क्यालकुलेटर — सार्वजनिक उपकरण।', 'Installment calculator — public tool.'),
     ],
 ];
 
@@ -85,13 +88,13 @@ require __DIR__ . '/includes/chrome.php';
 <div class="mem-alert mem-alert-info" style="margin-bottom:14px;font-size:0.86rem;line-height:1.5;">
     <i class="fas fa-shield-halved"></i>
     <?php echo htmlspecialchars($meta['hint']); ?>
-    <span class="d-block mt-1" style="opacity:.9;">सम्पूर्ण आवेदन सुरक्षित रूपमा सहकारीमा पठाइन्छ।</span>
+    <span class="d-block mt-1" style="opacity:.9;"><?php echo $_t('सम्पूर्ण आवेदन सुरक्षित रूपमा सहकारीमा पठाइन्छ।', 'All applications are sent securely to the cooperative.'); ?></span>
 </div>
 
 <div class="mem-card mem-apply-frame-card">
     <div class="mem-card-header" style="padding:12px 16px;">
         <div class="mem-card-title" style="font-size:0.92rem;"><i class="fas fa-file-signature"></i><?php echo htmlspecialchars($meta['title']); ?></div>
-        <a href="<?php echo SITE_URL; ?>member/tracker.php" style="font-size:0.78rem;font-weight:700;color:var(--mem-primary);text-decoration:none;white-space:nowrap;">Tracker →</a>
+        <a href="<?php echo SITE_URL; ?>member/tracker.php" style="font-size:0.78rem;font-weight:700;color:var(--mem-primary);text-decoration:none;white-space:nowrap;"><?php echo $_t('ट्र्याकर', 'Tracker'); ?> →</a>
     </div>
     <div class="mem-card-body" style="padding:0;">
         <iframe class="mem-public-form-frame" title="<?php echo htmlspecialchars($meta['title']); ?>"

@@ -5,13 +5,16 @@
  */
 require_once '../includes/config.php';
 require_once '../includes/member-auth.php';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $provider = strtolower(trim((string)($_GET['provider'] ?? '')));
 $code     = (string)($_GET['code'] ?? '');
 $state    = (string)($_GET['state'] ?? '');
 $error_p  = (string)($_GET['error'] ?? '');
 if (!in_array($provider, ['google', 'facebook'], true)) {
-    oauthRedirectError('Unknown OAuth provider.');
+    oauthRedirectError($_t('अज्ञात OAuth provider।', 'Unknown OAuth provider.'));
 }
 $code  = mb_substr(str_replace("\0", '', $code), 0, 4096, 'UTF-8');
 $state = mb_substr(str_replace("\0", '', $state), 0, 512, 'UTF-8');
@@ -24,7 +27,7 @@ function oauthRedirectError($msg) {
 
 /* State CSRF check — state is ALWAYS required */
 if ($error_p) {
-    oauthRedirectError('OAuth रद्द भयो। पुनः प्रयास गर्नुहोस्।');
+    oauthRedirectError($_t('OAuth रद्द भयो। पुनः प्रयास गर्नुहोस्।', 'OAuth cancelled. Please try again.'));
 }
 if (!$code || !$state || !isset($_SESSION['oauth_state']) || !hash_equals($_SESSION['oauth_state'], $state)) {
     oauthRedirectError('OAuth security check failed. Please try again.');
@@ -37,7 +40,7 @@ if ($provider === 'google') {
     $clientSecret = getSetting('google_client_secret', '');
     $redirectUri  = SITE_URL . 'member/oauth.php?provider=google';
 
-    if (!$clientId || !$clientSecret) oauthRedirectError('Google OAuth configured chaina. Admin lai bhetnu.');
+    if (!$clientId || !$clientSecret) oauthRedirectError($_t('Google OAuth configure भएको छैन। Admin लाई भेट्नुहोस्।', 'Google OAuth is not configured. Please contact admin.'));
 
     /* Exchange code for token */
     $tokenResp = file_get_contents('https://oauth2.googleapis.com/token', false, stream_context_create([
@@ -87,7 +90,7 @@ if ($provider === 'facebook') {
     $appSecret = getSetting('facebook_app_secret', '');
     $redirectUri = SITE_URL . 'member/oauth.php?provider=facebook';
 
-    if (!$appId || !$appSecret) oauthRedirectError('Facebook OAuth configured chaina. Admin lai bhetnu.');
+    if (!$appId || !$appSecret) oauthRedirectError($_t('Facebook OAuth configure भएको छैन। Admin लाई भेट्नुहोस्।', 'Facebook OAuth is not configured. Please contact admin.'));
 
     /* Exchange code for token */
     $tokenUrl = 'https://graph.facebook.com/v18.0/oauth/access_token?' . http_build_query([
@@ -122,4 +125,4 @@ if ($provider === 'facebook') {
     exit;
 }
 
-oauthRedirectError('Unknown OAuth provider.');
+oauthRedirectError($_t('अज्ञात OAuth provider।', 'Unknown OAuth provider.'));

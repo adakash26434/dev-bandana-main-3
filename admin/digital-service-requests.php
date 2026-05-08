@@ -1,5 +1,8 @@
 <?php
-$pageTitle = 'डिजिटल सेवा अनुरोधहरू';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle = $__t('डिजिटल सेवा अनुरोधहरू', 'Digital Service Requests');
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
@@ -14,25 +17,25 @@ ensureDigitalServiceRequestsTables($db);
 checkCSRF();
 
 $statusLabels = [
-    'pending' => ['np' => 'पेन्डिङ', 'class' => 'warning'],
-    'processing' => ['np' => 'प्रक्रियामा', 'class' => 'info'],
-    'approved' => ['np' => 'स्वीकृत', 'class' => 'success'],
-    'rejected' => ['np' => 'अस्वीकृत', 'class' => 'danger'],
-    'completed' => ['np' => 'सम्पन्न', 'class' => 'primary']
+    'pending' => ['np' => 'पेन्डिङ', 'en' => 'Pending', 'class' => 'warning'],
+    'processing' => ['np' => 'प्रक्रियामा', 'en' => 'Processing', 'class' => 'info'],
+    'approved' => ['np' => 'स्वीकृत', 'en' => 'Approved', 'class' => 'success'],
+    'rejected' => ['np' => 'अस्वीकृत', 'en' => 'Rejected', 'class' => 'danger'],
+    'completed' => ['np' => 'सम्पन्न', 'en' => 'Completed', 'class' => 'primary']
 ];
 
 $serviceLabels = [
-    'missed_call_banking' => 'मिस्ड कल बैंकिङ',
-    'statement_request' => 'स्टेटमेन्ट अनुरोध',
-    'bill_payment' => 'बिल भुक्तानी सहयोग',
-    'mobile_recharge' => 'मोबाइल रिचार्ज',
-    'internet_banking' => 'इन्टरनेट/मोबाइल बैंकिङ',
-    'sms_alert' => 'SMS अलर्ट',
-    'card_service' => 'कार्ड सेवा',
-    'qr_payment' => 'QR/डिजिटल भुक्तानी',
-    'share_refund' => 'शेयर फिर्ता',
-    'share_increase' => 'शेयर वृद्धि',
-    'other' => 'अन्य'
+    'missed_call_banking' => ['np' => 'मिस्ड कल बैंकिङ', 'en' => 'Missed Call Banking'],
+    'statement_request' => ['np' => 'स्टेटमेन्ट अनुरोध', 'en' => 'Statement Request'],
+    'bill_payment' => ['np' => 'बिल भुक्तानी सहयोग', 'en' => 'Bill Payment Support'],
+    'mobile_recharge' => ['np' => 'मोबाइल रिचार्ज', 'en' => 'Mobile Recharge'],
+    'internet_banking' => ['np' => 'इन्टरनेट/मोबाइल बैंकिङ', 'en' => 'Internet/Mobile Banking'],
+    'sms_alert' => ['np' => 'SMS अलर्ट', 'en' => 'SMS Alert'],
+    'card_service' => ['np' => 'कार्ड सेवा', 'en' => 'Card Service'],
+    'qr_payment' => ['np' => 'QR/डिजिटल भुक्तानी', 'en' => 'QR/Digital Payment'],
+    'share_refund' => ['np' => 'शेयर फिर्ता', 'en' => 'Share Refund'],
+    'share_increase' => ['np' => 'शेयर वृद्धि', 'en' => 'Share Increase'],
+    'other' => ['np' => 'अन्य', 'en' => 'Other']
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -62,18 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $status, $remarks, $nData['tracking_id'] ?? '');
                 }
             } catch (Exception $e) { /* notification fail भए पनि main काम रोकिँदैन */ }
-            setFlash('success', 'डिजिटल सेवा अनुरोध अपडेट भयो।');
+            setFlash('success', $__t('डिजिटल सेवा अनुरोध अपडेट भयो।', 'Digital service request updated.'));
             redirect('digital-service-requests.php');
         }
         if (isset($_POST['delete_request'])) {
             $requestId = (int)$_POST['request_id'];
             $stmt = $db->prepare("DELETE FROM digital_service_requests WHERE id = ?");
             $stmt->execute([$requestId]);
-            setFlash('success', 'अनुरोध हटाइयो।');
+            setFlash('success', $__t('अनुरोध हटाइयो।', 'Request deleted.'));
             redirect('digital-service-requests.php');
         }
     } catch (Exception $e) {
-        setFlash('error', 'त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।');
+        setFlash('error', $__t('त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।', 'An error occurred. Please try again later.'));
     }
 }
 
@@ -90,14 +93,14 @@ $stmt = $db->prepare("SELECT * FROM digital_service_requests WHERE id = ?");
 $stmt->execute([$id]);
 $request = $stmt->fetch();
 if (!$request) {
-    setFlash('error', 'अनुरोध फेला परेन।');
+    setFlash('error', $__t('अनुरोध फेला परेन।', 'Request not found.'));
     redirect('digital-service-requests.php');
 }
 ?>
 <div class="card admin-table-card mb-4">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-mobile-alt"></i> अनुरोध विवरण - <?php echo e($request['tracking_id']); ?></h5>
-        <a href="digital-service-requests.php" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-1"></i>फिर्ता</a>
+        <h5 class="mb-0"><i class="fas fa-mobile-alt"></i> <?php echo $__t('अनुरोध विवरण', 'Request Details'); ?> - <?php echo e($request['tracking_id']); ?></h5>
+        <a href="digital-service-requests.php" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-1"></i><?php echo $__t('फिर्ता', 'Back'); ?></a>
     </div>
     <div class="card-body">
         <div class="row g-4">
@@ -112,7 +115,7 @@ if (!$request) {
                         </div>
                         <div class="col-md-6">
                             <p><strong>इमेल:</strong> <?php echo e($request['email']) ?: 'N/A'; ?></p>
-                            <p><strong>सेवा:</strong> <?php echo e($request['service_type_np'] ?: ($serviceLabels[$request['service_type']] ?? $request['service_type'])); ?></p>
+                            <p><strong><?php echo $__t('सेवा', 'Service'); ?>:</strong> <?php echo e($request['service_type_np'] ?: (isset($serviceLabels[$request['service_type']]) ? $__t($serviceLabels[$request['service_type']]['np'], $serviceLabels[$request['service_type']]['en']) : $request['service_type'])); ?></p>
                             <p><strong>मिति:</strong> <?php echo formatNepaliDate($request['created_at']); ?></p>
                         </div>
                     </div>
@@ -121,7 +124,7 @@ if (!$request) {
                     <h6><i class="fas fa-list-check"></i> सेवा विवरण</h6>
                     <div class="row">
                         <div class="col-md-6"><p><strong>खाता नं.:</strong> <?php echo e($request['account_number']) ?: 'N/A'; ?></p></div>
-                        <div class="col-md-6"><p><strong>सम्पर्क माध्यम:</strong> <?php echo e($request['preferred_contact']); ?></p></div>
+                        <div class="col-md-6"><p><strong><?php echo $__t('सम्पर्क माध्यम', 'Preferred Contact'); ?>:</strong> <?php echo e($request['preferred_contact']); ?></p></div>
                         <?php if ($request['statement_from'] || $request['statement_to']): ?>
                         <div class="col-md-6"><p><strong>Statement:</strong> <?php echo e($request['statement_from']); ?> - <?php echo e($request['statement_to']); ?></p></div>
                         <?php endif; ?>
@@ -145,35 +148,35 @@ if (!$request) {
                 </div>
                 <?php if ($request['admin_remarks']): ?>
                 <div class="info-section">
-                    <h6><i class="fas fa-note-sticky"></i> टिप्पणी</h6>
+                    <h6><i class="fas fa-note-sticky"></i> <?php echo $__t('टिप्पणी', 'Remarks'); ?></h6>
                     <div class="bg-warning-subtle p-3 rounded"><?php echo nl2br(e($request['admin_remarks'])); ?></div>
                 </div>
                 <?php endif; ?>
             </div>
             <div class="col-lg-4">
                 <div class="card bg-light">
-                    <div class="card-header"><h6 class="mb-0"><i class="fas fa-edit"></i> स्थिति अपडेट</h6></div>
+                    <div class="card-header"><h6 class="mb-0"><i class="fas fa-edit"></i> <?php echo $__t('स्थिति अपडेट', 'Update Status'); ?></h6></div>
                     <div class="card-body">
                         <form method="POST" enctype="multipart/form-data">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="update_status" value="1">
                             <input type="hidden" name="request_id" value="<?php echo (int)$request['id']; ?>">
                             <div class="mb-3">
-                                <label class="form-label">स्थिति</label>
+                                <label class="form-label"><?php echo $__t('स्थिति', 'Status'); ?></label>
                                 <select name="status" class="form-select">
                                     <?php foreach ($statusLabels as $key => $label): ?>
-                                    <option value="<?php echo $key; ?>" <?php echo $request['status'] === $key ? 'selected' : ''; ?>><?php echo $label['np']; ?></option>
+                                    <option value="<?php echo $key; ?>" <?php echo $request['status'] === $key ? 'selected' : ''; ?>><?php echo $__t($label['np'], $label['en']); ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Admin टिप्पणी</label>
+                                <label class="form-label"><?php echo $__t('Admin टिप्पणी', 'Admin Remarks'); ?></label>
                                 <textarea name="admin_remarks" class="form-control" rows="4"><?php echo e($request['admin_remarks']); ?></textarea>
                             </div>
                             <!-- Admin ले सेवा सम्बन्धी document वा instruction attach गर्न सक्छ -->
                             <div class="mb-3">
                                 <label class="form-label">
-                                    <i class="fas fa-paperclip me-1"></i>संलग्न फाइल (Optional)
+                                    <i class="fas fa-paperclip me-1"></i><?php echo $__t('संलग्न फाइल (Optional)', 'Attachment (Optional)'); ?>
                                 </label>
                                 <?php if (!empty($request['admin_attachment'])): ?>
                                 <div class="mb-1"><?php echo adminAttachmentHtml($request['admin_attachment']); ?></div>
@@ -182,14 +185,14 @@ if (!$request) {
                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
                                 <small class="text-muted">PDF, JPG, PNG, DOC — max 5MB</small>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> अपडेट गर्नुहोस्</button>
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> <?php echo $__t('अपडेट गर्नुहोस्', 'Update'); ?></button>
                         </form>
                         <hr>
-                        <form method="POST" onsubmit="return confirm('के तपाईं निश्चित हुनुहुन्छ?');">
+                        <form method="POST" onsubmit="return confirm('<?php echo $__t('के तपाईं निश्चित हुनुहुन्छ?', 'Are you sure?'); ?>');">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="delete_request" value="1">
                             <input type="hidden" name="request_id" value="<?php echo (int)$request['id']; ?>">
-                            <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="fas fa-trash"></i> हटाउनुहोस्</button>
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="fas fa-trash"></i> <?php echo $__t('हटाउनुहोस्', 'Delete'); ?></button>
                         </form>
                     </div>
                 </div>
@@ -256,11 +259,11 @@ try {
     $totalRequests = 0;
 }
 echo adminPageHeader(
-    'डिजिटल सेवा अनुरोधहरू', 'fa-mobile-alt',
-    'अनलाइन डिजिटल सेवा अनुरोधहरूको स्थिति र व्यवस्थापन',
-    adminStatLink('?status=pending', 'danger', 'पेन्डिङ', $statusCounts['pending'] ?? 0)
-    . ' ' . adminStatLink('?status=completed', 'success', 'सम्पन्न', $statusCounts['completed'] ?? 0)
-    . ' ' . adminStatLink('digital-service-requests.php', 'secondary', 'जम्मा', $totalRequests)
+    $__t('डिजिटल सेवा अनुरोधहरू', 'Digital Service Requests'), 'fa-mobile-alt',
+    $__t('अनलाइन डिजिटल सेवा अनुरोधहरूको स्थिति र व्यवस्थापन', 'Manage status of online digital service requests'),
+    adminStatLink('?status=pending', 'danger', $__t('पेन्डिङ', 'Pending'), $statusCounts['pending'] ?? 0)
+    . ' ' . adminStatLink('?status=completed', 'success', $__t('सम्पन्न', 'Completed'), $statusCounts['completed'] ?? 0)
+    . ' ' . adminStatLink('digital-service-requests.php', 'secondary', $__t('जम्मा', 'Total'), $totalRequests)
 );
 $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['message']);
 ?>
@@ -269,27 +272,27 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
     <a href="digital-service-requests.php" class="stat-mini <?php echo !$filterStatus&&!$filterType&&!$search?'active-filter':''; ?>">
         <div class="sm-icon ic-total"><i class="fas fa-mobile-alt"></i></div>
         <div class="sm-val"><?php echo $totalRequests; ?></div>
-        <div class="sm-lbl">जम्मा</div>
+        <div class="sm-lbl"><?php echo $__t('जम्मा', 'Total'); ?></div>
     </a>
     <a href="?status=pending" class="stat-mini <?php echo $filterStatus==='pending'?'active-filter':''; ?>">
         <div class="sm-icon ic-pending"><i class="fas fa-clock"></i></div>
         <div class="sm-val"><?php echo $statusCounts['pending'] ?? 0; ?></div>
-        <div class="sm-lbl">पेन्डिङ</div>
+        <div class="sm-lbl"><?php echo $__t('पेन्डिङ', 'Pending'); ?></div>
     </a>
     <a href="?status=processing" class="stat-mini <?php echo $filterStatus==='processing'?'active-filter':''; ?>">
         <div class="sm-icon ic-process"><i class="fas fa-spinner"></i></div>
         <div class="sm-val"><?php echo $statusCounts['processing'] ?? 0; ?></div>
-        <div class="sm-lbl">प्रक्रियाधीन</div>
+        <div class="sm-lbl"><?php echo $__t('प्रक्रियाधीन', 'Processing'); ?></div>
     </a>
     <a href="?status=completed" class="stat-mini <?php echo $filterStatus==='completed'?'active-filter':''; ?>">
         <div class="sm-icon ic-approved"><i class="fas fa-check-circle"></i></div>
         <div class="sm-val"><?php echo $statusCounts['completed'] ?? 0; ?></div>
-        <div class="sm-lbl">सम्पन्न</div>
+        <div class="sm-lbl"><?php echo $__t('सम्पन्न', 'Completed'); ?></div>
     </a>
     <a href="?status=rejected" class="stat-mini <?php echo $filterStatus==='rejected'?'active-filter':''; ?>">
         <div class="sm-icon ic-rejected"><i class="fas fa-times-circle"></i></div>
         <div class="sm-val"><?php echo $statusCounts['rejected'] ?? 0; ?></div>
-        <div class="sm-lbl">अस्वीकृत</div>
+        <div class="sm-lbl"><?php echo $__t('अस्वीकृत', 'Rejected'); ?></div>
     </a>
 </div>
 
@@ -297,52 +300,52 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
 <div class="adm-filter-bar no-print">
     <form method="GET" class="row g-2 align-items-end">
         <div class="col-md-2 col-6">
-            <label>स्थिति</label>
+            <label><?php echo $__t('स्थिति', 'Status'); ?></label>
             <select name="status" class="form-select form-select-sm" onchange="this.closest('form').submit()">
-                <option value="">सबै स्थिति</option>
+                <option value=""><?php echo $__t('सबै स्थिति', 'All Status'); ?></option>
                 <?php foreach ($statusLabels as $key => $label): ?>
-                <option value="<?php echo $key; ?>" <?php echo $filterStatus===$key?'selected':''; ?>><?php echo $label['np']; ?></option>
+                <option value="<?php echo $key; ?>" <?php echo $filterStatus===$key?'selected':''; ?>><?php echo $__t($label['np'], $label['en']); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
         <div class="col-md-2 col-6">
-            <label>सेवा</label>
+            <label><?php echo $__t('सेवा', 'Service'); ?></label>
             <select name="type" class="form-select form-select-sm" onchange="this.closest('form').submit()">
-                <option value="">सबै</option>
+                <option value=""><?php echo $__t('सबै', 'All'); ?></option>
                 <?php foreach ($serviceLabels as $key => $label): ?>
-                <option value="<?php echo $key; ?>" <?php echo $filterType===$key?'selected':''; ?>><?php echo $label; ?></option>
+                <option value="<?php echo $key; ?>" <?php echo $filterType===$key?'selected':''; ?>><?php echo $__t($label['np'], $label['en']); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
         <div class="col-md-6 col-12">
-            <label>खोज्नुहोस्</label>
+            <label><?php echo $__t('खोज्नुहोस्', 'Search'); ?></label>
             <div class="input-group input-group-sm">
                 <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
-                <input type="text" name="search" class="form-control" value="<?php echo e($search); ?>" placeholder="Tracking ID, नाम, फोन, सदस्य ID...">
+                <input type="text" name="search" class="form-control" value="<?php echo e($search); ?>" placeholder="<?php echo $__t('Tracking ID, नाम, फोन, सदस्य ID...', 'Tracking ID, name, phone, member ID...'); ?>">
             </div>
         </div>
         <div class="col-md-2 col-6">
-            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i>खोज</button>
-            <?php if ($filterStatus||$filterType||$search): ?><a href="digital-service-requests.php" class="btn btn-outline-secondary btn-sm w-100 mt-1"><i class="fas fa-times me-1"></i>हटाउनुहोस्</a><?php endif; ?>
+            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i><?php echo $__t('खोज', 'Search'); ?></button>
+            <?php if ($filterStatus||$filterType||$search): ?><a href="digital-service-requests.php" class="btn btn-outline-secondary btn-sm w-100 mt-1"><i class="fas fa-times me-1"></i><?php echo $__t('रिसेट', 'Reset'); ?></a><?php endif; ?>
         </div>
     </form>
 </div>
 
 <div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
-        <h6><i class="fas fa-mobile-alt me-2 text-primary"></i>डिजिटल सेवा अनुरोध सूची</h6>
-        <span class="result-count-badge"><?php echo count($requests); ?> रेकर्ड</span>
+        <h6><i class="fas fa-mobile-alt me-2 text-primary"></i><?php echo $__t('डिजिटल सेवा अनुरोध सूची', 'Digital Service Requests List'); ?></h6>
+        <span class="result-count-badge"><?php echo count($requests); ?> <?php echo $__t('रेकर्ड', 'records'); ?></span>
     </div>
     <div class="table-responsive">
         <table class="table-hover table app-table align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Tracking</th>
-                        <th>नाम/सम्पर्क</th>
-                        <th>सेवा</th>
-                        <th>मिति</th>
-                        <th>स्थिति</th>
-                        <th>कार्य</th>
+                        <th><?php echo $__t('नाम/सम्पर्क', 'Name/Contact'); ?></th>
+                        <th><?php echo $__t('सेवा', 'Service'); ?></th>
+                        <th><?php echo $__t('मिति', 'Date'); ?></th>
+                        <th><?php echo $__t('स्थिति', 'Status'); ?></th>
+                        <th><?php echo $__t('कार्य', 'Action'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -353,14 +356,14 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                             <strong><?php echo e($request['requester_name']); ?></strong>
                             <br><small><i class="fas fa-phone"></i> <?php echo e($request['phone']); ?><?php if ($request['email']): ?> | <i class="fas fa-envelope"></i> <?php echo e($request['email']); ?><?php endif; ?></small>
                         </td>
-                        <td><?php echo e($request['service_type_np'] ?: ($serviceLabels[$request['service_type']] ?? $request['service_type'])); ?></td>
+                        <td><?php echo e($request['service_type_np'] ?: (isset($serviceLabels[$request['service_type']]) ? $__t($serviceLabels[$request['service_type']]['np'], $serviceLabels[$request['service_type']]['en']) : $request['service_type'])); ?></td>
                         <td><?php echo formatNepaliDate($request['created_at']); ?></td>
-                        <td><span class="badge bg-<?php echo $statusLabels[$request['status']]['class'] ?? 'secondary'; ?>"><?php echo $statusLabels[$request['status']]['np'] ?? e($request['status']); ?></span></td>
+                        <td><span class="badge bg-<?php echo $statusLabels[$request['status']]['class'] ?? 'secondary'; ?>"><?php echo isset($statusLabels[$request['status']]) ? $__t($statusLabels[$request['status']]['np'], $statusLabels[$request['status']]['en']) : e($request['status']); ?></span></td>
                         <td><a href="?action=view&id=<?php echo (int)$request['id']; ?>" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a></td>
                     </tr>
                     <?php endforeach; ?>
                     <?php if (empty($requests)): ?>
-                    <tr><td colspan="6" class="text-center py-4">कुनै अनुरोध छैन</td></tr>
+                    <tr><td colspan="6" class="text-center py-4"><?php echo $__t('कुनै अनुरोध छैन', 'No requests found'); ?></td></tr>
                     <?php endif; ?>
                 </tbody>
         </table>

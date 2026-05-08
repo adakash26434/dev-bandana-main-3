@@ -27,9 +27,11 @@ if (!isset($mem) && function_exists('currentMember')) $mem = currentMember();
 
 $_siteUrl  = SITE_URL;
 $_siteName = function_exists('getSetting') ? getSetting('site_name', 'आकाश सहकारी') : 'आकाश सहकारी';
-$_logoPath = function_exists('getSetting')
-    ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
-    : 'assets/images/logo.png';
+$_logoPath = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath('assets/images/logo.png'))
+    : (function_exists('getSetting')
+        ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
+        : 'assets/images/logo.png');
 $_memName  = $mem['name'] ?? 'Member';
 $_memAvatar = trim((string)($mem['avatar_url'] ?? ''));
 $_memId    = (int)($mem['id'] ?? 0);
@@ -84,6 +86,16 @@ if ($_memAvatar !== '' && !preg_match('#^(https?:)?//#i', $_memAvatar)) {
 if (!isset($pageTitle)) $pageTitle = 'Member — ' . $_siteName;
 if (!isset($extraHead)) $extraHead = '';
 
+$_lang = function_exists('getCurrentLang') ? getCurrentLang() : 'np';
+$_isEn = ($_lang === 'en');
+$_t = static function (string $np, string $en) use ($_isEn): string {
+    return $_isEn ? $en : $np;
+};
+$_langQuery = $_GET;
+$_langQuery['lang'] = $_isEn ? 'np' : 'en';
+$_langToggleUrl = strtok($_SERVER['REQUEST_URI'] ?? '', '?') . '?' . http_build_query($_langQuery);
+$_langBadge = $_isEn ? 'EN' : 'ने';
+
 /* Auto-detect active nav from filename */
 $_self  = basename($_SERVER['PHP_SELF'] ?? '');
 $_active = $_self === 'index.php' || $_self === ''  ? 'dashboard'
@@ -113,7 +125,7 @@ if ($_memId) {
 $_hasIdCard = true;
 ?>
 <!DOCTYPE html>
-<html lang="ne" dir="ltr">
+<html lang="<?php echo $_isEn ? 'en' : 'ne'; ?>" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -160,7 +172,7 @@ $_hasIdCard = true;
         <div class="mem-logo-fallback"><i class="fas fa-leaf"></i></div>
         <div class="mem-brand-text">
             <span class="mem-brand-name"><?php echo htmlspecialchars($_siteName); ?></span>
-            <span class="mem-brand-sub">MEMBER PORTAL</span>
+            <span class="mem-brand-sub"><?php echo $_t('सदस्य पोर्टल', 'MEMBER PORTAL'); ?></span>
         </div>
         <?php endif; ?>
     </a>
@@ -168,19 +180,22 @@ $_hasIdCard = true;
 
         <!-- Bell -->
         <div class="bell-wrap">
-            <button class="mem-bell-btn" id="bellBtn" title="Notifications" type="button">
+            <a class="mem-bell-btn" href="<?php echo htmlspecialchars($_langToggleUrl, ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $_t('भाषा परिवर्तन', 'Switch Language'); ?>" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                <small style="font-size:11px;font-weight:800;line-height:1;"><?php echo htmlspecialchars($_langBadge); ?></small>
+            </a>
+            <button class="mem-bell-btn" id="bellBtn" title="<?php echo $_t('सूचनाहरू', 'Notifications'); ?>" type="button">
                 <i class="fas fa-bell"></i>
                 <?php if ($_unread > 0): ?><span class="mem-notif-dot"><?php echo $_unread > 9 ? '9+' : $_unread; ?></span><?php endif; ?>
             </button>
             <div class="bell-dropdown" id="bellDropdown">
                 <div class="bell-dd-head">
-                    <span class="title"><i class="fas fa-bell"></i> सूचनाहरू</span>
-                    <?php if ($_unread > 0): ?><span class="badge"><?php echo $_unread; ?> नयाँ</span><?php endif; ?>
+                    <span class="title"><i class="fas fa-bell"></i> <?php echo $_t('सूचनाहरू', 'Notifications'); ?></span>
+                    <?php if ($_unread > 0): ?><span class="badge"><?php echo $_unread; ?> <?php echo $_t('नयाँ', 'new'); ?></span><?php endif; ?>
                 </div>
                 <?php if (empty($_bellNotifs)): ?>
                 <div class="bell-dd-empty">
                     <i class="fas fa-bell-slash" style="font-size:1.4rem;display:block;margin-bottom:6px;opacity:.5;"></i>
-                    कुनै सूचना छैन।
+                    <?php echo $_t('कुनै सूचना छैन।', 'No notifications.'); ?>
                 </div>
                 <?php else:
                     $_iconMap = [
@@ -204,7 +219,7 @@ $_hasIdCard = true;
                 </div>
                 <?php endforeach; endif; ?>
                 <div class="bell-dd-foot">
-                    <a href="<?php echo $_siteUrl; ?>member/notifications.php">सबै सूचना हेर्नुहोस् →</a>
+                    <a href="<?php echo $_siteUrl; ?>member/notifications.php"><?php echo $_t('सबै सूचना हेर्नुहोस्', 'View all notifications'); ?> →</a>
                 </div>
             </div>
         </div>
@@ -223,7 +238,7 @@ $_hasIdCard = true;
         <?php endif; ?>
         <span class="mem-topbar-name"><?php echo htmlspecialchars($_memName); ?></span>
         <a href="<?php echo $_siteUrl; ?>member/logout.php" class="mem-topbar-btn">
-            <i class="fas fa-sign-out-alt"></i> Logout
+            <i class="fas fa-sign-out-alt"></i> <?php echo $_t('लगआउट', 'Logout'); ?>
         </a>
     </div>
 </div>
@@ -232,21 +247,21 @@ $_hasIdCard = true;
 
     <!-- ══ Unified Nav ══ -->
     <nav class="mem-nav">
-        <a href="<?php echo $_siteUrl; ?>member/" class="mem-nav-item <?php echo $_active==='dashboard'?'active':''; ?>"><i class="fas fa-house"></i>Dashboard</a>
-        <a href="<?php echo $_siteUrl; ?>member/tracker.php" class="mem-nav-item <?php echo $_active==='tracker'?'active':''; ?>"><i class="fas fa-magnifying-glass-chart"></i>Tracker</a>
+        <a href="<?php echo $_siteUrl; ?>member/" class="mem-nav-item <?php echo $_active==='dashboard'?'active':''; ?>"><i class="fas fa-house"></i><?php echo $_t('ड्यासबोर्ड', 'Dashboard'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/tracker.php" class="mem-nav-item <?php echo $_active==='tracker'?'active':''; ?>"><i class="fas fa-magnifying-glass-chart"></i><?php echo $_t('ट्र्याकर', 'Tracker'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/notifications.php" class="mem-nav-item <?php echo $_active==='notifications'?'active':''; ?>" style="position:relative;">
-            <i class="fas fa-bell"></i>सूचनाहरू
+            <i class="fas fa-bell"></i><?php echo $_t('सूचनाहरू', 'Notifications'); ?>
             <?php if ($_unread > 0): ?><span class="mem-notif-dot" style="position:static;margin-left:4px;"><?php echo $_unread; ?></span><?php endif; ?>
         </a>
         <?php if ($_hasIdCard): ?>
-        <a href="<?php echo $_siteUrl; ?>member/id-card.php" class="mem-nav-item <?php echo $_active==='idcard'?'active':''; ?>"><i class="fas fa-id-card"></i>ID Card</a>
+        <a href="<?php echo $_siteUrl; ?>member/id-card.php" class="mem-nav-item <?php echo $_active==='idcard'?'active':''; ?>"><i class="fas fa-id-card"></i><?php echo $_t('परिचयपत्र', 'ID Card'); ?></a>
         <?php endif; ?>
-        <a href="<?php echo $_siteUrl; ?>member/welfare.php" class="mem-nav-item <?php echo $_active==='welfare'?'active':''; ?>"><i class="fas fa-heart-pulse"></i>कल्याण दाबी</a>
-        <a href="<?php echo $_siteUrl; ?>member/election-vote.php" class="mem-nav-item <?php echo $_active==='election'?'active':''; ?>"><i class="fas fa-check-to-slot"></i>मतदान</a>
-        <a href="<?php echo $_siteUrl; ?>member/scan.php" class="mem-nav-item <?php echo $_active==='scan'?'active':''; ?>"><i class="fas fa-qrcode"></i>QR स्क्यान</a>
-        <a href="<?php echo $_siteUrl; ?>member/attend.php" class="mem-nav-item <?php echo $_active==='attend'?'active':''; ?>"><i class="fas fa-calendar-check"></i>उपस्थिति</a>
-        <a href="<?php echo $_siteUrl; ?>member/service-request.php" class="mem-nav-item <?php echo $_active==='service'?'active':''; ?>"><i class="fas fa-concierge-bell"></i>सेवा अनुरोध</a>
-        <a href="<?php echo $_siteUrl; ?>member/certificate.php" class="mem-nav-item <?php echo $_active==='certificate'?'active':''; ?>"><i class="fas fa-certificate"></i>प्रमाणपत्र</a>
-        <a href="<?php echo $_siteUrl; ?>member/profile.php" class="mem-nav-item <?php echo $_active==='profile'?'active':''; ?>"><i class="fas fa-user-circle"></i>प्रोफाइल</a>
-        <a href="<?php echo $_siteUrl; ?>" class="mem-nav-item"><i class="fas fa-globe"></i>Main Site</a>
+        <a href="<?php echo $_siteUrl; ?>member/welfare.php" class="mem-nav-item <?php echo $_active==='welfare'?'active':''; ?>"><i class="fas fa-heart-pulse"></i><?php echo $_t('कल्याण दाबी', 'Welfare Claim'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/election-vote.php" class="mem-nav-item <?php echo $_active==='election'?'active':''; ?>"><i class="fas fa-check-to-slot"></i><?php echo $_t('मतदान', 'Vote'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/scan.php" class="mem-nav-item <?php echo $_active==='scan'?'active':''; ?>"><i class="fas fa-qrcode"></i><?php echo $_t('QR स्क्यान', 'QR Scan'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/attend.php" class="mem-nav-item <?php echo $_active==='attend'?'active':''; ?>"><i class="fas fa-calendar-check"></i><?php echo $_t('उपस्थिति', 'Attendance'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/service-request.php" class="mem-nav-item <?php echo $_active==='service'?'active':''; ?>"><i class="fas fa-concierge-bell"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/certificate.php" class="mem-nav-item <?php echo $_active==='certificate'?'active':''; ?>"><i class="fas fa-certificate"></i><?php echo $_t('प्रमाणपत्र', 'Certificates'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/profile.php" class="mem-nav-item <?php echo $_active==='profile'?'active':''; ?>"><i class="fas fa-user-circle"></i><?php echo $_t('प्रोफाइल', 'Profile'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>" class="mem-nav-item"><i class="fas fa-globe"></i><?php echo $_t('मुख्य साइट', 'Main Site'); ?></a>
     </nav>

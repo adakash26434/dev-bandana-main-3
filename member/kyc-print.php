@@ -2,6 +2,9 @@
 require_once __DIR__ . '/_bootstrap.php';
 requireMemberLogin();
 memberSecurityHeaders();
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $db = getDB();
 $mem = currentMember();
@@ -58,11 +61,11 @@ if (!$kycRow) {
 }
 ?>
 <!doctype html>
-<html lang="ne">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KYC Print</title>
+    <title><?php echo htmlspecialchars($_t('KYC प्रिन्ट', 'KYC Print')); ?></title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; color: #111827; background: #f3f4f6; }
         .wrap { max-width: 980px; margin: 12px auto; background: #fff; border: 1px solid #d1d5db; }
@@ -95,12 +98,12 @@ if (!$kycRow) {
 <body>
 <div class="wrap">
     <div class="toolbar">
-        <a href="#" class="btn" onclick="window.print();return false;">Print</a>
-        <a href="<?php echo SITE_URL; ?>member/profile.php" class="btn">Back</a>
+        <a href="#" class="btn" onclick="window.print();return false;"><?php echo $_t('प्रिन्ट', 'Print'); ?></a>
+        <a href="<?php echo SITE_URL; ?>member/profile.php" class="btn"><?php echo $_t('फिर्ता', 'Back'); ?></a>
     </div>
     <div class="page">
         <?php if (!$kycRow): ?>
-            <div class="empty">KYC रेकर्ड भेटिएन।</div>
+            <div class="empty"><?php echo $_t('KYC रेकर्ड भेटिएन।', 'KYC record not found.'); ?></div>
         <?php else: ?>
         <div class="hdr">
             <h2>व्यक्तिगत सदस्य पहिचान फारम (KYC/KYM)</h2>

@@ -12,9 +12,12 @@ if (!$mem) {
     header('Location: login.php?msg=session_expired');
     exit;
 }
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 $siteName  = function_exists('getSetting') ? getSetting('site_name', 'सहकारी') : 'सहकारी';
-$pageTitle = 'कार्यक्रम QR स्क्यान — ' . $siteName;
+$pageTitle = $_t('कार्यक्रम QR स्क्यान', 'Program QR Scan') . ' — ' . $siteName;
 $base      = rtrim(SITE_URL, '/') . '/';
 
 $extraHead = <<<'HTML'
@@ -74,25 +77,24 @@ require __DIR__ . '/includes/chrome.php';
 <main class="mp-main">
 <div class="mp-container mp-container-narrow scan-wrap">
   <h1 style="font-size:1.2rem;font-weight:800;color:var(--primary-color,#1a8754);margin:0 0 10px;">
-    <i class="fas fa-qrcode" style="margin-right:8px;"></i>कार्यक्रम QR स्क्यान
+    <i class="fas fa-qrcode" style="margin-right:8px;"></i><?php echo $_t('कार्यक्रम QR स्क्यान', 'Program QR Scan'); ?>
   </h1>
 
   <div class="scan-hero">
-    <strong>कसरी?</strong> स्थलमा राखिएको <strong>कार्यक्रम QR</strong> क्यामेराले स्क्यान गर्नुहोस्। पछि खुल्ने पृष्ठमा
-    <strong>Check-in / OK</strong> थिच्नुहोस् — उपस्थिति Admin र तपाईंको <strong>उपस्थिति इतिहास</strong>मा जान्छ।
-    (Pre-registration मात्र उपस्थिति होइन।)
+    <strong><?php echo $_t('कसरी?', 'How?'); ?></strong> <?php echo $_t('स्थलमा राखिएको', 'Scan the'); ?> <strong><?php echo $_t('कार्यक्रम QR', 'program QR'); ?></strong> <?php echo $_t('क्यामेराले स्क्यान गर्नुहोस्। पछि खुल्ने पृष्ठमा', 'at the venue with camera. On the next page, press'); ?>
+    <strong><?php echo $_t('Check-in / OK', 'Check-in / OK'); ?></strong> <?php echo $_t('थिच्नुहोस् — उपस्थिति Admin र तपाईंको', '— attendance goes to admin and your'); ?> <strong><?php echo $_t('उपस्थिति इतिहास', 'attendance history'); ?></strong><?php echo $_t('मा जान्छ। (Pre-registration मात्र उपस्थिति होइन।)', '. (Pre-registration alone is not attendance.)'); ?>
   </div>
 
   <div id="scan-reader"></div>
   <div id="scan-err" class="scan-err" role="alert"></div>
 
   <div class="scan-actions">
-    <button type="button" class="scan-btn-start" id="scanStart"><i class="fas fa-camera me-2"></i>क्यामेरा सुरु</button>
-    <button type="button" class="scan-btn-stop" id="scanStop" style="display:none;"><i class="fas fa-stop me-2"></i>रोक्नुहोस्</button>
+    <button type="button" class="scan-btn-start" id="scanStart"><i class="fas fa-camera me-2"></i><?php echo $_t('क्यामेरा सुरु', 'Start Camera'); ?></button>
+    <button type="button" class="scan-btn-stop" id="scanStop" style="display:none;"><i class="fas fa-stop me-2"></i><?php echo $_t('रोक्नुहोस्', 'Stop'); ?></button>
   </div>
 
   <div class="scan-links">
-    <a href="<?= htmlspecialchars($base) ?>member/attend.php"><i class="fas fa-calendar-check me-1"></i>उपस्थिति र इतिहास</a>
+    <a href="<?= htmlspecialchars($base) ?>member/attend.php"><i class="fas fa-calendar-check me-1"></i><?php echo $_t('उपस्थिति र इतिहास', 'Attendance & History'); ?></a>
   </div>
 </div>
 </main>
@@ -107,6 +109,9 @@ require __DIR__ . '/includes/chrome.php';
   var btnStop = document.getElementById('scanStop');
   var html5Qr = null;
   var busy = false;
+  var msgInvalid = <?= json_encode($_t('यो QR कार्यक्रम check-in को लागि मान्य देखिँदैन। Admin को कार्यक्रम QR प्रयोग गर्नुहोस्।', 'This QR is not valid for program check-in. Please use admin-generated program QR.')) ?>;
+  var msgLib = <?= json_encode($_t('स्क्यान लाइब्रेरी लोड हुन सकेन। इन्टरनेट जाँच गरी पुनः प्रयास गर्नुहोस्।', 'Scanner library failed to load. Check internet and try again.')) ?>;
+  var msgCam = <?= json_encode($_t('क्यामेरा खोल्न सकिएन। अनुमति दिनुहोस् वा HTTPS प्रयोग गर्नुहोस्।', 'Unable to open camera. Allow permission or use HTTPS.')) ?>;
 
   function showErr(msg) {
     errEl.style.display = 'block';
@@ -137,7 +142,7 @@ require __DIR__ . '/includes/chrome.php';
     if (busy) return;
     var token = extractToken(decodedText);
     if (!token) {
-      showErr('यो QR कार्यक्रम check-in को लागि मान्य देखिँदैन। Admin को कार्यक्रम QR प्रयोग गर्नुहोस्।');
+      showErr(msgInvalid);
       return;
     }
     busy = true;
@@ -157,7 +162,7 @@ require __DIR__ . '/includes/chrome.php';
   btnStart.addEventListener('click', function() {
     hideErr();
     if (typeof Html5Qrcode === 'undefined') {
-      showErr('स्क्यान लाइब्रेरी लोड हुन सकेन। इन्टरनेट जाँच गरी पुनः प्रयास गर्नुहोस्।');
+      showErr(msgLib);
       return;
     }
     btnStart.disabled = true;
@@ -174,7 +179,7 @@ require __DIR__ . '/includes/chrome.php';
       btnStart.disabled = false;
     }).catch(function(e) {
       btnStart.disabled = false;
-      showErr('क्यामेरा खोल्न सकिएन। अनुमति दिनुहोस् वा HTTPS प्रयोग गर्नुहोस्। (' + (e && e.message ? e.message : 'unknown') + ')');
+      showErr(msgCam + ' (' + (e && e.message ? e.message : 'unknown') + ')');
     });
   });
 

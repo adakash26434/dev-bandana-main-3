@@ -57,10 +57,21 @@ $adminPhoto   = '';
 $isSuperAdmin = !empty($_SESSION['is_superadmin']);
 $currentPage  = getCurrentPage();
 $siteName     = function_exists('getSetting') ? getSetting('site_name', 'आकाश सहकारी') : 'आकाश सहकारी';
-$siteLogo     = function_exists('getSetting')
-    ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
-    : 'assets/images/logo.png';
+$siteLogo     = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath('assets/images/logo.png'))
+    : (function_exists('getSetting')
+        ? trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')))
+        : 'assets/images/logo.png');
 $hasSiteLogo  = !empty($siteLogo);
+$adminLang = function_exists('getCurrentLang') ? getCurrentLang() : 'np';
+$adminIsEnglish = ($adminLang === 'en');
+$adminT = static function (string $np, string $en) use ($adminIsEnglish): string {
+    return $adminIsEnglish ? $en : $np;
+};
+$adminLangQuery = $_GET;
+$adminLangQuery['lang'] = $adminIsEnglish ? 'np' : 'en';
+$adminLangToggleUrl = strtok($_SERVER['REQUEST_URI'] ?? '', '?') . '?' . http_build_query($adminLangQuery);
+$adminLangBadge = $adminIsEnglish ? 'EN' : 'ने';
 
 // Get unread messages count — DB नभए gracefully skip गर्छ
 $db = null;
@@ -221,11 +232,11 @@ set_exception_handler(function (\Throwable $ex) {
 });
 ?>
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="<?php echo $adminIsEnglish ? 'en' : 'ne'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($pageTitle) ? $pageTitle . ' - ' : ''; ?>Admin Panel</title>
+    <title><?php echo isset($pageTitle) ? $pageTitle . ' - ' : ''; ?><?php echo $adminT('एडमिन प्यानल', 'Admin Panel'); ?></title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -485,7 +496,7 @@ set_exception_handler(function (\Throwable $ex) {
                     <img src="<?php echo SITE_URL . htmlspecialchars($siteLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8'); ?>" class="sidebar-brand-logo">
                     <?php else: ?>
                     <div class="admin-logo-fallback"><i class="fas fa-landmark"></i></div>
-                    <span class="sidebar-brand-text">Admin Panel</span>
+                    <span class="sidebar-brand-text"><?php echo $adminT('एडमिन प्यानल', 'Admin Panel'); ?></span>
                     <?php endif; ?>
                 </a>
                 <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close menu">
@@ -992,7 +1003,7 @@ set_exception_handler(function (\Throwable $ex) {
                         <?php echo !empty($_SESSION['is_superadmin']) ? 'Superadmin' : 'Administrator'; ?>
                     </div>
                 </div>
-                <a href="logout.php" title="लगआउट" class="sidebar-strip-logout">
+                <a href="logout.php" title="<?php echo $adminT('लगआउट', 'Logout'); ?>" class="sidebar-strip-logout">
                     <i class="fas fa-right-from-bracket"></i>
                 </a>
             </div>
@@ -1015,8 +1026,8 @@ set_exception_handler(function (\Throwable $ex) {
                         <?php endif; ?>
                     </a>
                     <div class="page-title-wrap">
-                        <h1 class="page-title"><?php echo $pageTitle ?? 'ड्यासबोर्ड'; ?></h1>
-                        <span class="header-date-pill" title="आजको मिति">
+                        <h1 class="page-title"><?php echo $pageTitle ?? $adminT('ड्यासबोर्ड', 'Dashboard'); ?></h1>
+                        <span class="header-date-pill" title="<?php echo $adminT('आजको मिति', 'Today'); ?>">
                             <i class="fas fa-calendar-day"></i>
                             <?php echo function_exists('formatNepaliDate') ? formatNepaliDate(date('Y-m-d')) : date('Y-m-d'); ?>
                         </span>
@@ -1024,6 +1035,12 @@ set_exception_handler(function (\Throwable $ex) {
                 </div>
 
                 <div class="header-right">
+                    <div class="header-item d-none d-md-flex">
+                        <a href="<?php echo htmlspecialchars($adminLangToggleUrl, ENT_QUOTES, 'UTF-8'); ?>" class="version-badge text-decoration-none" title="<?php echo $adminT('भाषा परिवर्तन', 'Switch Language'); ?>">
+                            <i class="fas fa-language"></i>
+                            <?php echo $adminLangBadge; ?>
+                        </a>
+                    </div>
                     <!-- Website version badge -->
                     <?php
                     $siteVer = getSetting('site_version') ?? '1.0.0';
@@ -1045,17 +1062,17 @@ set_exception_handler(function (\Throwable $ex) {
 
                     /* Dropdown मा देखाउने items — label, count, link, icon, tone */
                     $notifItems = [
-                        ['label'=>'अपठित सन्देश',     'count'=>$unreadMessages,                        'href'=>'messages.php',                       'icon'=>'fa-envelope',            'tone'=>'red'],
-                        ['label'=>'KYC आवेदन',        'count'=>$adminAlertCounts['kyc'],               'href'=>'kyc-applications.php?status=pending', 'icon'=>'fa-id-card',             'tone'=>'orange'],
-                        ['label'=>'ऋण आवेदन',         'count'=>$adminAlertCounts['loan'],              'href'=>'loan-applications.php?status=pending','icon'=>'fa-hand-holding-usd',   'tone'=>'amber'],
-                        ['label'=>'खाता आवेदन',       'count'=>$adminAlertCounts['account'],           'href'=>'account-applications.php?status=pending','icon'=>'fa-university',       'tone'=>'purple'],
-                        ['label'=>'डिजिटल सेवा',      'count'=>$adminAlertCounts['digital'],           'href'=>'digital-service-requests.php?status=pending','icon'=>'fa-mobile-alt', 'tone'=>'cyan'],
-                        ['label'=>'जागिर आवेदन',      'count'=>$adminAlertCounts['job'],               'href'=>'job-applications.php?status=pending', 'icon'=>'fa-briefcase',           'tone'=>'green'],
-                        ['label'=>'गुनासो',            'count'=>$adminAlertCounts['grievance'],         'href'=>'grievances.php?status=pending',       'icon'=>'fa-comment-dots',        'tone'=>'red'],
-                        ['label'=>'सुझाव/प्रतिक्रिया', 'count'=>$adminAlertCounts['feedback'],          'href'=>'feedbacks.php?status=pending',        'icon'=>'fa-star',                'tone'=>'orange'],
-                        ['label'=>'कल्याण दाबी',      'count'=>$adminAlertCounts['welfare'],           'href'=>'welfare-claims.php?status=pending',   'icon'=>'fa-hand-holding-heart',  'tone'=>'teal'],
-                        ['label'=>'लिलामी बिड',       'count'=>$adminAlertCounts['auction'],           'href'=>'auction-bids.php',                    'icon'=>'fa-gavel',               'tone'=>'slate'],
-                        ['label'=>'भेन्डर आवेदन',      'count'=>$adminAlertCounts['vendor'],            'href'=>'vendor-enlistment.php?status=pending','icon'=>'fa-store',               'tone'=>'blue'],
+                        ['label'=>$adminT('अपठित सन्देश', 'Unread Messages'),     'count'=>$unreadMessages,                        'href'=>'messages.php',                       'icon'=>'fa-envelope',            'tone'=>'red'],
+                        ['label'=>$adminT('KYC आवेदन', 'KYC Applications'),        'count'=>$adminAlertCounts['kyc'],               'href'=>'kyc-applications.php?status=pending', 'icon'=>'fa-id-card',             'tone'=>'orange'],
+                        ['label'=>$adminT('ऋण आवेदन', 'Loan Applications'),         'count'=>$adminAlertCounts['loan'],              'href'=>'loan-applications.php?status=pending','icon'=>'fa-hand-holding-usd',   'tone'=>'amber'],
+                        ['label'=>$adminT('खाता आवेदन', 'Account Applications'),       'count'=>$adminAlertCounts['account'],           'href'=>'account-applications.php?status=pending','icon'=>'fa-university',       'tone'=>'purple'],
+                        ['label'=>$adminT('डिजिटल सेवा', 'Digital Services'),      'count'=>$adminAlertCounts['digital'],           'href'=>'digital-service-requests.php?status=pending','icon'=>'fa-mobile-alt', 'tone'=>'cyan'],
+                        ['label'=>$adminT('जागिर आवेदन', 'Job Applications'),      'count'=>$adminAlertCounts['job'],               'href'=>'job-applications.php?status=pending', 'icon'=>'fa-briefcase',           'tone'=>'green'],
+                        ['label'=>$adminT('गुनासो', 'Grievances'),            'count'=>$adminAlertCounts['grievance'],         'href'=>'grievances.php?status=pending',       'icon'=>'fa-comment-dots',        'tone'=>'red'],
+                        ['label'=>$adminT('सुझाव/प्रतिक्रिया', 'Feedback'), 'count'=>$adminAlertCounts['feedback'],          'href'=>'feedbacks.php?status=pending',        'icon'=>'fa-star',                'tone'=>'orange'],
+                        ['label'=>$adminT('कल्याण दाबी', 'Welfare Claims'),      'count'=>$adminAlertCounts['welfare'],           'href'=>'welfare-claims.php?status=pending',   'icon'=>'fa-hand-holding-heart',  'tone'=>'teal'],
+                        ['label'=>$adminT('लिलामी बिड', 'Auction Bids'),       'count'=>$adminAlertCounts['auction'],           'href'=>'auction-bids.php',                    'icon'=>'fa-gavel',               'tone'=>'slate'],
+                        ['label'=>$adminT('भेन्डर आवेदन', 'Vendor Requests'),      'count'=>$adminAlertCounts['vendor'],            'href'=>'vendor-enlistment.php?status=pending','icon'=>'fa-store',               'tone'=>'blue'],
                     ];
                     /* pending मात्र filter गर्ने — count > 0 भएका मात्र dropdown मा देखाउने */
                     $activeNotifs = array_filter($notifItems, function ($i) {
@@ -1065,7 +1082,7 @@ set_exception_handler(function (\Throwable $ex) {
                     <div class="header-item notif-wrapper">
                         <!-- Bell button — सधैं देखिन्छ, count > 0 भए red badge -->
                         <button type="button" class="notification-bell notif-toggle-btn"
-                                title="सूचनाहरू — <?php echo $totalAlerts > 0 ? $totalAlerts . ' pending' : 'सबै हेरिएको'; ?>"
+                                title="<?php echo $adminT('सूचनाहरू', 'Notifications'); ?> — <?php echo $totalAlerts > 0 ? $totalAlerts . ' pending' : $adminT('सबै हेरिएको', 'All clear'); ?>"
                                 aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-bell"></i>
                             <?php if ($totalAlerts > 0): ?>
@@ -1076,7 +1093,7 @@ set_exception_handler(function (\Throwable $ex) {
                         <!-- Dropdown panel -->
                         <div class="notif-dropdown" id="notifDropdown">
                             <div class="notif-dropdown-header">
-                                <span><i class="fas fa-bell me-1"></i>सूचनाहरू</span>
+                                <span><i class="fas fa-bell me-1"></i><?php echo $adminT('सूचनाहरू', 'Notifications'); ?></span>
                                 <?php if ($totalAlerts > 0): ?>
                                 <span class="notif-total-badge"><?php echo $totalAlerts; ?> pending</span>
                                 <?php endif; ?>
@@ -1085,7 +1102,7 @@ set_exception_handler(function (\Throwable $ex) {
                                 <?php if (empty($activeNotifs)): ?>
                                 <div class="notif-empty">
                                     <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
-                                    <p class="mb-0">सबै हेरिएको छ!</p>
+                                    <p class="mb-0"><?php echo $adminT('सबै हेरिएको छ!', 'All caught up!'); ?></p>
                                 </div>
                                 <?php else: ?>
                                 <?php foreach ($activeNotifs as $ni): ?>
@@ -1104,7 +1121,7 @@ set_exception_handler(function (\Throwable $ex) {
                             </div>
                             <div class="notif-dropdown-footer">
                                 <a href="<?php echo ADMIN_URL; ?>dashboard.php">
-                                    <i class="fas fa-th-large me-1"></i>ड्यासबोर्ड हेर्नुहोस्
+                                    <i class="fas fa-th-large me-1"></i><?php echo $adminT('ड्यासबोर्ड हेर्नुहोस्', 'Open Dashboard'); ?>
                                 </a>
                             </div>
                         </div>
@@ -1127,13 +1144,13 @@ set_exception_handler(function (\Throwable $ex) {
                             <div class="admin-menu">
                                 <?php if (empty($_SESSION['is_superadmin'])): ?>
                                     <!-- Normal admin मात्र profile र change-password देख्छ -->
-                                    <a href="profile.php"><i class="fas fa-user"></i> प्रोफाइल</a>
-                                    <a href="change-password.php"><i class="fas fa-key"></i> पासवर्ड</a>
+                                    <a href="profile.php"><i class="fas fa-user"></i> <?php echo $adminT('प्रोफाइल', 'Profile'); ?></a>
+                                    <a href="change-password.php"><i class="fas fa-key"></i> <?php echo $adminT('पासवर्ड', 'Password'); ?></a>
                                 <?php else: ?>
                                     <!-- Superadmin को लागि admin management link -->
-                                    <a href="manage-admins.php"><i class="fas fa-users-gear"></i> Admin व्यवस्थापन</a>
+                                    <a href="manage-admins.php"><i class="fas fa-users-gear"></i> <?php echo $adminT('Admin व्यवस्थापन', 'Admin Management'); ?></a>
                                 <?php endif; ?>
-                                <a href="logout.php"><i class="fas fa-sign-out-alt"></i> लगआउट</a>
+                                <a href="logout.php"><i class="fas fa-sign-out-alt"></i> <?php echo $adminT('लगआउट', 'Logout'); ?></a>
                             </div>
                         </div>
                     </div>

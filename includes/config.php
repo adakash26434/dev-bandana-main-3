@@ -369,6 +369,22 @@ function getSetting($key, $default = '') {
     }
 }
 
+/**
+ * Language-aware site logo path.
+ * - Nepali UI: logo_np -> site_logo -> logo
+ * - English UI: logo_en -> site_logo -> logo
+ */
+function getLocalizedLogoPath($default = 'assets/images/logo.png') {
+    $fallback = trim((string) getSetting('site_logo', getSetting('logo', $default)));
+    $isEn = function_exists('isEnglish') ? isEnglish() : false;
+    if ($isEn) {
+        $enLogo = trim((string) getSetting('logo_en', ''));
+        return $enLogo !== '' ? $enLogo : $fallback;
+    }
+    $npLogo = trim((string) getSetting('logo_np', ''));
+    return $npLogo !== '' ? $npLogo : $fallback;
+}
+
 // Update site setting (INSERT if not exists, UPDATE if exists)
 function updateSetting($key, $value) {
     try {

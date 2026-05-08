@@ -5,14 +5,21 @@
  */
 ?>
 </div><!-- /.mem-container -->
+<?php
+$_footLang = function_exists('getCurrentLang') ? getCurrentLang() : 'np';
+$_footIsEn = ($_footLang === 'en');
+$_footT = static function (string $np, string $en) use ($_footIsEn): string {
+    return $_footIsEn ? $en : $np;
+};
+?>
 
 <!-- Mobile bottom navigation (hidden on desktop ≥900px) -->
 <nav class="mp-bottom-nav">
-  <a href="<?php echo SITE_URL; ?>member/"><i class="fas fa-house"></i><span>गृह</span></a>
-  <a href="<?php echo SITE_URL; ?>member/welfare.php"><i class="fas fa-heart-pulse"></i><span>कल्याण</span></a>
-  <a href="<?php echo SITE_URL; ?>member/scan.php" class="mp-nav-scan" aria-label="कार्यक्रम QR स्क्यान"><i class="fas fa-qrcode"></i><span>स्क्यान</span></a>
-  <a href="<?php echo SITE_URL; ?>member/attend.php"><i class="fas fa-calendar-check"></i><span>उपस्थिति</span></a>
-  <a href="<?php echo SITE_URL; ?>member/profile.php"><i class="fas fa-user-circle"></i><span>प्रोफाइल</span></a>
+  <a href="<?php echo SITE_URL; ?>member/"><i class="fas fa-house"></i><span><?php echo $_footT('गृह', 'Home'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/welfare.php"><i class="fas fa-heart-pulse"></i><span><?php echo $_footT('कल्याण', 'Welfare'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/scan.php" class="mp-nav-scan" aria-label="<?php echo $_footT('कार्यक्रम QR स्क्यान', 'Scan QR'); ?>"><i class="fas fa-qrcode"></i><span><?php echo $_footT('स्क्यान', 'Scan'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/attend.php"><i class="fas fa-calendar-check"></i><span><?php echo $_footT('उपस्थिति', 'Attend'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/profile.php"><i class="fas fa-user-circle"></i><span><?php echo $_footT('प्रोफाइल', 'Profile'); ?></span></a>
 </nav>
 
 <style>

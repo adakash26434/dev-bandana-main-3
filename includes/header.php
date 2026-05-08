@@ -24,7 +24,9 @@ $facebookUrl = getSetting('facebook_url', '#');
 $youtubeUrl = getSetting('youtube_url', '#');
 $twitterUrl = getSetting('twitter_url', '');
 $instagramUrl = getSetting('instagram_url', '');
-$logo = trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')));
+$logo = function_exists('getLocalizedLogoPath')
+    ? trim((string) getLocalizedLogoPath('assets/images/logo.png'))
+    : trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')));
 $primaryColor = getSetting('primary_color', 'var(--primary-color)');
 $secondaryColor = getSetting('secondary_color', getSetting('topbar_color', '#c0392b'));
 /* Public portal strict 2-color scheme:

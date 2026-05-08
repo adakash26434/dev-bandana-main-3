@@ -7,6 +7,9 @@ memberSecurityHeaders();
 $db       = getDB();
 $mem      = currentMember();
 $memberId = $mem['id'];
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 /* Mark all as read — POST + CSRF only (GET ले CSRF जोखिम) */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_all'])) {
@@ -26,7 +29,7 @@ $notifs = $notifSt->fetchAll(PDO::FETCH_ASSOC);
 
 $siteName  = getSetting('site_name', 'आकाश सहकारी');
 $siteUrl   = SITE_URL;
-$pageTitle = 'सूचनाहरू — ' . $siteName;
+$pageTitle = $_t('सूचनाहरू', 'Notifications') . ' — ' . $siteName;
 
 $iconMap = [
     'success' => ['fas fa-circle-check',         '#16a34a', '#f0fdf4'],
@@ -40,7 +43,7 @@ require __DIR__ . '/includes/chrome.php';
     <div class="mem-card">
         <div class="mem-card-header">
             <div class="mem-card-title">
-                <i class="fas fa-bell"></i>सबै सूचनाहरू
+                <i class="fas fa-bell"></i><?php echo $_t('सबै सूचनाहरू', 'All Notifications'); ?>
                 <?php if ($unread > 0): ?><span class="mem-notif-dot" style="position:static;"><?php echo $unread; ?></span><?php endif; ?>
             </div>
             <?php if ($unread > 0): ?>
@@ -48,7 +51,7 @@ require __DIR__ . '/includes/chrome.php';
                 <?php echo csrfField(); ?>
                 <input type="hidden" name="mark_all" value="1">
                 <button type="submit" class="btn btn-link p-0 border-0" style="font-size:0.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;">
-                    <i class="fas fa-check-double me-1"></i>सबै पढिएको
+                    <i class="fas fa-check-double me-1"></i><?php echo $_t('सबै पढिएको', 'Mark all as read'); ?>
                 </button>
             </form>
             <?php endif; ?>
@@ -57,8 +60,8 @@ require __DIR__ . '/includes/chrome.php';
             <?php if (empty($notifs)): ?>
             <div class="mem-empty">
                 <span class="mem-empty-icon">🔔</span>
-                <div>कुनै सूचना छैन।</div>
-                <div style="font-size:0.78rem;margin-top:6px;">आवेदनको अवस्था बदलिएपछि यहाँ सूचना आउँछ।</div>
+                <div><?php echo $_t('कुनै सूचना छैन।', 'No notifications yet.'); ?></div>
+                <div style="font-size:0.78rem;margin-top:6px;"><?php echo $_t('आवेदनको अवस्था बदलिएपछि यहाँ सूचना आउँछ।', 'Updates will appear here when application status changes.'); ?></div>
             </div>
             <?php else: ?>
             <?php foreach ($notifs as $n):

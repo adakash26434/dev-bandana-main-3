@@ -3,7 +3,10 @@
  * सेवा व्यवस्थापन — Services Management
  * Tab UI: सूची + Add/Edit form (modal popup हटाइएको)
  */
-$pageTitle = 'सेवा व्यवस्थापन';
+$__t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
+$pageTitle = $__t('सेवा व्यवस्थापन', 'Services Management');
 require_once '../includes/config.php';
 require_once '../includes/service-products-tables.php';
 if (!isAdminLoggedIn()) redirect(ADMIN_URL . 'index.php');
@@ -125,12 +128,12 @@ $servicesArch = $svcPart['archived'];
 ?>
 
 <?php echo adminPageHeader(
-    'सेवा व्यवस्थापन',
+    $__t('सेवा व्यवस्थापन', 'Services Management'),
     'fa-concierge-bell',
-    'संस्थाले प्रदान गर्ने सेवाहरू व्यवस्थापन।',
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>जम्मा: ' . count($services) . '</span>'
-    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>सक्रिय: ' . count($servicesLive) . '</span>'
-    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>अभिलेख: ' . count($servicesArch) . '</span>'
+    $__t('संस्थाले प्रदान गर्ने सेवाहरू व्यवस्थापन।', 'Manage services provided by the organization.'),
+    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>' . $__t('जम्मा', 'Total') . ': ' . count($services) . '</span>'
+    . '<span class="badge admin-stat-badge bg-primary-subtle text-primary border border-primary border-opacity-25 me-2"><i class="fas fa-check-circle me-1"></i>' . $__t('सक्रिय', 'Active') . ': ' . count($servicesLive) . '</span>'
+    . '<span class="badge admin-stat-badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-archive me-1"></i>' . $__t('अभिलेख', 'Archived') . ': ' . count($servicesArch) . '</span>'
 ); ?>
 
 <?php echo adminAlert('success', $success) . adminAlert('danger', $error); ?>
@@ -138,13 +141,13 @@ $servicesArch = $svcPart['archived'];
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">
         <button class="nav-link <?php echo $openServiceForm ? '' : 'active'; ?>" data-bs-toggle="tab" data-bs-target="#svc-list" id="svc-list-btn" title="सक्रिय / जम्मा">
-            <i class="fas fa-list me-2"></i>सेवा सूची
+            <i class="fas fa-list me-2"></i><?php echo $__t('सेवा सूची', 'Service List'); ?>
             <span class="badge bg-success ms-1"><?php echo count($servicesLive); ?> / <?php echo count($services); ?></span>
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link <?php echo $openServiceForm ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#svc-form" id="svc-form-btn">
-            <i class="fas fa-plus-circle me-2"></i><span id="svcFormTabLabel"><?php echo $openServiceForm ? 'सम्पादन' : 'नयाँ थप्नुहोस्'; ?></span>
+            <i class="fas fa-plus-circle me-2"></i><span id="svcFormTabLabel"><?php echo $openServiceForm ? $__t('सम्पादन', 'Edit') : $__t('नयाँ थप्नुहोस्', 'Add New'); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -164,7 +167,7 @@ $servicesArch = $svcPart['archived'];
             <div class="admin-search-wrap px-3 py-2 border-bottom bg-light d-flex align-items-center gap-3 svc-search-wrap">
                 <div class="input-group input-group-sm svc-search-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" class="form-control border-start-0 admin-table-search" placeholder="नाम, विवरण अनुसार खोज्नुहोस्..." autocomplete="off">
+                    <input type="text" class="form-control border-start-0 admin-table-search" placeholder="<?php echo $__t('नाम, विवरण अनुसार खोज्नुहोस्...', 'Search by name or description...'); ?>" autocomplete="off">
                 </div>
                 <small class="text-muted search-count"></small>
             </div>
@@ -184,24 +187,24 @@ $servicesArch = $svcPart['archived'];
                         <thead>
                             <tr>
                                 <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#svc-sub-live .svc-select').forEach(c=>c.checked=this.checked)"></th>
-                                <th class="ps-3" width="60">आइकन</th>
-                                <th>शीर्षक</th>
-                                <th>विवरण</th>
-                                <th width="70" class="text-center">क्रम</th>
-                                <th width="90" class="text-center">स्थिति</th>
-                                <th width="140" class="text-center">कार्य</th>
+                                <th class="ps-3" width="60"><?php echo $__t('आइकन', 'Icon'); ?></th>
+                                <th><?php echo $__t('शीर्षक', 'Title'); ?></th>
+                                <th><?php echo $__t('विवरण', 'Description'); ?></th>
+                                <th width="70" class="text-center"><?php echo $__t('क्रम', 'Order'); ?></th>
+                                <th width="90" class="text-center"><?php echo $__t('स्थिति', 'Status'); ?></th>
+                                <th width="140" class="text-center"><?php echo $__t('कार्य', 'Actions'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($services)): ?>
                             <tr><td colspan="7" class="text-center py-5 text-muted">
                                 <i class="fas fa-concierge-bell fa-3x mb-2 d-block opacity-25"></i>
-                                कुनै सेवा छैन।
+                                <?php echo $__t('कुनै सेवा छैन।', 'No services found.'); ?>
                             </td></tr>
                             <?php elseif (empty($servicesLive)): ?>
                             <tr><td colspan="7" class="text-center py-5 text-muted">
                                 <i class="fas fa-check-circle fa-3x mb-2 d-block opacity-25 text-success"></i>
-                                सक्रिय सेवा छैन। अभिलेख हेर्नुहोस्।
+                                <?php echo $__t('सक्रिय सेवा छैन। अभिलेख हेर्नुहोस्।', 'No active services. Check archived tab.'); ?>
                             </td></tr>
                             <?php endif; ?>
                             <?php foreach ($servicesLive as $s): ?>
@@ -218,16 +221,16 @@ $servicesArch = $svcPart['archived'];
                                 </td>
                                 <td><span class="text-muted"><?php echo htmlspecialchars(mb_substr($s['description_np'] ?: ($s['description'] ?? ''), 0, 60)); ?>…</span></td>
                                 <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $s['display_order']; ?></span></td>
-                                <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? $__t('सक्रिय', 'Active') : $__t('निष्क्रिय', 'Inactive'); ?></span></td>
                                 <td class="text-center">
-                                    <a href="services.php?edit=<?php echo (int)$s['id']; ?>" class="btn btn-sm btn-primary me-1" title="सम्पादन">
+                                    <a href="services.php?edit=<?php echo (int)$s['id']; ?>" class="btn btn-sm btn-primary me-1" title="<?php echo $__t('सम्पादन', 'Edit'); ?>">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं यो सेवा मेटाउन निश्चित हुनुहुन्छ?')">
+                                    <form method="POST" class="svc-inline-form" onsubmit="return confirm('<?php echo $__t('के तपाईं यो सेवा मेटाउन निश्चित हुनुहुन्छ?', 'Are you sure you want to delete this service?'); ?>')">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $s['id']; ?>">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="<?php echo $__t('मेटाउनुहोस्', 'Delete'); ?>"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -242,19 +245,19 @@ $servicesArch = $svcPart['archived'];
                         <thead>
                             <tr>
                                 <th width="40" class="text-center"><input type="checkbox" onclick="document.querySelectorAll('#svc-sub-arch .svc-select').forEach(c=>c.checked=this.checked)"></th>
-                                <th class="ps-3" width="60">आइकन</th>
-                                <th>शीर्षक</th>
-                                <th>विवरण</th>
-                                <th width="70" class="text-center">क्रम</th>
-                                <th width="90" class="text-center">स्थिति</th>
-                                <th width="140" class="text-center">कार्य</th>
+                                <th class="ps-3" width="60"><?php echo $__t('आइकन', 'Icon'); ?></th>
+                                <th><?php echo $__t('शीर्षक', 'Title'); ?></th>
+                                <th><?php echo $__t('विवरण', 'Description'); ?></th>
+                                <th width="70" class="text-center"><?php echo $__t('क्रम', 'Order'); ?></th>
+                                <th width="90" class="text-center"><?php echo $__t('स्थिति', 'Status'); ?></th>
+                                <th width="140" class="text-center"><?php echo $__t('कार्य', 'Actions'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($servicesArch)): ?>
                             <tr><td colspan="7" class="text-center py-5 text-muted">
                                 <i class="fas fa-folder-open fa-3x mb-2 d-block opacity-25"></i>
-                                अभिलेखमा कुनै सेवा छैन।
+                                <?php echo $__t('अभिलेखमा कुनै सेवा छैन।', 'No archived services.'); ?>
                             </td></tr>
                             <?php endif; ?>
                             <?php foreach ($servicesArch as $s): ?>
@@ -271,7 +274,7 @@ $servicesArch = $svcPart['archived'];
                                 </td>
                                 <td><span class="text-muted"><?php echo htmlspecialchars(mb_substr($s['description_np'] ?: ($s['description'] ?? ''), 0, 60)); ?>…</span></td>
                                 <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $s['display_order']; ?></span></td>
-                                <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?></span></td>
+                                <td class="text-center"><span class="badge bg-<?php echo $s['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $s['is_active'] ? $__t('सक्रिय', 'Active') : $__t('निष्क्रिय', 'Inactive'); ?></span></td>
                                 <td class="text-center">
                                     <a href="services.php?edit=<?php echo (int)$s['id']; ?>" class="btn btn-sm btn-primary me-1" title="सम्पादन">
                                         <i class="fas fa-edit"></i>
@@ -300,10 +303,10 @@ $servicesArch = $svcPart['archived'];
         <div class="card svc-flat-top-card">
             <div class="card-header d-flex justify-content-between align-items-center svc-form-header-grad">
                 <h5 class="mb-0 fw-bold" id="svcFormTitle">
-                    <i class="fas fa-plus-circle me-2"></i><?php echo $openServiceForm ? 'सेवा सम्पादन' : 'नयाँ सेवा थप्नुहोस्'; ?>
+                    <i class="fas fa-plus-circle me-2"></i><?php echo $openServiceForm ? $__t('सेवा सम्पादन', 'Edit Service') : $__t('नयाँ सेवा थप्नुहोस्', 'Add New Service'); ?>
                 </h5>
                 <a href="services.php" class="btn btn-light btn-sm" id="btnCancelSvc">
-                    <i class="fas fa-arrow-left me-1"></i>सूचीमा फर्कनुहोस्
+                    <i class="fas fa-arrow-left me-1"></i><?php echo $__t('सूचीमा फर्कनुहोस्', 'Back to List'); ?>
                 </a>
             </div>
             <div class="card-body p-4">
@@ -314,16 +317,16 @@ $servicesArch = $svcPart['archived'];
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold text-success">शीर्षक (नेपाली) <span class="text-danger">*</span></label>
-                            <input type="text" name="title" id="svcf_title" class="form-control admin-fancy-input" required placeholder="सेवाको शीर्षक नेपालीमा" value="<?php echo htmlspecialchars($editService['title_np'] ?? ($editService['title'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
+                            <label class="form-label fw-semibold text-success"><?php echo $__t('शीर्षक (नेपाली)', 'Title (Nepali)'); ?> <span class="text-danger">*</span></label>
+                            <input type="text" name="title" id="svcf_title" class="form-control admin-fancy-input" required placeholder="<?php echo $__t('सेवाको शीर्षक नेपालीमा', 'Service title in Nepali'); ?>" value="<?php echo htmlspecialchars($editService['title_np'] ?? ($editService['title'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold text-success">Title (English)</label>
                             <input type="text" name="title_en" id="svcf_title_en" class="form-control admin-fancy-input" placeholder="Service title in English" value="<?php echo htmlspecialchars($editService['title_en'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold text-success">विवरण</label>
-                            <textarea name="description" id="svcf_desc" class="form-control admin-fancy-input" rows="3" placeholder="सेवाको संक्षिप्त विवरण..."><?php echo htmlspecialchars($editService['description_np'] ?? ($editService['description'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></textarea>
+                            <label class="form-label fw-semibold text-success"><?php echo $__t('विवरण', 'Description'); ?></label>
+                            <textarea name="description" id="svcf_desc" class="form-control admin-fancy-input" rows="3" placeholder="<?php echo $__t('सेवाको संक्षिप्त विवरण...', 'Short service description...'); ?>"><?php echo htmlspecialchars($editService['description_np'] ?? ($editService['description'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></textarea>
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-semibold text-success">आइकन क्लास (Font Awesome)</label>
@@ -333,16 +336,16 @@ $servicesArch = $svcPart['archived'];
                                        value="<?php echo htmlspecialchars($editService['icon'] ?? 'fas fa-star', ENT_QUOTES, 'UTF-8'); ?>" placeholder="fas fa-star"
                                        oninput="document.getElementById('svcIconPreview').innerHTML='<i class=\''+this.value+'\'></i>'">
                             </div>
-                            <small class="text-muted">FontAwesome class — जस्तै: fas fa-piggy-bank, fas fa-hand-holding-usd</small>
+                            <small class="text-muted"><?php echo $__t('FontAwesome class — जस्तै', 'FontAwesome class — e.g.'); ?>: fas fa-piggy-bank, fas fa-hand-holding-usd</small>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-semibold text-success">क्रम</label>
+                            <label class="form-label fw-semibold text-success"><?php echo $__t('क्रम', 'Order'); ?></label>
                             <input type="number" name="display_order" id="svcf_order" class="form-control admin-fancy-input" value="<?php echo (int)($editService['display_order'] ?? 0); ?>" min="0">
                         </div>
                         <div class="col-md-2 d-flex align-items-end pb-1">
                             <div class="form-check form-switch fs-5">
                                 <input class="form-check-input" type="checkbox" name="is_active" id="svcf_active" <?php echo !isset($editService['is_active']) || (int)$editService['is_active'] === 1 ? 'checked' : ''; ?>>
-                                <label class="form-check-label fw-semibold" for="svcf_active">सक्रिय</label>
+                                <label class="form-check-label fw-semibold" for="svcf_active"><?php echo $__t('सक्रिय', 'Active'); ?></label>
                             </div>
                         </div>
                     </div>
@@ -350,10 +353,10 @@ $servicesArch = $svcPart['archived'];
                     <hr class="my-4">
                     <div class="d-flex gap-3">
                         <button type="submit" id="svcf_submit" class="btn btn-success px-5 fw-semibold">
-                            <i class="fas fa-plus-circle me-2"></i><?php echo $openServiceForm ? 'अपडेट गर्नुहोस्' : 'थप्नुहोस्'; ?>
+                            <i class="fas fa-plus-circle me-2"></i><?php echo $openServiceForm ? $__t('अपडेट गर्नुहोस्', 'Update') : $__t('थप्नुहोस्', 'Add'); ?>
                         </button>
                         <button type="button" id="svcf_cancel2" class="btn btn-outline-secondary px-4">
-                            <i class="fas fa-times me-1"></i>रद्द
+                            <i class="fas fa-times me-1"></i><?php echo $__t('रद्द', 'Cancel'); ?>
                         </button>
                     </div>
                 </form>

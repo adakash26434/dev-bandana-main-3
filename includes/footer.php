@@ -89,7 +89,11 @@ try {
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="footer-widget">
                             <!-- Footer Logo: logo तल name राखिएको छ (issue #4) -->
-                                <?php $footerLogo = trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png'))); ?>
+                                <?php
+                                $footerLogo = function_exists('getLocalizedLogoPath')
+                                    ? trim((string) getLocalizedLogoPath('assets/images/logo.png'))
+                                    : trim((string) getSetting('site_logo', getSetting('logo', 'assets/images/logo.png')));
+                                ?>
                         <div class="footer-logo footer-logo-stacked <?php echo !empty($footerLogo) ? 'has-logo' : 'no-logo'; ?>">
                 <!-- Logo image — logo भए नाम नदेखाउने -->
                 <?php if (!empty($footerLogo)): ?>
@@ -201,7 +205,7 @@ try {
 
                 <?php if ($supportedName !== ''): ?>
                 <p class="developer" style="opacity:.9; margin-bottom:2px;">
-                    Supported By
+                    <?php echo isEnglish() ? 'Supported By' : 'समर्थन'; ?>
                     <?php if ($supportedUrl !== ''): ?>
                     <a href="<?php echo htmlspecialchars($supportedUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener"><?php echo htmlspecialchars($supportedName, ENT_QUOTES, 'UTF-8'); ?></a>
                     <?php else: ?>
@@ -211,7 +215,7 @@ try {
                 <?php endif; ?>
 
                 <p class="developer" style="opacity:.9; margin-bottom:0;">
-                    Developed By
+                    <?php echo isEnglish() ? 'Developed By' : 'विकास सहयोग'; ?>
                     <a href="<?php echo $developerUrl; ?>" target="_blank" rel="noopener"><?php echo $developerName; ?></a>
                 </p>
             </div>

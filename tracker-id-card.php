@@ -11,6 +11,9 @@
  * - कुनै login आवश्यक छैन
  */
 require_once __DIR__ . '/includes/config.php';
+$_t = static function (string $np, string $en): string {
+    return isEnglish() ? $en : $np;
+};
 
 /* ── Token validation ── */
 $mid = (int)($_GET['mid'] ?? 0);
@@ -21,9 +24,9 @@ $valid = false;
 $errMsg = '';
 
 if (!$mid || !$exp || !$sig) {
-    $errMsg = 'अमान्य लिङ्क — Tracker verification बाट मात्र आउनु पर्छ।';
+    $errMsg = $_t('अमान्य लिङ्क — Tracker verification बाट मात्र आउनु पर्छ।', 'Invalid link — this must come from tracker verification.');
 } elseif ($exp < time()) {
-    $errMsg = 'यो लिङ्कको म्याद सकिएको छ (15 मिनेट)। कृपया फेरि Tracker बाट verify गर्नुहोस्।';
+    $errMsg = $_t('यो लिङ्कको म्याद सकिएको छ (15 मिनेट)। कृपया फेरि Tracker बाट verify गर्नुहोस्।', 'This link has expired (15 minutes). Please verify again from tracker.');
 } else {
     $secret  = defined('AUTH_SECRET') ? AUTH_SECRET : (defined('SECRET_KEY') ? SECRET_KEY : 'aakash-fallback-secret-2026');
     $payload = $mid . '.' . $exp;
@@ -31,7 +34,7 @@ if (!$mid || !$exp || !$sig) {
     if (hash_equals($expected, $sig)) {
         $valid = true;
     } else {
-        $errMsg = 'सुरक्षा हस्ताक्षर मेल खाएन। यो लिङ्क सम्भवतः छेडछाड भएको छ।';
+        $errMsg = $_t('सुरक्षा हस्ताक्षर मेल खाएन। यो लिङ्क सम्भवतः छेडछाड भएको छ।', 'Security signature mismatch. This link may have been tampered.');
     }
 }
 
@@ -52,20 +55,22 @@ if ($valid) {
         $mem = $st->fetch(PDO::FETCH_ASSOC) ?: null;
         if (!$mem) {
             $valid = false;
-            $errMsg = 'सदस्य अहिले उपलब्ध छैन वा ID Card अझै Generate भएको छैन।';
+            $errMsg = $_t('सदस्य अहिले उपलब्ध छैन वा ID Card अझै Generate भएको छैन।', 'Member is unavailable or ID card is not generated yet.');
         }
     } catch (\Throwable $e) {
         $valid = false;
-        $errMsg = 'डेटा लोड गर्दा त्रुटि भयो। पुनः प्रयास गर्नुहोस्।';
+        $errMsg = $_t('डेटा लोड गर्दा त्रुटि भयो। पुनः प्रयास गर्नुहोस्।', 'Error loading data. Please try again.');
         error_log('tracker-id-card fetch: ' . $e->getMessage());
     }
 }
 
 /* ── Site settings ── */
-$siteName = function_exists('getSetting') ? getSetting('site_name', 'आकाश सहकारी') : 'आकाश सहकारी';
+$siteName = function_exists('getSetting') ? getSetting('site_name', $_t('आकाश सहकारी', 'Aakash Cooperative')) : $_t('आकाश सहकारी', 'Aakash Cooperative');
 $siteUrl  = SITE_URL;
-$logoPath = function_exists('getSetting') ? getSetting('logo', 'assets/images/logo.png') : 'assets/images/logo.png';
-$address  = function_exists('getSetting') ? getSetting('address', 'काठमाडौं, नेपाल') : 'काठमाडौं, नेपाल';
+$logoPath = function_exists('getLocalizedLogoPath')
+    ? getLocalizedLogoPath('assets/images/logo.png')
+    : (function_exists('getSetting') ? getSetting('logo', 'assets/images/logo.png') : 'assets/images/logo.png');
+$address  = function_exists('getSetting') ? getSetting('address', $_t('काठमाडौं, नेपाल', 'Kathmandu, Nepal')) : $_t('काठमाडौं, नेपाल', 'Kathmandu, Nepal');
 
 /* No-cache + no-index */
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -74,12 +79,12 @@ header('X-Robots-Tag: noindex, nofollow, noarchive');
 header('Referrer-Policy: no-referrer');
 ?>
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <meta name="robots" content="noindex,nofollow">
-<title>Digital ID Card Preview — <?php echo htmlspecialchars($siteName); ?></title>
+<title><?php echo htmlspecialchars($_t('डिजिटल परिचयपत्र पूर्वावलोकन', 'Digital ID Card Preview')); ?> — <?php echo htmlspecialchars($siteName); ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -215,10 +220,10 @@ document.addEventListener('keydown', e => {
 <?php if (!$valid || !$mem): ?>
     <div class="error-card">
         <div class="error-icon"><i class="fas fa-shield-exclamation"></i></div>
-        <h3>लिङ्क पहुँच असफल</h3>
-        <p><?php echo htmlspecialchars($errMsg ?: 'यो लिङ्क मान्य छैन।'); ?></p>
+        <h3><?php echo $_t('लिङ्क पहुँच असफल', 'Link Access Failed'); ?></h3>
+        <p><?php echo htmlspecialchars($errMsg ?: $_t('यो लिङ्क मान्य छैन।', 'This link is invalid.')); ?></p>
         <a href="<?php echo $siteUrl; ?>application-tracker.php" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Tracker मा फर्किनुहोस्
+            <i class="fas fa-arrow-left"></i> <?php echo $_t('Tracker मा फर्किनुहोस्', 'Back to Tracker'); ?>
         </a>
     </div>
 <?php else: ?>
@@ -264,23 +269,23 @@ document.addEventListener('keydown', e => {
                 <div class="id-fields">
                     <div class="id-name"><?php echo $name; ?></div>
                     <div class="id-num"><?php echo $cardNo; ?></div>
-                    <div class="id-row"><span class="lbl">सदस्यता:</span><span class="val"><?php echo $sadNo; ?></span></div>
-                    <div class="id-row"><span class="lbl">फोन:</span><span class="val"><?php echo $phone; ?></span></div>
-                    <div class="id-row"><span class="lbl">इमेल:</span><span class="val"><?php echo $emailMa; ?></span></div>
-                    <div class="id-row"><span class="lbl">जारी मिति:</span><span class="val"><?php echo $genTs; ?></span></div>
+                    <div class="id-row"><span class="lbl"><?php echo $_t('सदस्यता', 'Member'); ?>:</span><span class="val"><?php echo $sadNo; ?></span></div>
+                    <div class="id-row"><span class="lbl"><?php echo $_t('फोन', 'Phone'); ?>:</span><span class="val"><?php echo $phone; ?></span></div>
+                    <div class="id-row"><span class="lbl"><?php echo $_t('इमेल', 'Email'); ?>:</span><span class="val"><?php echo $emailMa; ?></span></div>
+                    <div class="id-row"><span class="lbl"><?php echo $_t('जारी मिति', 'Issued Date'); ?>:</span><span class="val"><?php echo $genTs; ?></span></div>
                 </div>
             </div>
             <div class="id-footer">
-                <?php echo htmlspecialchars($address); ?> · आधिकारिक डिजिटल परिचयपत्र
+                <?php echo htmlspecialchars($address); ?> · <?php echo $_t('आधिकारिक डिजिटल परिचयपत्र', 'Official Digital Identity Card'); ?>
             </div>
         </div>
         <div class="preview-meta">
             <strong>🔐 Verified Public Preview</strong><br>
-            यो preview <?php echo date('H:i'); ?> मा generate भयो र <strong>१५ मिनेटमा expire</strong> हुन्छ।<br>
-            पूर्ण उपयोग र Download को लागि <a href="<?php echo $siteUrl; ?>member/login.php" style="color:var(--primary-color);font-weight:600;">Member Portal</a> मा Login गर्नुहोस्।
+            <?php echo $_t('यो preview', 'This preview was generated at'); ?> <?php echo date('H:i'); ?> <?php echo $_t('मा generate भयो र', 'and will'); ?> <strong><?php echo $_t('१५ मिनेटमा expire', 'expire in 15 minutes'); ?></strong> <?php echo $_t('हुन्छ।', '.'); ?><br>
+            <?php echo $_t('पूर्ण उपयोग र Download को लागि', 'For full access and download, login to'); ?> <a href="<?php echo $siteUrl; ?>member/login.php" style="color:var(--primary-color);font-weight:600;">Member Portal</a>.
             <br>
             <a href="<?php echo $siteUrl; ?>application-tracker.php" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Tracker मा फर्किनुहोस्
+                <i class="fas fa-arrow-left"></i> <?php echo $_t('Tracker मा फर्किनुहोस्', 'Back to Tracker'); ?>
             </a>
         </div>
     </div>
