@@ -7940,10 +7940,24 @@ body.chatbot-open {
 }
 
 .tools-mini-link span {
+    display: inline-block;
+    line-height: 1.15;
+    color: #0d5a1c;
+    transition: color .28s ease, background-color .28s ease, transform .28s ease;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.22), rgba(76, 175, 80, 0.10));
+    font-weight: 900;
+    letter-spacing: -0.01em;
+}
+
+.tools-mini-more {
     display: block;
-    line-height: 1.25;
-    color: var(--primary-color);
-    transition: color .28s ease;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(13, 90, 28, 0.9);
+    margin-top: -6px;
+    opacity: 0.9;
 }
 
 .tools-mini-link::after {
@@ -7967,7 +7981,14 @@ body.chatbot-open {
 }
 
 .tools-mini-link:hover span {
-    color: #fff;
+    color: #0d5a1c;
+    background: rgba(255, 255, 255, 0.75);
+    transform: translateY(-1px);
+}
+
+.tools-mini-link:hover .tools-mini-more {
+    color: #ffffff;
+    opacity: 1;
 }
 
 .tools-mini-link:hover i {
@@ -12378,6 +12399,73 @@ input[readonly].nepali-datepicker:hover,
 
 .rates-box-enhanced .btn-primary:hover i {
     transform: translateX(5px);
+}
+
+/* ==============================================
+   Rates & Notices: Compact sizing (homepage)
+   ============================================== */
+.rates-notices-section .rate-card-enhanced {
+    padding: 16px !important;
+    border-radius: 16px !important;
+}
+
+.rates-notices-section .rate-card-enhanced h5 {
+    font-size: 0.98rem !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 10px !important;
+    border-bottom-width: 1px !important;
+}
+
+.rates-notices-section .rate-card-enhanced .rate-item {
+    padding: 10px 10px !important;
+    margin: 0 -10px !important;
+}
+
+.rates-notices-section .rate-card-enhanced .rate-name {
+    font-size: 0.92rem !important;
+    line-height: 1.2;
+}
+
+.rates-notices-section .rate-card-enhanced .rate-value {
+    font-size: 0.9rem !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    min-width: 60px !important;
+}
+
+.rates-notices-section .notices-box-enhanced .notices-body {
+    padding: 16px !important;
+}
+
+.rates-notices-section .notice-item-enhanced {
+    padding: 12px !important;
+    margin-bottom: 10px !important;
+    border-radius: 14px !important;
+}
+
+.rates-notices-section .notice-item-enhanced .notice-date-box {
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 3px 12px rgba(255, 193, 7, 0.22) !important;
+}
+
+.rates-notices-section .notice-item-enhanced .notice-date-box .day {
+    font-size: 1.2rem !important;
+}
+
+.rates-notices-section .notice-item-enhanced .notice-date-box .month {
+    font-size: 0.6rem !important;
+}
+
+.rates-notices-section .notice-item-enhanced .notice-content h6 {
+    font-size: 0.88rem !important;
+    margin: 0 0 5px !important;
+    line-height: 1.25;
+}
+
+.rates-notices-section .notice-item-enhanced .notice-content .notice-meta {
+    font-size: 0.75rem !important;
 }
 
 /* ==============================================
