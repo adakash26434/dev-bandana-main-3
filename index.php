@@ -326,11 +326,13 @@ if ($db instanceof PDO) {
                             <i class="fas fa-mobile-screen-button"></i>
                             <span><?php echo isEnglish() ? 'Digital Service' : 'डिजिटल सेवा'; ?></span>
                             <small class="tools-mini-more"><?php echo isEnglish() ? 'More details' : 'थप विवरण'; ?></small>
+                            <small class="tools-link-badge"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></small>
                         </a>
                         <a href="member-welfare.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="90">
                             <i class="fas fa-hand-holding-heart"></i>
                             <span><?php echo isEnglish() ? 'Member Welfare' : 'सदस्य सुविधा'; ?></span>
                             <small class="tools-mini-more"><?php echo isEnglish() ? 'More details' : 'थप विवरण'; ?></small>
+                            <small class="tools-link-badge"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></small>
                         </a>
                         <a href="grievance.php" class="tools-mini-link" data-aos="fade-up" data-aos-delay="140">
                             <i class="fas fa-exclamation-circle"></i>
@@ -341,6 +343,7 @@ if ($db instanceof PDO) {
                             <i class="fas fa-gavel"></i>
                             <span><?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span>
                             <small class="tools-mini-more"><?php echo isEnglish() ? 'More details' : 'थप विवरण'; ?></small>
+                            <small class="tools-link-badge"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></small>
                         </a>
                     </div>
                 </div>

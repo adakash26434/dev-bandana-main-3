@@ -7941,23 +7941,25 @@ body.chatbot-open {
 
 .tools-mini-link span {
     display: inline-block;
-    line-height: 1.15;
+    line-height: 1.05;
     color: #0d5a1c;
     transition: color .28s ease, background-color .28s ease, transform .28s ease;
-    padding: 7px 14px;
+    padding: 6px 12px;
     border-radius: 999px;
     background: linear-gradient(135deg, rgba(76, 175, 80, 0.22), rgba(76, 175, 80, 0.10));
+    font-size: 0.86rem;
     font-weight: 900;
     letter-spacing: -0.01em;
 }
 
 .tools-mini-more {
     display: block;
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: 0.70rem;
+    font-weight: 800;
     color: rgba(13, 90, 28, 0.9);
-    margin-top: -6px;
+    margin-top: -4px;
     opacity: 0.9;
+    line-height: 1.0;
 }
 
 .tools-mini-link::after {
@@ -7989,6 +7991,21 @@ body.chatbot-open {
 .tools-mini-link:hover .tools-mini-more {
     color: #ffffff;
     opacity: 1;
+}
+
+.tools-link-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #ff4757;
+    color: #fff;
+    font-size: 0.62rem;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    z-index: 2;
 }
 
 .tools-mini-link:hover i {
