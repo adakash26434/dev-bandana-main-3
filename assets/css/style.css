@@ -12744,6 +12744,36 @@ input[readonly].nepali-datepicker:hover,
     font-size: 0.5rem !important;
 }
 
+/* Notice rows: make true compact like interest rows */
+.rates-notices-section .notices-box-enhanced .notice-item-enhanced {
+    padding: 8px 10px !important;
+    gap: 10px !important;
+    border-radius: 12px !important;
+    min-height: 0 !important;
+}
+
+.rates-notices-section .notices-box-enhanced .notice-item-enhanced .notice-date-box {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+}
+
+.rates-notices-section .notices-box-enhanced .notice-item-enhanced .notice-date-box .day {
+    font-size: 0.98rem !important;
+    line-height: 1 !important;
+}
+
+.rates-notices-section .notices-box-enhanced .notice-item-enhanced .notice-date-box .month {
+    font-size: 0.52rem !important;
+    line-height: 1 !important;
+}
+
+.rates-notices-section .notices-box-enhanced .notice-item-enhanced .notice-content h6 a {
+    font-size: 0.64rem !important;
+    line-height: 1 !important;
+    display: block !important;
+}
+
 .notices-box-enhanced .notices-footer {
     padding: 18px 20px;
     border-top: 1px dashed rgba(255, 193, 7, 0.3);
