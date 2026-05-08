@@ -111,7 +111,7 @@ require __DIR__ . '/includes/chrome.php';
     min-height: min(78vh, 900px);
     height: 78vh;
     border: 0;
-    background: #f8fafc;
+    background: color-mix(in srgb, var(--primary-color) 8%, white);
 }
 @media (max-width: 768px) {
     .mem-public-form-frame {

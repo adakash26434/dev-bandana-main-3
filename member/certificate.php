@@ -85,38 +85,58 @@ $extraHead = <<<HTML
   body { padding-bottom:0 !important; }
   .mp-topbar, .mem-nav, .mp-bottom-nav { display:none !important; }
   .mp-container { padding:0 !important; }
-  .cert-page { box-shadow:none !important; border:2px solid #ccc !important; }
+.cert-page { box-shadow:none !important; border:2px solid color-mix(in srgb, var(--primary-color) 22%, #ccc) !important; }
   @page { size: A4; margin: 10mm; }
 }
 .cert-page {
-  background:#fff; max-width:680px; margin:0 auto;
+  background:white; max-width:680px; margin:0 auto;
   border:3px double {$primaryColor};
   border-radius:8px;
-  box-shadow:0 8px 32px rgba(0,0,0,.12);
+  box-shadow:0 8px 32px rgba(var(--primary-rgb,26,95,42),.12);
   position:relative; overflow:hidden;
 }
-.cert-top-band { background:{$primaryColor}; color:#fff; padding:14px 24px; display:flex; align-items:center; gap:16px; }
-.cert-logo { width:52px; height:52px; border-radius:10px; background:#fff; padding:4px; object-fit:contain; }
+.cert-top-band { background:{$primaryColor}; color:var(--text-on-primary,white); padding:14px 24px; display:flex; align-items:center; gap:16px; }
+.cert-logo { width:52px; height:52px; border-radius:10px; background:white; padding:4px; object-fit:contain; }
 .cert-logo-placeholder { width:52px;height:52px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem; }
 .cert-site-name { font-size:1.1rem; font-weight:800; line-height:1.2; }
 .cert-site-sub  { font-size:.78rem; opacity:.85; margin-top:2px; }
 .cert-body { padding:22px 28px; }
 .cert-title { text-align:center; margin-bottom:20px; }
 .cert-title h2 { font-size:1.25rem; font-weight:800; color:{$primaryColor}; letter-spacing:.05em; border-bottom:2px solid {$primaryColor}; display:inline-block; padding-bottom:4px; }
-.cert-title p { font-size:.78rem; color:#6b7280; margin-top:4px; }
+.cert-title p { font-size:.78rem; color:var(--text-light,#6b7280); margin-top:4px; }
 .cert-member-row { display:flex; gap:20px; margin-bottom:20px; align-items:flex-start; }
-.cert-photo { width:90px; height:110px; border:2px solid #e5e7eb; border-radius:6px; object-fit:cover; flex-shrink:0; background:#f9fafb; display:flex; align-items:center; justify-content:center; }
+.cert-photo { width:90px; height:110px; border:2px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb); border-radius:6px; object-fit:cover; flex-shrink:0; background:color-mix(in srgb, var(--primary-color) 8%, white); display:flex; align-items:center; justify-content:center; }
 .cert-photo img { width:86px; height:106px; object-fit:cover; border-radius:4px; }
 .cert-details { flex:1; }
 .cert-field { margin-bottom:8px; display:flex; gap:4px; font-size:.88rem; }
-.cert-field-label { min-width:140px; color:#6b7280; font-weight:600; flex-shrink:0; }
-.cert-field-value { color:#1f2937; font-weight:700; border-bottom:1px solid #e5e7eb; flex:1; padding-bottom:2px; }
-.cert-footer { background:#f9fafb; border-top:2px solid {$primaryColor}; padding:14px 28px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.cert-field-label { min-width:140px; color:var(--text-light,#6b7280); font-weight:600; flex-shrink:0; }
+.cert-field-value { color:var(--text-color,#1f2937); font-weight:700; border-bottom:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb); flex:1; padding-bottom:2px; }
+.cert-footer { background:color-mix(in srgb, var(--primary-color) 8%, white); border-top:2px solid {$primaryColor}; padding:14px 28px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
 .cert-seal { width:80px; height:80px; border-radius:50%; border:3px solid {$primaryColor}; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:.55rem; font-weight:700; color:{$primaryColor}; line-height:1.2; }
 .cert-qr img { display:block; }
-.cert-sign-line { border-top:1.5px solid #374151; margin-top:40px; padding-top:5px; font-size:.75rem; color:#6b7280; text-align:center; min-width:100px; }
+.cert-sign-line { border-top:1.5px solid var(--text-color,#374151); margin-top:40px; padding-top:5px; font-size:.75rem; color:var(--text-light,#6b7280); text-align:center; min-width:100px; }
 .cert-watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-30deg); font-size:5rem; font-weight:900; color:rgba(26,95,42,.04); pointer-events:none; white-space:nowrap; z-index:0; }
-.cert-ribbon { position:absolute; top:16px; right:-20px; background:var(--secondary-color,#c0392b); color:var(--text-on-secondary,#fff); font-size:.65rem; font-weight:700; padding:4px 28px; transform:rotate(35deg); letter-spacing:.08em; }
+.cert-ribbon { position:absolute; top:16px; right:-20px; background:var(--secondary-color,#c0392b); color:var(--text-on-secondary,white); font-size:.65rem; font-weight:700; padding:4px 28px; transform:rotate(35deg); letter-spacing:.08em; }
+.cert-actions { display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px; }
+.cert-page-title { font-size:1.15rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0; }
+.cert-btn-row { display:flex;gap:10px;flex-wrap:wrap; }
+.cert-btn { padding:9px 20px;border-radius:8px;font-family:inherit;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:6px;text-decoration:none; }
+.cert-btn.primary { background:var(--primary-color,#1a8754);color:var(--text-on-primary,white);border:none;cursor:pointer; }
+.cert-btn.outline { background:white;color:var(--primary-color,#1a8754);border:2px solid var(--primary-color,#1a8754); }
+.cert-alert { border-radius:10px;padding:16px;font-size:.88rem;margin-bottom:16px;display:flex;gap:8px;align-items:center; }
+.cert-alert.warn { background:color-mix(in srgb, var(--secondary-color) 12%, white);border:1px solid color-mix(in srgb, var(--secondary-color) 24%, white);color:var(--secondary-dark,#922b21); }
+.cert-body-inner { position:relative;z-index:1; }
+.cert-intro { text-align:center;font-size:.88rem;color:var(--text-color,#4b5563);margin-bottom:18px;line-height:1.6; }
+.cert-photo-empty-icon { font-size:2.5rem;color:color-mix(in srgb, var(--primary-color) 20%, #d1d5db); }
+.cert-plain-muted { font-size:.75rem;color:var(--text-muted,#9ca3af);margin-bottom:4px; }
+.cert-plain-phone { font-size:.72rem;color:var(--text-muted,#9ca3af); }
+.cert-qr { display:block;border:1px solid color-mix(in srgb, var(--primary-color) 14%, #e5e7eb);border-radius:4px; }
+.cert-qr-note { font-size:.65rem;color:var(--text-muted,#9ca3af);margin-top:3px; }
+.cert-bottom-help { text-align:center;margin-top:16px;font-size:.8rem;color:var(--text-muted,#9ca3af); }
+.cert-inline-icon-sm { margin-right:3px; }
+.cert-inline-icon-md { margin-right:4px; }
+.cert-inline-icon-lg { margin-right:8px; }
+.cert-member-code { font-family:monospace;color:var(--primary-color); }
 </style>
 HTML;
 ?>
@@ -126,22 +146,22 @@ HTML;
 <div class="mp-container">
 
   <!-- Action buttons (hidden on print) -->
-  <div class="cert-noprint" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-    <h1 style="font-size:1.15rem;font-weight:700;color:var(--primary-color,#1a8754);margin:0;">
-      <i class="fas fa-certificate" style="margin-right:8px;"></i><?php echo $_t('सदस्यता प्रमाणपत्र', 'Membership Certificate'); ?>
+  <div class="cert-noprint cert-actions">
+    <h1 class="cert-page-title">
+      <i class="fas fa-certificate cert-inline-icon-lg"></i><?php echo $_t('सदस्यता प्रमाणपत्र', 'Membership Certificate'); ?>
     </h1>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button onclick="window.print()" style="padding:9px 20px;background:var(--primary-color,#1a8754);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+    <div class="cert-btn-row">
+      <button onclick="window.print()" class="cert-btn primary">
         <i class="fas fa-print"></i> Print / PDF
       </button>
-      <a href="id-card.php" style="padding:9px 20px;background:#fff;color:var(--primary-color,#1a8754);border:2px solid var(--primary-color,#1a8754);border-radius:8px;font-size:.88rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;">
+      <a href="id-card.php" class="cert-btn outline">
         <i class="fas fa-id-card"></i> <?php echo $_t('पहिचान कार्ड', 'ID Card'); ?>
       </a>
     </div>
   </div>
 
   <?php if (!$fullName || !$sadasyata): ?>
-  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;font-size:.88rem;color:var(--secondary-dark,#922b21);margin-bottom:16px;display:flex;gap:8px;align-items:center;" class="cert-noprint">
+  <div class="cert-noprint cert-alert warn">
     <i class="fas fa-triangle-exclamation"></i>
     <div><?php echo $_t('तपाईंको KYC अनुमोदन भएको छैन। KYC approve भएपछि मात्र पूर्ण प्रमाणपत्र उपलब्ध हुनेछ।', 'Your KYC is not approved yet. Full certificate will be available only after KYC approval.'); ?></div>
   </div>
@@ -165,19 +185,19 @@ HTML;
         <div class="cert-site-name"><?= htmlspecialchars($siteName) ?></div>
         <div class="cert-site-sub"><?= htmlspecialchars($siteNameEn) ?></div>
         <?php if ($siteAddress): ?>
-        <div class="cert-site-sub"><i class="fas fa-location-dot" style="margin-right:3px;"></i><?= htmlspecialchars($siteAddress) ?></div>
+        <div class="cert-site-sub"><i class="fas fa-location-dot cert-inline-icon-sm"></i><?= htmlspecialchars($siteAddress) ?></div>
         <?php endif; ?>
       </div>
     </div>
 
     <!-- Body -->
-    <div class="cert-body" style="position:relative;z-index:1;">
+    <div class="cert-body cert-body-inner">
       <div class="cert-title">
         <h2><?php echo $_t('सदस्यता प्रमाणपत्र', 'Membership Certificate'); ?></h2>
         <p>MEMBERSHIP CERTIFICATE</p>
       </div>
 
-      <div style="text-align:center;font-size:.88rem;color:#4b5563;margin-bottom:18px;line-height:1.6;">
+      <div class="cert-intro">
         <?php echo $_t('यसद्वारा प्रमाणित गरिन्छ कि तल उल्लिखित व्यक्ति', 'This is to certify that the person mentioned below is a'); ?>
         <strong><?= htmlspecialchars($siteName) ?></strong>
         <?php echo $_t('को', 'of'); ?>
@@ -189,7 +209,7 @@ HTML;
           <?php if ($photoUrl): ?>
           <img src="<?= htmlspecialchars($photoUrl) ?>" alt="Photo">
           <?php else: ?>
-          <i class="fas fa-user" style="font-size:2.5rem;color:#d1d5db;"></i>
+          <i class="fas fa-user cert-photo-empty-icon"></i>
           <?php endif; ?>
         </div>
         <div class="cert-details">
@@ -199,7 +219,7 @@ HTML;
           </div>
           <div class="cert-field">
             <span class="cert-field-label"><?php echo $_t('सदस्यता नम्बर', 'Membership Number'); ?></span>
-            <span class="cert-field-value" style="font-family:monospace;color:var(--primary-color,#1a5f2a);"><?= htmlspecialchars($sadasyata ?: '—') ?></span>
+            <span class="cert-field-value cert-member-code"><?= htmlspecialchars($sadasyata ?: '—') ?></span>
           </div>
           <?php if ($fatherName): ?>
           <div class="cert-field">
@@ -239,23 +259,23 @@ HTML;
         <div class="cert-seal"><?= htmlspecialchars(mb_substr($siteName,0,12)) ?><br><?php echo $_t('सहकारी', 'Co-op'); ?><br><?php echo $_t('छाप', 'Seal'); ?></div>
       </div>
       <div style="flex:1;text-align:center;">
-        <div style="font-size:.75rem;color:#9ca3af;margin-bottom:4px;"><?php echo $_t('जारी मिति', 'Issued Date'); ?>: <?= htmlspecialchars($issueDateNp) ?></div>
+        <div class="cert-plain-muted"><?php echo $_t('जारी मिति', 'Issued Date'); ?>: <?= htmlspecialchars($issueDateNp) ?></div>
         <?php if ($sitePhone): ?>
-        <div style="font-size:.72rem;color:#9ca3af;"><i class="fas fa-phone" style="margin-right:3px;"></i><?= htmlspecialchars($sitePhone) ?></div>
+        <div class="cert-plain-phone"><i class="fas fa-phone cert-inline-icon-sm"></i><?= htmlspecialchars($sitePhone) ?></div>
         <?php endif; ?>
         <div style="margin-top:8px;">
           <div class="cert-sign-line"><?php echo $_t('अध्यक्ष', 'Chairperson'); ?></div>
         </div>
       </div>
       <div style="text-align:center;">
-        <img src="<?= htmlspecialchars($qrUrl) ?>" alt="QR" width="80" height="80" style="display:block;border:1px solid #e5e7eb;border-radius:4px;">
-        <div style="font-size:.65rem;color:#9ca3af;margin-top:3px;">Scan to Verify</div>
+        <img src="<?= htmlspecialchars($qrUrl) ?>" alt="QR" width="80" height="80" class="cert-qr">
+        <div class="cert-qr-note">Scan to Verify</div>
       </div>
     </div>
   </div>
 
-  <div class="cert-noprint" style="text-align:center;margin-top:16px;font-size:.8rem;color:#9ca3af;">
-    <i class="fas fa-info-circle" style="margin-right:4px;"></i>
+  <div class="cert-noprint cert-bottom-help">
+    <i class="fas fa-info-circle cert-inline-icon-md"></i>
     <?php echo $_t('Print / PDF download को लागि माथिको "Print / PDF" button थिच्नुहोस्। Browser मा "Save as PDF" option छान्नुहोस्।', 'To print or download PDF, click the "Print / PDF" button above and choose "Save as PDF" in browser.'); ?>
   </div>
 
