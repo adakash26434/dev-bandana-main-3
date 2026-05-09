@@ -309,6 +309,11 @@ ensurePublicTables();
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(var(--primary-rgb), .1);
 }
+</style>
+<?php
+// Get homepage data with caching (cache for 30 minutes)
+$homepageData = getCachedData('homepage_data', 1800, function() {
+    $data = [];
     try {
         $db = getDB();
         $data['sliders'] = $db->query("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order, id")->fetchAll();
