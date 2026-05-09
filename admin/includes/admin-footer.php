@@ -238,18 +238,53 @@
                     log: makePane('log', false)
                 };
 
+                var DOCS_RE  = /(कागजात|प्रतिलिपि|प्रमाण|document|attached|attachment|संलग्न|फाइल|file|photo|फोटो|signature|हस्ताक्षर|download|डाउनलोड|national\s*id|नागरिकता\s*\/?\s*national)/i;
+                var LOG_RE   = /(status\s*\/\s*comment\s*history|history|activity\s*log|gatividhi|गतिविधि|इतिहास|comment\s*history)/i;
+                var SKIP_TAG = { SCRIPT: 1, STYLE: 1, LINK: 1, META: 1 };
+
+                function nodeHasImage(n) {
+                    return !!n.querySelector('img.img-thumbnail, img[class*="thumb"], img[class*="doc"], .acc-doc-thumb, .img-thumbnail');
+                }
+                function nodeHasFileLink(n) {
+                    return !!n.querySelector('a[download], a[target="_blank"][href*="upload"], a[href$=".pdf"], a[href$=".jpg"], a[href$=".jpeg"], a[href$=".png"], a[href$=".webp"]');
+                }
+                function nodeIsImageWrap(n) {
+                    if (!n.querySelector) return false;
+                    var imgs = n.querySelectorAll('img');
+                    if (!imgs.length) return false;
+                    var headerEl = n.querySelector('.adm-info-group-header, .card-header, h5, h6');
+                    return !headerEl;
+                }
+
                 sourceNodes.forEach(function(node) {
                     if (!node || node.nodeType !== 1) return;
+                    if (SKIP_TAG[node.tagName]) { panes.overview.appendChild(node); node.style.display = 'none'; return; }
+
+                    if (node.id === 'kycInfoTabs' || node.classList && node.classList.contains('kyc-mini-tab-bar')) {
+                        node.style.display = 'none';
+                        panes.overview.appendChild(node);
+                        return;
+                    }
+
+                    if (node.style && node.style.display === 'none') node.style.display = '';
+
                     var text = (node.textContent || '').replace(/\s+/g, ' ').trim();
                     var header = node.querySelector('.adm-info-group-header, .card-header, h5, h6');
                     var headText = ((header && header.textContent) || text).replace(/\s+/g, ' ').trim();
-                    if (/(status\s*\/\s*comment\s*history|history|activity|log|गतिविधि|इतिहास)/i.test(headText)) {
+
+                    if (LOG_RE.test(headText)) {
                         panes.log.appendChild(node);
-                    } else if (/(कागजात|document|attached|attachment|संलग्न|फाइल|file|photo|फोटो|signature|हस्ताक्षर|download|डाउनलोड)/i.test(headText)) {
+                    } else if (DOCS_RE.test(headText) || nodeHasImage(node) || nodeHasFileLink(node) || nodeIsImageWrap(node)) {
                         panes.docs.appendChild(node);
                     } else {
                         panes.overview.appendChild(node);
                     }
+                });
+
+                ['overview','docs','log'].forEach(function(k) {
+                    panes[k].querySelectorAll('.adm-info-group').forEach(function(g) {
+                        if (g.style && g.style.display === 'none') g.style.display = '';
+                    });
                 });
 
                 if (sidebarSource) {
