@@ -437,9 +437,11 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 
     <div class="auth-portal-toolbar">
         <a href="<?php echo SITE_URL; ?>" class="page-back"><i class="fas fa-arrow-left"></i> <?php echo $_t('मुख्य पृष्ठ', 'Home'); ?></a>
+        <?php if (function_exists('portalLangToggleUrl') && function_exists('portalLangToggleBadge')): ?>
         <a href="<?php echo htmlspecialchars(portalLangToggleUrl(), ENT_QUOTES, 'UTF-8'); ?>" class="auth-lang-toggle" title="<?php echo htmlspecialchars($_t('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($_t('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>">
             <i class="fas fa-language"></i> <?php echo htmlspecialchars(portalLangToggleBadge()); ?>
         </a>
+        <?php endif; ?>
     </div>
 
     <?php

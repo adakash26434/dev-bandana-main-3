@@ -92,6 +92,12 @@ if (!defined('CRED_MASTER_KEY')) {
     } elseif (defined('SESSION_SECRET') || getenv('SESSION_SECRET')) {
         // Last-resort fallback so add-credential नबन्द होस्
         define('CRED_MASTER_KEY', hash('sha256', (string)(getenv('SESSION_SECRET') ?: 'aakash-coop-fallback-key')));
+    } else {
+        // Writable key file नभए पनि constant जरुरी (undefined constant fatal रोक्न)
+        define(
+            'CRED_MASTER_KEY',
+            hash('sha256', 'coop-vault-bootstrap-' . (string)($_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost'))
+        );
     }
     unset($_cred_key_file, $_k);
 }
