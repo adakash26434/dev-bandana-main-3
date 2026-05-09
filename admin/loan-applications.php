@@ -218,7 +218,7 @@ if ($viewApp):
     $sl = $statusLabel[$viewApp['status']] ?? $viewApp['status'];
     $trackId = $viewApp['tracking_id'] ?? 'LOAN-' . str_pad($viewApp['id'], 6, '0', STR_PAD_LEFT);
 ?>
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm mb-4 arv-legacy-detail">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-hand-holding-usd me-2"></i><?php echo $__t('ऋण आवेदन विवरण', 'Loan Application Details'); ?>

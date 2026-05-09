@@ -146,7 +146,7 @@ if (!$claim) {
 }
 ?>
 
-<div class="card admin-table-card mb-4">
+<div class="card admin-table-card mb-4 arv-legacy-detail">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-eye"></i> दाबी विवरण — <?php echo $claim['tracking_id']; ?>

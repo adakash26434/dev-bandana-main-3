@@ -268,7 +268,7 @@ function attachmentName($path) {
     <!-- ════════════════════════════════════════════
          Single Feedback Detail View + Edit
     ════════════════════════════════════════════ -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-4 arv-legacy-detail">
         <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">
                 <i class="fas fa-comment-dots me-2"></i>Feedback विवरण
@@ -653,20 +653,20 @@ function attachmentName($path) {
                             <!-- Actions -->
                             <td>
                                 <div class="adm-action-icons">
-                                <a href="?view=<?php echo $fb['id']; ?>"
-                                   class="adm-icon-btn adm-icon-btn--view" title="विवरण हेर्नुहोस् / अपडेट गर्नुहोस्" aria-label="View">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                                    <a href="?view=<?php echo $fb['id']; ?>"
+                                       class="adm-icon-btn adm-icon-btn--view" title="विवरण हेर्नुहोस् / अपडेट गर्नुहोस्" aria-label="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <form method="POST" class="adm-icon-form"
+                                          onsubmit="return confirm('यो feedback मेटाउने?');">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id"     value="<?php echo $fb['id']; ?>">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <button type="submit" class="adm-icon-btn adm-icon-btn--delete" title="मेटाउनुहोस्" aria-label="Delete">
+                                            <i class="fas fa-trash-can"></i>
+                                        </button>
+                                    </form>
                                 </div>
-                                <form method="POST" style="display:inline;"
-                                      onsubmit="return confirm('यो feedback मेटाउने?');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id"     value="<?php echo $fb['id']; ?>">
-                                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger mb-1" title="मेटाउनुहोस्">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>

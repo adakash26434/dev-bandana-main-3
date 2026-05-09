@@ -196,10 +196,10 @@ try {
                                 <?php echo $statusLabel[$bid['status']] ?? htmlspecialchars($bid['status']); ?>
                             </span>
                         </td>
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                    <i class="fas fa-cog"></i>
+                        <td class="no-print">
+                            <div class="adm-action-icons dropdown">
+                                <button type="button" class="adm-icon-btn adm-icon-btn--edit dropdown-toggle" data-bs-toggle="dropdown" title="कार्य" aria-label="Actions">
+                                    <i class="fas fa-sliders"></i>
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>

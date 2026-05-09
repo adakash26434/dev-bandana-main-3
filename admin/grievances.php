@@ -292,7 +292,7 @@ if ($viewGrv):
     $trackId = $viewGrv['tracking_id'] ?? 'GRV-' . str_pad($viewGrv['id'], 6, '0', STR_PAD_LEFT);
     $catTxt  = $catLabels[$viewGrv['category'] ?? ''] ?? ($viewGrv['category'] ?? '—');
 ?>
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm mb-4 arv-legacy-detail">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-exclamation-circle me-2"></i><?php echo $__t('गुनासो विवरण', 'Grievance Details'); ?>

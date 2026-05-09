@@ -221,7 +221,7 @@ if ($viewApp):
     $trackId = $viewApp['tracking_id'] ?? 'ACC-' . str_pad($viewApp['id'], 6, '0', STR_PAD_LEFT);
     $accType = $accTypes[$viewApp['account_type']] ?? $viewApp['account_type'];
 ?>
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm mb-4 arv-legacy-detail">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             <i class="fas fa-user-plus me-2"></i><?php echo $__t('खाता आवेदन विवरण', 'Account Application Details'); ?>

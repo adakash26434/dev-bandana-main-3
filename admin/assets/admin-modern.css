@@ -3863,3 +3863,107 @@ aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
     outline: 2px solid color-mix(in srgb, var(--primary-color, #1a5f2a) 60%, transparent);
     outline-offset: 2px;
 }
+
+/* ──────────────────────────────────────────────────────────
+   Unified Legacy Detail Tabs
+   Gives older single-record admin pages the same detail shell
+   without changing their existing forms or server handlers.
+   ────────────────────────────────────────────────────────── */
+.arv-legacy-detail {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 18px !important;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08) !important;
+}
+.arv-legacy-detail > .card-header,
+.arv-legacy-detail .gradient-card-header {
+    background: linear-gradient(135deg, var(--primary-color, #1a5f2a), #0f766e) !important;
+    color: #fff !important;
+    border: 0 !important;
+    padding: 16px 20px !important;
+}
+.arv-legacy-detail > .card-body {
+    background: #f8fafc;
+    padding: 18px;
+}
+.arv-legacy-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 18px;
+    align-items: start;
+}
+.arv-legacy-shell.arv-legacy-shell--single {
+    grid-template-columns: 1fr;
+}
+.arv-legacy-main,
+.arv-legacy-sidebar {
+    min-width: 0;
+}
+.arv-legacy-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: -18px -18px 18px;
+    padding: 0 18px;
+    list-style: none;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+.arv-legacy-tabs button {
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: #334155;
+    border-radius: 0;
+    padding: 14px 16px 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+.arv-legacy-tabs button:hover {
+    color: var(--primary-color, #1a5f2a);
+}
+.arv-legacy-tabs button.active {
+    border-bottom-color: var(--primary-color, #1a5f2a);
+    color: var(--primary-color, #1a5f2a);
+}
+.arv-legacy-pane {
+    display: none;
+}
+.arv-legacy-pane.active {
+    display: block;
+}
+.arv-legacy-pane > .adm-info-group,
+.arv-legacy-pane > .card,
+.arv-legacy-pane > .alert,
+.arv-legacy-sidebar > .card,
+.arv-legacy-sidebar > form,
+.arv-legacy-sidebar > .alert {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+.arv-legacy-pane > .adm-info-group {
+    padding: 16px;
+    margin-bottom: 14px;
+}
+.arv-legacy-pane > .adm-info-group:last-child {
+    margin-bottom: 0;
+}
+.arv-legacy-sidebar .card,
+.arv-legacy-sidebar form,
+.arv-legacy-sidebar .alert {
+    margin-bottom: 14px;
+}
+@media (max-width: 991.98px) {
+    .arv-legacy-shell {
+        grid-template-columns: 1fr;
+    }
+    .arv-legacy-detail > .card-body {
+        padding: 14px;
+    }
+    .arv-legacy-tabs {
+        margin: -14px -14px 14px;
+        padding: 0 12px;
+    }
+}

@@ -69,7 +69,7 @@ if ($action === 'view' && isset($_GET['id'])) {
     $flash = getFlash(); if ($flash) echo adminAlert($flash['type'], $flash['message']);
     ?>
 
-    <div class="card admin-table-card mb-4">
+    <div class="card admin-table-card mb-4 arv-legacy-detail">
         <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-envelope-open me-2"></i>
                 <?php echo htmlspecialchars($message['name']); ?> को सन्देश
@@ -283,15 +283,17 @@ if ($action === 'view' && isset($_GET['id'])) {
                                 <small class="text-muted"><?php echo formatNepaliDate($msg['created_at']); ?></small>
                             </td>
                             <td class="text-center">
-                                <a href="messages.php?action=view&id=<?php echo $msg['id']; ?>"
-                                   class="btn btn-sm btn-info me-1" title="हेर्नुहोस्">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <form method="POST" class="d-inline" onsubmit="return confirm('सन्देश मेट्ने?')">
-                    <?php echo csrfField(); ?>
-                    <input type="hidden" name="delete_id" value="<?php echo (int)$msg['id']; ?>">
-                    <button type="submit" class="btn btn-sm btn-outline-danger" title="मेट्नुहोस्"><i class="fas fa-trash"></i></button>
-                </form>
+                                <div class="adm-action-icons">
+                                    <a href="messages.php?action=view&id=<?php echo $msg['id']; ?>"
+                                       class="adm-icon-btn adm-icon-btn--view" title="हेर्नुहोस्" aria-label="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <form method="POST" class="adm-icon-form" onsubmit="return confirm('सन्देश मेट्ने?')">
+                                        <?php echo csrfField(); ?>
+                                        <input type="hidden" name="delete_id" value="<?php echo (int)$msg['id']; ?>">
+                                        <button type="submit" class="adm-icon-btn adm-icon-btn--delete" title="मेट्नुहोस्" aria-label="Delete"><i class="fas fa-trash-can"></i></button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; endif; ?>

@@ -118,7 +118,7 @@ $businessLabels = [
 
 <?php if ($detail): ?>
 <!-- ══ Detail View ══ -->
-<div class="card admin-table-card mb-3">
+<div class="card admin-table-card mb-3 arv-legacy-detail">
     <div class="card-header d-flex align-items-center justify-content-between py-2">
         <span class="fw-semibold"><i class="fas fa-store me-2"></i><?php echo htmlspecialchars($detail['company_name']); ?></span>
         <a href="vendor-enlistment.php?tab=<?php echo $tab; ?>" class="btn btn-sm btn-outline-secondary">
@@ -311,11 +311,11 @@ $businessLabels = [
                             <button type="submit" class="btn-qreject"><i class="fas fa-times me-1"></i>अस्वीकृत</button>
                         </form>
                         <?php endif; ?>
-                        <form method="POST" class="qaction-form d-inline" onsubmit="return confirm('के तपाईं पक्का हुनुहुन्छ?')">
+                        <form method="POST" class="adm-icon-form" onsubmit="return confirm('के तपाईं पक्का हुनुहुन्छ?')">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $v['id']; ?>">
-                            <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="मेटाउनुहोस्"><i class="fas fa-trash"></i></button>
+                            <button type="submit" class="adm-icon-btn adm-icon-btn--delete" title="मेटाउनुहोस्" aria-label="Delete"><i class="fas fa-trash-can"></i></button>
                         </form>
                     </div>
                 </td>

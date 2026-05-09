@@ -162,7 +162,7 @@ try {
     $dsrHistory = [];
 }
 ?>
-<div class="card admin-table-card mb-4">
+<div class="card admin-table-card mb-4 arv-legacy-detail">
     <div class="card-header gradient-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-mobile-alt"></i> <?php echo $__t('अनुरोध विवरण', 'Request Details'); ?> - <?php echo e($request['tracking_id']); ?></h5>
         <a href="digital-service-requests.php" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-1"></i><?php echo $__t('फिर्ता', 'Back'); ?></a>

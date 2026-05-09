@@ -185,6 +185,121 @@
         autoSplitListFormRows();
 
         /* ─────────────────────────────────────────────────────
+           UNIFIED REQUEST DETAIL SHELL
+           पुराना single-record detail pages लाई same tab layout मा राख्ने।
+           ───────────────────────────────────────────────────── */
+        function initLegacyRequestDetailTabs() {
+            document.querySelectorAll('.arv-legacy-detail:not([data-arv-legacy-done])').forEach(function(card, cardIndex) {
+                var body = Array.prototype.slice.call(card.children).find(function(el) {
+                    return el.classList && el.classList.contains('card-body');
+                });
+                if (!body) return;
+
+                var directRows = Array.prototype.slice.call(body.children).filter(function(el) {
+                    return el.classList && el.classList.contains('row');
+                });
+                var detailRow = directRows.find(function(row) {
+                    var cols = Array.prototype.slice.call(row.children).filter(function(ch) {
+                        return ch.className && /(^|\s)col-/.test(ch.className);
+                    });
+                    if (cols.length < 2) return false;
+                    var hasInfo = cols.some(function(col) { return !!col.querySelector('.adm-info-group'); });
+                    var hasAction = cols.some(function(col) {
+                        return !!(col.querySelector('form') || col.querySelector('.card') || col.querySelector('.btn'));
+                    });
+                    return hasInfo && hasAction;
+                });
+
+                var sourceNodes = [];
+                var sidebarSource = null;
+                if (detailRow) {
+                    var cols = Array.prototype.slice.call(detailRow.children).filter(function(ch) {
+                        return ch.className && /(^|\s)col-/.test(ch.className);
+                    });
+                    sidebarSource = cols.find(function(col) { return !!col.querySelector('form'); }) || cols[cols.length - 1];
+                    var mainSource = cols.find(function(col) { return col !== sidebarSource && !!col.querySelector('.adm-info-group'); }) || cols[0];
+                    sourceNodes = Array.prototype.slice.call(mainSource.children);
+                } else {
+                    sourceNodes = Array.prototype.slice.call(body.children);
+                }
+
+                var tabs = document.createElement('div');
+                tabs.className = 'arv-legacy-tabs no-print';
+                var shell = document.createElement('div');
+                shell.className = 'arv-legacy-shell' + (sidebarSource ? '' : ' arv-legacy-shell--single');
+                var main = document.createElement('div');
+                main.className = 'arv-legacy-main';
+                var sidebar = document.createElement('aside');
+                sidebar.className = 'arv-legacy-sidebar no-print';
+
+                var panes = {
+                    overview: makePane('overview', true),
+                    docs: makePane('docs', false),
+                    log: makePane('log', false)
+                };
+
+                sourceNodes.forEach(function(node) {
+                    if (!node || node.nodeType !== 1) return;
+                    var text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+                    var header = node.querySelector('.adm-info-group-header, .card-header, h5, h6');
+                    var headText = ((header && header.textContent) || text).replace(/\s+/g, ' ').trim();
+                    if (/(status\s*\/\s*comment\s*history|history|activity|log|गतिविधि|इतिहास)/i.test(headText)) {
+                        panes.log.appendChild(node);
+                    } else if (/(कागजात|document|attached|attachment|संलग्न|फाइल|file|photo|फोटो|signature|हस्ताक्षर|download|डाउनलोड)/i.test(headText)) {
+                        panes.docs.appendChild(node);
+                    } else {
+                        panes.overview.appendChild(node);
+                    }
+                });
+
+                if (sidebarSource) {
+                    Array.prototype.slice.call(sidebarSource.children).forEach(function(node) {
+                        sidebar.appendChild(node);
+                    });
+                }
+
+                body.innerHTML = '';
+                var availableTabs = [
+                    ['overview', '<i class="fas fa-id-card me-1"></i> अवलोकन'],
+                    ['docs', '<i class="fas fa-paperclip me-1"></i> कागजात'],
+                    ['log', '<i class="fas fa-clock-rotate-left me-1"></i> गतिविधि लग']
+                ].filter(function(item) {
+                    return panes[item[0]].children.length > 0;
+                });
+
+                availableTabs.forEach(function(item, index) {
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = index === 0 ? 'active' : '';
+                    btn.innerHTML = item[1];
+                    btn.addEventListener('click', function() {
+                        Array.prototype.slice.call(tabs.children).forEach(function(b) { b.classList.remove('active'); });
+                        Array.prototype.slice.call(main.children).forEach(function(p) { p.classList.remove('active'); });
+                        btn.classList.add('active');
+                        panes[item[0]].classList.add('active');
+                    });
+                    tabs.appendChild(btn);
+                    if (index !== 0) panes[item[0]].classList.remove('active');
+                    main.appendChild(panes[item[0]]);
+                });
+
+                body.appendChild(tabs);
+                shell.appendChild(main);
+                if (sidebarSource && sidebar.children.length) shell.appendChild(sidebar);
+                body.appendChild(shell);
+                card.dataset.arvLegacyDone = '1';
+
+                function makePane(name, active) {
+                    var pane = document.createElement('section');
+                    pane.className = 'arv-legacy-pane' + (active ? ' active' : '');
+                    pane.dataset.tab = name;
+                    return pane;
+                }
+            });
+        }
+        initLegacyRequestDetailTabs();
+
+        /* ─────────────────────────────────────────────────────
            TAB STANDARDIZATION (global)
            Rule:
              1) 'सूची' tab first
