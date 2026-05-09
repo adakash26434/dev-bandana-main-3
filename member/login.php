@@ -459,10 +459,10 @@ body {
         <div class="card-title">
             <?php echo $tab === 'register' ? $_t('नयाँ खाता खोल्नुहोस्', 'Create New Account') : $_t('सदस्य लगिन', 'Member Login'); ?>
         </div>
-        <div class="card-sub">
+        <div class="card-sub"<?php echo $tab === 'register' ? '' : ' hidden'; ?>>
             <?php echo $tab === 'register'
                 ? $_t('सदस्यता नम्बर सहित दर्ता गर्नुहोस् — Admin अनुमोदन पछि लगिन सक्नुहुन्छ।', 'Register with member number — you can login after admin approval.')
-                : $_t('इमेल वा सदस्यता नम्बर बाट लगिन गर्नुहोस्।', 'Login with email or member number.'); ?>
+                : ''; ?>
         </div>
 
         <?php if ($error): ?>
@@ -633,9 +633,15 @@ function switchTab(t) {
     var title = document.querySelector('.card-title');
     var sub   = document.querySelector('.card-sub');
     if (title) title.textContent = t === 'register' ? 'नयाँ खाता खोल्नुहोस्' : 'सदस्य लगिन';
-    if (sub)   sub.textContent   = t === 'register'
-        ? 'सदस्यता नम्बर सहित दर्ता गर्नुहोस् — Admin अनुमोदन पछि लगिन सक्नुहुन्छ।'
-        : 'इमेल वा सदस्यता नम्बर बाट लगिन गर्नुहोस्।';
+    if (sub) {
+        if (t === 'register') {
+            sub.textContent = 'सदस्यता नम्बर सहित दर्ता गर्नुहोस् — Admin अनुमोदन पछि लगिन सक्नुहुन्छ।';
+            sub.hidden = false;
+        } else {
+            sub.textContent = '';
+            sub.hidden = true;
+        }
+    }
 }
 function togglePw(id, btn) {
     var inp = document.getElementById(id);

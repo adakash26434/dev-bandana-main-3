@@ -624,7 +624,9 @@ $showLicenseRenewalOnLogin = $showLicenseRenewalOnLogin && !$forceShowLogin;
 
     <div class="card-body">
         <div class="card-title"><?php echo is_array($admin2faPending) ? '2FA Verify' : 'लग इन'; ?></div>
-        <div class="card-sub"><?php echo is_array($admin2faPending) ? 'Google Authenticator code verify गर्नुहोस्।' : 'आफ्नो username र password प्रविष्ट गर्नुहोस्।'; ?></div>
+        <?php if (is_array($admin2faPending)): ?>
+        <div class="card-sub">Google Authenticator code verify गर्नुहोस्।</div>
+        <?php endif; ?>
 
         <?php if ($error): ?>
             <div class="alert-error">

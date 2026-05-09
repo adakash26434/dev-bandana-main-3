@@ -338,6 +338,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 }
 .vp-result-fail i { font-size:18px; }
 .vp-help { font-size:12px; color:var(--text-muted); text-align:center; margin-top:22px; padding-top:16px; border-top:1px solid var(--border-soft); line-height:1.65; max-width:520px; margin-left:auto; margin-right:auto; }
+.vp-help-inline { margin-top: 14px; padding-top: 12px; max-width: 100%; font-size: 11.5px; }
 .vp-help b { color:var(--primary-color); }
 .vp-mini-tab { border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; }
 .vp-mini-tab.is-active { background:var(--primary-color); color:var(--text-on-primary); border-color:var(--primary-color); }
@@ -648,7 +649,6 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
       <div class="verify-form-card__head">
         <div class="vp-icon"><i class="fas fa-id-card-clip"></i></div>
         <h1><?php echo $_t('सदस्य प्रमाणीकरण', 'Member Verification'); ?></h1>
-        <p class="vp-sub"><?php echo $_t('ID Card को <b>Verification Code / Card Number</b> र <b>4-अङ्कको CVV</b> राखेर सदस्य सत्यता जाँच गर्नुहोस्।', 'Enter <b>Verification Code / Card Number</b> and <b>4-digit CVV</b> to verify member authenticity.'); ?></p>
       </div>
       <div class="verify-form-card__body">
       <form method="POST" autocomplete="off" novalidate class="needs-validation">
@@ -673,13 +673,12 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
         <button type="submit" class="vp-btn">
           <i class="fas fa-shield-halved"></i> <?php echo $_t('सदस्य प्रमाणित गर्नुहोस्', 'Verify Member'); ?>
         </button>
+        <div class="vp-help vp-help-inline">
+          🔒 <?php echo $_t('तपाईंको प्रत्येक प्रयास log गरिन्छ। Card अरूलाई share नगर्नुहोस्।', 'Every attempt is logged. Do not share card details with others.'); ?><br>
+          <?php echo $_t('समस्या भए कार्यालयमा सम्पर्क गर्नुहोस्।', 'If you face issues, contact office.'); ?>
+        </div>
       </form>
       </div>
-    </div>
-
-    <div class="vp-help">
-      🔒 <?php echo $_t('तपाईंको प्रत्येक प्रयास log गरिन्छ। Card अरूलाई share नगर्नुहोस्।', 'Every attempt is logged. Do not share card details with others.'); ?><br>
-      <?php echo $_t('समस्या भए कार्यालयमा सम्पर्क गर्नुहोस्।', 'If you face issues, contact office.'); ?>
     </div>
   </div>
 </div>
