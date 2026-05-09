@@ -70,74 +70,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
     if ($csrfOk) {
         $action = $_POST['action'] ?? '';
         if ($action === 'checkin_logged') {
-            /* Logged-in member check-in */
             if ($memberId && !$alreadyDone) {
                 try {
-                    $ins = $db->prepare("INSERT INTO member_program_attendance
-                        (member_id, member_card_no, program_id, program_title, source, verified_by_ip)
-                        VALUES (?,?,?,?,?,?)");
-                    $ins->execute([$memberId, $memCard, (int)$prog['id'], $prog['title'], 'qr_scan', $_SERVER['REMOTE_ADDR'] ?? '']);
-                    $done = true; $alreadyDone = true;
-                } catch (Throwable $e) { $err = 'Check-in गर्न समस्या भयो।'; }
+                    $pend = $db->prepare("SELECT id FROM member_program_attendance_requests WHERE member_id=? AND program_id=? AND status='pending' LIMIT 1");
+                    $pend->execute([$memberId, (int)$prog['id']]);
+                    if ($pend->fetchColumn()) {
+                        $requestSubmitted = true;
+                    } else {
+                        $ins = $db->prepare("INSERT INTO member_program_attendance_requests
+                            (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
+                            VALUES (?,?,?,?,?,'pending',?,?)");
+                        $ins->execute([
+                            $memberId,
+                            $memCard,
+                            $memName,
+                            (int)$prog['id'],
+                            mb_substr((string)$prog['title'], 0, 180),
+                            $_SERVER['REMOTE_ADDR'] ?? '',
+                            'member_portal_qr_pending'
+                        ]);
+                        $requestSubmitted = true;
+                    }
+                } catch (Throwable $e) { $err = 'Attendance अनुरोध पठाउन समस्या भयो।'; }
             }
         } elseif ($action === 'checkin_manual') {
-            /* Manual: enter member ID + phone */
             $inputCard  = trim(preg_replace('/\s+/', '', strtoupper($_POST['member_card'] ?? '')));
             $inputPhone = preg_replace('/[^0-9]/', '', $_POST['phone'] ?? '');
-            if (!$inputCard && !$inputPhone) {
-                $err = 'सदस्यता नम्बर वा फोन नम्बर आवश्यक छ।';
+            $inputName = mb_substr(trim((string)($_POST['member_name'] ?? '')), 0, 150, 'UTF-8');
+            $inputAddress = mb_substr(trim((string)($_POST['member_address'] ?? '')), 0, 255, 'UTF-8');
+            if (!$inputCard && !$inputPhone && $inputName === '') {
+                $err = 'सदस्यता नम्बर, फोन वा नाम आवश्यक छ।';
             } else {
                 try {
-                    /* Find member by card or phone */
                     $kw = []; $kp = [];
                     if ($inputCard)  { $kw[] = 'UPPER(sadasyata_number)=?'; $kp[] = $inputCard; }
                     if ($inputPhone) { $kw[] = 'phone=?'; $kp[] = $inputPhone; }
-                    $mst = $db->prepare("SELECT m.id, m.name, m.sadasyata_number FROM members m WHERE (" . implode(' OR ', $kw) . ") AND is_active=1 LIMIT 1");
-                    $mst->execute($kp);
-                    $mRow = $mst->fetch(PDO::FETCH_ASSOC) ?: null;
-                    if (!$mRow) {
-                        /* Try via KYC */
+                    $mRow = null;
+                    if (!empty($kw)) {
+                        $mst = $db->prepare("SELECT m.id, m.name, m.sadasyata_number, m.phone FROM members m WHERE (" . implode(' OR ', $kw) . ") AND is_active=1 LIMIT 1");
+                        $mst->execute($kp);
+                        $mRow = $mst->fetch(PDO::FETCH_ASSOC) ?: null;
+                    }
+                    if (!$mRow && ($inputCard || $inputPhone)) {
                         $kwk = []; $kpk = [];
                         if ($inputCard)  { $kwk[] = 'UPPER(member_id)=?'; $kpk[] = $inputCard; }
                         if ($inputPhone) { $kwk[] = 'mobile=?'; $kpk[] = $inputPhone; }
-                        $kst = $db->prepare("SELECT m.id, m.name, m.sadasyata_number FROM members m
-                            JOIN kyc_applications k ON (LOWER(k.email)=LOWER(m.email) OR k.mobile=m.phone)
-                            WHERE (" . implode(' OR ', $kwk) . ") AND m.is_active=1 LIMIT 1");
-                        $kst->execute($kpk);
-                        $mRow = $kst->fetch(PDO::FETCH_ASSOC) ?: null;
+                        if (!empty($kwk)) {
+                            $kst = $db->prepare("SELECT m.id, m.name, m.sadasyata_number, m.phone FROM members m
+                                JOIN kyc_applications k ON (LOWER(k.email)=LOWER(m.email) OR k.mobile=m.phone)
+                                WHERE (" . implode(' OR ', $kwk) . ") AND m.is_active=1 LIMIT 1");
+                            $kst->execute($kpk);
+                            $mRow = $kst->fetch(PDO::FETCH_ASSOC) ?: null;
+                        }
                     }
-                    if (!$mRow) {
-                        $err = 'सदस्य फेला परेन। सदस्यता नम्बर वा फोन जाँच्नुहोस्।';
-                    } else {
-                        $mId   = (int)$mRow['id'];
+                    if ($mRow) {
+                        $mId = (int)$mRow['id'];
                         $mCard = trim((string)($mRow['sadasyata_number'] ?? ''));
-                        $mNm   = trim((string)($mRow['name'] ?? ''));
-                        /* Already counted as attended */
+                        $mNm = trim((string)($mRow['name'] ?? ''));
+                        $mPhone = trim((string)($mRow['phone'] ?? $inputPhone));
                         $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
                         $dup->execute([$mId, (int)$prog['id']]);
                         if ($dup->fetchColumn()) {
                     $alreadyDone = true; $memName = $mNm; $memCard = $mCard; $memberId = $mId;
-                        } elseif ($memberId && $mId === $memberId) {
-                            /* आफै लगइन भएको सदस्यले manual फारम प्रयोग — तुरुन्त दर्ता */
-                            $ins = $db->prepare("INSERT INTO member_program_attendance
-                                (member_id, member_card_no, program_id, program_title, source, verified_by_ip)
-                                VALUES (?,?,?,?,?,?)");
-                            $ins->execute([$mId, $mCard, (int)$prog['id'], $prog['title'], 'qr_manual', $_SERVER['REMOTE_ADDR'] ?? '']);
-                            $done = true; $memName = $mNm; $memCard = $mCard; $memberId = $mId;
                         } else {
-                            /* अरुको वा लगइन बिना: Admin स्वीकृति पछि मात्र सूचीमा */
                             $pend = $db->prepare("SELECT id FROM member_program_attendance_requests WHERE member_id=? AND program_id=? AND status='pending' LIMIT 1");
                             $pend->execute([$mId, (int)$prog['id']]);
                             if ($pend->fetchColumn()) {
                                 $err = $_t('तपाईंको उपस्थिति अनुरोध पहिले नै Admin सामु प्रक्रियामा छ। स्वीकृत भएपछि सूचीमा देखिनेछ।', 'Your attendance request is already pending with admin. It will appear in the list after approval.');
                             } else {
                                 $ins = $db->prepare("INSERT INTO member_program_attendance_requests
-                                    (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
-                                    VALUES (?,?,?,?,?,'pending',?,?)");
+                                    (member_id, member_card_no, member_name, member_phone, member_address, program_id, program_title, status, verified_by_ip, source)
+                                    VALUES (?,?,?,?,?,?,?,'pending',?,?)");
                                 $ins->execute([
                                     $mId,
                                     $mCard,
                                     $mNm,
+                                    $mPhone,
+                                    $inputAddress,
                                     (int)$prog['id'],
                                     mb_substr((string)$prog['title'], 0, 180),
                                     $_SERVER['REMOTE_ADDR'] ?? '',
@@ -148,6 +157,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                                 $memCard = $mCard;
                                 $memberId = $mId;
                             }
+                        }
+                    } else {
+                        $pend = $db->prepare("SELECT id FROM member_program_attendance_requests WHERE program_id=? AND status='pending' AND (member_card_no=? OR member_phone=?) LIMIT 1");
+                        $pend->execute([(int)$prog['id'], $inputCard, $inputPhone]);
+                        if ($pend->fetchColumn()) {
+                            $err = $_t('तपाईंको उपस्थिति अनुरोध पहिले नै Admin सामु प्रक्रियामा छ। स्वीकृत भएपछि सूचीमा देखिनेछ।', 'Your attendance request is already pending with admin. It will appear in the list after approval.');
+                        } else {
+                            $ins = $db->prepare("INSERT INTO member_program_attendance_requests
+                                (member_id, member_card_no, member_name, member_phone, member_address, program_id, program_title, status, verified_by_ip, source)
+                                VALUES (?,?,?,?,?,?,?,'pending',?,?)");
+                            $ins->execute([
+                                0,
+                                $inputCard,
+                                $inputName,
+                                $inputPhone,
+                                $inputAddress,
+                                (int)$prog['id'],
+                                mb_substr((string)$prog['title'], 0, 180),
+                                $_SERVER['REMOTE_ADDR'] ?? '',
+                                'public_qr_unmatched_request',
+                            ]);
+                            $requestSubmitted = true;
+                            $memName = $inputName;
+                            $memCard = $inputCard;
                         }
                     }
                 } catch (Throwable $e) { $err = $_t('Check-in गर्न समस्या भयो।', 'There was a problem checking in.'); error_log('[attend] ' . $e->getMessage()); }
@@ -269,7 +302,7 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,color-mix(
         <i class="fas fa-circle-info icon-shrink"></i>
         <div class="text-left">
           <strong><?php echo $_t('कार्यक्रम उपस्थिति QR:', 'Program Attendance QR:'); ?></strong>
-          <?php echo $_t('सदस्यले स्थलमा उपस्थित भइसकेपछि मोबाइलबाट Member Portal खोली scan गर्दा दर्ता हुन्छ — Admin को attendance सूची र सदस्यको उपस्थिति इतिहासमा जान्छ, जति कार्यक्रममा check-in, त्यति नै गणना बढ्छ।', 'After arriving at the venue, members can scan from Member Portal on mobile to register attendance — it appears in admin attendance list and member attendance history, and the count increases per check-in.'); ?>
+          <?php echo $_t('सदस्यले स्थलमा उपस्थित भइसकेपछि scan गर्दा Admin स्वीकृतिको लागि अनुरोध जान्छ — Admin ले approve गरेपछि मात्र attendance सूची र सदस्यको इतिहासमा देखिन्छ।', 'After arriving at the venue, scanning sends a request for admin approval — it appears in attendance list and member history only after admin approval.'); ?>
           <br>
           <span class="text-soft">
             <?php echo $_t('(Pre-registration भन्दा फरक — त्यो अगाडि नाम दर्ता मात्र हो।)', '(Different from pre-registration — that is only early name registration.)'); ?>
@@ -302,12 +335,20 @@ body{font-family:'Mukta',sans-serif;background:linear-gradient(135deg,color-mix(
       <form method="POST" id="manualForm" class="<?= $memberId ? 'manual-form-hide' : '' ?>">
         <?= $csrfField ?><input type="hidden" name="action" value="checkin_manual">
         <div class="form-group">
+          <label><i class="fas fa-user meta-icon-gap"></i><?php echo $_t('पूरा नाम', 'Full Name'); ?></label>
+          <input type="text" name="member_name" class="form-control" placeholder="<?php echo $_t('आफ्नो नाम लेख्नुहोस्', 'Enter your name'); ?>">
+        </div>
+        <div class="form-group">
           <label><i class="fas fa-id-card meta-icon-gap"></i><?php echo $_t('सदस्यता नम्बर', 'Member Number'); ?></label>
           <input type="text" name="member_card" class="form-control" placeholder="<?php echo $_t('जस्तै: A-001, SA-2025-001', 'e.g. A-001, SA-2025-001'); ?>">
         </div>
         <div class="form-group">
           <label><i class="fas fa-phone meta-icon-gap"></i><?php echo $_t('फोन नम्बर', 'Phone Number'); ?></label>
           <input type="text" name="phone" class="form-control" placeholder="9XXXXXXXXX">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-location-dot meta-icon-gap"></i><?php echo $_t('ठेगाना', 'Address'); ?></label>
+          <input type="text" name="member_address" class="form-control" placeholder="<?php echo $_t('वडा/टोल/ठेगाना', 'Ward/tole/address'); ?>">
         </div>
         <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> <?php echo $_t('उपस्थिति अनुरोध पठाउनुहोस्', 'Send Attendance Request'); ?></button>
       </form>

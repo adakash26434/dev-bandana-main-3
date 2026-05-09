@@ -43,7 +43,6 @@ body, .mem-wrapper, .main-content {
 h1, .page-title, .dash-title-main {
     font-size: var(--font-2xl) !important;
     font-weight: 700 !important;
-    color: var(--primary-color, #1a5f2a) !important;
     margin-bottom: 1rem !important;
 }
 
@@ -51,21 +50,18 @@ h1, .page-title, .dash-title-main {
 h2, .card-header h5, .card-header h6 {
     font-size: var(--font-xl) !important;
     font-weight: 600 !important;
-    color: var(--text-primary, #1a2e1f) !important;
 }
 
 /* Subsection headers */
 h3, .section-header h2, .section-header h3 {
     font-size: var(--font-lg) !important;
     font-weight: 600 !important;
-    color: var(--text-primary, #1a2e1f) !important;
 }
 
 /* Small headings */
 h4, h5, h6 {
     font-size: var(--font-base) !important;
     font-weight: 600 !important;
-    color: var(--text-primary, #1a2e1f) !important;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -155,13 +151,104 @@ h4, h5, h6 {
    ═══════════════════════════════════════════════════ */
 
 /* Primary color consistency */
-.text-primary, .btn-primary, .page-title, .dash-title-main {
+.text-primary, .page-title, .dash-title-main {
     color: var(--primary-color, #1a5f2a) !important;
 }
 
 .btn-primary {
     background-color: var(--primary-color, #1a5f2a) !important;
     border-color: var(--primary-color, #1a5f2a) !important;
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.btn-secondary,
+.badge.bg-secondary,
+.bg-secondary,
+.text-bg-secondary {
+    background-color: var(--secondary-color, #c0392b) !important;
+    border-color: var(--secondary-color, #c0392b) !important;
+    color: var(--text-on-secondary, #fff) !important;
+}
+
+.bg-primary,
+.badge.bg-primary,
+.text-bg-primary,
+.nav-pills .nav-link.active,
+.nav-tabs .nav-link.active {
+    background-color: var(--primary-color, #1a5f2a) !important;
+    border-color: var(--primary-color, #1a5f2a) !important;
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.bg-primary *,
+.text-bg-primary *,
+.bg-secondary *,
+.text-bg-secondary *,
+.btn-primary *,
+.btn-secondary * {
+    color: inherit !important;
+}
+
+.hero-title-modern,
+.hero-subtitle-modern,
+.slider-content h1,
+.slider-content p {
+    color: #fff !important;
+    text-shadow: 0 2px 10px rgba(0,0,0,.45) !important;
+}
+
+.hero-btn-modern,
+.home-btn-primary,
+.contact-btn-modern {
+    color: var(--text-on-primary, #fff) !important;
+}
+
+.hero-btn-modern *,
+.home-btn-primary *,
+.contact-btn-modern * {
+    color: inherit !important;
+}
+
+.top-bar,
+.topbar,
+.header-top,
+.site-topbar,
+.quick-links-bar {
+    color: var(--text-on-header, #fff) !important;
+}
+
+.top-bar a,
+.topbar a,
+.header-top a,
+.site-topbar a,
+.quick-links-bar a {
+    color: inherit !important;
+}
+
+footer,
+.site-footer,
+.footer,
+.footer-section,
+.footer-bottom {
+    color: var(--text-on-footer, #fff) !important;
+}
+
+footer a,
+.site-footer a,
+.footer a {
+    color: color-mix(in srgb, var(--text-on-footer, #fff) 92%, transparent) !important;
+}
+
+footer a:hover,
+.site-footer a:hover,
+.footer a:hover {
+    color: var(--text-on-footer, #fff) !important;
 }
 
 /* Secondary text colors */

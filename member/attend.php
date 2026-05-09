@@ -58,34 +58,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
                 } elseif ($qrToken && $progRow['qr_enabled'] && $qrToken !== $progRow['qr_token']) {
                     $checkInErr = $_t('QR token अमान्य छ।', 'Invalid QR token.');
                 } else {
-                    /* Check duplicate */
                     $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
                     $dup->execute([$memberId, $progId]);
                     if ($dup->fetchColumn()) {
                         $checkInErr = $_t('तपाईं यो कार्यक्रममा पहिल्यै check-in हुनुभएको छ।', 'You are already checked in for this program.');
                     } else {
-                        // Set source based on QR usage
-                        if ($qrToken) {
-                            $source = 'qr_scan_auto';
-                        }
-                        
-                        $ins = $db->prepare("INSERT INTO member_program_attendance
-                            (member_id, member_card_no, program_id, program_title, source, verified_by_ip, notes)
-                            VALUES (?,?,?,?,?,?,?)");
-                        $ins->execute([
-                            $memberId, 
-                            $memCard, 
-                            $progId, 
-                            $progRow['title'], 
-                            $source, 
-                            $_SERVER['REMOTE_ADDR'] ?? '',
-                            $qrToken ? json_encode(['qr_token' => $qrToken, 'scan_time' => date('Y-m-d H:i:s')]) : null
-                        ]);
-                        
-                        if ($qrToken) {
-                            $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा QR स्क्यानबाट उपस्थिति दर्ता भयो!', 'attendance recorded via QR scan!');
+                        $pend = $db->prepare("SELECT id FROM member_program_attendance_requests WHERE member_id=? AND program_id=? AND status='pending' LIMIT 1");
+                        $pend->execute([$memberId, $progId]);
+                        if ($pend->fetchColumn()) {
+                            $checkInErr = $_t('तपाईंको उपस्थिति अनुरोध Admin स्वीकृतिको लागि पहिले नै pending छ।', 'Your attendance request is already pending for admin approval.');
                         } else {
-                            $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा उपस्थिति दर्ता भयो!', 'attendance recorded successfully!');
+                            $source = $qrToken ? 'member_portal_qr_pending' : 'member_portal_pending';
+                            $ins = $db->prepare("INSERT INTO member_program_attendance_requests
+                                (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
+                                VALUES (?,?,?,?,?,'pending',?,?)");
+                            $ins->execute([
+                                $memberId,
+                                $memCard,
+                                $memName,
+                                $progId,
+                                mb_substr((string)$progRow['title'], 0, 180),
+                                $_SERVER['REMOTE_ADDR'] ?? '',
+                                $source
+                            ]);
+                            $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा उपस्थिति अनुरोध Admin स्वीकृतिको लागि पठाइयो।', 'attendance request sent for admin approval.');
                         }
                     }
                 }
@@ -175,26 +171,25 @@ if ($qrProgramRow && ($_GET['auto'] ?? '') === '1' && $_SERVER['REQUEST_METHOD']
         if ($dup->fetchColumn()) {
             $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा तपाईंको उपस्थिति पहिल्यै दर्ता छ।', 'attendance is already recorded.');
         } else {
-            $ins = $db->prepare("INSERT INTO member_program_attendance
-                (member_id, member_card_no, program_id, program_title, source, verified_by_ip)
-                VALUES (?,?,?,?,?,?)");
-            $ins->execute([
-                $memberId,
-                $memCard,
-                $qpid,
-                (string)$qrProgramRow['title'],
-                'member_qr_scan_auto',
-                $_SERVER['REMOTE_ADDR'] ?? ''
-            ]);
-            $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा उपस्थिति स्वतः दर्ता भयो!', 'attendance auto-recorded successfully!');
-            $qrAlreadyAttended = true;
-            // local list पनि update (same request मा badge/count सही देखियोस्)
-            array_unshift($myAttendance, [
-                'program_id' => $qpid,
-                'program_title' => (string)$qrProgramRow['title'],
-                'attended_at' => date('Y-m-d H:i:s'),
-                'location' => $qrProgramRow['location'] ?? '',
-            ]);
+            $pend = $db->prepare("SELECT id FROM member_program_attendance_requests WHERE member_id=? AND program_id=? AND status='pending' LIMIT 1");
+            $pend->execute([$memberId, $qpid]);
+            if ($pend->fetchColumn()) {
+                $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा तपाईंको उपस्थिति अनुरोध Admin स्वीकृतिको लागि pending छ।', 'attendance request is pending for admin approval.');
+            } else {
+                $ins = $db->prepare("INSERT INTO member_program_attendance_requests
+                    (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
+                    VALUES (?,?,?,?,?,'pending',?,?)");
+                $ins->execute([
+                    $memberId,
+                    $memCard,
+                    $memName,
+                    $qpid,
+                    mb_substr((string)$qrProgramRow['title'], 0, 180),
+                    $_SERVER['REMOTE_ADDR'] ?? '',
+                    'member_portal_qr_pending'
+                ]);
+                $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा QR उपस्थिति अनुरोध Admin स्वीकृतिको लागि पठाइयो।', 'QR attendance request sent for admin approval.');
+            }
         }
     } catch (Throwable $e) {
         $sqlState = ($e instanceof PDOException) ? (string)$e->getCode() : '';

@@ -124,6 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $mid = (int)$req['member_id'];
                     $pid = (int)$req['program_id'];
+                    if ($mid <= 0) {
+                        setFlash('error', 'यो अनुरोध existing member सँग match भएको छैन। पहिले सदस्य registration/link गरेर मात्र attendance approve गर्नुहोस्।');
+                    } else {
                     $chk = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
                     $chk->execute([$mid, $pid]);
                     if ($chk->fetchColumn()) {
@@ -148,6 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $db->prepare("UPDATE member_program_attendance_requests SET status='approved', processed_at=NOW(), admin_id=? WHERE id=?")
                             ->execute([$adminId ?: null, $reqId]);
                         setFlash('success', 'उपस्थिति अनुरोध स्वीकृत भयो — सूचीमा थपियो।');
+                    }
                     }
                 }
             } catch (Throwable $e) {
@@ -608,12 +612,13 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
       <?php foreach ($reqRows as $rx): ?>
       <?php
         $rn = trim((string)($rx['mname'] ?: $rx['member_name'] ?: ''));
-        $rph = trim((string)($rx['mphone'] ?: ($rx['mmobile'] ?? '')));
+        $rph = trim((string)($rx['mphone'] ?: ($rx['mmobile'] ?? $rx['member_phone'] ?? '')));
+        $raddr = trim((string)($rx['member_address'] ?? ''));
       ?>
       <tr>
         <td><?php echo htmlspecialchars($rx['program_title'] ?? ''); ?></td>
         <td class="small"><?php echo htmlspecialchars(trim(($rx['event_date'] ?? '') . ' ' . ($rx['location'] ?? ''))); ?></td>
-        <td><?php echo htmlspecialchars($rn ?: '—'); ?></td>
+        <td><?php echo htmlspecialchars($rn ?: '—'); ?><?php if ($raddr !== ''): ?><div class="small text-muted"><?php echo htmlspecialchars($raddr); ?></div><?php endif; ?></td>
         <td><code><?php echo htmlspecialchars($rx['member_card_no'] ?: '—'); ?></code></td>
         <td><?php echo htmlspecialchars($rph ?: '—'); ?></td>
         <td class="small"><?php echo htmlspecialchars($rx['requested_at'] ?? ''); ?></td>

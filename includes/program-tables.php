@@ -86,6 +86,8 @@ if (!function_exists('ensureProgramTables')) {
                 member_id INT NOT NULL,
                 member_card_no VARCHAR(60) DEFAULT '',
                 member_name VARCHAR(150) DEFAULT '',
+                member_phone VARCHAR(30) DEFAULT '',
+                member_address VARCHAR(255) DEFAULT '',
                 program_id INT NOT NULL,
                 program_title VARCHAR(180) NOT NULL,
                 status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
@@ -104,6 +106,15 @@ if (!function_exists('ensureProgramTables')) {
             try {
                 $db->exec('ALTER TABLE member_program_attendance_requests ADD INDEX idx_mpar_status_prog (status, program_id)');
             } catch (Throwable $e) {
+            }
+            foreach ([
+                'ALTER TABLE member_program_attendance_requests ADD COLUMN member_phone VARCHAR(30) DEFAULT "" AFTER member_name',
+                'ALTER TABLE member_program_attendance_requests ADD COLUMN member_address VARCHAR(255) DEFAULT "" AFTER member_phone',
+            ] as $sql) {
+                try {
+                    $db->exec($sql);
+                } catch (Throwable $e) {
+                }
             }
 
             $db->exec("CREATE TABLE IF NOT EXISTS member_program_preregistrations (
