@@ -3963,6 +3963,35 @@ aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
 .arv-legacy-sidebar .alert {
     margin-bottom: 14px;
 }
+.arv-empty-tab {
+    display: grid;
+    place-items: center;
+    gap: 8px;
+    min-height: 180px;
+    padding: 28px;
+    text-align: center;
+    color: #64748b;
+    background: #fff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+}
+.arv-empty-tab i {
+    width: 48px;
+    height: 48px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: var(--primary-color, #1a5f2a);
+    font-size: 1.15rem;
+}
+.arv-empty-tab strong {
+    color: #334155;
+    font-weight: 800;
+}
+.arv-empty-tab span {
+    font-size: .9rem;
+}
 @media (max-width: 991.98px) {
     .arv-legacy-shell {
         grid-template-columns: 1fr;

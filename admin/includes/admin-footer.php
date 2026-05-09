@@ -294,13 +294,17 @@
                 }
 
                 body.innerHTML = '';
+                if (!panes.docs.children.length) {
+                    panes.docs.innerHTML = '<div class="arv-empty-tab"><i class="fas fa-folder-open"></i><strong>कागजात छैन</strong><span>यस अनुरोधमा कागजात / attachment भेटिएन।</span></div>';
+                }
+                if (!panes.log.children.length) {
+                    panes.log.innerHTML = '<div class="arv-empty-tab"><i class="fas fa-clock-rotate-left"></i><strong>गतिविधि लग छैन</strong><span>Status/comment history उपलब्ध छैन।</span></div>';
+                }
                 var availableTabs = [
                     ['overview', '<i class="fas fa-id-card me-1"></i> अवलोकन'],
                     ['docs', '<i class="fas fa-paperclip me-1"></i> कागजात'],
                     ['log', '<i class="fas fa-clock-rotate-left me-1"></i> गतिविधि लग']
-                ].filter(function(item) {
-                    return panes[item[0]].children.length > 0;
-                });
+                ];
 
                 availableTabs.forEach(function(item, index) {
                     var btn = document.createElement('button');
