@@ -144,8 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
             foreach ($cs2->fetchAll(PDO::FETCH_ASSOC) ?: [] as $c) $validCandIds[(int)$c['id']] = (int)$c['position_id'];
 
             $db->beginTransaction();
-            $db->prepare('INSERT INTO election_vote_submissions (cycle_id, member_id, ip, user_agent) VALUES (?,?,?,?)')
-                ->execute([$cycleId, $memberId, substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64), substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255)]);
+            $db->prepare('INSERT INTO election_vote_submissions (cycle_id, member_id, source, ip, user_agent) VALUES (?,?,?,?,?)')
+                ->execute([$cycleId, $memberId, 'member_portal', substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64), substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255)]);
 
             $ins = $db->prepare('INSERT INTO election_votes (cycle_id, position_id, candidate_id, member_id) VALUES (?,?,?,?)');
             foreach ($picks as $pid => $candList) {
@@ -160,35 +160,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
             }
             $db->commit();
             $alreadyVoted = true;
-            
-            // Record attendance for voting with pattern tracking
-            try {
-                // Get selected candidates for pattern analysis
-                $selectedCandidates = [];
-                foreach ($_POST['picks'] as $posId => $candList) {
-                    if (is_array($candList)) {
-                        $selectedCandidates = array_merge($selectedCandidates, $candList);
-                    }
-                }
-                
-                // Analyze voting pattern
-                $votingPattern = analyzeVotingPattern($selectedCandidates, $positions, $cycle);
-                
-                $db->prepare("INSERT INTO member_program_attendance (member_id, program_title, attended_at, notes) VALUES (?, ?, ?, ?)")
-                   ->execute([
-                       $memberId, 
-                       'Election Voting - ' . ($cycle['title_np'] ?? 'Election'), 
-                       date('Y-m-d H:i:s'),
-                       json_encode([
-                           'pattern_type' => $votingPattern['type'],
-                           'pattern_score' => $votingPattern['score'],
-                           'selected_candidates' => $selectedCandidates,
-                           'diversity_score' => $votingPattern['diversity']
-                       ])
-                   ]);
-            } catch (Throwable $e) {
-                error_log("Failed to record election attendance: " . $e->getMessage());
-            }
             $flash = $_t('तपाईंको मत सफलतापूर्वक रेकर्ड भयो। धन्यवाद!', 'Your vote has been recorded successfully. Thank you!');
             $flashType = 'success';
         } catch (Throwable $e) {
@@ -206,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
 
 /* Recompute after submit handling so UI reflects latest state immediately */
 $canVoteNow = (bool)($cycle && !$alreadyVoted && $votingOpen);
-$resultsVisible = (bool)($cycle && (!empty($cycle['results_finalized']) || $voteEnded));
+$resultsVisible = (bool)($cycle && !empty($cycle['results_finalized']));
 
 /* डाटा लोड — समिति-wise grouping */
 $positions = []; $candByPos = []; $samitiGroups = [];
@@ -463,7 +434,7 @@ require __DIR__ . '/includes/chrome.php';
             <?php endforeach; ?>
         <?php elseif ($cycle): ?>
             <div class="alert alert-secondary mt-3">
-                <i class="fas fa-hourglass-half me-1"></i> परिणाम मतदान अवधि सकिएपछि (वा Admin ले finalize गरेपछि) देखाइनेछ।
+                <i class="fas fa-hourglass-half me-1"></i> परिणाम निर्वाचन समितिले final status राखेपछि मात्र देखाइनेछ।
             </div>
         <?php endif; ?>
         <?php else: ?>

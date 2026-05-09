@@ -117,14 +117,24 @@ foreach ($rows as $r) {
     if ($r['candidate_id']) $grouped[$pid]['candidates'][] = $r;
 }
 $totalVoters = (int)$db->query('SELECT COUNT(*) FROM election_vote_submissions WHERE cycle_id=' . $cycleId)->fetchColumn();
+$sourceCounts = ['member_portal' => 0, 'manual_staff' => 0];
+try {
+    $sc = $db->prepare('SELECT source, COUNT(*) AS c FROM election_vote_submissions WHERE cycle_id=? GROUP BY source');
+    $sc->execute([$cycleId]);
+    foreach ($sc->fetchAll(PDO::FETCH_ASSOC) ?: [] as $sr) {
+        $sourceCounts[(string)($sr['source'] ?? '')] = (int)($sr['c'] ?? 0);
+    }
+} catch (Throwable $e) {
+}
 ?>
 <div class="container-fluid py-3">
 <?php
 echo adminPageHeader(
     'निर्वाचन नतिजा',
     'fa-chart-bar',
-    htmlspecialchars($cycle['title_np']) . ' — कुल मतदाता: ' . $totalVoters . (empty($cycle['results_finalized']) ? '' : ' • अन्तिम भयो'),
-    '<a class="btn btn-outline-secondary btn-sm" href="election-candidates.php?cycle=' . $cycleId . '"><i class="fas fa-arrow-left me-1"></i>उम्मेदवार</a>'
+    htmlspecialchars($cycle['title_np']) . ' — कुल मतदाता: ' . $totalVoters . ' (Digital: ' . (int)$sourceCounts['member_portal'] . ', Manual: ' . (int)$sourceCounts['manual_staff'] . ')' . (empty($cycle['results_finalized']) ? '' : ' • अन्तिम भयो'),
+    '<a class="btn btn-outline-secondary btn-sm" href="election-candidates.php?cycle=' . $cycleId . '"><i class="fas fa-arrow-left me-1"></i>उम्मेदवार</a> '
+    . '<a class="btn btn-outline-primary btn-sm" href="election-voting-attendance.php?cycle=' . $cycleId . '"><i class="fas fa-person-booth me-1"></i>Voting Attendance</a>'
 );
 ?>
 <?php if ($f = getFlash()): ?><div class="mb-3"><?php echo adminAlert($f['type'], $f['message']); ?></div><?php endif; ?>

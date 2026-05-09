@@ -165,6 +165,7 @@ echo adminPageHeader(
     'fa-user-tie',
     htmlspecialchars($cycle['title_np']) . ' — पद र उम्मेदवार थप/सम्पादन',
     '<a class="btn btn-outline-secondary btn-sm" href="election-information.php?edit=' . $cycleId . '"><i class="fas fa-arrow-left me-1"></i>चक्र फर्कनुहोस्</a> '
+    . '<a class="btn btn-outline-primary btn-sm" href="election-voting-attendance.php?cycle=' . $cycleId . '"><i class="fas fa-person-booth me-1"></i>Voting Attendance</a> '
     . '<a class="btn btn-outline-success btn-sm" href="election-results.php?cycle=' . $cycleId . '"><i class="fas fa-chart-bar me-1"></i>नतिजा</a>'
 );
 ?>

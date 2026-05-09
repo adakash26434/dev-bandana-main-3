@@ -158,6 +158,11 @@ if (!function_exists('ensureElectionVotingTables')) {
                 cycle_id INT NOT NULL,
                 member_id INT NOT NULL,
                 submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                source VARCHAR(30) NOT NULL DEFAULT 'member_portal',
+                proof_type VARCHAR(30) NOT NULL DEFAULT '',
+                verified_by_admin_id INT NULL DEFAULT NULL,
+                verified_by_name VARCHAR(120) NOT NULL DEFAULT '',
+                note VARCHAR(500) NOT NULL DEFAULT '',
                 ip VARCHAR(64) NULL DEFAULT NULL,
                 user_agent VARCHAR(255) NULL DEFAULT NULL,
                 UNIQUE KEY uniq_cycle_member (cycle_id, member_id),
@@ -192,6 +197,21 @@ if (!function_exists('ensureElectionVotingTables')) {
             $addIdx($db, 'election_votes', 'idx_ev_cycle_pos', 'cycle_id, position_id');
             $addIdx($db, 'election_candidates', 'idx_ec_cycle_active', 'cycle_id, is_active');
             $addIdx($db, 'election_positions', 'idx_ep_cycle_active', 'cycle_id, is_active');
+
+            try {
+                $evsCols = $db->query("SHOW COLUMNS FROM election_vote_submissions")->fetchAll(PDO::FETCH_COLUMN, 0) ?: [];
+                $evsColSet = array_flip($evsCols);
+                $evsAlters = [];
+                if (!isset($evsColSet['source'])) $evsAlters[] = "ADD COLUMN source VARCHAR(30) NOT NULL DEFAULT 'member_portal' AFTER submitted_at";
+                if (!isset($evsColSet['proof_type'])) $evsAlters[] = "ADD COLUMN proof_type VARCHAR(30) NOT NULL DEFAULT '' AFTER source";
+                if (!isset($evsColSet['verified_by_admin_id'])) $evsAlters[] = "ADD COLUMN verified_by_admin_id INT NULL DEFAULT NULL AFTER proof_type";
+                if (!isset($evsColSet['verified_by_name'])) $evsAlters[] = "ADD COLUMN verified_by_name VARCHAR(120) NOT NULL DEFAULT '' AFTER verified_by_admin_id";
+                if (!isset($evsColSet['note'])) $evsAlters[] = "ADD COLUMN note VARCHAR(500) NOT NULL DEFAULT '' AFTER verified_by_name";
+                if ($evsAlters) {
+                    $db->exec("ALTER TABLE election_vote_submissions " . implode(', ', $evsAlters));
+                }
+                $addIdx($db, 'election_vote_submissions', 'idx_evs_cycle_source', 'cycle_id, source');
+            } catch (Throwable $e) { /* ignore */ }
 
             /* election_positions मा post_id (master link) — idempotent ALTER */
             try {

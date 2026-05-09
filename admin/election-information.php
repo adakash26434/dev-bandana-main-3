@@ -455,6 +455,7 @@ echo adminPageHeader(
                     <?php if ($editRow): ?>
                     <div class="col-12">
                         <a href="election-candidates.php?cycle=<?php echo (int)$editRow['id']; ?>" class="btn btn-outline-primary btn-sm"><i class="fas fa-user-tie me-1"></i>उम्मेदवार/पद व्यवस्थापन</a>
+                        <a href="election-voting-attendance.php?cycle=<?php echo (int)$editRow['id']; ?>" class="btn btn-outline-warning btn-sm"><i class="fas fa-person-booth me-1"></i>Voting Attendance</a>
                         <a href="election-results.php?cycle=<?php echo (int)$editRow['id']; ?>" class="btn btn-outline-success btn-sm"><i class="fas fa-chart-bar me-1"></i>नतिजा हेर्नुहोस्</a>
                     </div>
                     <?php endif; ?>
