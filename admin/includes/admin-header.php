@@ -262,7 +262,7 @@ set_exception_handler(function (\Throwable $ex) {
 
     <!-- Admin CSS -->
     <link rel="stylesheet" href="assets/admin.css?v=9.7">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=6.3">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=6.4">
     <link rel="stylesheet" href="../assets/css/v9-mobile-fix.css?v=9.7">
     <link rel="stylesheet" href="../assets/css/site-banner-logo.css?v=1">
 

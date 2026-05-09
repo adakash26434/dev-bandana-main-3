@@ -667,6 +667,8 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                                placeholder="https://www.google.com/maps/embed?pb=...">
                         <small class="stg-muted"><?php echo $__t('Google Maps बाट Embed URL copy गर्नुहोस्', 'Copy embed URL from Google Maps'); ?></small>
                     </div>
+                    <h6 class="stg-title-accent fw-bold mb-2"><i class="fas fa-eye me-2"></i><?php echo $__t('सार्वजनिक प्रदर्शन समय (वेबसाइटमा देखिने)', 'Public Display Hours (shown on website)'); ?></h6>
+                    <div class="alert alert-light border small py-2 mb-3"><i class="fas fa-info-circle me-1 text-primary"></i><?php echo $__t('यो text Footer / Contact पेजमा जस्ताको तस्तै देखिन्छ। मानिसले पढ्नका लागि — कुनै time-picker मा प्रयोग हुँदैन।', 'This text is shown as-is on the Footer / Contact page. For human reading only — not used by any time-picker.'); ?></div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -686,22 +688,21 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                         </div>
                     </div>
                     <hr>
-                    <h6 class="stg-title-accent fw-bold mb-3"><i class="fas fa-clock me-2"></i><?php echo $__t('Selection Time (कार्यालय समय)', 'Selection Time (Office Hours)'); ?></h6>
+                    <h6 class="stg-title-accent fw-bold mb-2"><i class="fas fa-calendar-check me-2"></i><?php echo $__t('Appointment समयसीमा (Time-picker मा प्रयोग)', 'Appointment Time Range (for time-picker)'); ?></h6>
+                    <div class="alert alert-light border small py-2 mb-3"><i class="fas fa-info-circle me-1 text-primary"></i><?php echo $__t('यी मानहरूले Appointment booking फर्मको time-picker मा कति बजेदेखि कति बजेसम्म छनोट गर्न मिल्ने हो भन्ने सीमा तोक्छ। माथिको Display Hours सँग स्वतन्त्र हुन्छ।', 'These values define the from–to range of allowed times in the Appointment booking time-picker. Independent of the Display Hours above.'); ?></div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label"><?php echo $__t('कार्यालय समय सुरु', 'Office Time Start'); ?></label>
+                                <label class="form-label"><?php echo $__t('Appointment सुरु समय', 'Appointment Start Time'); ?></label>
                                 <input type="time" name="office_time_start" class="form-control" step="1800"
                                        value="<?php echo htmlspecialchars($settings['office_time_start'] ?? '10:00', ENT_QUOTES, 'UTF-8'); ?>">
-                                <small class="stg-muted"><?php echo $__t('समय selection मा यहीँबाट सुरु हुन्छ', 'Time selections start from this value'); ?></small>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label"><?php echo $__t('कार्यालय समय अन्त्य', 'Office Time End'); ?></label>
+                                <label class="form-label"><?php echo $__t('Appointment अन्त्य समय', 'Appointment End Time'); ?></label>
                                 <input type="time" name="office_time_end" class="form-control" step="1800"
                                        value="<?php echo htmlspecialchars($settings['office_time_end'] ?? '17:00', ENT_QUOTES, 'UTF-8'); ?>">
-                                <small class="stg-muted"><?php echo $__t('समय selection यहीँसम्म सीमित हुन्छ', 'Time selections end at this value'); ?></small>
                             </div>
                         </div>
                     </div>
