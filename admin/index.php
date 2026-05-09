@@ -357,7 +357,12 @@ $logoPath = function_exists('getLocalizedLogoPath')
         : 'assets/images/logo.png');
 $logoSrc  = $logoPath ? (strpos($logoPath,'http')===0 ? $logoPath : SITE_URL . ltrim($logoPath,'/')) : '';
 
-$licExpiredLogin = function_exists('site_license_expired') && site_license_expired();
+$licExpiredLogin = false;
+try {
+    $licExpiredLogin = function_exists('site_license_expired') && site_license_expired();
+} catch (Throwable $eLic) {
+    error_log('[admin-login] site_license_expired: ' . $eLic->getMessage());
+}
 $renewalNoticeSent = $licExpiredLogin && isset($_GET['renewal_sent']) && (string) $_GET['renewal_sent'] === '1';
 $loginRenewKhalti = '';
 $loginRenewEsewa = '';
@@ -593,9 +598,12 @@ $showLicenseRenewalOnLogin = $showLicenseRenewalOnLogin && !$forceShowLogin;
 </head>
 <body class="auth-portal-page admin-auth-page">
 
-<a href="<?php echo htmlspecialchars(portalLangToggleUrl(), ENT_QUOTES, 'UTF-8'); ?>" class="auth-lang-toggle" title="<?php echo htmlspecialchars(getText('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars(getText('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>">
+<?php if (function_exists('portalLangToggleUrl') && function_exists('portalLangToggleBadge')): ?>
+<?php $__lt = function_exists('getText') ? getText('भाषा परिवर्तन', 'Switch language') : (function_exists('isEnglish') && isEnglish() ? 'Switch language' : 'भाषा परिवर्तन'); ?>
+<a href="<?php echo htmlspecialchars(portalLangToggleUrl(), ENT_QUOTES, 'UTF-8'); ?>" class="auth-lang-toggle" title="<?php echo htmlspecialchars($__lt, ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($__lt, ENT_QUOTES, 'UTF-8'); ?>">
     <i class="fas fa-language"></i> <?php echo htmlspecialchars(portalLangToggleBadge()); ?>
 </a>
+<?php endif; ?>
 
 <a href="../index.php" class="page-back">
     <i class="fas fa-arrow-left"></i> वेबसाइट
