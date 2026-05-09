@@ -329,7 +329,7 @@ if ($action === 'edit' || $action === 'add') {
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">समय</label>
-                        <?php $auctionTimeValue = trim((string)($auction['auction_time'] ?? '')); $auctionTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions() : []; ?>
+                        <?php $auctionTimeValue = trim((string)($auction['auction_time'] ?? '')); $auctionTimeOptions = function_exists('getOfficeTimeOptions') ? getOfficeTimeOptions(30) : []; ?>
                         <select name="auction_time" class="form-select">
                             <option value="">— समय छान्नुहोस् —</option>
                             <?php foreach ($auctionTimeOptions as $optVal => $optLabel): ?>

@@ -128,7 +128,7 @@ foreach ($rows as $_r) {
         </div>
         <div class="col-md-3">
           <label class="form-label">समय</label>
-          <?php $eventTimeValue = trim((string)($edit['event_time'] ?? '')); $eventTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions() : []; ?>
+          <?php $eventTimeValue = trim((string)($edit['event_time'] ?? '')); $eventTimeOptions = function_exists('getOfficeTimeOptions') ? getOfficeTimeOptions(30) : []; ?>
           <select name="event_time" class="form-select">
             <option value="">— समय छान्नुहोस् —</option>
             <?php foreach ($eventTimeOptions as $optVal => $optLabel): ?>

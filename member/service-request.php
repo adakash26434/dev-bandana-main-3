@@ -253,7 +253,7 @@ HTML;
       </div>
       <div class="form-group">
         <label><i class="fas fa-clock sr-icon-brand"></i><?php echo $_t('मनपर्ने समय', 'Preferred Time'); ?></label>
-        <?php $preferredTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $preferredTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions('10:00', '17:00', 30) : []; ?>
+        <?php $preferredTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $preferredTimeOptions = function_exists('getOfficeTimeOptions') ? getOfficeTimeOptions(30) : []; ?>
         <select name="preferred_time" class="form-control">
           <option value="">— <?php echo $_t('समय छान्नुहोस्', 'Select time'); ?> —</option>
           <?php foreach ($preferredTimeOptions as $optVal => $optLabel): ?>

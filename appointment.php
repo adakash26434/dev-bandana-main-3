@@ -356,7 +356,7 @@ require_once 'includes/header.php';
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label"><?php echo isEnglish() ? 'Preferred Time' : 'रुचाइएको समय'; ?> <span class="req">*</span></label>
-                                    <?php $apptTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $apptTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions('10:00', '17:00', 30) : []; ?>
+                                    <?php $apptTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $apptTimeOptions = function_exists('getOfficeTimeOptions') ? getOfficeTimeOptions(30) : []; ?>
                                     <select name="preferred_time" class="form-select" required>
                                         <option value=""><?php echo isEnglish() ? 'Select time' : 'समय छान्नुहोस्'; ?></option>
                                         <?php foreach ($apptTimeOptions as $optVal => $optLabel): ?>
