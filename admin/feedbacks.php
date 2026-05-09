@@ -13,8 +13,10 @@
 $pageTitle = 'Feedback / सुझाव व्यवस्थापन';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 
 $db = getDB();
+ensureRequestStatusHistoryTable($db);
 
 /* CSRF सुरक्षा: POST अनुरोध प्रमाणित गर्नुहोस् */
 checkCSRF();
@@ -40,6 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $adminReply = trim($_POST['admin_reply']  ?? '');
             $adminNote  = trim($_POST['admin_note']   ?? '');
+            $oldStatus = '';
+            $notifySent = false;
+            try {
+                $os = $db->prepare("SELECT status FROM member_feedback WHERE id=? LIMIT 1");
+                $os->execute([$id]);
+                $oldStatus = (string)($os->fetchColumn() ?: '');
+            } catch (Exception $e) {}
 
             /* File upload — adminUploadFile() function config.php मा छ
                नयाँ file आएमा save गर्छ, नआएमा पुरानो attachment राख्छ */
@@ -60,6 +69,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     WHERE id = ?");
                 $stmt->execute([$status, $adminReply, $adminNote, $id]);
             }
+            try {
+                $nr = $db->prepare("SELECT name, email, phone, tracking_id FROM member_feedback WHERE id=? LIMIT 1");
+                $nr->execute([$id]);
+                $nd = $nr->fetch();
+                if ($nd && function_exists('sendMemberStatusUpdate')) {
+                    sendMemberStatusUpdate(
+                        'feedback',
+                        (string)($nd['email'] ?? ''),
+                        (string)($nd['phone'] ?? ''),
+                        (string)($nd['name'] ?? ''),
+                        (string)$status,
+                        (string)$adminReply,
+                        (string)($nd['tracking_id'] ?? '')
+                    );
+                    $notifySent = true;
+                }
+            } catch (Throwable $e) {}
+            try {
+                logRequestStatusHistory(
+                    $db,
+                    'feedback',
+                    $id,
+                    $oldStatus !== '' ? $oldStatus : null,
+                    $status,
+                    (string)$adminReply,
+                    $notifySent,
+                    (int)($_SESSION['admin_id'] ?? 0),
+                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                );
+            } catch (Exception $e) {}
             setFlash('success', 'Feedback सफलतापूर्वक अपडेट भयो।');
 
         } elseif ($action === 'delete') {
@@ -132,6 +171,10 @@ if (isset($_GET['view'])) {
     $s = $db->prepare("SELECT * FROM member_feedback WHERE id = ?");
     $s->execute([(int)$_GET['view']]);
     $viewFeedback = $s->fetch();
+}
+$feedbackHistory = [];
+if ($viewFeedback && !empty($viewFeedback['id'])) {
+    try { $feedbackHistory = fetchRequestStatusHistory($db, 'feedback', (int)$viewFeedback['id'], 40); } catch (Exception $e) { $feedbackHistory = []; }
 }
 
 /* ─── Counts for badges ─── */
@@ -329,6 +372,18 @@ function attachmentName($path) {
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (!empty($feedbackHistory)): ?>
+                    <h6 class="fw-bold mb-2 text-primary"><i class="fas fa-clock-rotate-left me-1"></i>Status / Comment History</h6>
+                    <div class="mb-3">
+                        <?php foreach ($feedbackHistory as $h): ?>
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                            <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div><?php endif; ?>
+                            <div class="small text-muted mt-1"><?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                     <?php endif; ?>
                 </div>

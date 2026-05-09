@@ -13,6 +13,7 @@ $pageTitle   = $__t('ऋण आवेदन व्यवस्थापन', 'Lo
 $currentPage = 'loans';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
 /* RBAC: staff hercha matra; mutate (approve/reject/delete) admin+ matra */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { require_role('admin'); checkCSRF(); }
@@ -22,6 +23,7 @@ safeAddColumn($db, 'loan_applications', 'admin_attachment', "VARCHAR(500) DEFAUL
 safeAddColumn($db, 'loan_applications', 'updated_at', "TIMESTAMP NULL DEFAULT NULL");
 
 $loanListStatuses = ['pending', 'processing', 'approved', 'rejected', 'disbursed'];
+ensureRequestStatusHistoryTable($db);
 
 /* ─── Status Update ─── */
 if (isset($_POST['update_status'])) {
@@ -29,6 +31,13 @@ if (isset($_POST['update_status'])) {
     $status  = clean_text($_POST['status']);
     $remarks = clean_text($_POST['remarks'] ?? '');
     $newFile = adminUploadFile('admin_attachment');
+    $oldStatus = '';
+    $notifySent = false;
+    try {
+        $os = $db->prepare("SELECT status FROM loan_applications WHERE id=? LIMIT 1");
+        $os->execute([$id]);
+        $oldStatus = (string)($os->fetchColumn() ?: '');
+    } catch (Exception $e) {}
 
     try {
         if ($newFile) {
@@ -47,7 +56,21 @@ if (isset($_POST['update_status'])) {
                 sendMemberStatusUpdate('loan',
                     $nData['email'] ?? '', $nData['phone'] ?? '', $nData['full_name'] ?? '',
                     $status, $remarks, $nData['tracking_id'] ?? '');
+                $notifySent = true;
             }
+        } catch (Exception $e) {}
+        try {
+            logRequestStatusHistory(
+                $db,
+                'loan',
+                $id,
+                $oldStatus !== '' ? $oldStatus : null,
+                $status,
+                (string)$remarks,
+                $notifySent,
+                (int)($_SESSION['admin_id'] ?? 0),
+                (string)($_SESSION['admin_name'] ?? 'Admin')
+            );
         } catch (Exception $e) {}
         setFlash('success', $__t('स्थिति अपडेट गरियो।', 'Status updated.'));
     } catch (Exception $e) {
@@ -68,12 +91,32 @@ if (isset($_POST['quick_status'])) {
     $qid = (int)($_POST['quick_id'] ?? 0);
     $allowed = ['pending','processing','approved','rejected','disbursed'];
     $qst = in_array($_POST['quick_status_val'] ?? '', $allowed) ? $_POST['quick_status_val'] : 'pending';
+    $oldStatus = '';
+    $notifySent = false;
+    try {
+        $os = $db->prepare("SELECT status FROM loan_applications WHERE id=? LIMIT 1");
+        $os->execute([$qid]);
+        $oldStatus = (string)($os->fetchColumn() ?: '');
+    } catch (Exception $e) {}
     try {
         $db->prepare("UPDATE loan_applications SET status=?, updated_at=NOW() WHERE id=?")->execute([$qst, $qid]);
         try {
             $nr = $db->prepare("SELECT full_name, email, mobile, tracking_id FROM loan_applications WHERE id=?");
             $nr->execute([$qid]); $nd = $nr->fetch();
-            if ($nd) sendMemberStatusUpdate('loan', $nd['email']??'', $nd['mobile']??'', $nd['full_name']??'', $qst, '', $nd['tracking_id']??'');
+            if ($nd) { sendMemberStatusUpdate('loan', $nd['email']??'', $nd['mobile']??'', $nd['full_name']??'', $qst, '', $nd['tracking_id']??''); $notifySent = true; }
+        } catch (Exception $e) {}
+        try {
+            logRequestStatusHistory(
+                $db,
+                'loan',
+                $qid,
+                $oldStatus !== '' ? $oldStatus : null,
+                $qst,
+                '',
+                $notifySent,
+                (int)($_SESSION['admin_id'] ?? 0),
+                (string)($_SESSION['admin_name'] ?? 'Admin')
+            );
         } catch (Exception $e) {}
         setFlash('success', $__t('स्थिति परिवर्तन गरियो।', 'Status changed.'));
     } catch (Exception $e) { setFlash('error', $__t('त्रुटि भयो।', 'An error occurred.')); }
@@ -127,6 +170,10 @@ if (isset($_GET['view'])) {
     $s->execute([(int)$_GET['view']]);
     $viewApp = $s->fetch();
     if (!$viewApp) { setFlash('error', $__t('आवेदन फेला परेन।', 'Application not found.')); redirect('loan-applications.php'); }
+}
+$loanHistory = [];
+if ($viewApp && !empty($viewApp['id'])) {
+    try { $loanHistory = fetchRequestStatusHistory($db, 'loan', (int)$viewApp['id'], 40); } catch (Exception $e) { $loanHistory = []; }
 }
 
 $statusLabel = [
@@ -273,6 +320,21 @@ if ($viewApp):
                     <div class="adm-info-group-header"><i class="fas fa-sticky-note"></i>Admin टिप्पणी (Member ले Tracker मा देख्छ)</div>
                     <div class="p-3 apt-text-block apt-text-block-success">
                         <?php echo nl2br(htmlspecialchars($viewApp['remarks'])); ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <?php if (!empty($loanHistory)): ?>
+                <div class="adm-info-group">
+                    <div class="adm-info-group-header"><i class="fas fa-clock-rotate-left"></i>Status / Comment History</div>
+                    <div class="p-3">
+                        <?php foreach ($loanHistory as $h): ?>
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                            <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div><?php endif; ?>
+                            <div class="small text-muted mt-1"><?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <?php endif; ?>

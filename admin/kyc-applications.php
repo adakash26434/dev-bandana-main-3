@@ -10,6 +10,7 @@ $currentPage = 'kyc';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 require_once '../includes/member-auth.php'; /* adminGenerateMemberIdCard() को लागि */
+require_once __DIR__ . '/../includes/request-status-history.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
 /* RBAC: staff hercha matra; mutate admin+ matra */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { require_role('admin'); checkCSRF(); }
@@ -45,6 +46,9 @@ if ($db instanceof PDO) {
 }
 
 $kycListStatuses = ['pending', 'approved', 'rejected', 'incomplete', 'partial'];
+if ($db instanceof PDO) {
+    ensureRequestStatusHistoryTable($db);
+}
 
 /* ── Bulk Import (Excel CSV) ── */
 if (isset($_POST['import_kyc_csv'])) {
@@ -199,6 +203,13 @@ if (isset($_POST['update_status'])) {
     $editMobile = preg_replace('/[^0-9]/', '', (string)($_POST['mobile'] ?? ''));
     $editEmail  = strtolower(trim((string)($_POST['email'] ?? '')));
     $newFile = adminUploadFile('admin_attachment');
+    $oldStatus = '';
+    $notifySent = false;
+    try {
+        $os = $db->prepare("SELECT status FROM kyc_applications WHERE id=? LIMIT 1");
+        $os->execute([$id]);
+        $oldStatus = (string)($os->fetchColumn() ?: '');
+    } catch (Exception $e) {}
 
     if ($editMemberId === '') {
         setFlash('error', 'Member ID खाली राख्न मिल्दैन।');
@@ -265,6 +276,7 @@ if (isset($_POST['update_status'])) {
                 sendMemberStatusUpdate('kyc',
                     $nData['email'] ?? '', $nData['phone'] ?? $nData['mobile'] ?? '', $nData['full_name'] ?? '',
                     $status, $remarks, $nData['tracking_id'] ?? '');
+                $notifySent = true;
                 /* KYC approved + want_id_card = 1 → ID card auto-generate */
                 if ($status === 'approved') {
                     kycAutoGenerateIdCard($db, $id,
@@ -272,6 +284,19 @@ if (isset($_POST['update_status'])) {
                         $nData['mobile'] ?? $nData['phone'] ?? '');
                 }
             }
+        } catch (Exception $e) {}
+        try {
+            logRequestStatusHistory(
+                $db,
+                'kyc',
+                $id,
+                $oldStatus !== '' ? $oldStatus : null,
+                $status,
+                (string)$remarks,
+                $notifySent,
+                (int)($_SESSION['admin_id'] ?? 0),
+                (string)($_SESSION['admin_name'] ?? 'Admin')
+            );
         } catch (Exception $e) {}
         setFlash('success', 'स्थिति अपडेट गरियो।');
     } catch (Exception $e) {
@@ -292,6 +317,13 @@ if (isset($_POST['quick_status'])) {
     $qid = (int)($_POST['quick_id'] ?? 0);
     $allowed = ['pending','approved','rejected','incomplete','partial'];
     $qst = in_array($_POST['quick_status_val'] ?? '', $allowed) ? $_POST['quick_status_val'] : 'pending';
+    $oldStatus = '';
+    $notifySent = false;
+    try {
+        $os = $db->prepare("SELECT status FROM kyc_applications WHERE id=? LIMIT 1");
+        $os->execute([$qid]);
+        $oldStatus = (string)($os->fetchColumn() ?: '');
+    } catch (Exception $e) {}
     try {
         $db->prepare("UPDATE kyc_applications
                       SET status=?, updated_at=NOW(),
@@ -310,11 +342,25 @@ if (isset($_POST['quick_status'])) {
             $nr->execute([$qid]); $nd = $nr->fetch();
             if ($nd) {
                 sendMemberStatusUpdate('kyc', $nd['email']??'', $nd['mobile']??'', $nd['full_name']??'', $qst, '', $nd['tracking_id']??'');
+                $notifySent = true;
                 /* KYC approved + want_id_card = 1 → ID card auto-generate */
                 if ($qst === 'approved') {
                     kycAutoGenerateIdCard($db, $qid, $nd['email'] ?? '', $nd['mobile'] ?? '');
                 }
             }
+        } catch (Exception $e) {}
+        try {
+            logRequestStatusHistory(
+                $db,
+                'kyc',
+                $qid,
+                $oldStatus !== '' ? $oldStatus : null,
+                $qst,
+                '',
+                $notifySent,
+                (int)($_SESSION['admin_id'] ?? 0),
+                (string)($_SESSION['admin_name'] ?? 'Admin')
+            );
         } catch (Exception $e) {}
         setFlash('success', 'KYC स्थिति परिवर्तन गरियो।');
     } catch (Exception $e) { setFlash('error', 'त्रुटि भयो।'); }
@@ -368,6 +414,10 @@ if (isset($_GET['view'])) {
     $s->execute([(int)$_GET['view']]);
     $viewApp = $s->fetch();
     if (!$viewApp) { setFlash('error', 'आवेदन फेला परेन।'); redirect('kyc-applications.php'); }
+}
+$kycHistory = [];
+if ($viewApp && !empty($viewApp['id'])) {
+    try { $kycHistory = fetchRequestStatusHistory($db, 'kyc', (int)$viewApp['id'], 40); } catch (Exception $e) { $kycHistory = []; }
 }
 
 $statusClass = ['pending'=>'warning','approved'=>'success','rejected'=>'danger','incomplete'=>'secondary','partial'=>'info'];
@@ -713,6 +763,20 @@ if ($viewApp):
                     <div class="adm-info-group-header"><i class="fas fa-sticky-note"></i>Admin टिप्पणी (Member ले Tracker मा देख्छ)</div>
                     <div class="p-3 apt-text-block apt-text-block-success">
                         <?php echo nl2br(htmlspecialchars($viewApp['remarks'])); ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($kycHistory)): ?>
+                <div class="adm-info-group">
+                    <div class="adm-info-group-header"><i class="fas fa-clock-rotate-left"></i>Status / Comment History</div>
+                    <div class="p-3">
+                        <?php foreach ($kycHistory as $h): ?>
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                            <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div><?php endif; ?>
+                            <div class="small text-muted mt-1"><?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <?php endif; ?>

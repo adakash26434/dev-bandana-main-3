@@ -412,7 +412,7 @@ if ($viewApplication && !empty($viewApplication['id'])) {
                                         <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
                                         <?php endif; ?>
                                         <div class="small text-muted mt-1">
-                                            <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?>
+                                            <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?>
                                         </div>
                                     </div>
                                     <?php endforeach; ?>

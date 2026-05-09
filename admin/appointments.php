@@ -9,11 +9,13 @@ $pageTitle   = 'भेटघाट व्यवस्थापन';
 $currentPage = 'appointments';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 
 /* ── Auto-ALTER: admin_attachment column थप्ने — MySQL 5.7+ compatible ── */
 safeAddColumn($db, 'appointments', 'admin_attachment', "VARCHAR(500) DEFAULT '' COMMENT 'Admin reply मा संलग्न file'");
 
 $appointmentListStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+ensureRequestStatusHistoryTable($db);
 
 /* ─── Status Update ─── */
 if (isset($_POST['update_status'])) {
@@ -22,6 +24,13 @@ if (isset($_POST['update_status'])) {
     $status  = clean_text($_POST['status']);
     $remarks = clean_text($_POST['remarks'] ?? '');
     $newFile = adminUploadFile('admin_attachment');
+    $oldStatus = '';
+    $notifySent = false;
+    try {
+        $os = $db->prepare("SELECT status FROM appointments WHERE id=? LIMIT 1");
+        $os->execute([$id]);
+        $oldStatus = (string)($os->fetchColumn() ?: '');
+    } catch (Exception $e) {}
 
     if ($newFile) {
         $stmt = $db->prepare("UPDATE appointments SET status=?, remarks=?, admin_attachment=? WHERE id=?");
@@ -40,8 +49,22 @@ if (isset($_POST['update_status'])) {
             sendMemberStatusUpdate('appointment',
                 $nData['email'] ?? '', $nData['phone'] ?? '', $nData['name'] ?? '',
                 $status, $remarks, 'APT-' . $id);
+            $notifySent = true;
         }
     } catch (Exception $e) { /* notification fail भए पनि main काम रोकिँदैन */ }
+    try {
+        logRequestStatusHistory(
+            $db,
+            'appointment',
+            $id,
+            $oldStatus !== '' ? $oldStatus : null,
+            $status,
+            (string)$remarks,
+            $notifySent,
+            (int)($_SESSION['admin_id'] ?? 0),
+            (string)($_SESSION['admin_name'] ?? 'Admin')
+        );
+    } catch (Exception $e) {}
     setFlash('success', 'स्थिति अपडेट भयो।');
     redirect('appointments.php' . ($id ? '?view=' . $id : ''));
 }
@@ -59,13 +82,33 @@ if (isset($_POST['quick_status'])) {
     $qid = (int)($_POST['quick_id'] ?? 0);
     $allowed = ['pending','confirmed','completed','cancelled'];
     $qst = in_array($_POST['quick_status_val'] ?? '', $allowed) ? $_POST['quick_status_val'] : 'pending';
+    $oldStatus = '';
+    $notifySent = false;
+    try {
+        $os = $db->prepare("SELECT status FROM appointments WHERE id=? LIMIT 1");
+        $os->execute([$qid]);
+        $oldStatus = (string)($os->fetchColumn() ?: '');
+    } catch (Exception $e) {}
     try {
         $db->prepare("UPDATE appointments SET status=? WHERE id=?")->execute([$qst, $qid]);
         try {
             $nr = $db->prepare("SELECT name, email, phone, tracking_id FROM appointments WHERE id=?");
             $nr->execute([$qid]); $nd = $nr->fetch();
-            if ($nd) sendMemberStatusUpdate('appointment', $nd['email']??'', $nd['phone']??'', $nd['name']??'', $qst, '', $nd['tracking_id']??'');
+            if ($nd) { sendMemberStatusUpdate('appointment', $nd['email']??'', $nd['phone']??'', $nd['name']??'', $qst, '', $nd['tracking_id']??''); $notifySent = true; }
         } catch (Throwable $e) { error_log("[appointments.php] " . $e->getMessage()); }
+        try {
+            logRequestStatusHistory(
+                $db,
+                'appointment',
+                $qid,
+                $oldStatus !== '' ? $oldStatus : null,
+                $qst,
+                '',
+                $notifySent,
+                (int)($_SESSION['admin_id'] ?? 0),
+                (string)($_SESSION['admin_name'] ?? 'Admin')
+            );
+        } catch (Exception $e) {}
         setFlash('success', 'स्थिति परिवर्तन गरियो।');
     } catch (Exception $e) { setFlash('error', 'त्रुटि भयो।'); }
     $redAptSt = $_GET['status'] ?? '';
@@ -119,6 +162,10 @@ if (isset($_GET['view'])) {
     $s->execute([(int)$_GET['view']]);
     $viewApt = $s->fetch();
     if (!$viewApt) { setFlash('error', 'भेटघाट फेला परेन।'); redirect('appointments.php'); }
+}
+$appointmentHistory = [];
+if ($viewApt && !empty($viewApt['id'])) {
+    try { $appointmentHistory = fetchRequestStatusHistory($db, 'appointment', (int)$viewApt['id'], 40); } catch (Exception $e) { $appointmentHistory = []; }
 }
 
 /* ─── Helpers ─── */
@@ -238,6 +285,20 @@ if ($viewApt):
                            class="btn btn-sm btn-outline-primary" target="_blank" download>
                             <i class="fas fa-download me-1"></i>Download
                         </a>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($appointmentHistory)): ?>
+                <div class="adm-info-group">
+                    <div class="adm-info-group-header"><i class="fas fa-clock-rotate-left"></i>Status / Comment History</div>
+                    <div class="p-3">
+                        <?php foreach ($appointmentHistory as $h): ?>
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                            <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div><?php endif; ?>
+                            <div class="small text-muted mt-1"><?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <?php endif; ?>

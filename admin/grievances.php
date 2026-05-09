@@ -42,8 +42,6 @@ require_once 'includes/admin-ui.php';
 
 /* ─── POST handlers ─── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $viewId = (int)($_POST['view_id'] ?? 0); /* form पछि detail page मा redirect */
-
     /* ── Status + Response Update ── */
     if (isset($_POST['update_grievance'])) {
         $id          = (int)$_POST['id'];
@@ -133,8 +131,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $qid = (int)($_POST['quick_id'] ?? 0);
         $allowed = ['pending','in_progress','resolved','closed'];
         $qst = in_array($_POST['quick_resolve_status'] ?? '', $allowed) ? $_POST['quick_resolve_status'] : 'resolved';
+        $oldStatus = '';
+        $notifySent = false;
+        try {
+            $oldQ = $db->prepare("SELECT status FROM grievances WHERE id=? LIMIT 1");
+            $oldQ->execute([$qid]);
+            $oldStatus = (string)($oldQ->fetchColumn() ?: '');
+        } catch (Exception $e) {}
         try {
             $db->prepare("UPDATE grievances SET status=? WHERE id=?")->execute([$qst, $qid]);
+            try {
+                $nr = $db->prepare("SELECT name, email, phone, tracking_id FROM grievances WHERE id=?");
+                $nr->execute([$qid]);
+                $nd = $nr->fetch();
+                if ($nd) {
+                    sendMemberStatusUpdate(
+                        'grievance',
+                        (string)($nd['email'] ?? ''),
+                        (string)($nd['phone'] ?? ''),
+                        (string)($nd['name'] ?? ''),
+                        $qst,
+                        '',
+                        (string)($nd['tracking_id'] ?? ('GRV-' . $qid))
+                    );
+                    $notifySent = true;
+                }
+            } catch (Exception $e) {}
+            try {
+                logRequestStatusHistory(
+                    $db,
+                    'grievance',
+                    $qid,
+                    $oldStatus !== '' ? $oldStatus : null,
+                    $qst,
+                    '',
+                    $notifySent,
+                    (int)($_SESSION['admin_id'] ?? 0),
+                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                );
+            } catch (Exception $e) {}
             setFlash('success', $__t('गुनासो स्थिति परिवर्तन गरियो।', 'Grievance status changed.'));
         } catch (Exception $e) { setFlash('error', $__t('त्रुटि भयो।', 'An error occurred.')); }
         $gStatuses = ['pending', 'in_progress', 'resolved', 'closed'];

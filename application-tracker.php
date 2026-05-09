@@ -1,9 +1,47 @@
 <?php
 require_once 'includes/config.php';
+require_once __DIR__ . '/includes/request-status-history.php';
 /* ensure-tables: silent fail — DB tables नभए पनि page crash नगर्ने */
 try { require_once 'includes/ensure-tables.php'; } catch (\Throwable $e) { error_log('tracker ensure-tables: ' . $e->getMessage()); }
 $pageTitle = isEnglish() ? 'Application Status Tracker' : 'आवेदन स्थिति ट्र्याकर';
 require_once 'includes/header.php';
+
+function trackerHistoryModuleKeyFromType(string $appType): ?string {
+    return match ($appType) {
+        'appointment' => 'appointment',
+        'kyc' => 'kyc',
+        'loan' => 'loan',
+        'account' => 'account',
+        'grievance' => 'grievance',
+        'welfare_claim' => 'welfare',
+        'job' => 'job_application',
+        'feedback' => 'feedback',
+        'digital_service' => 'digital_service',
+        default => null,
+    };
+}
+
+function trackerFetchHistoryEntries(array $app): array {
+    static $dbRef = null;
+    static $tableEnsured = false;
+    $module = trackerHistoryModuleKeyFromType((string)($app['app_type'] ?? ''));
+    $requestId = (int)($app['id'] ?? 0);
+    if ($module === null || $requestId <= 0) {
+        return [];
+    }
+    try {
+        if (!($dbRef instanceof PDO)) {
+            $dbRef = getDB();
+        }
+        if (!$tableEnsured) {
+            ensureRequestStatusHistoryTable($dbRef);
+            $tableEnsured = true;
+        }
+        return fetchRequestStatusHistory($dbRef, $module, $requestId, 20);
+    } catch (Throwable $e) {
+        return [];
+    }
+}
 
 $allResults       = [];
 $error            = '';
@@ -829,6 +867,7 @@ function getAppTypeLabel($type) {
                         $typeInfo = getAppTypeLabel($app['app_type']);
                         $_status = $app['status'] ?? 'pending';
                         $_tabGroup = in_array($_status, $doneStatuses) ? 'done' : 'active';
+                        $statusHistory = trackerFetchHistoryEntries($app);
                     ?>
                     <div class="result-card-premium mb-4" data-tab-group="<?php echo $_tabGroup; ?>" <?php if ($_tabGroup === 'done'): ?>style="display:none;"<?php endif; ?>>
                         <div class="rcp-accent rcp-accent-<?php echo $typeInfo['color']; ?>"></div>
@@ -1427,6 +1466,25 @@ function getAppTypeLabel($type) {
                                                 <small><?php echo isEnglish() ? 'Decision' : 'निर्णय'; ?></small>
                                             </div>
                                         </div>
+                                    </div>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($statusHistory)): ?>
+                                    <div class="admin-response-block mt-2">
+                                        <strong><i class="fas fa-clock-rotate-left tracker-ico-primary"></i> <?php echo isEnglish() ? 'Status / Comment History' : 'स्टाटस / कमेन्ट इतिहास'; ?></strong>
+                                        <?php foreach ($statusHistory as $h): ?>
+                                        <div class="mt-2 p-2 bg-light rounded border">
+                                            <div class="small fw-semibold text-dark"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                                            <?php if (!empty($h['admin_comment'])): ?>
+                                            <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
+                                            <?php endif; ?>
+                                            <div class="small text-muted mt-1">
+                                                <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> ·
+                                                <?php echo formatNepaliDate((string)$h['created_at'], true); ?> ·
+                                                <?php echo !empty($h['notify_sent']) ? (isEnglish() ? 'Notify sent' : 'Notify पठाइयो') : (isEnglish() ? 'No notify' : 'Notify छैन'); ?>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; ?>
                                     </div>
                                     <?php endif; ?>
 
@@ -2135,14 +2193,6 @@ if (searchTypeEl) {
     padding: 0 6px;
 }
 .tab-badge-active { background: var(--primary-color); color: var(--text-on-primary,white); }
-.tab-badge-done   { background: var(--text-muted,#94a3b8); color: white; }
-.tracker-tab-empty-msg {
-    flex: 1;
-    text-align: center;
-    color: var(--text-muted,#94a3b8);
-    font-size: 0.9rem;
-    padding: 8px;
-}
 
 /* ── HELP STRIP ── */
 .tracker-help-strip {
@@ -2178,7 +2228,7 @@ if (searchTypeEl) {
 }
 .thc-icon-primary { background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); }
 .thc-icon-success { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
-.thc-icon-warn { background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark,var(--secondary-color))); }
+.thc-icon-warn { background: linear-gradient(135deg, var(--primary-dark), var(--primary-color)); }
 
 /* ── ALERT IMPROVEMENTS ── */
 .alert-warning.tracker-alert {
@@ -2190,8 +2240,8 @@ if (searchTypeEl) {
 .alert-success.tracker-alert {
     border-radius: 12px;
     border: none;
-    background: #f0fdf4;
-    border-left: 4px solid #10b981;
+    background: var(--bg-soft);
+    border-left: 4px solid var(--primary-color);
 }
 
 /* ── RESPONSIVE ── */
@@ -2231,13 +2281,6 @@ if (searchTypeEl) {
     transition: transform 0.2s;
     display: inline-block;
 }
-/* Timeline wrap inside collapse */
-.rcp-timeline-wrap {
-    border-top: 1px solid #f1f5f9;
-    padding: 16px 4px 4px;
-    margin-top: 12px;
-}
-
 </style>
 
 <script>

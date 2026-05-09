@@ -7,9 +7,11 @@ $pageTitle = 'सदस्य कल्याण दाबीहरू';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 require_once __DIR__ . '/../includes/welfare-claims-tables.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 
 $db = getDB();
 ensureWelfareClaimsTables($db);
+ensureRequestStatusHistoryTable($db);
 
 /* CSRF सुरक्षा: POST अनुरोध प्रमाणित गर्नुहोस् */
 checkCSRF();
@@ -27,6 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = clean_text($_POST['status']);
             $approved_amount = floatval($_POST['approved_amount'] ?? 0);
             $admin_remarks = clean_text($_POST['admin_remarks'] ?? '');
+            $oldStatus = '';
+            $notifySent = false;
+            try {
+                $os = $db->prepare("SELECT status FROM member_welfare_claims WHERE id=? LIMIT 1");
+                $os->execute([$claim_id]);
+                $oldStatus = (string)($os->fetchColumn() ?: '');
+            } catch (Exception $e) {}
 
             $stmt = $db->prepare("UPDATE member_welfare_claims SET
                 status = ?,
@@ -40,12 +49,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /* Member portal notification */
             try {
-                $nr = $db->prepare("SELECT full_name, email, phone FROM member_welfare_claims WHERE id=?");
+                $nr = $db->prepare("SELECT member_name, full_name, email, phone FROM member_welfare_claims WHERE id=?");
                 $nr->execute([$claim_id]); $nd = $nr->fetch();
                 if ($nd && function_exists('sendMemberStatusUpdate')) {
-                    sendMemberStatusUpdate('welfare', $nd['email']??'', $nd['phone']??'', $nd['member_name']??'', $status, $admin_remarks, '');
+                    sendMemberStatusUpdate('welfare', $nd['email']??'', $nd['phone']??'', $nd['full_name'] ?? $nd['member_name'] ?? '', $status, $admin_remarks, '');
+                    $notifySent = true;
                 }
             } catch (Exception $ex) {}
+            try {
+                logRequestStatusHistory(
+                    $db,
+                    'welfare',
+                    $claim_id,
+                    $oldStatus !== '' ? $oldStatus : null,
+                    $status,
+                    (string)$admin_remarks,
+                    $notifySent,
+                    (int)($_SESSION['admin_id'] ?? 0),
+                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                );
+            } catch (Exception $e) {}
 
             setFlash('success', 'दाबी स्थिति सफलतापूर्वक अपडेट भयो।');
             /* Update पछि detail page मा नै redirect — list होइन */
@@ -101,6 +124,10 @@ $search = mb_substr(trim((string)($_GET['search'] ?? '')), 0, 200, 'UTF-8');
 $stmt = $db->prepare("SELECT * FROM member_welfare_claims WHERE id = ?");
 $stmt->execute([$id]);
 $claim = $stmt->fetch();
+$claimHistory = [];
+if ($claim) {
+    try { $claimHistory = fetchRequestStatusHistory($db, 'welfare', (int)$id, 40); } catch (Exception $e) { $claimHistory = []; }
+}
 
 if (!$claim) {
     setFlash('error', 'दाबी फेला परेन।');
@@ -266,6 +293,18 @@ if (!$claim) {
                     <?php if ($claim['reviewed_by']): ?>
                     <small class="text-muted">समीक्षा गर्ने: <?php echo e($claim['reviewed_by']); ?> | <?php echo $claim['reviewed_at'] ? formatDate($claim['reviewed_at'], 'Y-m-d H:i') : ''; ?></small>
                     <?php endif; ?>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($claimHistory)): ?>
+                <div class="info-section">
+                    <h6><i class="fas fa-clock-rotate-left"></i> Status / Comment History</h6>
+                    <?php foreach ($claimHistory as $h): ?>
+                    <div class="border rounded p-2 mb-2 bg-white">
+                        <div class="small fw-semibold"><?php echo e((string)($h['old_status'] ?: '—')); ?> → <?php echo e((string)($h['new_status'] ?: '—')); ?></div>
+                        <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(e((string)$h['admin_comment'])); ?></div><?php endif; ?>
+                        <div class="small text-muted mt-1"><?php echo e((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
             </div>

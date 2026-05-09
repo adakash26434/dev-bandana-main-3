@@ -5,10 +5,12 @@
  */
 /* v2: bootstrap ले config + member-auth + global error guard load गर्छ */
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 requireMemberLogin();
 memberSecurityHeaders();
 
 $db       = getDB();
+ensureRequestStatusHistoryTable($db);
 $mem      = currentMember();
 $memEmail = trim((string)($mem['email'] ?? ''));
 $memPhone = trim((string)($mem['phone'] ?? ''));
@@ -101,6 +103,30 @@ if ($viewId > 0 && $viewTbl !== '') {
     }
 }
 
+function memberTrackerModuleKey(string $table): ?string {
+    return match ($table) {
+        'appointments' => 'appointment',
+        'kyc_applications' => 'kyc',
+        'loan_applications' => 'loan',
+        'account_applications' => 'account',
+        'grievances' => 'grievance',
+        'welfare_claims' => 'welfare',
+        'job_applications' => 'job_application',
+        default => null,
+    };
+}
+$viewHistory = [];
+if ($viewApp && $viewTbl !== '') {
+    $moduleKey = memberTrackerModuleKey($viewTbl);
+    if ($moduleKey !== null) {
+        try {
+            $viewHistory = fetchRequestStatusHistory($db, $moduleKey, (int)$viewApp['id'], 40);
+        } catch (Exception $e) {
+            $viewHistory = [];
+        }
+    }
+}
+
 $siteName = getSetting('site_name', 'आकाश सहकारी');
 $siteUrl  = SITE_URL;
 $pageTitle = $_t('आवेदन ट्र्याकर', 'Application Tracker') . ' — ' . $siteName;
@@ -144,7 +170,7 @@ require __DIR__ . '/includes/chrome.php';
             <!-- Tracking ID -->
             <?php if (!empty($viewApp['tracking_id'])): ?>
             <div style="margin-bottom:16px;">
-                <div style="font-size:0.75rem;color:#6b7280;font-weight:700;margin-bottom:4px;">TRACKING ID</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;margin-bottom:4px;">TRACKING ID</div>
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span class="mem-tracking-id" id="trkId"><?php echo htmlspecialchars($viewApp['tracking_id']); ?></span>
                     <button onclick="copyTrk('trkId',this)" class="mem-topbar-btn" style="background:var(--primary-color);border:none;font-size:0.72rem;padding:5px 12px;cursor:pointer;">
@@ -156,6 +182,26 @@ require __DIR__ . '/includes/chrome.php';
 
             <!-- Timeline -->
             <?php echo timelineSteps($viewApp['status'] ?? 'pending'); ?>
+            <?php if (!empty($viewHistory)): ?>
+            <div style="margin-top:14px;background:var(--bg-soft);border:1px solid var(--border-soft);border-radius:10px;padding:12px;">
+                <div style="font-size:.78rem;font-weight:700;color:var(--text-primary);margin-bottom:8px;">
+                    <i class="fas fa-clock-rotate-left me-1"></i><?php echo $_t('स्टाटस/कमेन्ट इतिहास', 'Status/Comment History'); ?>
+                </div>
+                <?php foreach ($viewHistory as $h): ?>
+                <div style="border:1px solid var(--border-soft);border-radius:8px;background:var(--bg-card);padding:8px 10px;margin-bottom:8px;">
+                    <div style="font-size:.8rem;font-weight:700;color:var(--text-primary);"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                    <?php if (!empty($h['admin_comment'])): ?>
+                    <div style="font-size:.8rem;color:var(--text-secondary);margin-top:4px;white-space:pre-wrap;"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
+                    <?php endif; ?>
+                    <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;">
+                        <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> ·
+                        <?php echo formatNepaliDate((string)$h['created_at'], true); ?> ·
+                        <?php echo !empty($h['notify_sent']) ? ($_t('Notify पठाइयो', 'Notify sent')) : ($_t('Notify छैन', 'No notify')); ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
 
             <?php
             /* v10.3 (Issue #4): Admin reply highlight panel — पुरानो version मा
@@ -166,7 +212,7 @@ require __DIR__ . '/includes/chrome.php';
             $hasAttach = !empty($viewApp['admin_attachment']);
             if ($hasReply || $hasAttach):
             ?>
-            <div style="margin:14px 0 6px;background:#f0fdf4;border:1.5px solid var(--primary-light,#2e8b4a);border-radius:12px;padding:14px 16px;">
+            <div style="margin:14px 0 6px;background:var(--bg-soft);border:1.5px solid var(--primary-light,#2e8b4a);border-radius:12px;padding:14px 16px;">
                 <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--primary-dark,#144a21);font-size:.92rem;margin-bottom:8px;">
                     <i class="fas fa-comment-dots"></i> <?php echo $_t('Admin बाट प्रतिक्रिया', 'Response from Admin'); ?>
                     <?php if (!empty($viewApp['resolved_at'])): ?>
@@ -210,13 +256,13 @@ require __DIR__ . '/includes/chrome.php';
                     $isHighlight = in_array($k, ['admin_response','remarks']);
                 ?>
                 <tr>
-                    <th style="width:35%;color:#6b7280;font-weight:700;font-size:0.78rem;vertical-align:top;padding:6px 8px;border-bottom:1px solid #f3f4f6;"><?php echo htmlspecialchars($label); ?></th>
-                    <td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;<?php echo $isHighlight ? 'background:#f0fdf4;' : ''; ?>">
+                            <th style="width:35%;color:var(--text-muted);font-weight:700;font-size:0.78rem;vertical-align:top;padding:6px 8px;border-bottom:1px solid var(--border-soft);"><?php echo htmlspecialchars($label); ?></th>
+                    <td style="padding:6px 8px;border-bottom:1px solid var(--border-soft);<?php echo $isHighlight ? 'background:var(--bg-soft);' : ''; ?>">
                         <?php if ($k === 'status'): echo memberStatusBadge($v);
                         elseif ($k === 'created_at' || $k === 'updated_at'): echo formatNepaliDate($v, true);
                         elseif ($k === 'preferred_date'): echo formatNepaliDate($v);
                         elseif ($k === 'loan_amount' || $k === 'collateral_value'): echo 'रू. ' . number_format((float)$v);
-                        elseif ($isHighlight): echo '<div style="white-space:pre-wrap;font-size:0.85rem;color:#374151;">' . nl2br(htmlspecialchars($v)) . '</div>';
+                        elseif ($isHighlight): echo '<div style="white-space:pre-wrap;font-size:0.85rem;color:var(--text-secondary);">' . nl2br(htmlspecialchars($v)) . '</div>';
                         else: echo htmlspecialchars($v); ?>
                         <?php endif; ?>
                     </td>
@@ -237,17 +283,17 @@ require __DIR__ . '/includes/chrome.php';
             <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">
                 <?php $filters = ['all'=>$_t('सबै','All'),'appointment'=>$_t('भेटघाट','Appointment'),'kyc'=>'KYC','loan'=>$_t('ऋण','Loan'),'account'=>$_t('खाता','Account'),'grievance'=>$_t('गुनासो','Grievance'),'welfare'=>$_t('कल्याण','Welfare'),'job'=>$_t('जागिर','Job')]; ?>
                 <?php foreach ($filters as $fk => $fl): ?>
-                <a href="?filter=<?php echo $fk; ?>&q=<?php echo urlencode($q); ?>" style="padding:5px 13px;border-radius:20px;font-size:0.75rem;font-weight:700;text-decoration:none;border:1.5px solid <?php echo $filter===$fk ? 'var(--mem-primary)' : '#e5e7eb'; ?>;background:<?php echo $filter===$fk ? 'var(--mem-primary)' : '#fff'; ?>;color:<?php echo $filter===$fk ? '#fff' : '#6b7280'; ?>;">
+                <a href="?filter=<?php echo $fk; ?>&q=<?php echo urlencode($q); ?>" style="padding:5px 13px;border-radius:20px;font-size:0.75rem;font-weight:700;text-decoration:none;border:1.5px solid <?php echo $filter===$fk ? 'var(--mem-primary)' : 'var(--border-soft)'; ?>;background:<?php echo $filter===$fk ? 'var(--mem-primary)' : 'var(--bg-card)'; ?>;color:<?php echo $filter===$fk ? 'var(--text-on-primary, #fff)' : 'var(--text-muted)'; ?>;">
                     <?php echo $fl; ?>
                 </a>
                 <?php endforeach; ?>
             </div>
             <form method="GET" style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
                 <input type="hidden" name="filter" value="<?php echo htmlspecialchars($filter); ?>">
-                <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="<?php echo $_t('Tracking ID, सेवा, विवरणबाट खोज्नुहोस्...', 'Search by tracking ID, service or details...'); ?>" style="flex:1;min-width:0;border:1px solid #d1d5db;border-radius:8px;padding:7px 10px;font-size:.8rem;">
-                <button type="submit" style="padding:7px 12px;border:none;border-radius:8px;background:var(--mem-primary);color:#fff;font-size:.78rem;font-weight:700;"><i class="fas fa-search me-1"></i><?php echo $_t('खोज', 'Search'); ?></button>
+                <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="<?php echo $_t('Tracking ID, सेवा, विवरणबाट खोज्नुहोस्...', 'Search by tracking ID, service or details...'); ?>" style="flex:1;min-width:0;border:1px solid var(--border-color);border-radius:8px;padding:7px 10px;font-size:.8rem;">
+                <button type="submit" style="padding:7px 12px;border:none;border-radius:8px;background:var(--mem-primary);color:var(--text-on-primary, #fff);font-size:.78rem;font-weight:700;"><i class="fas fa-search me-1"></i><?php echo $_t('खोज', 'Search'); ?></button>
                 <?php if ($q !== ''): ?>
-                <a href="?filter=<?php echo urlencode($filter); ?>" style="padding:7px 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#6b7280;font-size:.78rem;font-weight:700;text-decoration:none;">Reset</a>
+                <a href="?filter=<?php echo urlencode($filter); ?>" style="padding:7px 12px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-card);color:var(--text-muted);font-size:.78rem;font-weight:700;text-decoration:none;">Reset</a>
                 <?php endif; ?>
             </form>
 
@@ -268,29 +314,29 @@ require __DIR__ . '/includes/chrome.php';
                         <div style="font-size:0.72rem;font-weight:700;color:<?php echo $app['service_color']; ?>;text-transform:uppercase;margin-bottom:2px;">
                             <?php echo htmlspecialchars($app['service_name']); ?>
                         </div>
-                        <div style="font-size:0.88rem;font-weight:600;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        <div style="font-size:0.88rem;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                             <?php echo htmlspecialchars($app['detail'] ?: '—'); ?>
                         </div>
-                        <div style="font-size:0.7rem;color:#6b7280;margin-top:2px;">
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">
                             <?php echo formatNepaliDate($app['created_at']); ?>
                             <?php if ($app['tracking_id']): ?> · <code style="font-size:0.68rem;"><?php echo htmlspecialchars($app['tracking_id']); ?></code><?php endif; ?>
                         </div>
                     </div>
                     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
                         <?php echo memberStatusBadge($app['status']); ?>
-                        <i class="fas fa-chevron-down" style="font-size:0.7rem;color:#9ca3af;transition:transform .2s;" class="trk-chevron"></i>
+                        <i class="fas fa-chevron-down" style="font-size:0.7rem;color:var(--text-muted);transition:transform .2s;" class="trk-chevron"></i>
                     </div>
                 </div>
                 <div class="mem-trk-body">
                     <?php echo timelineSteps($app['status']); ?>
                     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
                         <a href="?view=<?php echo (int)$app['id']; ?>&tbl=<?php echo htmlspecialchars($app['_table']); ?>&filter=<?php echo htmlspecialchars($filter); ?>&q=<?php echo urlencode($q); ?>"
-                           class="btn" style="padding:7px 14px;background:var(--mem-primary);color:#fff;border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;border:none;">
+                           class="btn" style="padding:7px 14px;background:var(--mem-primary);color:var(--text-on-primary, #fff);border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;border:none;">
                             <i class="fas fa-eye me-1"></i><?php echo $_t('विस्तृत हेर्नुहोस्', 'View Details'); ?>
                         </a>
                         <?php if ($app['tracking_id']): ?>
                         <a href="<?php echo $siteUrl; ?>application-tracker.php?tracking_id=<?php echo urlencode($app['tracking_id']); ?>"
-                           target="_blank" style="padding:7px 14px;background:#f0fdf4;color:var(--mem-primary);border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;border:1px solid var(--mem-primary);">
+                           target="_blank" style="padding:7px 14px;background:var(--bg-soft);color:var(--mem-primary);border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;border:1px solid var(--mem-primary);">
                             <i class="fas fa-search-location me-1"></i><?php echo $_t('पब्लिक ट्र्याकर', 'Public Tracker'); ?>
                         </a>
                         <?php endif; ?>
