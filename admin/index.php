@@ -386,7 +386,7 @@ if ($licExpiredLogin && !is_array($admin2faPending)) {
 $showLicenseRenewalOnLogin = $showLicenseRenewalOnLogin && !$forceShowLogin;
 ?>
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="<?php echo isEnglish() ? 'en' : 'ne'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -396,118 +396,33 @@ $showLicenseRenewalOnLogin = $showLicenseRenewalOnLogin && !$forceShowLogin;
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=9.7">
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=3">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=6">
     <link rel="stylesheet" href="assets/admin-modern.css?v=4.9">
     <?php if (file_exists(__DIR__ . '/../assets/css/_color-vars.php')) require __DIR__ . '/../assets/css/_color-vars.php'; ?>
     <style>
         *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-        body {
+        body.admin-auth-page {
             font-family: var(--font-primary,'Mukta','Noto Sans Devanagari','Segoe UI',sans-serif);
             min-height: 100dvh;
-            background: linear-gradient(150deg,#f0fdf4 0%,#e8f5e9 45%,#eef2ff 100%);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             padding: 24px 16px;
-            color: var(--text-primary,#1f2937);
-        }
-        .page-back {
-            position: fixed; top: 18px; right: 20px; z-index: 10;
-            background: rgba(255,255,255,.9); backdrop-filter: blur(8px);
-            border: 1px solid #e5e7eb;
-            color: var(--primary-color,#1a8754);
-            padding: 7px 15px; border-radius: 999px;
-            text-decoration: none; font-size: .78rem; font-weight: 700;
-            display: inline-flex; align-items: center; gap: 6px;
-            box-shadow: 0 1px 6px rgba(0,0,0,.07);
-            transition: all .15s;
-        }
-        .page-back:hover { background: #f0fdf4; transform: translateX(-2px); }
-
-        .auth-card {
-            width: 100%; max-width: 420px;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 24px 56px rgba(0,0,0,.09);
-            border-top: 4px solid var(--primary-color,#1a8754);
-            overflow: hidden;
-        }
-        .card-header {
-            padding: 30px 28px 22px;
-            text-align: center;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .card-logo-wrap {
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 14px;
         }
         .card-logo-wrap img {
-            height: auto; width: auto;
-            max-height: 72px; max-width: 210px;
-            object-fit: contain; border-radius: 8px;
-        }
-        .card-logo-icon {
-            width: 66px; height: 66px;
-            border-radius: 16px;
-            background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
-            color: #fff; display: grid; place-items: center;
-            font-size: 1.7rem; margin: 0 auto 14px;
-            box-shadow: 0 6px 18px rgba(26,95,42,.28);
-        }
-        .card-portal-label {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: .72rem; font-weight: 700;
-            color: var(--primary-color,#1a8754);
-            text-transform: uppercase; letter-spacing: .9px;
-            background: #f0fdf4; border: 1px solid #bbf7d0;
-            padding: 3px 11px; border-radius: 999px;
-        }
-        .card-body { padding: 26px 28px 30px; }
-        .card-title {
-            font-size: 1.32rem; font-weight: 800;
-            color: var(--primary-dark,var(--primary-color,#1a8754));
-            margin-bottom: 4px; line-height: 1.2;
-        }
-        .card-sub {
-            font-size: .84rem; color: #6b7280;
-            margin-bottom: 20px; line-height: 1.5;
-        }
-        .field { margin-bottom: 14px; }
-        .field label {
-            display: block; font-size: .78rem; font-weight: 600;
-            color: #374151; margin-bottom: 6px;
+            max-height: 56px;
+            max-width: 200px;
+            object-fit: contain;
+            border-radius: 8px;
         }
         .input-icon { position: relative; }
         .input-icon i {
             position: absolute; left: 13px; top: 50%;
-            transform: translateY(-50%); color: #9ca3af; font-size: .88rem;
+            transform: translateY(-50%); color: var(--text-muted); font-size: .88rem;
             pointer-events: none;
         }
         .field input {
-            width: 100%; padding: 11px 13px 11px 38px;
-            border: 1.5px solid #e5e7eb; border-radius: 10px;
-            font-size: .93rem; font-family: inherit;
-            background: #fafbfc; color: #111827;
-            transition: border-color .15s, box-shadow .15s;
+            padding-left: 38px;
         }
-        .field input::placeholder { color: #aab0ba; }
-        .field input:focus {
-            outline: none;
-            border-color: var(--primary-color,#1a8754);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(26,135,84,.12);
-        }
-        .submit-btn {
-            width: 100%; padding: 12px 16px;
-            background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754));
-            color: #fff; border: none; border-radius: 10px;
-            font-size: .95rem; font-weight: 700; font-family: inherit;
-            cursor: pointer; margin-top: 8px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 14px rgba(26,135,84,.3);
-            transition: all .18s; letter-spacing: .1px;
-        }
-        .submit-btn:hover { filter: brightness(1.06); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(26,135,84,.35); }
-        .submit-btn:active { transform: none; filter: brightness(.97); }
         .alert-error {
             background: #fef2f2; color: #b91c1c;
             border: 1px solid #fecaca;
@@ -677,6 +592,10 @@ $showLicenseRenewalOnLogin = $showLicenseRenewalOnLogin && !$forceShowLogin;
     </style>
 </head>
 <body class="auth-portal-page admin-auth-page">
+
+<a href="<?php echo htmlspecialchars(portalLangToggleUrl(), ENT_QUOTES, 'UTF-8'); ?>" class="auth-lang-toggle" title="<?php echo htmlspecialchars(getText('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars(getText('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>">
+    <i class="fas fa-language"></i> <?php echo htmlspecialchars(portalLangToggleBadge()); ?>
+</a>
 
 <a href="../index.php" class="page-back">
     <i class="fas fa-arrow-left"></i> वेबसाइट
