@@ -15,19 +15,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') require_role('admin');
 /* ── Ensure tables ── */
 ensureMemberTables();
 
-/* ── Send Notification ── */
+/* ── Send Notification (single + bulk) ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_notif'])) {
     checkCSRF();
-    $memberId = (int)($_POST['member_id'] ?? 0);
+    $target   = (string)($_POST['notif_target'] ?? 'single');
     $title    = clean_text($_POST['notif_title']   ?? '');
     $message  = clean_text($_POST['notif_message'] ?? '');
     $type     = in_array($_POST['notif_type'] ?? '', ['info','success','warning','error']) ? $_POST['notif_type'] : 'info';
+    $url      = SITE_URL . 'member/notifications.php';
 
-    if ($memberId && $title) {
-        createMemberNotification($memberId, $title, $message, $type, SITE_URL . 'member/notifications.php');
+    if (trim($title) === '') {
+        setFlash('error', 'Title राख्नुहोस्।');
+        redirect('members.php');
+    }
+
+    if ($target === 'all') {
+        /* Bulk: सबै सक्रिय + अनुमोदित member-portal सदस्यहरू */
+        $audience = (string)($_POST['notif_audience'] ?? 'active');
+        $where = "is_active = 1 AND COALESCE(approval_status, 'approved') IN ('approved','active')";
+        if ($audience === 'pending') {
+            $where = "approval_status = 'pending'";
+        } elseif ($audience === 'kyc_linked') {
+            $where = "is_active = 1 AND kyc_application_id IS NOT NULL";
+        } elseif ($audience === 'all_active') {
+            $where = "is_active = 1";
+        }
+        $sent = 0;
+        try {
+            $q = $db->query("SELECT id FROM members WHERE {$where}");
+            foreach ($q->fetchAll(PDO::FETCH_COLUMN, 0) ?: [] as $mid) {
+                $mid = (int)$mid;
+                if ($mid <= 0) continue;
+                createMemberNotification($mid, $title, $message, $type, $url);
+                $sent++;
+            }
+            setFlash('success', "Bulk Notification {$sent} जना सदस्यलाई सफलतापूर्वक पठाइयो।");
+        } catch (Throwable $e) {
+            setFlash('error', 'Bulk send गर्दा त्रुटि भयो: ' . $e->getMessage());
+        }
+        redirect('members.php');
+    }
+
+    /* Single member */
+    $memberId = (int)($_POST['member_id'] ?? 0);
+    if ($memberId) {
+        createMemberNotification($memberId, $title, $message, $type, $url);
         setFlash('success', 'Notification सफलतापूर्वक पठाइयो!');
     } else {
-        setFlash('error', 'Title राख्नुहोस्।');
+        setFlash('error', 'Member id गलत।');
     }
     redirect('members.php' . ($memberId ? '?view=' . $memberId : ''));
 }
@@ -442,6 +477,9 @@ try {
             <?php if ($search !== '' || $kycFilter !== 'all'): ?>
                 <a href="members.php<?php echo $memSub === 'arch' ? '?mem_sub=arch' : ''; ?>" class="btn btn-sm btn-outline-secondary">Clear</a>
             <?php endif; ?>
+            <button type="button" class="btn btn-sm btn-outline-success ms-auto" data-bs-toggle="modal" data-bs-target="#bulkNotifModal" title="सबै सदस्यलाई एकैचोटि सूचना पठाउनुहोस्">
+                <i class="fas fa-bullhorn me-1"></i>Bulk Notification
+            </button>
         </form>
         <small class="text-muted">
             <?php echo $memSub === 'live' ? 'सक्रिय सदस्य' : 'अभिलेख (निष्क्रिय)'; ?>
@@ -552,6 +590,64 @@ try {
 </div>
 
 <?php endif; ?>
+
+<!-- ── Bulk Notification Modal ── -->
+<div class="modal fade" id="bulkNotifModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form method="POST" class="modal-content border-0 shadow-lg">
+            <?php echo csrfField(); ?>
+            <input type="hidden" name="send_notif" value="1">
+            <input type="hidden" name="notif_target" value="all">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-bullhorn me-2"></i>सबै सदस्यलाई Notification पठाउनुहोस्</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning small">
+                    <i class="fas fa-triangle-exclamation me-1"></i>
+                    यो सूचना तपाईंले छनोट गर्नुभएको audience का सबै सदस्यको Member Portal नोटिफिकेसन panel मा देखिनेछ। पठाइसकेपछि फिर्ता गर्न मिल्दैन।
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <label class="form-label fw-semibold"><i class="fas fa-heading me-1 text-success"></i>शीर्षक <span class="text-danger">*</span></label>
+                        <input type="text" name="notif_title" class="form-control" required maxlength="200" placeholder="Notification शीर्षक (e.g. आजको कार्यक्रमको सूचना)">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold"><i class="fas fa-tag me-1 text-success"></i>प्रकार</label>
+                        <select name="notif_type" class="form-select">
+                            <option value="info">📘 सूचना (Info)</option>
+                            <option value="success">✅ सफलता (Success)</option>
+                            <option value="warning">⚠️ सतर्कता (Warning)</option>
+                            <option value="error">❌ अस्वीकृति (Error)</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold"><i class="fas fa-comment me-1 text-success"></i>विस्तृत सन्देश</label>
+                        <textarea name="notif_message" class="form-control" rows="4" maxlength="2000" placeholder="विस्तृत सन्देश यहाँ लेख्नुहोस्…"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold"><i class="fas fa-users me-1 text-success"></i>कसलाई पठाउने (Audience)</label>
+                        <select name="notif_audience" class="form-select">
+                            <option value="active" selected>✅ सक्रिय + अनुमोदित सदस्य मात्र (recommended)</option>
+                            <option value="all_active">🌐 सबै सक्रिय (अनुमोदन-स्थिति नहेरी)</option>
+                            <option value="kyc_linked">🔗 KYC-Linked सक्रिय सदस्य मात्र</option>
+                            <option value="pending">⏳ Pending Approval मात्र</option>
+                        </select>
+                        <div class="form-text">"सक्रिय + अनुमोदित" चयन गरेको खण्डमा रद्द गरिएका वा निष्क्रिय सदस्यलाई पठाइने छैन।</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">रद्द</button>
+                <button type="submit" class="btn btn-success" onclick="return confirm('के तपाईं पक्का सबै चयनित सदस्यलाई यो notification पठाउन चाहनुहुन्छ?')">
+                    <i class="fas fa-paper-plane me-1"></i>सबैलाई पठाउनुहोस्
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </div>
 
 <script>

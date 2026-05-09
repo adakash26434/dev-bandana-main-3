@@ -123,6 +123,39 @@ if ($_memId) {
 
 /* ID Card link सधैं देखाउने — generate नभएको भए id-card.php भित्रै "Pending" screen देखाउँछ */
 $_hasIdCard = true;
+
+/* ─────────────────────────────────────────────────────────────
+   Election nav state
+     - 'none'       : कुनै published निर्वाचन छैन वा उम्मेदवार छैन → nav link छैन
+     - 'candidates' : चक्र प्रकाशित + उम्मेदवार छन्, तर मतदान अहिले बन्द → 'उम्मेदवारहरू' (users icon)
+     - 'voting'     : मतदान खुला छ → 'मतदान' (check-to-slot icon)
+   ───────────────────────────────────────────────────────────── */
+$_electionState = 'none';
+$_electionCycleId = 0;
+try {
+    $_dbE = function_exists('getDB') ? getDB() : null;
+    if ($_dbE) {
+        if (file_exists(__DIR__ . '/../../includes/election-tables.php')) {
+            require_once __DIR__ . '/../../includes/election-tables.php';
+            if (function_exists('ensureElectionTables'))       ensureElectionTables($_dbE);
+            if (function_exists('ensureElectionVotingTables')) ensureElectionVotingTables($_dbE);
+        }
+        $_eCy = $_dbE->query("SELECT id, voting_enabled, vote_start_at, vote_end_at FROM election_cycles WHERE is_published=1 ORDER BY voting_enabled DESC, sort_order ASC, id DESC LIMIT 1")
+            ->fetch(PDO::FETCH_ASSOC) ?: null;
+        if ($_eCy) {
+            $_eCs = $_dbE->prepare("SELECT COUNT(*) FROM election_candidates WHERE cycle_id=? AND is_active=1");
+            $_eCs->execute([(int)$_eCy['id']]);
+            $_eCandCount = (int)$_eCs->fetchColumn();
+            if ($_eCandCount > 0) {
+                $_electionCycleId = (int)$_eCy['id'];
+                $_isOpen = function_exists('isElectionVotingOpen') ? isElectionVotingOpen($_eCy) : false;
+                $_electionState = $_isOpen ? 'voting' : 'candidates';
+            }
+        }
+    }
+} catch (\Throwable $_eIgnore) {
+    $_electionState = 'none';
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $_isEn ? 'en' : 'ne'; ?>" dir="ltr">
@@ -133,7 +166,7 @@ $_hasIdCard = true;
 <title><?php echo htmlspecialchars($pageTitle); ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php if (function_exists('memberHeadAssets')) memberHeadAssets(); ?>
-<link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/member.css?v=9.8">
+<link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/member.css?v=9.9">
 <link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/eye-candy-v7.css?v=7">
 <link rel="stylesheet" href="<?php echo $_siteUrl; ?>assets/css/site-banner-logo.css?v=1">
 <style>
@@ -162,6 +195,9 @@ $_hasIdCard = true;
 .mem-lang-code{font-size:11px;font-weight:800;line-height:1;}
 .mem-nav-item-rel{position:relative;}
 .mem-notif-dot-inline{position:static;margin-left:4px;}
+.mem-nav-vote-live{position:relative;}
+.mem-vote-live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#16a34a;margin-left:6px;box-shadow:0 0 0 0 rgba(22,163,74,.55);animation:memVoteLivePulse 1.4s infinite;}
+@keyframes memVoteLivePulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.55);}70%{box-shadow:0 0 0 8px rgba(22,163,74,0);}100%{box-shadow:0 0 0 0 rgba(22,163,74,0);}}
 </style>
 <?php echo $extraHead; ?>
 </head>
@@ -261,7 +297,11 @@ $_hasIdCard = true;
         <a href="<?php echo $_siteUrl; ?>member/id-card.php" class="mem-nav-item <?php echo $_active==='idcard'?'active':''; ?>"><i class="fas fa-id-card"></i><?php echo $_t('परिचयपत्र', 'ID Card'); ?></a>
         <?php endif; ?>
         <a href="<?php echo $_siteUrl; ?>member/welfare.php" class="mem-nav-item <?php echo $_active==='welfare'?'active':''; ?>"><i class="fas fa-heart-pulse"></i><?php echo $_t('कल्याण दाबी', 'Welfare Claim'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>member/election-vote.php" class="mem-nav-item <?php echo $_active==='election'?'active':''; ?>"><i class="fas fa-check-to-slot"></i><?php echo $_t('मतदान', 'Vote'); ?></a>
+        <?php if ($_electionState === 'voting'): ?>
+        <a href="<?php echo $_siteUrl; ?>member/election-vote.php" class="mem-nav-item mem-nav-vote-live <?php echo $_active==='election'?'active':''; ?>"><i class="fas fa-check-to-slot"></i><?php echo $_t('मतदान', 'Vote'); ?> <span class="mem-vote-live-dot" aria-hidden="true"></span></a>
+        <?php elseif ($_electionState === 'candidates'): ?>
+        <a href="<?php echo $_siteUrl; ?>member/election-vote.php" class="mem-nav-item <?php echo $_active==='election'?'active':''; ?>"><i class="fas fa-users"></i><?php echo $_t('उम्मेदवारहरू', 'Candidates'); ?></a>
+        <?php endif; ?>
         <a href="<?php echo $_siteUrl; ?>member/scan.php" class="mem-nav-item <?php echo $_active==='scan'?'active':''; ?>"><i class="fas fa-qrcode"></i><?php echo $_t('QR स्क्यान', 'QR Scan'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/attend.php" class="mem-nav-item <?php echo $_active==='attend'?'active':''; ?>"><i class="fas fa-calendar-check"></i><?php echo $_t('उपस्थिति', 'Attendance'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/service-request.php" class="mem-nav-item <?php echo $_active==='service'?'active':''; ?>"><i class="fas fa-concierge-bell"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?></a>

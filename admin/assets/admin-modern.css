@@ -4042,6 +4042,123 @@ aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
     border-color: rgba(255, 255, 255, 0.8) !important;
 }
 
+/* Filter search: compact icon-only, not a long color block. */
+.main-content .adm-filter-bar button[type="submit"].btn-primary {
+    width: 46px !important;
+    min-width: 46px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    font-size: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.main-content .adm-filter-bar button[type="submit"].btn-primary i {
+    margin: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Density Polish — सबै admin pages मा एकैसाथ effect:
+   - Page header banner: tighter padding
+   - Stat cards: smaller height, uniform alignment
+   - Filter bar: smaller labels, less spacing
+   - Help tip / banner alerts: compact
+   ────────────────────────────────────────────────────────── */
+.main-content .stat-uniform-card,
+.main-content .stat-mini,
+.main-content .col-6.col-md-3 > .card.stat-uniform-card {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+}
+.main-content .stat-uniform-card i.fa-2x,
+.main-content .stat-uniform-card .fa-2x {
+    font-size: 1.45rem !important;
+    margin-bottom: 6px !important;
+}
+.main-content .stat-uniform-card .stat-value,
+.main-content .stat-uniform-card .sm-val {
+    font-size: 1.35rem !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+}
+.main-content .stat-uniform-card .stat-label,
+.main-content .stat-uniform-card .sm-lbl {
+    font-size: .76rem !important;
+    color: #64748b !important;
+    margin-top: 2px !important;
+}
+.main-content .stat-mini-row {
+    gap: 10px !important;
+}
+.main-content .adm-filter-bar {
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+    margin-bottom: 14px !important;
+}
+.main-content .adm-filter-bar label {
+    font-size: .72rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .04em !important;
+    color: #64748b !important;
+    margin-bottom: 4px !important;
+}
+.main-content .adm-filter-bar .form-select-sm,
+.main-content .adm-filter-bar .form-control-sm,
+.main-content .adm-filter-bar .input-group-sm > .form-control,
+.main-content .adm-filter-bar .input-group-sm > .input-group-text {
+    font-size: .85rem !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+}
+.main-content .admin-help-tip {
+    padding: 10px 14px !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    font-size: .82rem !important;
+    color: #475569 !important;
+}
+.main-content .alert {
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    font-size: .88rem !important;
+}
+.main-content .admin-page-header {
+    padding: 14px 18px !important;
+    border-radius: 14px !important;
+    margin-bottom: 14px !important;
+}
+.main-content .admin-page-subtitle-text {
+    font-size: .82rem !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+.main-content .tbl-header-bar {
+    padding: 10px 14px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+.main-content .tbl-header-bar h6 {
+    font-size: .92rem !important;
+    margin: 0 !important;
+    font-weight: 800 !important;
+    color: #1e293b !important;
+}
+.main-content .result-count-badge {
+    font-size: .72rem !important;
+    background: #ecfdf5 !important;
+    color: var(--primary-color, #1a5f2a) !important;
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+    font-weight: 700 !important;
+}
+
 @media (max-width: 991.98px) {
     .arv-legacy-shell {
         grid-template-columns: 1fr;

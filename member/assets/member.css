@@ -1808,3 +1808,279 @@ html, body {
     .mem-grid-2     { grid-template-columns:1fr !important; }
     .bell-dropdown  { width:280px; right:-40px; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Member Unify Pass v1 — Global icon/colour consistency
+   Scope: .mem-wrapper (chrome-using pages only)
+   - Buttons, badges, alerts, modals, chips, action icons
+   - Replaces leaking Bootstrap defaults with the member palette
+   ══════════════════════════════════════════════════════════════ */
+.mem-wrapper {
+    --mu-success: var(--primary-color, #1a5f2a);
+    --mu-success-soft: #f0fdf4;
+    --mu-success-border: #bbf7d0;
+    --mu-info: #0e7490;
+    --mu-info-soft: #ecfeff;
+    --mu-info-border: #a5f3fc;
+    --mu-warning: #b45309;
+    --mu-warning-soft: #fffbeb;
+    --mu-warning-border: #fde68a;
+    --mu-danger: #b91c1c;
+    --mu-danger-soft: #fef2f2;
+    --mu-danger-border: #fecaca;
+    --mu-secondary: #475569;
+    --mu-secondary-soft: #f1f5f9;
+    --mu-secondary-border: #cbd5e1;
+}
+
+/* ── Buttons ── flat, theme-aligned, no awkward gradients ── */
+.mem-wrapper .btn {
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: .01em;
+    transition: transform .12s, box-shadow .15s, background .15s, border-color .15s;
+}
+.mem-wrapper .btn:hover { transform: translateY(-1px); }
+.mem-wrapper .btn:active { transform: translateY(0); }
+
+.mem-wrapper .btn-primary,
+.mem-wrapper .btn-success {
+    background: var(--mu-success) !important;
+    border-color: var(--mu-success) !important;
+    color: #fff !important;
+    box-shadow: 0 1px 2px rgba(26,95,42,.18);
+    background-image: none !important;
+}
+.mem-wrapper .btn-primary:hover,
+.mem-wrapper .btn-primary:focus,
+.mem-wrapper .btn-success:hover,
+.mem-wrapper .btn-success:focus {
+    background: #154d22 !important;
+    border-color: #154d22 !important;
+    box-shadow: 0 4px 14px rgba(26,95,42,.28);
+    color: #fff !important;
+}
+
+.mem-wrapper .btn-info {
+    background: var(--mu-info) !important;
+    border-color: var(--mu-info) !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+.mem-wrapper .btn-info:hover,
+.mem-wrapper .btn-info:focus {
+    background: #0a5a73 !important; border-color: #0a5a73 !important; color: #fff !important;
+}
+
+.mem-wrapper .btn-warning {
+    background: var(--mu-warning) !important;
+    border-color: var(--mu-warning) !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+.mem-wrapper .btn-warning:hover,
+.mem-wrapper .btn-warning:focus {
+    background: #92400e !important; border-color: #92400e !important; color: #fff !important;
+}
+
+.mem-wrapper .btn-danger {
+    background: var(--mu-danger) !important;
+    border-color: var(--mu-danger) !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+.mem-wrapper .btn-danger:hover,
+.mem-wrapper .btn-danger:focus {
+    background: #991b1b !important; border-color: #991b1b !important; color: #fff !important;
+}
+
+.mem-wrapper .btn-secondary {
+    background: var(--mu-secondary) !important;
+    border-color: var(--mu-secondary) !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+.mem-wrapper .btn-secondary:hover,
+.mem-wrapper .btn-secondary:focus {
+    background: #334155 !important; border-color: #334155 !important; color: #fff !important;
+}
+
+.mem-wrapper .btn-outline-primary,
+.mem-wrapper .btn-outline-success {
+    color: var(--mu-success) !important;
+    border-color: var(--mu-success) !important;
+    background: transparent !important;
+}
+.mem-wrapper .btn-outline-primary:hover,
+.mem-wrapper .btn-outline-success:hover {
+    background: var(--mu-success) !important; color: #fff !important;
+}
+.mem-wrapper .btn-outline-secondary {
+    color: var(--mu-secondary) !important;
+    border-color: var(--mu-secondary-border) !important;
+    background: #fff !important;
+}
+.mem-wrapper .btn-outline-secondary:hover {
+    background: var(--mu-secondary-soft) !important;
+    color: var(--mu-secondary) !important;
+    border-color: var(--mu-secondary) !important;
+}
+.mem-wrapper .btn-outline-danger {
+    color: var(--mu-danger) !important;
+    border-color: var(--mu-danger-border) !important;
+    background: #fff !important;
+}
+.mem-wrapper .btn-outline-danger:hover {
+    background: var(--mu-danger) !important; color: #fff !important;
+}
+
+/* ── Bootstrap badges → soft pill style ── */
+.mem-wrapper .badge.bg-success,
+.mem-wrapper .badge.bg-primary {
+    background: var(--mu-success-soft) !important;
+    color: var(--mu-success) !important;
+    border: 1px solid var(--mu-success-border);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+.mem-wrapper .badge.bg-info {
+    background: var(--mu-info-soft) !important;
+    color: var(--mu-info) !important;
+    border: 1px solid var(--mu-info-border);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+.mem-wrapper .badge.bg-warning {
+    background: var(--mu-warning-soft) !important;
+    color: var(--mu-warning) !important;
+    border: 1px solid var(--mu-warning-border);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+.mem-wrapper .badge.bg-danger {
+    background: var(--mu-danger-soft) !important;
+    color: var(--mu-danger) !important;
+    border: 1px solid var(--mu-danger-border);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+.mem-wrapper .badge.bg-secondary {
+    background: var(--mu-secondary-soft) !important;
+    color: var(--mu-secondary) !important;
+    border: 1px solid var(--mu-secondary-border);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+
+/* ── Alerts (Bootstrap variants) → match member theme ── */
+.mem-wrapper .alert {
+    border-radius: 12px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 11px 14px;
+    font-size: .88rem;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+.mem-wrapper .alert-success,
+.mem-wrapper .alert-primary {
+    background: var(--mu-success-soft) !important;
+    color: var(--mu-success) !important;
+    border-color: var(--mu-success-border) !important;
+}
+.mem-wrapper .alert-info {
+    background: var(--mu-info-soft) !important;
+    color: var(--mu-info) !important;
+    border-color: var(--mu-info-border) !important;
+}
+.mem-wrapper .alert-warning {
+    background: var(--mu-warning-soft) !important;
+    color: var(--mu-warning) !important;
+    border-color: var(--mu-warning-border) !important;
+}
+.mem-wrapper .alert-danger {
+    background: var(--mu-danger-soft) !important;
+    color: var(--mu-danger) !important;
+    border-color: var(--mu-danger-border) !important;
+}
+.mem-wrapper .alert-secondary {
+    background: var(--mu-secondary-soft) !important;
+    color: var(--mu-secondary) !important;
+    border-color: var(--mu-secondary-border) !important;
+}
+
+/* ── Bootstrap text utility colours → mapped to member theme ── */
+.mem-wrapper .text-success,
+.mem-wrapper .text-primary { color: var(--mu-success) !important; }
+.mem-wrapper .text-info    { color: var(--mu-info) !important; }
+.mem-wrapper .text-warning { color: var(--mu-warning) !important; }
+.mem-wrapper .text-danger  { color: var(--mu-danger) !important; }
+
+/* ── Modal dialogs (Bootstrap) — green theme header, themed footer buttons ── */
+.mem-wrapper .modal-content { border-radius: 14px; border: 1px solid var(--mem-border); }
+.mem-wrapper .modal-header {
+    background: linear-gradient(135deg, var(--mem-primary), var(--mem-primary2));
+    color: #fff;
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+    padding: 13px 18px;
+}
+.mem-wrapper .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: .85;
+}
+.mem-wrapper .modal-header .btn-close:hover { opacity: 1; }
+.mem-wrapper .modal-title { font-weight: 700; font-size: 1rem; }
+.mem-wrapper .modal-footer { border-top: 1px solid var(--mem-border); padding: 12px 16px; }
+
+/* ── Card headers used by election results & similar bootstrap sub-cards ── */
+.mem-wrapper .card { border-radius: 12px; border: 1px solid var(--mem-border); }
+.mem-wrapper .card .card-header {
+    background: var(--bg-soft, #f0fdf4);
+    border-bottom: 1px solid var(--mem-border);
+    color: var(--mem-text);
+    font-weight: 700;
+}
+
+/* ── Forms — input focus uses primary green ── */
+.mem-wrapper .form-control:focus,
+.mem-wrapper .form-select:focus,
+.mem-wrapper .form-check-input:focus {
+    border-color: var(--mu-success);
+    box-shadow: 0 0 0 .2rem rgba(26,95,42,.18);
+}
+.mem-wrapper .form-check-input:checked {
+    background-color: var(--mu-success);
+    border-color: var(--mu-success);
+}
+
+/* ── Action icon helpers (consistent square chips for tile-style links) ── */
+.mem-wrapper .mu-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #fff;
+    flex-shrink: 0;
+}
+.mem-wrapper .mu-chip--primary { background: var(--mu-success); }
+.mem-wrapper .mu-chip--info    { background: var(--mu-info); }
+.mem-wrapper .mu-chip--warn    { background: var(--mu-warning); }
+.mem-wrapper .mu-chip--danger  { background: var(--mu-danger); }
+.mem-wrapper .mu-chip--soft    { background: var(--mu-success-soft); color: var(--mu-success); }
+
+/* ── Bootstrap close button visual fix on coloured headers ── */
+.mem-wrapper .btn-close { box-shadow: none; }
+
+/* ── List group within member portal: themed accents ── */
+.mem-wrapper .list-group-item.active {
+    background: var(--mu-success);
+    border-color: var(--mu-success);
+}
+
+/* Done — Member Unify Pass v1 */
