@@ -34,6 +34,13 @@ if ($db && $token) {
         $st->execute([$token]);
         $prog = $st->fetch(PDO::FETCH_ASSOC) ?: null;
         if (!$prog) $err = $_t('यो QR code मान्य छैन वा कार्यक्रम समाप्त भयो।', 'This QR code is invalid or the program has ended.');
+        if ($prog && !empty($prog['qr_starts_at']) && strtotime((string)$prog['qr_starts_at']) > time()) {
+            $err = $_t('यो QR scan समय अझै सुरु भएको छैन।', 'This QR scan window has not started yet.');
+            $prog = null;
+        } elseif ($prog && !empty($prog['qr_expires_at']) && strtotime((string)$prog['qr_expires_at']) < time()) {
+            $err = $_t('यो QR scan समय समाप्त भइसकेको छ।', 'This QR scan window has expired.');
+            $prog = null;
+        }
     } catch (Throwable $e) { $err = $_t('कार्यक्रम लोड गर्न सकिएन।', 'Could not load program.'); }
 } elseif (!$token) {
     $err = $_t('QR code token आवश्यक छ।', 'QR code token is required.');
@@ -78,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                         $requestSubmitted = true;
                     } else {
                         $ins = $db->prepare("INSERT INTO member_program_attendance_requests
-                            (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
-                            VALUES (?,?,?,?,?,'pending',?,?)");
+                            (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, user_agent, source)
+                            VALUES (?,?,?,?,?,'pending',?,?,?)");
                         $ins->execute([
                             $memberId,
                             $memCard,
@@ -87,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                             (int)$prog['id'],
                             mb_substr((string)$prog['title'], 0, 180),
                             $_SERVER['REMOTE_ADDR'] ?? '',
+                            mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
                             'member_portal_qr_pending'
                         ]);
                         $requestSubmitted = true;
@@ -139,8 +147,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                                 $err = $_t('तपाईंको उपस्थिति अनुरोध पहिले नै Admin सामु प्रक्रियामा छ। स्वीकृत भएपछि सूचीमा देखिनेछ।', 'Your attendance request is already pending with admin. It will appear in the list after approval.');
                             } else {
                                 $ins = $db->prepare("INSERT INTO member_program_attendance_requests
-                                    (member_id, member_card_no, member_name, member_phone, member_address, program_id, program_title, status, verified_by_ip, source)
-                                    VALUES (?,?,?,?,?,?,?,'pending',?,?)");
+                                    (member_id, member_card_no, member_name, member_phone, member_address, program_id, program_title, status, verified_by_ip, user_agent, source)
+                                    VALUES (?,?,?,?,?,?,?,'pending',?,?,?)");
                                 $ins->execute([
                                     $mId,
                                     $mCard,
@@ -150,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                                     (int)$prog['id'],
                                     mb_substr((string)$prog['title'], 0, 180),
                                     $_SERVER['REMOTE_ADDR'] ?? '',
+                                    mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
                                     'public_qr_request',
                                 ]);
                                 $requestSubmitted = true;
@@ -165,8 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                             $err = $_t('तपाईंको उपस्थिति अनुरोध पहिले नै Admin सामु प्रक्रियामा छ। स्वीकृत भएपछि सूचीमा देखिनेछ।', 'Your attendance request is already pending with admin. It will appear in the list after approval.');
                         } else {
                             $ins = $db->prepare("INSERT INTO member_program_attendance_requests
-                                (member_id, member_card_no, member_name, member_phone, member_address, program_id, program_title, status, verified_by_ip, source)
-                                VALUES (?,?,?,?,?,?,?,'pending',?,?)");
+                                (member_id, member_card_no, member_name, member_phone, member_address, program_id, program_title, status, verified_by_ip, user_agent, source)
+                                VALUES (?,?,?,?,?,?,?,'pending',?,?,?)");
                             $ins->execute([
                                 0,
                                 $inputCard,
@@ -176,6 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $prog && $db && !$err) {
                                 (int)$prog['id'],
                                 mb_substr((string)$prog['title'], 0, 180),
                                 $_SERVER['REMOTE_ADDR'] ?? '',
+                                mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
                                 'public_qr_unmatched_request',
                             ]);
                             $requestSubmitted = true;

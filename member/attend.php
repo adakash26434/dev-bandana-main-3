@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
         if ($progId > 0) {
             try {
                 /* Verify program exists and is active */
-                $prog = $db->prepare("SELECT id, title, is_active, qr_token, qr_enabled FROM upcoming_programs WHERE id=? LIMIT 1");
+                $prog = $db->prepare("SELECT id, title, is_active, qr_token, qr_enabled, qr_starts_at, qr_expires_at FROM upcoming_programs WHERE id=? LIMIT 1");
                 $prog->execute([$progId]);
                 $progRow = $prog->fetch(PDO::FETCH_ASSOC);
                 
@@ -57,6 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
                     $checkInErr = $_t('यो कार्यक्रम उपलब्ध छैन।', 'This program is not available.');
                 } elseif ($qrToken && $progRow['qr_enabled'] && $qrToken !== $progRow['qr_token']) {
                     $checkInErr = $_t('QR token अमान्य छ।', 'Invalid QR token.');
+                } elseif ($qrToken && !empty($progRow['qr_starts_at']) && strtotime((string)$progRow['qr_starts_at']) > time()) {
+                    $checkInErr = $_t('यो QR scan समय अझै सुरु भएको छैन।', 'This QR scan window has not started yet.');
+                } elseif ($qrToken && !empty($progRow['qr_expires_at']) && strtotime((string)$progRow['qr_expires_at']) < time()) {
+                    $checkInErr = $_t('यो QR scan समय समाप्त भइसकेको छ।', 'This QR scan window has expired.');
                 } else {
                     $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
                     $dup->execute([$memberId, $progId]);
@@ -70,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
                         } else {
                             $source = $qrToken ? 'member_portal_qr_pending' : 'member_portal_pending';
                             $ins = $db->prepare("INSERT INTO member_program_attendance_requests
-                                (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
-                                VALUES (?,?,?,?,?,'pending',?,?)");
+                                (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, user_agent, source)
+                                VALUES (?,?,?,?,?,'pending',?,?,?)");
                             $ins->execute([
                                 $memberId,
                                 $memCard,
@@ -79,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
                                 $progId,
                                 mb_substr((string)$progRow['title'], 0, 180),
                                 $_SERVER['REMOTE_ADDR'] ?? '',
+                                mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
                                 $source
                             ]);
                             $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा उपस्थिति अनुरोध Admin स्वीकृतिको लागि पठाइयो।', 'attendance request sent for admin approval.');
@@ -148,6 +153,13 @@ if ($qrToken !== '') {
         $qst = $db->prepare('SELECT * FROM upcoming_programs WHERE qr_token = ? AND is_active = 1 LIMIT 1');
         $qst->execute([$qrToken]);
         $qrProgramRow = $qst->fetch(PDO::FETCH_ASSOC) ?: null;
+        if ($qrProgramRow && !empty($qrProgramRow['qr_starts_at']) && strtotime((string)$qrProgramRow['qr_starts_at']) > time()) {
+            $checkInErr = $_t('यो QR scan समय अझै सुरु भएको छैन।', 'This QR scan window has not started yet.');
+            $qrProgramRow = null;
+        } elseif ($qrProgramRow && !empty($qrProgramRow['qr_expires_at']) && strtotime((string)$qrProgramRow['qr_expires_at']) < time()) {
+            $checkInErr = $_t('यो QR scan समय समाप्त भइसकेको छ।', 'This QR scan window has expired.');
+            $qrProgramRow = null;
+        }
     } catch (Throwable $e) {
         $qrProgramRow = null;
     }
@@ -177,8 +189,8 @@ if ($qrProgramRow && ($_GET['auto'] ?? '') === '1' && $_SERVER['REQUEST_METHOD']
                 $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा तपाईंको उपस्थिति अनुरोध Admin स्वीकृतिको लागि pending छ।', 'attendance request is pending for admin approval.');
             } else {
                 $ins = $db->prepare("INSERT INTO member_program_attendance_requests
-                    (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, source)
-                    VALUES (?,?,?,?,?,'pending',?,?)");
+                    (member_id, member_card_no, member_name, program_id, program_title, status, verified_by_ip, user_agent, source)
+                    VALUES (?,?,?,?,?,'pending',?,?,?)");
                 $ins->execute([
                     $memberId,
                     $memCard,
@@ -186,6 +198,7 @@ if ($qrProgramRow && ($_GET['auto'] ?? '') === '1' && $_SERVER['REQUEST_METHOD']
                     $qpid,
                     mb_substr((string)$qrProgramRow['title'], 0, 180),
                     $_SERVER['REMOTE_ADDR'] ?? '',
+                    mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
                     'member_portal_qr_pending'
                 ]);
                 $checkInMsg = '"' . htmlspecialchars((string)$qrProgramRow['title']) . '" ' . $_t('मा QR उपस्थिति अनुरोध Admin स्वीकृतिको लागि पठाइयो।', 'QR attendance request sent for admin approval.');

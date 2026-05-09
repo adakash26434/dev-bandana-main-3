@@ -21,14 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $loc  = trim((string)($_POST['location'] ?? ''));
             $active = !empty($_POST['is_active']) ? 1 : 0;
             $preRegOpen = !empty($_POST['pre_registration_open']) ? 1 : 0;
+            $qrStartsAt = trim((string)($_POST['qr_starts_at'] ?? '')) ?: null;
+            $qrExpiresAt = trim((string)($_POST['qr_expires_at'] ?? '')) ?: null;
             if ($title === '') throw new Exception('कार्यक्रम शीर्षक आवश्यक छ।');
             if ($id > 0) {
-                $st = $db->prepare("UPDATE upcoming_programs SET title=?, description=?, event_date=?, event_time=?, location=?, is_active=?, pre_registration_open=? WHERE id=?");
-                $st->execute([$title, $desc, $date, $time, $loc, $active, $preRegOpen, $id]);
+                $st = $db->prepare("UPDATE upcoming_programs SET title=?, description=?, event_date=?, event_time=?, location=?, is_active=?, pre_registration_open=?, qr_starts_at=?, qr_expires_at=? WHERE id=?");
+                $st->execute([$title, $desc, $date, $time, $loc, $active, $preRegOpen, $qrStartsAt, $qrExpiresAt, $id]);
                 setFlash('success', 'कार्यक्रम अपडेट भयो।');
             } else {
-                $st = $db->prepare("INSERT INTO upcoming_programs (title, description, event_date, event_time, location, is_active, pre_registration_open, created_by) VALUES (?,?,?,?,?,?,?,?)");
-                $st->execute([$title, $desc, $date, $time, $loc, $active, $preRegOpen, $_SESSION['admin_name'] ?? 'Admin']);
+                $st = $db->prepare("INSERT INTO upcoming_programs (title, description, event_date, event_time, location, is_active, pre_registration_open, qr_starts_at, qr_expires_at, created_by) VALUES (?,?,?,?,?,?,?,?,?,?)");
+                $st->execute([$title, $desc, $date, $time, $loc, $active, $preRegOpen, $qrStartsAt, $qrExpiresAt, $_SESSION['admin_name'] ?? 'Admin']);
                 setFlash('success', 'नयाँ कार्यक्रम थपियो।');
             }
         } elseif ($action === 'toggle') {
@@ -45,12 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('कार्यक्रम छान्नुहोस्।');
             }
             $token = bin2hex(random_bytes(16));
-            $db->prepare('UPDATE upcoming_programs SET qr_token=? WHERE id=?')->execute([$token, $id]);
+            $db->prepare('UPDATE upcoming_programs SET qr_token=?, qr_starts_at=COALESCE(qr_starts_at, NOW()), qr_expires_at=COALESCE(qr_expires_at, DATE_ADD(NOW(), INTERVAL 1 DAY)) WHERE id=?')->execute([$token, $id]);
             setFlash('success', 'QR लिंक तयार भयो। सदस्यले Member Portal बाट scan गर्छन्।');
         } elseif ($action === 'clear_qr') {
             $id = (int)($_POST['id'] ?? 0);
             if ($id > 0) {
-                $db->prepare('UPDATE upcoming_programs SET qr_token=NULL WHERE id=?')->execute([$id]);
+                $db->prepare('UPDATE upcoming_programs SET qr_token=NULL, qr_starts_at=NULL, qr_expires_at=NULL WHERE id=?')->execute([$id]);
                 setFlash('success', 'QR हटाइयो।');
             }
         }
@@ -90,6 +92,17 @@ try {
     }
 } catch (Throwable $e) {
     $attendByProgram = [];
+}
+$pendingByProgram = [];
+try {
+    $pc = $db->query("SELECT program_id, COUNT(*) AS c FROM member_program_attendance_requests WHERE status='pending' GROUP BY program_id");
+    if ($pc) {
+        while ($row = $pc->fetch(PDO::FETCH_ASSOC)) {
+            $pendingByProgram[(int)$row['program_id']] = (int)$row['c'];
+        }
+    }
+} catch (Throwable $e) {
+    $pendingByProgram = [];
 }
 
 $rowsActive = [];
@@ -149,6 +162,8 @@ foreach ($rows as $_r) {
           <label class="form-check-label"><input class="form-check-input me-1" type="checkbox" name="is_active" value="1" <?php echo !isset($edit['is_active']) || (int)$edit['is_active']===1 ? 'checked' : ''; ?>>Active</label>
           <label class="form-check-label"><input class="form-check-input me-1" type="checkbox" name="pre_registration_open" value="1" <?php echo !empty($edit['pre_registration_open']) ? 'checked' : ''; ?>>Pre-registration Open</label>
         </div>
+        <div class="col-md-6"><label class="form-label">QR सुरु समय</label><input type="datetime-local" name="qr_starts_at" class="form-control" value="<?php echo htmlspecialchars(!empty($edit['qr_starts_at']) ? date('Y-m-d\TH:i', strtotime($edit['qr_starts_at'])) : ''); ?>"></div>
+        <div class="col-md-6"><label class="form-label">QR समाप्त समय</label><input type="datetime-local" name="qr_expires_at" class="form-control" value="<?php echo htmlspecialchars(!empty($edit['qr_expires_at']) ? date('Y-m-d\TH:i', strtotime($edit['qr_expires_at'])) : ''); ?>"></div>
         <div class="col-12 d-flex gap-2">
           <button class="btn btn-primary"><i class="fas fa-save me-1"></i>सेभ</button>
           <?php if ($edit): ?><a href="programs.php" class="btn btn-outline-secondary">रद्द</a><?php endif; ?>
@@ -159,10 +174,11 @@ foreach ($rows as $_r) {
 
   <?php
   $programTableHead = '<thead><tr><th>शीर्षक</th><th>मिति</th><th>स्थान</th><th>स्थिति</th><th>Pre-reg / उपस्थिति</th><th>QR</th><th>कार्य</th></tr></thead>';
-  $renderProgramRows = function (array $list) use ($preregByProgram, $attendByProgram): void {
+  $renderProgramRows = function (array $list) use ($preregByProgram, $attendByProgram, $pendingByProgram): void {
       foreach ($list as $r) {
           $prc = (int)($preregByProgram[(int)$r['id']] ?? 0);
           $atc = (int)($attendByProgram[(int)$r['id']] ?? 0);
+          $pnc = (int)($pendingByProgram[(int)$r['id']] ?? 0);
           $prLink = 'program-attendance.php?program_id=' . (int)$r['id'];
           $memberQrUrl = rtrim(SITE_URL, '/') . '/member/attend.php?qr_token=' . rawurlencode((string)($r['qr_token'] ?? ''));
           $legacyQrUrl = rtrim(SITE_URL, '/') . '/attend.php?token=' . rawurlencode((string)($r['qr_token'] ?? ''));
@@ -185,6 +201,7 @@ foreach ($rows as $_r) {
                 <a href="<?php echo htmlspecialchars($prLink); ?>" class="fw-semibold text-decoration-none"><?php echo $prc; ?> दर्ता</a>
                 <span class="text-muted">·</span>
                 <a href="<?php echo htmlspecialchars($prLink); ?>" class="fw-semibold text-success text-decoration-none"><?php echo $atc; ?> उपस्थिति</a>
+                <?php if ($pnc > 0): ?><span class="text-muted">·</span> <a href="<?php echo htmlspecialchars($prLink); ?>" class="fw-semibold text-warning text-decoration-none"><?php echo $pnc; ?> pending</a><?php endif; ?>
               </div>
               <a href="<?php echo htmlspecialchars($prLink); ?>" class="small text-decoration-none">रिपोर्ट →</a>
             </td>

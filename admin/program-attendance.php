@@ -158,6 +158,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 setFlash('error', 'स्वीकृति गर्दा समस्या भयो।');
             }
         }
+    } elseif ($action === 'link_attendance_request_member') {
+        $reqId = (int)($_POST['request_id'] ?? 0);
+        $targetMemberId = (int)($_POST['target_member_id'] ?? 0);
+        if ($reqId > 0 && $targetMemberId > 0) {
+            try {
+                $m = $db->prepare("SELECT id, name, sadasyata_number, phone, address FROM members WHERE id=? LIMIT 1");
+                $m->execute([$targetMemberId]);
+                $member = $m->fetch(PDO::FETCH_ASSOC) ?: null;
+                if (!$member) {
+                    setFlash('error', 'Link गर्ने सदस्य फेला परेन।');
+                } else {
+                    $u = $db->prepare("UPDATE member_program_attendance_requests
+                        SET member_id=?, member_name=?, member_card_no=?, member_phone=COALESCE(NULLIF(member_phone,''), ?), member_address=COALESCE(NULLIF(member_address,''), ?)
+                        WHERE id=? AND status='pending'");
+                    $u->execute([
+                        (int)$member['id'],
+                        (string)($member['name'] ?? ''),
+                        (string)($member['sadasyata_number'] ?? ''),
+                        (string)($member['phone'] ?? ''),
+                        (string)($member['address'] ?? ''),
+                        $reqId
+                    ]);
+                    setFlash('success', 'Attendance request सदस्यसँग link भयो। अब approve गर्न सकिन्छ।');
+                }
+            } catch (Throwable $e) {
+                setFlash('error', 'Member link गर्न समस्या भयो।');
+            }
+        }
+    } elseif ($action === 'create_member_from_attendance_request') {
+        $reqId = (int)($_POST['request_id'] ?? 0);
+        if ($reqId > 0) {
+            try {
+                $stR = $db->prepare("SELECT * FROM member_program_attendance_requests WHERE id=? AND status='pending' LIMIT 1");
+                $stR->execute([$reqId]);
+                $req = $stR->fetch(PDO::FETCH_ASSOC) ?: null;
+                if (!$req) {
+                    setFlash('error', 'अनुरोध फेला परेन।');
+                } else {
+                    $name = mb_substr(trim((string)($req['member_name'] ?? '')), 0, 200, 'UTF-8');
+                    $phone = mb_substr(trim((string)($req['member_phone'] ?? '')), 0, 20, 'UTF-8');
+                    $address = mb_substr(trim((string)($req['member_address'] ?? '')), 0, 300, 'UTF-8');
+                    $cardNo = mb_substr(trim((string)($req['member_card_no'] ?? '')), 0, 60, 'UTF-8');
+                    if ($name === '' || $phone === '') {
+                        setFlash('error', 'नयाँ सदस्य बनाउन नाम र फोन आवश्यक छ।');
+                    } else {
+                        if ($cardNo === '') {
+                            $cardNo = 'MEM-' . date('Y') . '-' . str_pad((string)((int)$db->query("SELECT COUNT(*) FROM members")->fetchColumn() + 1), 4, '0', STR_PAD_LEFT);
+                        }
+                        $insM = $db->prepare("INSERT INTO members (sadasyata_number, name, phone, address, approval_status, is_active, created_at)
+                            VALUES (?,?,?,?, 'approved', 1, NOW())");
+                        $insM->execute([$cardNo, $name, $phone, $address]);
+                        $newMemberId = (int)$db->lastInsertId();
+                        $db->prepare("UPDATE member_program_attendance_requests SET member_id=?, member_card_no=? WHERE id=?")
+                            ->execute([$newMemberId, $cardNo, $reqId]);
+                        setFlash('success', 'नयाँ सदस्य बन्यो र request link भयो। अब approve गर्न सकिन्छ।');
+                    }
+                }
+            } catch (Throwable $e) {
+                setFlash('error', 'नयाँ सदस्य बनाउन समस्या भयो: ' . $e->getMessage());
+            }
+        }
     } elseif ($action === 'reject_attendance_request') {
         $reqId = (int)($_POST['request_id'] ?? 0);
         $adminId = (int)($_SESSION['admin_id'] ?? 0);
@@ -476,6 +537,43 @@ if ($q !== '') {
     $like = "%$q%";
     array_push($paramsReq, $like, $like, $like, $like);
 }
+
+if (isset($_GET['export']) && $_GET['export'] === 'requests') {
+    $reqExportSql = "SELECT r.*, COALESCE(NULLIF(m.name,''), r.member_name) AS display_name, m.phone AS matched_phone, p.event_date, p.location
+               FROM member_program_attendance_requests r
+               LEFT JOIN members m ON m.id=r.member_id
+               LEFT JOIN upcoming_programs p ON p.id=r.program_id
+               WHERE {$whereReq}
+               ORDER BY r.requested_at ASC";
+    $rex = $db->prepare($reqExportSql);
+    $rex->execute($paramsReq);
+    $reqExportRows = $rex->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="program-attendance-requests-' . date('Ymd-His') . '.csv"');
+    header('Cache-Control: no-store');
+    $out = fopen('php://output', 'w');
+    fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    fputcsv($out, ['Program', 'Event Date', 'Member Name', 'Member ID', 'Phone', 'Address', 'Source', 'IP', 'User Agent', 'Requested At']);
+    foreach ($reqExportRows as $r) {
+        fputcsv($out, [
+            (string)($r['program_title'] ?? ''),
+            (string)($r['event_date'] ?? ''),
+            (string)($r['display_name'] ?? $r['member_name'] ?? ''),
+            (string)($r['member_card_no'] ?? ''),
+            (string)($r['matched_phone'] ?? $r['member_phone'] ?? ''),
+            (string)($r['member_address'] ?? ''),
+            (string)($r['source'] ?? ''),
+            (string)($r['verified_by_ip'] ?? ''),
+            (string)($r['user_agent'] ?? ''),
+            (string)($r['requested_at'] ?? ''),
+        ]);
+    }
+    fclose($out);
+    exit;
+}
 $reqRows = [];
 $reqPendingCount = 0;
 try {
@@ -601,6 +699,11 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
     <?php if ($reqPendingCount > count($reqRows)): ?>
       <div class="alert alert-info py-1 px-2 mt-2 mb-0 small">Pending जम्मा <?php echo (int)$reqPendingCount; ?> — तालिकामा पहिलो <?php echo count($reqRows); ?> मात्र (छिटो लोड)। बाँकी स्वीकृत गर्दै जाँदा सूची छोटो हुन्छ।</div>
     <?php endif; ?>
+    <div class="mt-2">
+      <a href="program-attendance.php?<?php echo htmlspecialchars(http_build_query(array_merge($paQuery, ['export' => 'requests'])), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-sm btn-outline-warning">
+        <i class="fas fa-file-csv me-1"></i>Pending Request CSV
+      </a>
+    </div>
   </div>
   <div class="table-responsive">
     <table class="table table-hover table-sm align-middle mb-0">
@@ -637,6 +740,21 @@ $programs = $db->query("SELECT id, title, is_active FROM upcoming_programs ORDER
               <input type="text" name="reject_note" class="form-control form-control-sm" style="min-width:120px;max-width:180px;" placeholder="कारण (वैकल्पिक)">
               <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-times me-1"></i><?php echo $__t('अस्वीकृत','Reject'); ?></button>
             </form>
+            <?php if ((int)($rx['member_id'] ?? 0) <= 0): ?>
+            <form method="POST" class="d-inline-flex align-items-center gap-1 flex-wrap">
+              <?php echo csrfField(); ?>
+              <input type="hidden" name="action" value="link_attendance_request_member">
+              <input type="hidden" name="request_id" value="<?php echo (int)$rx['id']; ?>">
+              <input type="number" min="1" name="target_member_id" class="form-control form-control-sm" style="width:92px;" placeholder="Member ID">
+              <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-link me-1"></i>Link</button>
+            </form>
+            <form method="POST" class="d-inline" onsubmit="return confirm('<?php echo $__t('यस request बाट नयाँ सदस्य बनाउने?', 'Create a new member from this request?'); ?>');">
+              <?php echo csrfField(); ?>
+              <input type="hidden" name="action" value="create_member_from_attendance_request">
+              <input type="hidden" name="request_id" value="<?php echo (int)$rx['id']; ?>">
+              <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-user-plus me-1"></i>Create Member</button>
+            </form>
+            <?php endif; ?>
           </div>
         </td>
       </tr>
