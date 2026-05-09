@@ -284,13 +284,13 @@ body {
     box-shadow: 0 3px 12px rgba(var(--primary-rgb),.2);
 }
 
-/* Main stack card */
-.vp-card {
-    background: transparent;
-    border-radius: 0;
-    border: none;
-    padding: 0;
-    box-shadow: none;
+/* Main stack card: keep only the actual form card visible on verify page */
+body.auth-portal-page.verify-auth-page .vp-card {
+    background: transparent !important;
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
 }
 
 /* inner content styles (preserved) */
@@ -344,7 +344,7 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 .vp-mini-tab.is-active { background:var(--primary-color); color:var(--text-on-primary); border-color:var(--primary-color); }
 /* Form card — same language as program-attendance-verify */
 .verify-form-card {
-    margin-top: 8px;
+    margin: 8px auto 0;
     border-radius: 14px;
     overflow: hidden;
     background: var(--bg-card);
