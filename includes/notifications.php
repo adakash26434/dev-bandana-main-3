@@ -434,12 +434,36 @@ function sendMemberStatusUpdate(
     string $memberName,  /* member को नाम */
     string $newStatus,   /* नयाँ status */
     string $adminComment,/* Admin को टिप्पणी */
-    string $trackingId = ''
-) {
+    string $trackingId = '',
+    bool $forceSkip = false  /* admin ले "नपठाउने" चुने भए true */
+): array {
+    /* Structured outcome — caller ले audit log मा राख्न सक्छ.
+       Status values: 'sent' | 'failed' | 'skipped' | 'not_attempted' */
+    $out = [
+        'master_enabled' => false,
+        'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => $memberEmail],
+        'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => $memberPhone],
+    ];
+
     ensureNotificationTable();
 
+    if ($forceSkip) {
+        $out['email']['status'] = 'skipped';
+        $out['email']['reason'] = 'admin opted not to notify';
+        $out['sms']['status']   = 'skipped';
+        $out['sms']['reason']   = 'admin opted not to notify';
+        return $out;
+    }
+
     /* Member notification feature enabled छ? — admin ले toggle गर्न सक्छ */
-    if (getSetting('notify_member_enabled', '0') !== '1') return;
+    if (getSetting('notify_member_enabled', '0') !== '1') {
+        $out['email']['status'] = 'skipped';
+        $out['email']['reason'] = 'master notification disabled in settings';
+        $out['sms']['status']   = 'skipped';
+        $out['sms']['reason']   = 'master notification disabled in settings';
+        return $out;
+    }
+    $out['master_enabled'] = true;
 
     $siteName = getSetting('site_name', 'आकाश सहकारी');
     $siteUrl  = defined('SITE_URL') ? SITE_URL : '';
@@ -477,6 +501,17 @@ function sendMemberStatusUpdate(
     $eventLabel = $eventLabels[$eventType] ?? $eventType;
 
     /* -------- EMAIL to member -------- */
+    if (!$memberEmail) {
+        $out['email']['status'] = 'skipped';
+        $out['email']['reason'] = 'member email empty';
+    } elseif (!filter_var($memberEmail, FILTER_VALIDATE_EMAIL)) {
+        $out['email']['status'] = 'skipped';
+        $out['email']['reason'] = 'member email invalid format';
+    } elseif (getSetting('notify_member_email', '1') !== '1') {
+        $out['email']['status'] = 'skipped';
+        $out['email']['reason'] = 'email channel disabled';
+    }
+
     if ($memberEmail && filter_var($memberEmail, FILTER_VALIDATE_EMAIL)
         && getSetting('notify_member_email', '1') === '1') {
 
@@ -570,13 +605,31 @@ function sendMemberStatusUpdate(
             $subject, "Status: {$newStatus}", $sent ? 'sent' : 'failed',
             $sent ? '' : 'mail/smtp failed — check email config'
         );
+        $out['email']['status'] = $sent ? 'sent' : 'failed';
+        if (!$sent) $out['email']['reason'] = 'mail/smtp failed — check email config';
     }
 
     /* -------- SMS to member -------- */
+    if (!$memberPhone) {
+        $out['sms']['status'] = 'skipped';
+        $out['sms']['reason'] = 'member phone empty';
+    } elseif (getSetting('notify_member_sms', '1') !== '1') {
+        $out['sms']['status'] = 'skipped';
+        $out['sms']['reason'] = 'sms channel disabled';
+    } elseif (getSetting('notify_sms_enabled', '0') !== '1') {
+        $out['sms']['status'] = 'skipped';
+        $out['sms']['reason'] = 'sms gateway not enabled';
+    }
+
     if ($memberPhone && getSetting('notify_member_sms', '1') === '1'
         && getSetting('notify_sms_enabled', '0') === '1') {
 
         $phone   = preg_replace('/[^0-9]/', '', $memberPhone);
+        $out['sms']['to'] = $phone;
+        if (strlen($phone) < 10) {
+            $out['sms']['status'] = 'skipped';
+            $out['sms']['reason'] = 'phone too short (<10 digits)';
+        }
         if (strlen($phone) >= 10) {
 
             /* v4: Member SMS template (admin-edited) — fallback to legacy if missing */
@@ -642,6 +695,8 @@ function sendMemberStatusUpdate(
                 'member_status_' . $eventType, 'sms', $phone,
                 '', $smsText, $sent ? 'sent' : 'failed', $error
             );
+            $out['sms']['status'] = $sent ? 'sent' : 'failed';
+            if (!$sent) $out['sms']['reason'] = $error !== '' ? $error : 'sms gateway error';
         }
     }
 
@@ -658,6 +713,7 @@ function sendMemberStatusUpdate(
             error_log('[notifications] In-app notification error: ' . $e->getMessage());
         }
     }
+    return $out;
 }
 
 /* -------------------------------------------------------

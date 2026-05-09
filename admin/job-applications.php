@@ -39,7 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $oldSt->execute([$id]);
                 $oldStatus = (string)($oldSt->fetchColumn() ?: '');
             } catch (Exception $e) {}
-            $notifySent = false;
+
+            /* Admin ले SMS/Email पठाउने option choose गर्‍यो? */
+            $notifyOptIn = !empty($_POST['notify_member']) && $_POST['notify_member'] === '1';
+            $notifyOutcome = [
+                'admin_chose' => $notifyOptIn,
+                'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+                'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+            ];
 
             if ($hasIsRead) {
                 $stmt = $db->prepare("UPDATE job_applications SET status = ?, admin_notes = ?, is_read = 1 WHERE id = ?");
@@ -49,16 +56,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$status, $notes, $id]);
             }
 
-            /* Member portal notification */
+            /* Member portal notification — outcome capture, channel-wise */
             try {
                 $nr = $db->prepare("SELECT full_name, email, phone FROM job_applications WHERE id=?");
                 $nr->execute([$id]); $nd = $nr->fetch();
                 if ($nd && function_exists('sendMemberStatusUpdate')) {
-                    sendMemberStatusUpdate('job', $nd['email']??'', $nd['phone']??'', $nd['full_name']??'', $status, $notes, '');
-                    $notifySent = true;
+                    $r = sendMemberStatusUpdate(
+                        'job',
+                        $nd['email']??'', $nd['phone']??'', $nd['full_name']??'',
+                        $status, $notes, '',
+                        /* forceSkip if admin opted out */ !$notifyOptIn
+                    );
+                    if (is_array($r)) {
+                        $notifyOutcome['email'] = $r['email'] ?? $notifyOutcome['email'];
+                        $notifyOutcome['sms']   = $r['sms']   ?? $notifyOutcome['sms'];
+                    }
                 }
-            } catch (Exception $ex) {}
+            } catch (Exception $ex) {
+                error_log('[job-applications notify] '.$ex->getMessage());
+            }
 
+            $notifySent = ($notifyOutcome['email']['status'] === 'sent') || ($notifyOutcome['sms']['status'] === 'sent');
             try {
                 logRequestStatusHistory(
                     $db,
@@ -69,11 +87,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (string)$notes,
                     $notifySent,
                     (int)($_SESSION['admin_id'] ?? 0),
-                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                    (string)($_SESSION['admin_name'] ?? 'Admin'),
+                    $notifyOutcome
                 );
             } catch (Exception $e) {}
 
-            setFlash('success', 'आवेदन स्थिति अपडेट भयो।');
+            /* Flash message — notification outcome reflect गर्ने */
+            $flashMsg = 'आवेदन स्थिति अपडेट भयो।';
+            if ($notifyOptIn) {
+                $emails = $notifyOutcome['email']['status'];
+                $smses  = $notifyOutcome['sms']['status'];
+                if ($emails === 'sent' || $smses === 'sent') {
+                    $bits = [];
+                    if ($emails === 'sent') $bits[] = 'Email';
+                    if ($smses  === 'sent') $bits[] = 'SMS';
+                    $flashMsg .= ' ' . implode(' + ', $bits) . ' सूचना पठाइयो।';
+                } else {
+                    $flashMsg .= ' तर सूचना पठाउन सकिएन (जाँच: settings/email/SMS gateway)।';
+                }
+            }
+            setFlash('success', $flashMsg);
         } elseif ($action === 'delete') {
             $id = (int)$_POST['id'];
             $db->prepare("DELETE FROM job_applications WHERE id = ?")->execute([$id]);
@@ -86,7 +119,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setFlash('error', 'त्रुटि भयो। कृपया पछि प्रयास गर्नुहोस्।');
     }
 
-    redirect('job-applications.php' . (isset($_GET['career_id']) ? '?career_id=' . (int) $_GET['career_id'] : ''));
+    $redirectQs = [];
+    if (isset($_GET['view'])) {
+        $redirectQs['view'] = (int)$_GET['view'];
+    } elseif (!empty($_POST['id']) && $action === 'update_status') {
+        $redirectQs['view'] = (int)$_POST['id'];
+    }
+    if (isset($_GET['career_id'])) {
+        $redirectQs['career_id'] = (int)$_GET['career_id'];
+    }
+    redirect('job-applications.php' . ($redirectQs ? '?' . http_build_query($redirectQs) : ''));
 }
 
 // Filter by career/job
@@ -327,6 +369,24 @@ if ($viewApplication && !empty($viewApplication['id'])) {
                 <textarea name="admin_notes" class="form-control form-control-sm" rows="3"
                     placeholder="(वैकल्पिक) यो स्थिति परिवर्तनको कारण..."><?php echo htmlspecialchars((string)($viewApplication['admin_notes'] ?? '')); ?></textarea>
             </div>
+            <?php
+            $hasEmail = !empty($viewApplication['email']);
+            $hasPhone = !empty($viewApplication['phone']);
+            ?>
+            <div class="arv-notify-row mb-3">
+                <label class="arv-notify-toggle">
+                    <input type="checkbox" name="notify_member" value="1" <?php echo ($hasEmail || $hasPhone) ? 'checked' : ''; ?>>
+                    <span><i class="fas fa-paper-plane"></i> Member लाई SMS/Email पठाउनुहोस्</span>
+                </label>
+                <div class="arv-notify-channels">
+                    <span class="<?php echo $hasEmail ? 'is-on' : 'is-off'; ?>">
+                        <i class="fas fa-envelope"></i> Email <?php echo $hasEmail ? '✓' : '—'; ?>
+                    </span>
+                    <span class="<?php echo $hasPhone ? 'is-on' : 'is-off'; ?>">
+                        <i class="fas fa-mobile-screen"></i> SMS <?php echo $hasPhone ? '✓' : '—'; ?>
+                    </span>
+                </div>
+            </div>
             <button type="submit" class="btn btn-primary btn-sm w-100">
                 <i class="fas fa-save"></i> अपडेट गर्नुहोस्
             </button>
@@ -508,17 +568,21 @@ if ($viewApplication && !empty($viewApplication['id'])) {
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="?view=<?php echo $app['id']; ?><?php echo $careerId ? '&career_id=' . $careerId : ''; ?>" class="btn btn-sm btn-info" title="हेर्नुहोस्">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <form method="POST" class="svc-inline-form" onsubmit="return confirm('के तपाईं पक्का हुनुहुन्छ?')">
-    <?php echo csrfField(); ?>
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="id" value="<?php echo $app['id']; ?>">
-                                            <button type="submit" class="btn btn-sm btn-danger" title="मेट्नुहोस्">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <div class="adm-action-icons">
+                                            <a href="?view=<?php echo $app['id']; ?><?php echo $careerId ? '&career_id=' . $careerId : ''; ?>"
+                                               class="adm-icon-btn adm-icon-btn--view" title="विवरण हेर्नुहोस्" aria-label="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <form method="POST" class="adm-icon-form"
+                                                  onsubmit="return confirm('के तपाईं पक्का हुनुहुन्छ? यो कार्य फिर्ता हुँदैन।')">
+                                                <?php echo csrfField(); ?>
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="id" value="<?php echo $app['id']; ?>">
+                                                <button type="submit" class="adm-icon-btn adm-icon-btn--delete" title="मेट्नुहोस्" aria-label="Delete">
+                                                    <i class="fas fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>

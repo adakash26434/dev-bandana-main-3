@@ -813,6 +813,18 @@ function getAppTypeLabel($type) {
                 </div>
 
                 <style>
+                /* Notification chips inside status history (member-facing) */
+                .trkc-chip-row { display:flex; flex-wrap:wrap; gap:6px; }
+                .trkc-chip {
+                    display:inline-flex; align-items:center; gap:5px;
+                    padding:3px 10px; border-radius:999px;
+                    font-size:0.72rem; font-weight:600; line-height:1.4;
+                    border:1px solid transparent;
+                }
+                .trkc-chip i { font-size:0.7rem; }
+                .trkc-ok   { background:#dcfce7; color:#166534; border-color:#bbf7d0; }
+                .trkc-err  { background:#fee2e2; color:#991b1b; border-color:#fecaca; }
+                .trkc-skip { background:#f3f4f6; color:#374151; border-color:#e5e7eb; }
                 .tracker-tabs-nav {
                     display: flex;
                     align-items: center;
@@ -1472,7 +1484,29 @@ function getAppTypeLabel($type) {
                                     <?php if (!empty($statusHistory)): ?>
                                     <div class="admin-response-block mt-2">
                                         <strong><i class="fas fa-clock-rotate-left tracker-ico-primary"></i> <?php echo isEnglish() ? 'Status / Comment History' : 'स्टाटस / कमेन्ट इतिहास'; ?></strong>
-                                        <?php foreach ($statusHistory as $h): ?>
+                                        <?php foreach ($statusHistory as $h):
+                                            $emS = (string)($h['notify_email_status'] ?? '');
+                                            $smS = (string)($h['notify_sms_status']   ?? '');
+                                            $emR = (string)($h['notify_email_reason'] ?? '');
+                                            $smR = (string)($h['notify_sms_reason']   ?? '');
+                                            $hasV2 = ($emS !== '' || $smS !== '');
+                                            $renderChannelChip = static function (string $kind, string $st, string $reason) {
+                                                if ($st === '' || $st === 'not_attempted') return '';
+                                                $isEn = function_exists('isEnglish') && isEnglish();
+                                                $icon  = $kind === 'email' ? 'fa-envelope' : 'fa-mobile-screen';
+                                                $kLbl  = $kind === 'email' ? 'Email' : 'SMS';
+                                                $map   = [
+                                                    'sent'    => ['trkc-ok',   $isEn ? 'sent'    : 'पठाइयो'],
+                                                    'failed'  => ['trkc-err',  $isEn ? 'failed'  : 'असफल'],
+                                                    'skipped' => ['trkc-skip', $isEn ? 'skipped' : 'पठाइएन'],
+                                                ];
+                                                $info = $map[$st] ?? ['trkc-skip', $st];
+                                                $tip  = trim($kLbl . ' — ' . $info[1] . ($reason !== '' ? ' (' . $reason . ')' : ''));
+                                                return '<span class="trkc-chip ' . $info[0] . '" title="' . htmlspecialchars($tip, ENT_QUOTES, 'UTF-8') . '">'
+                                                     . '<i class="fas ' . $icon . '"></i> ' . $kLbl . ': '
+                                                     . htmlspecialchars($info[1], ENT_QUOTES, 'UTF-8') . '</span>';
+                                            };
+                                        ?>
                                         <div class="mt-2 p-2 bg-light rounded border">
                                             <div class="small fw-semibold text-dark"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
                                             <?php if (!empty($h['admin_comment'])): ?>
@@ -1480,9 +1514,21 @@ function getAppTypeLabel($type) {
                                             <?php endif; ?>
                                             <div class="small text-muted mt-1">
                                                 <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> ·
-                                                <?php echo formatNepaliDate((string)$h['created_at'], true); ?> ·
-                                                <?php echo !empty($h['notify_sent']) ? (isEnglish() ? 'Notify sent' : 'Notify पठाइयो') : (isEnglish() ? 'No notify' : 'Notify छैन'); ?>
+                                                <?php echo formatNepaliDate((string)$h['created_at'], true); ?>
                                             </div>
+                                            <?php
+                                            if ($hasV2):
+                                                $emailChip = $renderChannelChip('email', $emS, $emR);
+                                                $smsChip   = $renderChannelChip('sms',   $smS, $smR);
+                                                if ($emailChip !== '' || $smsChip !== ''):
+                                            ?>
+                                            <div class="trkc-chip-row mt-2"><?php echo $emailChip . $smsChip; ?></div>
+                                            <?php   endif;
+                                            elseif (!empty($h['notify_sent'])): ?>
+                                            <div class="trkc-chip-row mt-2">
+                                                <span class="trkc-chip trkc-ok"><i class="fas fa-bell"></i> <?php echo isEnglish() ? 'Notification sent' : 'सूचना पठाइयो'; ?></span>
+                                            </div>
+                                            <?php endif; ?>
                                         </div>
                                         <?php endforeach; ?>
                                     </div>

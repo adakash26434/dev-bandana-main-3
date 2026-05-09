@@ -18,10 +18,45 @@ if (!function_exists('ensureRequestStatusHistoryTable')) {
             INDEX idx_module_request (module, request_id),
             INDEX idx_created_at (created_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        /* ── Backward-compatible column upgrades ──
+           v2: per-channel notification audit columns. Run only if missing. */
+        $newCols = [
+            'admin_chose_to_notify' => "TINYINT(1) NOT NULL DEFAULT 0",
+            'notify_email_status'   => "VARCHAR(20) NOT NULL DEFAULT 'not_attempted'", /* sent | failed | skipped | not_attempted */
+            'notify_email_reason'   => "VARCHAR(180) DEFAULT NULL",
+            'notify_email_to'       => "VARCHAR(180) DEFAULT NULL",
+            'notify_sms_status'     => "VARCHAR(20) NOT NULL DEFAULT 'not_attempted'",
+            'notify_sms_reason'     => "VARCHAR(180) DEFAULT NULL",
+            'notify_sms_to'         => "VARCHAR(40) DEFAULT NULL",
+        ];
+        try {
+            $existing = [];
+            foreach ($db->query("SHOW COLUMNS FROM request_status_history") as $row) {
+                $existing[$row['Field']] = true;
+            }
+            foreach ($newCols as $col => $ddl) {
+                if (!isset($existing[$col])) {
+                    $db->exec("ALTER TABLE request_status_history ADD COLUMN `{$col}` {$ddl}");
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log('[request-status-history] migration warning: ' . $e->getMessage());
+        }
     }
 }
 
 if (!function_exists('logRequestStatusHistory')) {
+    /**
+     * Insert one audit row.
+     *
+     * @param array|null $notify  Optional structured notification outcome:
+     *  [
+     *    'admin_chose'  => bool,            // admin ले "send notification" choose गर्‍यो?
+     *    'email'        => ['status'=>'sent|failed|skipped|not_attempted','reason'=>'','to'=>''],
+     *    'sms'          => ['status'=>'sent|failed|skipped|not_attempted','reason'=>'','to'=>''],
+     *  ]
+     */
     function logRequestStatusHistory(
         PDO $db,
         string $module,
@@ -29,17 +64,30 @@ if (!function_exists('logRequestStatusHistory')) {
         ?string $oldStatus,
         ?string $newStatus,
         string $comment = '',
-        bool $notifySent = false,
+        bool $notifySent = false,           /* legacy bool — true if EITHER channel sent */
         ?int $actorAdminId = null,
-        ?string $actorName = null
+        ?string $actorName = null,
+        ?array $notify = null
     ): void {
         if ($requestId <= 0 || trim($module) === '') {
             return;
         }
         ensureRequestStatusHistoryTable($db);
+
+        $email = ($notify['email'] ?? []) + ['status' => 'not_attempted', 'reason' => null, 'to' => null];
+        $sms   = ($notify['sms']   ?? []) + ['status' => 'not_attempted', 'reason' => null, 'to' => null];
+        $adminChose = !empty($notify['admin_chose']) ? 1 : 0;
+
+        $emailStatus = in_array($email['status'], ['sent','failed','skipped','not_attempted'], true) ? $email['status'] : 'not_attempted';
+        $smsStatus   = in_array($sms['status'],   ['sent','failed','skipped','not_attempted'], true) ? $sms['status']   : 'not_attempted';
+
         $st = $db->prepare("INSERT INTO request_status_history
-            (module, request_id, old_status, new_status, admin_comment, notify_sent, actor_admin_id, actor_name)
-            VALUES (?,?,?,?,?,?,?,?)");
+            (module, request_id, old_status, new_status, admin_comment, notify_sent,
+             actor_admin_id, actor_name,
+             admin_chose_to_notify,
+             notify_email_status, notify_email_reason, notify_email_to,
+             notify_sms_status,   notify_sms_reason,   notify_sms_to)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         $st->execute([
             trim($module),
             $requestId,
@@ -49,6 +97,13 @@ if (!function_exists('logRequestStatusHistory')) {
             $notifySent ? 1 : 0,
             $actorAdminId,
             $actorName !== null ? trim($actorName) : null,
+            $adminChose,
+            $emailStatus,
+            $email['reason'] !== null ? mb_substr((string)$email['reason'], 0, 180) : null,
+            $email['to']     !== null ? mb_substr((string)$email['to'],     0, 180) : null,
+            $smsStatus,
+            $sms['reason'] !== null ? mb_substr((string)$sms['reason'], 0, 180) : null,
+            $sms['to']     !== null ? mb_substr((string)$sms['to'],     0, 40)  : null,
         ]);
     }
 }

@@ -3813,3 +3813,53 @@ aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
         transition: none !important;
     }
 }
+
+/* ──────────────────────────────────────────────────────────
+   Unified Action Icons — used in admin list "कार्य" column
+   (View / Edit / Delete / Print / Reply)
+   Reusable across all admin pages.
+   ────────────────────────────────────────────────────────── */
+.adm-action-icons {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+}
+.adm-action-icons .adm-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #6b7280;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background-color .15s ease, color .15s ease;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+.adm-action-icons .adm-icon-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+}
+.adm-action-icons .adm-icon-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+}
+.adm-action-icons .adm-icon-btn--view:hover  { border-color: #3b82f6; color: #1e40af; background: #eff6ff; }
+.adm-action-icons .adm-icon-btn--edit:hover  { border-color: var(--primary-color, #1a5f2a); color: var(--primary-dark, #0e3d1a); background: #ecfdf5; }
+.adm-action-icons .adm-icon-btn--delete:hover{ border-color: #ef4444; color: #991b1b; background: #fee2e2; }
+.adm-action-icons .adm-icon-btn--print:hover { border-color: #6366f1; color: #3730a3; background: #eef2ff; }
+.adm-action-icons .adm-icon-btn--reply:hover { border-color: #0ea5e9; color: #075985; background: #e0f2fe; }
+.adm-action-icons .adm-icon-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+.adm-action-icons .adm-icon-btn:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary-color, #1a5f2a) 60%, transparent);
+    outline-offset: 2px;
+}

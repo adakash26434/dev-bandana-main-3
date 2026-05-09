@@ -226,6 +226,37 @@ if (!function_exists('arvAssetsOnce')) {
 .arv-log-meta{font-size:.72rem;color:#9ca3af;margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;}
 .arv-log-meta .dot{color:#d1d5db;}
 .arv-log-empty{font-size:.85rem;color:#9ca3af;padding:14px;text-align:center;background:#f9fafb;border-radius:10px;}
+.arv-log-notify{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.arv-chip{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 10px;border-radius:999px;
+    font-size:.7rem;font-weight:700;line-height:1.4;
+    border:1px solid transparent;
+}
+.arv-chip i{font-size:.65rem;}
+.arv-chip--ok{background:#dcfce7;color:#166534;border-color:#bbf7d0;}
+.arv-chip--err{background:#fee2e2;color:#991b1b;border-color:#fecaca;}
+.arv-chip--skip{background:#f3f4f6;color:#374151;border-color:#e5e7eb;}
+.arv-chip--none{background:#f9fafb;color:#9ca3af;border-color:#f3f4f6;}
+.arv-chip--intent{background:#dbeafe;color:#1e40af;border-color:#bfdbfe;}
+.arv-chip--intent-off{background:#fef9c3;color:#854d0e;border-color:#fde68a;}
+
+/* Notify checkbox row in status update form */
+.arv-notify-row{
+    background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;
+    padding:10px 12px;
+}
+.arv-notify-toggle{
+    display:flex;align-items:center;gap:8px;cursor:pointer;
+    font-size:.83rem;font-weight:600;color:#111827;margin-bottom:6px;
+}
+.arv-notify-toggle input{margin:0;cursor:pointer;}
+.arv-notify-toggle i{color:var(--primary-color,#1a5f2a);}
+.arv-notify-channels{display:flex;flex-wrap:wrap;gap:10px;font-size:.72rem;font-weight:600;}
+.arv-notify-channels span{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;}
+.arv-notify-channels .is-on{background:#ecfdf5;color:#047857;}
+.arv-notify-channels .is-off{background:#f3f4f6;color:#9ca3af;}
+.arv-notify-channels i{font-size:.7rem;}
 
 .arv-action-card{
     background:#fff;border:1px solid #e5e7eb;border-radius:12px;
@@ -411,6 +442,25 @@ if (!function_exists('arvLogList')) {
         if (!$rows) {
             return '<div class="arv-log-empty">अहिलेसम्म कुनै गतिविधि लग छैन।</div>';
         }
+        /* channel-status → display chip class + label + tooltip */
+        $chip = static function (string $channel, string $status, string $reason = '', string $to = ''): string {
+            $statusMap = [
+                'sent'          => ['ok',   'पठाइयो'],
+                'failed'        => ['err',  'असफल'],
+                'skipped'       => ['skip', 'पठाइएन'],
+                'not_attempted' => ['none', 'प्रयास भएन'],
+            ];
+            $info = $statusMap[$status] ?? ['none', '—'];
+            [$cls, $label] = $info;
+            $icon = $channel === 'email' ? 'fa-envelope' : 'fa-mobile-screen';
+            $chLbl = $channel === 'email' ? 'Email' : 'SMS';
+            $title = $chLbl . ': ' . $label;
+            if ($to !== '')     $title .= ' → ' . $to;
+            if ($reason !== '') $title .= ' (' . $reason . ')';
+            return '<span class="arv-chip arv-chip--' . $cls . '" title="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '">'
+                 . '<i class="fas ' . $icon . '"></i> ' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
+        };
+
         $out = '<div class="arv-log-list">';
         foreach ($rows as $h) {
             $from   = htmlspecialchars((string)($h['old_status']    ?? '') ?: '—', ENT_QUOTES, 'UTF-8');
@@ -419,7 +469,28 @@ if (!function_exists('arvLogList')) {
             $actor  = htmlspecialchars((string)($h['actor_name']    ?? 'Admin'), ENT_QUOTES, 'UTF-8');
             $when   = (string)($h['created_at']    ?? '');
             $whenH  = function_exists('formatNepaliDate') ? formatNepaliDate($when, true) : htmlspecialchars($when, ENT_QUOTES, 'UTF-8');
-            $sent   = !empty($h['notify_sent']);
+
+            /* Per-channel audit (v2 schema) — fall back to legacy notify_sent */
+            $hasV2 = isset($h['notify_email_status']) || isset($h['notify_sms_status']);
+            if ($hasV2) {
+                $emailChip = $chip('email',
+                    (string)($h['notify_email_status'] ?? 'not_attempted'),
+                    (string)($h['notify_email_reason'] ?? ''),
+                    (string)($h['notify_email_to']     ?? ''));
+                $smsChip   = $chip('sms',
+                    (string)($h['notify_sms_status'] ?? 'not_attempted'),
+                    (string)($h['notify_sms_reason'] ?? ''),
+                    (string)($h['notify_sms_to']     ?? ''));
+                $intent = !empty($h['admin_chose_to_notify'])
+                    ? '<span class="arv-chip arv-chip--intent" title="Admin ले notify पठाउने तय गरेका थिए"><i class="fas fa-paper-plane"></i> Notify</span>'
+                    : '<span class="arv-chip arv-chip--intent-off" title="Admin ले notify नचुन्ने तय गरे"><i class="fas fa-bell-slash"></i> No-notify</span>';
+                $notifyHtml = $intent . ' ' . $emailChip . ' ' . $smsChip;
+            } else {
+                $sent = !empty($h['notify_sent']);
+                $notifyHtml = $sent
+                    ? '<span class="arv-chip arv-chip--ok"><i class="fas fa-bell"></i> Sent</span>'
+                    : '<span class="arv-chip arv-chip--none"><i class="fas fa-bell-slash"></i> Not sent</span>';
+            }
 
             $out .= '<div class="arv-log-item">'
                   . '<div class="arv-log-arrow"><span class="arv-log-from">' . $from . '</span>'
@@ -430,9 +501,8 @@ if (!function_exists('arvLogList')) {
             $out .= '<div class="arv-log-meta">'
                   . '<span><i class="fas fa-user-shield"></i> ' . $actor . '</span>'
                   . '<span class="dot">·</span><span><i class="fas fa-clock"></i> ' . $whenH . '</span>'
-                  . '<span class="dot">·</span><span><i class="fas fa-bell"></i> '
-                  . ($sent ? 'Sent' : 'Not sent') . '</span>'
                   . '</div>'
+                  . '<div class="arv-log-notify">' . $notifyHtml . '</div>'
                   . '</div>';
         }
         $out .= '</div>';
