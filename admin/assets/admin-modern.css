@@ -3992,6 +3992,56 @@ aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
 .arv-empty-tab span {
     font-size: .9rem;
 }
+
+/* ──────────────────────────────────────────────────────────
+   Unified primary "खोज" / Submit button — flat modern green.
+   पुरानो blue→green gradient सबैतिरबाट हटाउने।
+   ────────────────────────────────────────────────────────── */
+.main-content .btn-primary,
+.main-content button.btn-primary,
+.main-content a.btn-primary,
+.main-content .card .btn-primary,
+.main-content .adm-filter-bar .btn-primary,
+.main-content form .btn-primary,
+.main-content .tab-content .btn-primary {
+    background: var(--primary-color, #1a5f2a) !important;
+    background-image: none !important;
+    border: 1px solid var(--primary-color, #1a5f2a) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(26, 95, 42, 0.18) !important;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease !important;
+}
+.main-content .btn-primary:hover,
+.main-content button.btn-primary:hover,
+.main-content a.btn-primary:hover,
+.main-content .card .btn-primary:hover,
+.main-content .adm-filter-bar .btn-primary:hover,
+.main-content form .btn-primary:hover,
+.main-content .tab-content .btn-primary:hover {
+    background: var(--primary-dark, #144a21) !important;
+    background-image: none !important;
+    border-color: var(--primary-dark, #144a21) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(26, 95, 42, 0.22) !important;
+}
+.main-content .btn-primary:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary-color, #1a5f2a) 60%, transparent) !important;
+    outline-offset: 2px !important;
+}
+.main-content .admin-page-header .btn-primary,
+.main-content .admin-page-header a.btn-primary {
+    background: rgba(255, 255, 255, 0.18) !important;
+    background-image: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+.main-content .admin-page-header .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
 @media (max-width: 991.98px) {
     .arv-legacy-shell {
         grid-template-columns: 1fr;
