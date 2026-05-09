@@ -1,54 +1,49 @@
-/* v7 adjusted layer for verify page (safe overrides) */
+/* v7+: verify — ID card keeps polish; shell matches auth-portals tokens (no fighting !important) */
 :root{
   --v7v-green:#0d5c2e;
   --v7v-green2:#1a8a47;
   --v7v-gold:#f59e0b;
 }
-body{
-  background:
-    radial-gradient(1100px 550px at -10% -10%, rgba(74,222,128,.10), transparent 60%),
-    radial-gradient(900px 500px at 110% 0%, rgba(245,158,11,.08), transparent 55%),
-    #f0fdf4 !important;
+/* Page bg: same as login/verify unified (design-tokens --bg-page) */
+body.verify-auth-page{
+  background: var(--bg-page);
 }
 .v7v-brand{
   display:flex; align-items:center; justify-content:center;
-  background:#fff; border:1px solid #d1fae5;
+  background:var(--bg-card); border:1px solid var(--border-color);
   border-radius:14px; padding:12px 16px; margin-bottom:12px;
-  box-shadow:0 4px 12px rgba(13,92,46,.06);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--text-primary) 5%, transparent),
+    0 8px 22px color-mix(in srgb, var(--primary-color) 7%, transparent);
 }
 /* ब्यानर लोगो मात्र — चौडाइ अनुसार मध्य, नाम टेक्स्ट छैन */
 .v7v-brand--banner .v7v-brand-logo{
   width:auto; max-width:min(420px, 94vw); min-height:48px;
   display:flex; align-items:center; justify-content:center;
   border-radius:12px; overflow:hidden;
-  background:linear-gradient(135deg,#ecfdf5,#d1fae5);
-  border:1px solid #d1fae5;
+  background:var(--bg-soft);
+  border:1px solid var(--border-color);
   padding:6px 12px;
 }
 .v7v-brand--banner .v7v-brand-logo img{
   display:block; width:auto; max-width:100%; max-height:72px; height:auto;
   object-fit:contain;
 }
-.v7v-brand--banner .v7v-brand-logo i{ font-size:1.35rem; color:var(--v7v-green); }
+.v7v-brand--banner .v7v-brand-logo i{ font-size:1.35rem; color:var(--primary-color); }
 .v7v-brand-fallback{
-  margin-left:8px; font-size:.78rem; font-weight:800; color:var(--v7v-green);
+  margin-left:8px; font-size:.78rem; font-weight:800; color:var(--primary-dark);
   letter-spacing:.04em; text-transform:uppercase;
-}
-.vp-card{
-  border-radius:18px !important;
-  box-shadow:0 10px 26px rgba(13,92,46,.10) !important;
-}
-.vp-btn{
-  background:linear-gradient(135deg,var(--v7v-green),var(--v7v-green2)) !important;
 }
 
 /* सेवा लग सन्देश जस्ता साना सफलता बक्स (ID कार्ड होइन) */
 .vp-result-ok:not(:has(.vp-idcard)){
-  background:linear-gradient(135deg,#ecfdf5,#d1fae5);
-  border:1.5px solid #10b981;
-  border-radius:16px;
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-card));
+  border:1px solid color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+  border-radius:14px;
   padding:14px 18px;
-  box-shadow:0 8px 22px rgba(16,185,129,.12);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--text-primary) 6%, transparent),
+    0 10px 26px color-mix(in srgb, var(--primary-color) 10%, transparent);
 }
 
 /* ── Verified member: modern ID-style card (verify.php) ── */

@@ -236,8 +236,8 @@ if ($result && !empty($result['ok'])) {
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=3">
-<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=6">
-<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/eye-candy-verify-v7.css?v=10">
+<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=7">
+<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/eye-candy-verify-v7.css?v=11">
 <?php @require_once __DIR__ . '/assets/css/_color-vars.php'; ?>
 <style>
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }

@@ -316,7 +316,7 @@ if ($logoPath) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php memberHeadAssets(); ?>
 <?php @require_once __DIR__ . '/../assets/css/_color-vars.php'; ?>
-<link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>assets/css/auth-portals-unified.css?v=6">
+<link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>assets/css/auth-portals-unified.css?v=7">
 <link rel="stylesheet" href="<?php echo htmlspecialchars($siteUrl); ?>member/assets/member.css?v=10">
 <style>
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
