@@ -1,6 +1,7 @@
 <?php
 $__t = static function (string $np, string $en): string {
-    return isEnglish() ? $en : $np;
+    $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+    return strtolower($lang) === 'en' ? $en : $np;
 };
 $pageTitle = $__t('कार्यक्रम उपस्थिति रिपोर्ट', 'Program Attendance Report');
 $currentPage = 'program-attendance';

@@ -6,7 +6,8 @@
  * Modal पूर्ण रूपले हटाइयो।
  */
 $__t = static function (string $np, string $en): string {
-    return isEnglish() ? $en : $np;
+    $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+    return strtolower($lang) === 'en' ? $en : $np;
 };
 $pageTitle   = $__t('ऋण आवेदन व्यवस्थापन', 'Loan Applications');
 $currentPage = 'loans';

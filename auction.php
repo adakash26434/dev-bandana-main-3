@@ -288,6 +288,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_bid'])) {
     background: none; border: none; line-height: 1;
     z-index: 10000;
 }
+
+/* ── Bid Modal (uniform/global form layer) ── */
+.auc2-bid-modal-head{
+    background:linear-gradient(135deg,var(--primary-dark),var(--primary-color));
+    color:var(--text-on-primary);
+}
+.auc2-bid-modal-title{font-weight:700;letter-spacing:.2px;}
+.auc2-bid-form{padding:.15rem 0;}
+.auc2-bid-note{
+    background:color-mix(in srgb,var(--secondary-color) 12%,white);
+    border:1px solid color-mix(in srgb,var(--secondary-color) 22%,white);
+    color:var(--secondary-dark);
+    border-radius:10px;
+    font-weight:600;
+}
+.auc2-bid-min-amt{color:var(--secondary-dark);font-weight:800;}
+.auc2-bid-label{font-size:.88rem;font-weight:700;color:var(--primary-dark);margin-bottom:.4rem;}
+.auc2-req{color:var(--secondary-color);}
+.auc2-bid-input,.auc2-bid-textarea{
+    border:1.5px solid color-mix(in srgb,var(--primary-color) 16%,var(--gray-300));
+    border-radius:10px;
+    min-height:44px;
+    font-size:.92rem;
+}
+.auc2-bid-input:focus,.auc2-bid-textarea:focus{
+    border-color:var(--primary-color);
+    box-shadow:0 0 0 3px rgba(var(--primary-rgb),.14);
+}
+.auc2-bid-addon{
+    background:color-mix(in srgb,var(--primary-color) 8%,white);
+    border:1.5px solid color-mix(in srgb,var(--primary-color) 16%,var(--gray-300));
+    border-right:none;
+    color:var(--primary-dark);
+    font-weight:700;
+}
+.auc2-bid-help{font-size:.78rem;color:var(--text-muted);}
+.auc2-bid-help-warn{font-size:.78rem;color:var(--secondary-dark);font-weight:600;}
+.auc2-bid-footer{padding-top:.4rem;}
+.auc2-bid-cancel{
+    border-color:color-mix(in srgb,var(--primary-color) 18%,var(--gray-300));
+    color:var(--text-color);
+}
+.auc2-bid-cancel:hover{
+    background:color-mix(in srgb,var(--primary-color) 8%,white);
+    border-color:var(--primary-color);
+    color:var(--primary-dark);
+}
+.auc2-bid-submit{
+    background:linear-gradient(135deg,var(--secondary-color),var(--secondary-dark));
+    border-color:var(--secondary-color);
+    color:var(--text-on-secondary);
+    font-weight:700;
+}
+.auc2-bid-submit:hover{
+    background:linear-gradient(135deg,var(--secondary-dark),var(--secondary-color));
+    border-color:var(--secondary-dark);
+    color:var(--text-on-secondary);
+}
 </style>
 
 <style>
@@ -778,75 +836,75 @@ foreach ($auctions as $a) {
     <div class="modal fade" id="bidModal<?php echo $aId; ?>" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;">
-                    <h5 class="modal-title">
+                <div class="modal-header auc2-bid-modal-head">
+                    <h5 class="modal-title auc2-bid-modal-title">
                         <i class="fas fa-gavel me-2"></i>
                         <?php echo isEnglish() ? 'Submit Bid / Inquiry' : 'बोलपत्र / जिज्ञासा पेश'; ?>
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" novalidate class="bid-modal-form needs-validation">
+                <form method="POST" novalidate class="bid-modal-form auc2-bid-form needs-validation">
                     <?php echo csrfField(); ?>
                     <input type="hidden" name="bid_form_token" value="<?php echo bin2hex(random_bytes(12)); ?>">
                     <input type="hidden" name="auction_id" value="<?php echo $aId; ?>">
                     <input type="hidden" name="submit_bid" value="1">
                     <div class="modal-body">
-                        <div class="alert alert-warning py-2 px-3 mb-3 small">
+                        <div class="auc2-bid-note py-2 px-3 mb-3 small">
                             <i class="fas fa-gavel me-1"></i>
                             <?php echo isEnglish() ? 'Minimum bid amount:' : 'न्यूनतम बोलपत्र रकम:'; ?>
-                            <strong class="text-danger"> रु. <?php echo number_format($auction['minimum_price']); ?></strong>
+                            <strong class="auc2-bid-min-amt"> रु. <?php echo number_format($auction['minimum_price']); ?></strong>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold"><?php echo isEnglish()?'Full Name':'पूरा नाम'; ?> <span class="text-danger">*</span></label>
-                            <input type="text" name="bidder_name" class="form-control"
+                            <label class="form-label auc2-bid-label"><?php echo isEnglish()?'Full Name':'पूरा नाम'; ?> <span class="auc2-req">*</span></label>
+                            <input type="text" name="bidder_name" class="form-control auc2-bid-input"
                                    placeholder="<?php echo isEnglish()?'Enter your full name':'आफ्नो पूरा नाम लेख्नुहोस्'; ?>"
                                    required minlength="2" maxlength="120">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold"><?php echo isEnglish()?'Mobile Number':'मोबाइल नम्बर'; ?> <span class="text-danger">*</span></label>
+                            <label class="form-label auc2-bid-label"><?php echo isEnglish()?'Mobile Number':'मोबाइल नम्बर'; ?> <span class="auc2-req">*</span></label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                <input type="tel" name="bidder_phone" class="form-control"
+                                <span class="input-group-text auc2-bid-addon"><i class="fas fa-phone"></i></span>
+                                <input type="tel" name="bidder_phone" class="form-control auc2-bid-input"
                                        placeholder="98XXXXXXXX" pattern="[9][0-9]{9}"
                                        maxlength="10" minlength="10" inputmode="numeric" required
                                        title="<?php echo isEnglish()?'10-digit Nepal mobile':'९ बाट शुरु हुने १० अंकको नम्बर'; ?>">
                             </div>
-                            <div class="form-text small"><i class="fas fa-info-circle"></i> <?php echo isEnglish()?'10-digit Nepal mobile starting with 9':'९ बाट शुरु हुने १० अंकको नम्बर'; ?></div>
+                            <div class="auc2-bid-help"><i class="fas fa-info-circle"></i> <?php echo isEnglish()?'10-digit Nepal mobile starting with 9':'९ बाट शुरु हुने १० अंकको नम्बर'; ?></div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold"><?php echo isEnglish()?'Email':'इमेल'; ?></label>
+                            <label class="form-label auc2-bid-label"><?php echo isEnglish()?'Email':'इमेल'; ?></label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                <input type="email" name="bidder_email" class="form-control" placeholder="name@email.com" maxlength="150">
+                                <span class="input-group-text auc2-bid-addon"><i class="fas fa-envelope"></i></span>
+                                <input type="email" name="bidder_email" class="form-control auc2-bid-input" placeholder="name@email.com" maxlength="150">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold"><?php echo isEnglish()?'Address':'ठेगाना'; ?></label>
-                            <input type="text" name="bidder_address" class="form-control"
+                            <label class="form-label auc2-bid-label"><?php echo isEnglish()?'Address':'ठेगाना'; ?></label>
+                            <input type="text" name="bidder_address" class="form-control auc2-bid-input"
                                    placeholder="<?php echo isEnglish()?'District, Municipality':'जिल्ला, गाउँपालिका/नगरपालिका'; ?>" maxlength="200">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold"><?php echo isEnglish()?'Bid Amount (Rs.)':'बोलपत्र रकम (रु.)'; ?> <span class="text-danger">*</span></label>
+                            <label class="form-label auc2-bid-label"><?php echo isEnglish()?'Bid Amount (Rs.)':'बोलपत्र रकम (रु.)'; ?> <span class="auc2-req">*</span></label>
                             <div class="input-group">
-                                <span class="input-group-text fw-bold text-primary">रु.</span>
-                                <input type="number" name="bid_amount" class="form-control"
+                                <span class="input-group-text auc2-bid-addon">रु.</span>
+                                <input type="number" name="bid_amount" class="form-control auc2-bid-input"
                                        min="<?php echo $auction['minimum_price']; ?>"
                                        step="1" inputmode="numeric"
                                        placeholder="<?php echo number_format($auction['minimum_price']); ?>" required>
                             </div>
-                            <div class="form-text text-danger small"><i class="fas fa-exclamation-circle"></i> <?php echo isEnglish()?'Minimum bid: Rs.':'न्यूनतम रकम: रु.'; ?> <?php echo number_format($auction['minimum_price']); ?></div>
+                            <div class="auc2-bid-help-warn"><i class="fas fa-exclamation-circle"></i> <?php echo isEnglish()?'Minimum bid: Rs.':'न्यूनतम रकम: रु.'; ?> <?php echo number_format($auction['minimum_price']); ?></div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold"><?php echo isEnglish()?'Message / Query':'सन्देश / जिज्ञासा'; ?></label>
-                            <textarea name="message" class="form-control" rows="3" maxlength="500"
+                            <label class="form-label auc2-bid-label"><?php echo isEnglish()?'Message / Query':'सन्देश / जिज्ञासा'; ?></label>
+                            <textarea name="message" class="form-control auc2-bid-textarea" rows="3" maxlength="500"
                                       placeholder="<?php echo isEnglish()?'Optional message...':'थप जानकारी वा जिज्ञासा...'; ?>"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <div class="modal-footer auc2-bid-footer">
+                        <button type="button" class="btn auc2-bid-cancel" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i><?php echo isEnglish()?'Cancel':'रद्द'; ?>
                         </button>
-                        <button type="submit" class="btn btn-danger bid-submit-btn">
+                        <button type="submit" class="btn auc2-bid-submit bid-submit-btn">
                             <i class="fas fa-gavel me-1"></i><?php echo isEnglish()?'Submit Bid':'बोलपत्र पेश गर्नुहोस्'; ?>
                         </button>
                     </div>

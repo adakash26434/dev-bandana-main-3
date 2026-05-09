@@ -85,18 +85,18 @@ unset($GLOBALS['member_frame_extra_query']);
 require __DIR__ . '/includes/chrome.php';
 ?>
 
-<div class="mem-alert mem-alert-info" style="margin-bottom:14px;font-size:0.86rem;line-height:1.5;">
+<div class="mem-alert mem-alert-info mem-apply-hint">
     <i class="fas fa-shield-halved"></i>
     <?php echo htmlspecialchars($meta['hint']); ?>
-    <span class="d-block mt-1" style="opacity:.9;"><?php echo $_t('सम्पूर्ण आवेदन सुरक्षित रूपमा सहकारीमा पठाइन्छ।', 'All applications are sent securely to the cooperative.'); ?></span>
+    <span class="d-block mt-1 mem-apply-hint-sub"><?php echo $_t('सम्पूर्ण आवेदन सुरक्षित रूपमा सहकारीमा पठाइन्छ।', 'All applications are sent securely to the cooperative.'); ?></span>
 </div>
 
 <div class="mem-card mem-apply-frame-card">
-    <div class="mem-card-header" style="padding:12px 16px;">
-        <div class="mem-card-title" style="font-size:0.92rem;"><i class="fas fa-file-signature"></i><?php echo htmlspecialchars($meta['title']); ?></div>
-        <a href="<?php echo SITE_URL; ?>member/tracker.php" style="font-size:0.78rem;font-weight:700;color:var(--mem-primary);text-decoration:none;white-space:nowrap;"><?php echo $_t('ट्र्याकर', 'Tracker'); ?> →</a>
+    <div class="mem-card-header mem-apply-frame-head">
+        <div class="mem-card-title mem-apply-frame-title"><i class="fas fa-file-signature"></i><?php echo htmlspecialchars($meta['title']); ?></div>
+        <a href="<?php echo SITE_URL; ?>member/tracker.php" class="mem-apply-frame-link"><?php echo $_t('ट्र्याकर', 'Tracker'); ?> →</a>
     </div>
-    <div class="mem-card-body" style="padding:0;">
+    <div class="mem-card-body mem-apply-frame-body">
         <iframe class="mem-public-form-frame" title="<?php echo htmlspecialchars($meta['title']); ?>"
                 src="<?php echo htmlspecialchars($frameSrc); ?>"
                 loading="eager" referrerpolicy="same-origin"></iframe>
@@ -105,6 +105,12 @@ require __DIR__ . '/includes/chrome.php';
 
 <style>
 .mem-apply-frame-card { overflow: hidden; }
+.mem-apply-hint{margin-bottom:14px;font-size:.86rem;line-height:1.5;}
+.mem-apply-hint-sub{opacity:.9;}
+.mem-apply-frame-head{padding:12px 16px;}
+.mem-apply-frame-title{font-size:.92rem;}
+.mem-apply-frame-link{font-size:.78rem;font-weight:700;color:var(--mem-primary);text-decoration:none;white-space:nowrap;}
+.mem-apply-frame-body{padding:0;}
 .mem-public-form-frame {
     display: block;
     width: 100%;

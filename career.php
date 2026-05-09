@@ -46,7 +46,7 @@ $totalDepts = count($deptSet);
 .cr-hero {
     background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
     padding: 2.5rem 0 2rem;
-    color: var(--text-on-primary, white);
+    color: var(--text-on-primary);
     margin-bottom: 0;
 }
 .cr-hero-inner {
@@ -56,16 +56,16 @@ $totalDepts = count($deptSet);
 .cr-hero-text { flex: 1; min-width: 200px; }
 .cr-hero-text h2 {
     font-size: 1.7rem; font-weight: 800;
-    margin-bottom: .4rem; color: var(--text-on-primary, white);
+    margin-bottom: .4rem; color: var(--text-on-primary);
 }
-.cr-hero-text p { color: color-mix(in srgb, var(--text-on-primary, white) 68%, transparent); margin: 0; font-size: .95rem; }
+.cr-hero-text p { color: color-mix(in srgb, var(--text-on-primary) 68%, transparent); margin: 0; font-size: .95rem; }
 
 .cr-stats {
     display: flex; gap: 1rem; flex-wrap: wrap;
 }
 .cr-stat-box {
-    background: color-mix(in srgb, var(--text-on-primary, white) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--text-on-primary, white) 20%, transparent);
+    background: color-mix(in srgb, var(--text-on-primary) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--text-on-primary) 20%, transparent);
     backdrop-filter: blur(10px);
     border-radius: 14px;
     padding: .85rem 1.3rem;
@@ -83,7 +83,7 @@ $totalDepts = count($deptSet);
     background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
     -webkit-background-clip: text; background-clip: text;
 }
-.cr-stat-lbl { font-size: .7rem; color: color-mix(in srgb, var(--text-on-primary, white) 62%, transparent); text-transform: uppercase; letter-spacing: .4px; margin-top: .2rem; }
+.cr-stat-lbl { font-size: .7rem; color: color-mix(in srgb, var(--text-on-primary) 62%, transparent); text-transform: uppercase; letter-spacing: .4px; margin-top: .2rem; }
 
 /* ── Layout ── */
 .cr-layout { padding: 2.5rem 0 3rem; }
@@ -92,7 +92,7 @@ $totalDepts = count($deptSet);
 
 /* ── Search & Filter Bar ── */
 .cr-filterbar {
-    background: var(--surface-color, white);
+    background: var(--surface-color);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(var(--primary-rgb), .10);
     padding: 1.2rem 1.4rem;
@@ -130,11 +130,11 @@ $totalDepts = count($deptSet);
     user-select: none;
 }
 .cr-chip:hover { border-color: var(--primary-color); color: var(--primary-color); background: color-mix(in srgb, var(--primary-color) 12%, white); }
-.cr-chip.active { background: var(--primary-color); color: var(--text-on-primary, white); border-color: var(--primary-color); }
-.cr-chip.active.green { background: var(--accent-dark); border-color: var(--accent-dark); color: var(--text-on-accent, white); }
+.cr-chip.active { background: var(--primary-color); color: var(--text-on-primary); border-color: var(--primary-color); }
+.cr-chip.active.green { background: var(--accent-dark); border-color: var(--accent-dark); color: var(--text-on-accent); }
 .cr-chip.active.grey  { background: var(--text-muted); border-color: var(--text-muted); color: white; }
 .cr-chip-count {
-    background: color-mix(in srgb, var(--text-on-primary, white) 25%, transparent); color: inherit;
+    background: color-mix(in srgb, var(--text-on-primary) 25%, transparent); color: inherit;
     border-radius: 10px; padding: 0 .45rem; font-size: .72rem;
     min-width: 18px; text-align: center;
 }
@@ -148,7 +148,7 @@ $totalDepts = count($deptSet);
 
 /* ── Job Cards ── */
 .cr-job-card {
-    background: var(--surface-color, white);
+    background: var(--surface-color);
     border-radius: 14px;
     box-shadow: 0 2px 14px rgba(var(--primary-rgb), .09);
     border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white);
@@ -172,7 +172,7 @@ $totalDepts = count($deptSet);
 .cr-urgent-tag {
     position: absolute; top: 0; right: 0;
     background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
-    color: var(--text-on-secondary, white); font-size: .68rem; font-weight: 800;
+    color: var(--text-on-secondary); font-size: .68rem; font-weight: 800;
     padding: .25rem .75rem; border-radius: 0 0 0 10px;
     text-transform: uppercase; letter-spacing: .4px;
     display: flex; align-items: center; gap: .3rem;
@@ -254,16 +254,16 @@ $totalDepts = count($deptSet);
     text-decoration: none; display: inline-flex; align-items: center; gap: .35rem;
     transition: all .2s;
 }
-.cr-btn-detail:hover { background: var(--primary-color); color: var(--text-on-primary, white); }
+.cr-btn-detail:hover { background: var(--primary-color); color: var(--text-on-primary); }
 .cr-btn-apply {
     padding: .5rem 1.2rem; border-radius: 8px;
     font-size: .82rem; font-weight: 700;
     background: linear-gradient(135deg, var(--accent-dark), var(--primary-dark));
-    color: var(--text-on-primary, white); border: none; cursor: pointer;
+    color: var(--text-on-primary); border: none; cursor: pointer;
     text-decoration: none; display: inline-flex; align-items: center; gap: .35rem;
     transition: all .2s; box-shadow: 0 2px 8px rgba(var(--primary-rgb),.28);
 }
-.cr-btn-apply:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(var(--primary-rgb),.36); color: var(--text-on-primary, white); }
+.cr-btn-apply:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(var(--primary-rgb),.36); color: var(--text-on-primary); }
 .cr-btn-dl {
     padding: .5rem .9rem; border-radius: 8px;
     font-size: .82rem; font-weight: 600;
@@ -290,7 +290,7 @@ $totalDepts = count($deptSet);
 /* ── Empty / No results ── */
 .cr-empty {
     text-align: center; padding: 3rem 1.5rem;
-    background: var(--surface-color, white); border-radius: 14px;
+    background: var(--surface-color); border-radius: 14px;
     box-shadow: 0 2px 12px rgba(var(--primary-rgb),.08);
 }
 .cr-empty-icon {
@@ -308,9 +308,9 @@ $totalDepts = count($deptSet);
 }
 .cr-sb-card .cr-sb-head {
     padding: 1.2rem 1.4rem 1rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--text-on-primary, white) 20%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--text-on-primary) 20%, transparent);
 }
-.cr-sb-card .cr-sb-body { padding: 1.2rem 1.4rem; background: var(--surface-color, white); }
+.cr-sb-card .cr-sb-body { padding: 1.2rem 1.4rem; background: var(--surface-color); }
 
 /* ── Dept filter chips (below existing chips) ── */
 .cr-dept-chips {
@@ -324,12 +324,12 @@ $totalDepts = count($deptSet);
     transition: all .18s; display: inline-flex; align-items: center; gap: .3rem;
 }
 .cr-dept-chip:hover   { border-color: var(--accent-dark); color: var(--accent-dark); background: color-mix(in srgb, var(--accent-color) 16%, white); }
-.cr-dept-chip.active  { background: var(--accent-dark); color: var(--text-on-accent, white); border-color: var(--accent-dark); }
+.cr-dept-chip.active  { background: var(--accent-dark); color: var(--text-on-accent); border-color: var(--accent-dark); }
 .cr-dept-label{font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;gap:.3rem;margin-right:.3rem;}
 
 /* ── Sidebar on mobile: collapsible ── */
 .cr-sidebar-toggle {
-    display: none; width: 100%; background: var(--surface-color, white);
+    display: none; width: 100%; background: var(--surface-color);
     border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white); border-radius: 12px;
     padding: .75rem 1.1rem; font-size: .88rem; font-weight: 700;
     color: var(--primary-dark); cursor: pointer; margin-bottom: .75rem;
@@ -347,9 +347,9 @@ $totalDepts = count($deptSet);
 
 /* Track card */
 .cr-track-card { background: linear-gradient(135deg, var(--primary-dark), var(--primary-color)); }
-.cr-track-card .cr-sb-head h4 { color: var(--text-on-primary, white); margin: 0 0 .3rem; font-size: 1rem; font-weight: 700; }
-.cr-track-card .cr-sb-head p  { color: color-mix(in srgb, var(--text-on-primary, white) 68%, transparent); font-size: .84rem; margin: 0; }
-.cr-track-card .cr-sb-body { background: var(--primary-color); border-top: 1px solid color-mix(in srgb, var(--text-on-primary, white) 14%, transparent); }
+.cr-track-card .cr-sb-head h4 { color: var(--text-on-primary); margin: 0 0 .3rem; font-size: 1rem; font-weight: 700; }
+.cr-track-card .cr-sb-head p  { color: color-mix(in srgb, var(--text-on-primary) 68%, transparent); font-size: .84rem; margin: 0; }
+.cr-track-card .cr-sb-body { background: var(--primary-color); border-top: 1px solid color-mix(in srgb, var(--text-on-primary) 14%, transparent); }
 .cr-btn-track {
     display: flex; align-items: center; gap: .5rem;
     background: white; color: var(--primary-color);
@@ -360,7 +360,7 @@ $totalDepts = count($deptSet);
 .cr-btn-track:hover { background: color-mix(in srgb, var(--primary-color) 12%, white); color: var(--primary-color); }
 
 /* CV card */
-.cr-cv-card { background: var(--surface-color, white); border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white); }
+.cr-cv-card { background: var(--surface-color); border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white); }
 .cr-cv-card .cr-sb-body { padding: 1.4rem; }
 .cr-cv-icon {
     width: 48px; height: 48px; border-radius: 12px;
@@ -373,14 +373,18 @@ $totalDepts = count($deptSet);
 .cr-btn-cv {
     display: flex; align-items: center; gap: .5rem;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    color: var(--text-on-primary, white); padding: .65rem 1.2rem; border-radius: 10px;
+    color: var(--text-on-primary); padding: .65rem 1.2rem; border-radius: 10px;
     font-weight: 700; font-size: .88rem; text-decoration: none;
     transition: all .2s; width: 100%; justify-content: center;
 }
-.cr-btn-cv:hover { opacity: .9; color: var(--text-on-primary, white); }
+.cr-btn-cv:hover { opacity: .9; color: var(--text-on-primary); }
+.cr-muted{color:var(--text-muted)!important;}
+.cr-btn-primary{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.cr-btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.cr-ico-accent{color:var(--accent-color)!important;}
 
 /* Why join */
-.cr-why-card { background: var(--surface-color, white); border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white); }
+.cr-why-card { background: var(--surface-color); border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white); }
 .cr-why-card .cr-sb-body { padding: 1.4rem; }
 .cr-why-card h4 { font-size: 1rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 1rem; }
 .cr-benefits {
@@ -399,7 +403,7 @@ $totalDepts = count($deptSet);
 
 /* No vacancy state */
 .cr-novacancy {
-    background: var(--surface-color, white); border-radius: 14px;
+    background: var(--surface-color); border-radius: 14px;
     padding: 3rem 2rem; text-align: center;
     box-shadow: 0 2px 14px rgba(var(--primary-rgb),.09);
     border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white);
@@ -658,7 +662,7 @@ $totalDepts = count($deptSet);
         <div class="cr-empty">
             <div class="cr-empty-icon"><i class="fas fa-search"></i></div>
             <h5><?php echo isEnglish() ? 'No Matching Positions Found' : 'कुनै पद फेला परेन'; ?></h5>
-            <p class="text-muted small"><?php echo isEnglish() ? 'Try different keywords.' : 'अर्को शब्दले खोज्नुहोस्।'; ?></p>
+            <p class="cr-muted small"><?php echo isEnglish() ? 'Try different keywords.' : 'अर्को शब्दले खोज्नुहोस्।'; ?></p>
             <button class="btn btn-outline-secondary btn-sm mt-2" onclick="crReset()">
                 <i class="fas fa-redo me-1"></i><?php echo isEnglish() ? 'Reset' : 'रिसेट'; ?>
             </button>
@@ -670,13 +674,13 @@ $totalDepts = count($deptSet);
     <div class="cr-novacancy" data-aos="fade-up">
         <div class="cr-novacancy-icon"><i class="fas fa-briefcase"></i></div>
         <h4 class="mb-2"><?php echo isEnglish() ? 'No Current Openings' : 'हाल कुनै रिक्त पद छैन'; ?></h4>
-        <p class="text-muted mb-3">
+        <p class="cr-muted mb-3">
             <?php echo isEnglish()
                 ? 'No job openings at the moment. Please check back later or send your CV to our email.'
                 : 'हाल कुनै पद रिक्त छैन। कृपया पछि फेरि जाँच गर्नुहोस् वा हाम्रो इमेलमा CV पठाउनुहोस्।'; ?>
         </p>
         <a href="mailto:<?php echo getSetting('email','info@sahakari.org.np'); ?>?subject=CV Submission"
-           class="btn btn-primary">
+           class="btn cr-btn-primary">
             <i class="fas fa-envelope me-2"></i><?php echo isEnglish() ? 'Send Your CV' : 'CV इमेल गर्नुहोस्'; ?>
         </a>
     </div>
@@ -731,7 +735,7 @@ $totalDepts = count($deptSet);
     <!-- Why Join Us -->
     <div class="cr-sb-card cr-why-card" data-aos="fade-up" data-aos-delay="140">
         <div class="cr-sb-body">
-            <h4><i class="fas fa-star me-2 text-warning"></i><?php echo isEnglish() ? 'Why Join Us?' : 'हामीलाई किन रोज्ने?'; ?></h4>
+            <h4><i class="fas fa-star me-2 cr-ico-accent"></i><?php echo isEnglish() ? 'Why Join Us?' : 'हामीलाई किन रोज्ने?'; ?></h4>
             <div class="cr-benefits">
                 <?php
                 $benefits = [

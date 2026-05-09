@@ -417,12 +417,12 @@ if (!empty($verificationOk) && !empty($needsVerify) && in_array(($_POST['search_
 }
 
 function getStatusBadgeClass($status) {
-    if ($status === 'pending') return 'bg-warning text-dark';
-    if (in_array($status, ['shortlisted', 'in_progress', 'reviewed', 'under_review', 'processing'], true)) return 'bg-info text-white';
-    if (in_array($status, ['interviewed', 'confirmed'], true)) return 'bg-secondary text-white';
-    if (in_array($status, ['selected', 'approved', 'accepted', 'resolved', 'completed', 'disbursed', 'paid'], true)) return 'bg-success text-white';
-    if (in_array($status, ['rejected', 'closed', 'cancelled'], true)) return 'bg-danger text-white';
-    return 'bg-secondary text-white';
+    if ($status === 'pending') return 'tracker-status tracker-status-pending';
+    if (in_array($status, ['shortlisted', 'in_progress', 'reviewed', 'under_review', 'processing'], true)) return 'tracker-status tracker-status-info';
+    if (in_array($status, ['interviewed', 'confirmed'], true)) return 'tracker-status tracker-status-muted';
+    if (in_array($status, ['selected', 'approved', 'accepted', 'resolved', 'completed', 'disbursed', 'paid'], true)) return 'tracker-status tracker-status-success';
+    if (in_array($status, ['rejected', 'closed', 'cancelled'], true)) return 'tracker-status tracker-status-danger';
+    return 'tracker-status tracker-status-muted';
 }
 
 function getStatusText($status, $type = 'job') {
@@ -623,7 +623,7 @@ function getAppTypeLabel($type) {
                                     </select>
                                     <!-- Phone/Email चुनेपछि यहाँ tip देखाउने -->
                                     <small id="searchTypeTip" class="text-muted d-none">
-                                        <i class="fas fa-info-circle me-1 text-info"></i>
+                                        <i class="fas fa-info-circle me-1 tracker-ico-info"></i>
                                         <span id="tipPhone" class="d-none"><?php echo isEnglish() ? 'Enter your phone number &amp; email below — they will be used for search &amp; verification.' : 'तल फोन र इमेल राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
                                         <span id="tipEmail" class="d-none"><?php echo isEnglish() ? 'Enter your email &amp; phone below — they will be used for search &amp; verification.' : 'तल इमेल र फोन राख्नुहोस् — खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।'; ?></span>
                                     </small>
@@ -644,10 +644,10 @@ function getAppTypeLabel($type) {
                                      Phone / Email बाट खोज्दा मात्र देखिन्छ (JS ले control गर्छ)
                                      Code format: phone last 4 + email first 3 -->
                                 <div id="verifySection" class="col-12 d-none">
-                                    <div class="card bg-light border-warning">
+                                    <div class="card tracker-verify-card">
                                         <div class="card-body py-3">
-                                            <h6 class="mb-1 text-warning-emphasis" id="verifySectionTitle">
-                                                <i class="fas fa-shield-alt me-2 text-warning"></i>
+                                            <h6 class="mb-1 tracker-title-warn" id="verifySectionTitle">
+                                                <i class="fas fa-shield-alt me-2 tracker-ico-warn"></i>
                                                 <?php echo isEnglish() ? 'Search & Identity Verification' : 'खोज र पहिचान प्रमाणीकरण'; ?>
                                             </h6>
                                             <p class="text-muted small mb-3" id="verifySectionDesc">
@@ -673,7 +673,7 @@ function getAppTypeLabel($type) {
                                                            value="<?php echo htmlspecialchars($_POST['sec_email'] ?? ''); ?>">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label small"><i class="fas fa-key me-1 text-warning"></i>
+                                                    <label class="form-label small"><i class="fas fa-key me-1 tracker-ico-warn"></i>
                                                         <?php echo isEnglish() ? 'Security Code' : 'सुरक्षा कोड'; ?>
                                                     </label>
                                                     <input type="password" name="security_code" id="securityCode" class="form-control"
@@ -682,7 +682,7 @@ function getAppTypeLabel($type) {
                                                 </div>
                                             </div>
                                             <div class="small rounded-2 p-2 tracker-verify-rule">
-                                                <i class="fas fa-info-circle text-warning me-1"></i>
+                                                <i class="fas fa-info-circle tracker-ico-warn me-1"></i>
                                                 <?php echo isEnglish()
                                                     ? 'Code rule: last 4 digits of phone + first 3 letters of email before @ (example: 9827157000 + ram@gmail.com => 7000ram).'
                                                     : 'कोड बनाउने नियम: फोनको अन्तिम ४ अंक + इमेलको @ अघिका पहिला ३ अक्षर (उदाहरण: 9827157000 + ram@gmail.com => 7000ram)।'; ?>
@@ -697,7 +697,7 @@ function getAppTypeLabel($type) {
                                         <i class="fas fa-search me-2"></i><?php echo isEnglish() ? 'Search Application' : 'आवेदन खोज्नुहोस्'; ?>
                                     </button>
                                     <small class="text-muted" id="verifyNote">
-                                        <i class="fas fa-lock text-success me-1"></i>
+                                        <i class="fas fa-lock tracker-ico-ok me-1"></i>
                                         <?php echo isEnglish()
                                             ? 'Tracking ID search — no extra verification needed.'
                                             : 'Tracking ID बाट खोज्दा थप प्रमाणीकरण आवश्यक छैन।'; ?>
@@ -942,7 +942,7 @@ function getAppTypeLabel($type) {
 
                                         <?php if ($app['app_type'] === 'loan'): ?>
                                         <?php if (!empty($app['loan_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-tag"></i> <?php echo isEnglish() ? 'Loan Type' : 'ऋण प्रकार'; ?></span><span class="di-value"><?php echo e($app['loan_type']); ?></span></div><?php endif; ?>
-                                        <?php if (!empty($app['loan_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Requested Amount' : 'अनुरोधित रकम'; ?></span><span class="di-value fw-bold text-success">रु. <?php echo number_format((float)$app['loan_amount']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['loan_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Requested Amount' : 'अनुरोधित रकम'; ?></span><span class="di-value fw-bold tracker-amt-ok">रु. <?php echo number_format((float)$app['loan_amount']); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['loan_purpose'])): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-info-circle"></i> <?php echo isEnglish() ? 'Purpose' : 'उद्देश्य'; ?></span><span class="di-value"><?php echo e(mb_substr($app['loan_purpose'],0,80)); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['occupation'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Occupation' : 'पेशा'; ?></span><span class="di-value"><?php echo e($app['occupation']); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['monthly_income'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-wallet"></i> <?php echo isEnglish() ? 'Monthly Income' : 'मासिक आय'; ?></span><span class="di-value">रु. <?php echo number_format((float)$app['monthly_income']); ?></span></div><?php endif; ?>
@@ -954,7 +954,7 @@ function getAppTypeLabel($type) {
                                         <?php if (!empty($app['gender'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-venus-mars"></i> <?php echo isEnglish() ? 'Gender' : 'लिङ्ग'; ?></span><span class="di-value"><?php echo e($app['gender']); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['dob_bs'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-birthday-cake"></i> <?php echo isEnglish() ? 'DOB (BS)' : 'जन्म मिति (बि.स.)'; ?></span><span class="di-value"><?php echo e($app['dob_bs']); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['citizenship_no'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-id-card"></i> <?php echo isEnglish() ? 'Citizenship No.' : 'नागरिकता नं.'; ?></span><span class="di-value"><?php echo e($app['citizenship_no']); ?></span></div><?php endif; ?>
-                                        <?php if (!empty($app['initial_deposit'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Initial Deposit' : 'प्रारम्भिक जम्मा'; ?></span><span class="di-value fw-bold text-success">रु. <?php echo number_format((float)$app['initial_deposit']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['initial_deposit'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Initial Deposit' : 'प्रारम्भिक जम्मा'; ?></span><span class="di-value fw-bold tracker-amt-ok">रु. <?php echo number_format((float)$app['initial_deposit']); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['occupation'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-briefcase"></i> <?php echo isEnglish() ? 'Occupation' : 'पेशा'; ?></span><span class="di-value"><?php echo e($app['occupation']); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['nominee_name'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-user-friends"></i> <?php echo isEnglish() ? 'Nominee' : 'हकदार'; ?></span><span class="di-value"><?php echo e($app['nominee_name']); ?></span></div><?php endif; ?>
                                         <?php if ($diAddr): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Address' : 'ठेगाना'; ?></span><span class="di-value"><?php echo e(mb_substr($diAddr,0,80)); ?></span></div><?php endif; ?>
@@ -985,7 +985,7 @@ function getAppTypeLabel($type) {
                                         <?php elseif ($app['app_type'] === 'welfare_claim'): ?>
                                         <?php $wlfTypeLabels=['maternity'=>'सुत्केरी सुविधा','death'=>'मृत्यु सुविधा','insurance'=>'बीमा दाबी','medical'=>'उपचार खर्च','other'=>'अन्य सुविधा']; ?>
                                         <?php if (!empty($app['claim_type'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-hand-holding-heart"></i> <?php echo isEnglish() ? 'Claim Type' : 'दाबीको प्रकार'; ?></span><span class="di-value"><?php echo e($wlfTypeLabels[$app['claim_type']] ?? $app['claim_type']); ?></span></div><?php endif; ?>
-                                        <?php if (!empty($app['claim_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Claimed Amount' : 'दाबी रकम'; ?></span><span class="di-value fw-bold text-info">रु. <?php echo number_format((float)$app['claim_amount']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['claim_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Claimed Amount' : 'दाबी रकम'; ?></span><span class="di-value fw-bold tracker-amt-info">रु. <?php echo number_format((float)$app['claim_amount']); ?></span></div><?php endif; ?>
                                         <?php if ($diAddr): ?><div class="di-item"><span class="di-label"><i class="fas fa-map-marker-alt"></i> <?php echo isEnglish() ? 'Address' : 'ठेगाना'; ?></span><span class="di-value"><?php echo e(mb_substr($diAddr,0,60)); ?></span></div><?php endif; ?>
                                         <?php if (!empty($app['description'])): ?><div class="di-item di-item-full"><span class="di-label"><i class="fas fa-align-left"></i> <?php echo isEnglish() ? 'Description' : 'विवरण'; ?></span><span class="di-value"><?php echo nl2br(e(mb_substr($app['description'],0,200))); ?></span></div><?php endif; ?>
 
@@ -996,7 +996,7 @@ function getAppTypeLabel($type) {
 
                                         <?php elseif ($app['app_type'] === 'auction_bid'): ?>
                                         <?php if (!empty($app['auction_title'])): ?><div class="di-item di-item-wide"><span class="di-label"><i class="fas fa-gavel"></i> <?php echo isEnglish() ? 'Auction' : 'लिलामी'; ?></span><span class="di-value"><?php echo e($app['auction_title']); ?></span></div><?php endif; ?>
-                                        <?php if (!empty($app['bid_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Bid Amount' : 'बोलपत्र रकम'; ?></span><span class="di-value fw-bold text-danger">रु. <?php echo number_format((float)$app['bid_amount']); ?></span></div><?php endif; ?>
+                                        <?php if (!empty($app['bid_amount'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-rupee-sign"></i> <?php echo isEnglish() ? 'Bid Amount' : 'बोलपत्र रकम'; ?></span><span class="di-value fw-bold tracker-amt-danger">रु. <?php echo number_format((float)$app['bid_amount']); ?></span></div><?php endif; ?>
 
                                         <?php elseif ($app['app_type'] === 'vendor'): ?>
                                         <?php if (!empty($app['company_name'])): ?><div class="di-item"><span class="di-label"><i class="fas fa-building"></i> <?php echo isEnglish() ? 'Company' : 'कम्पनी'; ?></span><span class="di-value"><?php echo e($app['company_name']); ?></span></div><?php endif; ?>
@@ -1062,13 +1062,13 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['admin_response'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Response:' : 'प्रतिक्रिया:'; ?></strong>
+                                        <strong><i class="fas fa-reply tracker-ico-primary"></i> <?php echo isEnglish() ? 'Response:' : 'प्रतिक्रिया:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_response'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_attachment'])): ?>
                                     <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
-                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <i class="fas fa-paperclip tracker-ico-primary"></i>
                                         <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
                                         <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
                                            target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
@@ -1103,19 +1103,19 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['preferred_date'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-clock text-primary"></i> <?php echo isEnglish() ? 'Scheduled:' : 'तालिका:'; ?></strong>
+                                        <strong><i class="fas fa-clock tracker-ico-primary"></i> <?php echo isEnglish() ? 'Scheduled:' : 'तालिका:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo htmlspecialchars($app['preferred_date'] . ' ' . ($app['preferred_time'] ?? '')); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['remarks'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <strong><i class="fas fa-reply tracker-ico-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_attachment'])): ?>
                                     <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
-                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <i class="fas fa-paperclip tracker-ico-primary"></i>
                                         <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
                                         <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
                                            target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
@@ -1144,7 +1144,7 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['message'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-comment text-primary"></i> <?php echo isEnglish() ? 'Message:' : 'सन्देश:'; ?></strong>
+                                        <strong><i class="fas fa-comment tracker-ico-primary"></i> <?php echo isEnglish() ? 'Message:' : 'सन्देश:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['message'])); ?></p>
                                     </div>
                                     <?php endif; ?>
@@ -1174,13 +1174,13 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['admin_remarks'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Response:' : 'प्रतिक्रिया:'; ?></strong>
+                                        <strong><i class="fas fa-reply tracker-ico-primary"></i> <?php echo isEnglish() ? 'Response:' : 'प्रतिक्रिया:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_remarks'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_attachment'])): ?>
                                     <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
-                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <i class="fas fa-paperclip tracker-ico-primary"></i>
                                         <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
                                         <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
                                            target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
@@ -1219,19 +1219,19 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['approved_amount'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-money-bill text-success"></i> <?php echo isEnglish() ? 'Approved Amount:' : 'स्वीकृत रकम:'; ?></strong>
-                                        <span class="text-success fw-bold">रु. <?php echo number_format($app['approved_amount']); ?></span>
+                                        <strong><i class="fas fa-money-bill tracker-ico-ok"></i> <?php echo isEnglish() ? 'Approved Amount:' : 'स्वीकृत रकम:'; ?></strong>
+                                        <span class="tracker-amt-ok fw-bold">रु. <?php echo number_format($app['approved_amount']); ?></span>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_remarks'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-comment text-primary"></i> <?php echo isEnglish() ? 'Remarks:' : 'टिप्पणी:'; ?></strong>
+                                        <strong><i class="fas fa-comment tracker-ico-primary"></i> <?php echo isEnglish() ? 'Remarks:' : 'टिप्पणी:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_remarks'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_attachment'])): ?>
                                     <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
-                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <i class="fas fa-paperclip tracker-ico-primary"></i>
                                         <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
                                         <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
                                            target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
@@ -1270,19 +1270,19 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['approved_amount'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-money-bill text-success"></i> <?php echo isEnglish() ? 'Approved Amount:' : 'स्वीकृत रकम:'; ?></strong>
-                                        <span class="text-success fw-bold">रु. <?php echo number_format((float)($app['approved_amount'] ?? 0)); ?></span>
+                                        <strong><i class="fas fa-money-bill tracker-ico-ok"></i> <?php echo isEnglish() ? 'Approved Amount:' : 'स्वीकृत रकम:'; ?></strong>
+                                        <span class="tracker-amt-ok fw-bold">रु. <?php echo number_format((float)($app['approved_amount'] ?? 0)); ?></span>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['remarks'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <strong><i class="fas fa-reply tracker-ico-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_attachment'])): ?>
                                     <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
-                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <i class="fas fa-paperclip tracker-ico-primary"></i>
                                         <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
                                         <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
                                            target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
@@ -1317,13 +1317,13 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['remarks'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <strong><i class="fas fa-reply tracker-ico-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_attachment'])): ?>
                                     <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
-                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <i class="fas fa-paperclip tracker-ico-primary"></i>
                                         <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
                                         <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
                                            target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
@@ -1358,13 +1358,13 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['remarks'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-reply text-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
+                                        <strong><i class="fas fa-reply tracker-ico-primary"></i> <?php echo isEnglish() ? 'Admin Response:' : 'Admin जवाफ:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['remarks'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($app['admin_attachment'])): ?>
                                     <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center gap-2">
-                                        <i class="fas fa-paperclip text-primary"></i>
+                                        <i class="fas fa-paperclip tracker-ico-primary"></i>
                                         <span class="small text-muted"><?php echo isEnglish() ? 'Admin document:' : 'Admin संलग्न:'; ?></span>
                                         <a href="<?php echo SITE_URL . '/' . ltrim(htmlspecialchars($app['admin_attachment']), '/'); ?>"
                                            target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
@@ -1399,7 +1399,7 @@ function getAppTypeLabel($type) {
                                     </div>
                                     <?php if (!empty($app['bid_amount'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-tag text-primary"></i> <?php echo isEnglish() ? 'Bid Amount:' : 'बोलपत्र रकम:'; ?></strong>
+                                        <strong><i class="fas fa-tag tracker-ico-primary"></i> <?php echo isEnglish() ? 'Bid Amount:' : 'बोलपत्र रकम:'; ?></strong>
                                         <span class="fw-bold">रु. <?php echo number_format($app['bid_amount']); ?></span>
                                     </div>
                                     <?php endif; ?>
@@ -1432,7 +1432,7 @@ function getAppTypeLabel($type) {
 
                                     <?php if (!empty($app['admin_notes']) || !empty($app['remarks'])): ?>
                                     <div class="admin-response-block mt-2">
-                                        <strong><i class="fas fa-comment text-primary"></i> <?php echo isEnglish() ? 'Notes:' : 'टिप्पणी:'; ?></strong>
+                                        <strong><i class="fas fa-comment tracker-ico-primary"></i> <?php echo isEnglish() ? 'Notes:' : 'टिप्पणी:'; ?></strong>
                                         <p class="mb-0 mt-1"><?php echo nl2br(htmlspecialchars($app['admin_notes'] ?? $app['remarks'] ?? '')); ?></p>
                                     </div>
                                     <?php endif; ?>
@@ -1476,7 +1476,7 @@ function getAppTypeLabel($type) {
                                 </div>
                                 <div>
                                     <h6 class="mb-1"><?php echo isEnglish() ? 'Need Help?' : 'सहायता चाहिन्छ?'; ?></h6>
-                                    <p class="mb-0 text-muted small"><a href="<?php echo SITE_URL; ?>contact.php" class="text-warning-emphasis fw-semibold"><?php echo isEnglish() ? 'Contact us →' : 'हामीलाई सम्पर्क गर्नुहोस् →'; ?></a></p>
+                                    <p class="mb-0 tracker-text-muted small"><a href="<?php echo SITE_URL; ?>contact.php" class="tracker-link-warn fw-semibold"><?php echo isEnglish() ? 'Contact us →' : 'हामीलाई सम्पर्क गर्नुहोस् →'; ?></a></p>
                                 </div>
                             </div>
                         </div>
@@ -1569,6 +1569,23 @@ if (searchTypeEl) {
 .text-teal { color: var(--accent-color) !important; }
 .text-purple { color: var(--secondary-color) !important; }
 .text-pink { color: var(--primary-dark) !important; }
+.tracker-status{display:inline-flex;align-items:center;gap:.3rem;font-weight:700;}
+.tracker-status-pending{background:color-mix(in srgb,var(--secondary-color) 16%,white);color:var(--secondary-dark)!important;}
+.tracker-status-info{background:color-mix(in srgb,var(--accent-color) 16%,white);color:var(--accent-dark)!important;}
+.tracker-status-muted{background:color-mix(in srgb,var(--text-muted) 18%,white);color:var(--text-color)!important;}
+.tracker-status-success{background:color-mix(in srgb,var(--primary-color) 16%,white);color:var(--primary-dark)!important;}
+.tracker-status-danger{background:color-mix(in srgb,var(--secondary-color) 20%,white);color:var(--secondary-dark)!important;}
+.tracker-ico-info{color:var(--accent-color)!important;}
+.tracker-ico-warn{color:var(--secondary-color)!important;}
+.tracker-ico-ok{color:var(--primary-color)!important;}
+.tracker-ico-primary{color:var(--primary-color)!important;}
+.tracker-verify-card{background:color-mix(in srgb,var(--secondary-color) 10%,white);border:1px solid color-mix(in srgb,var(--secondary-color) 26%,white);}
+.tracker-title-warn{color:var(--secondary-dark);}
+.tracker-amt-ok{color:var(--primary-color)!important;}
+.tracker-amt-info{color:var(--accent-dark)!important;}
+.tracker-amt-danger{color:var(--secondary-dark)!important;}
+.tracker-text-muted{color:var(--text-muted)!important;}
+.tracker-link-warn{color:var(--secondary-dark)!important;}
 
 /* ── Detail Info Grid — applicant info in tracker detail panel ── */
 .di-grid {
@@ -1978,10 +1995,10 @@ if (searchTypeEl) {
     font-weight: 700;
     letter-spacing: 0.2px;
 }
-.rcp-status-glow.bg-success { box-shadow: 0 0 0 3px rgba(var(--primary-rgb,26,95,42),0.18); }
-.rcp-status-glow.bg-warning { box-shadow: 0 0 0 3px rgba(var(--secondary-rgb,192,57,43),0.2); }
-.rcp-status-glow.bg-danger  { box-shadow: 0 0 0 3px rgba(var(--secondary-rgb,192,57,43),0.18); }
-.rcp-status-glow.bg-info    { box-shadow: 0 0 0 3px rgba(var(--accent-rgb,23,162,184),0.18); }
+.rcp-status-glow.tracker-status-success { box-shadow: 0 0 0 3px rgba(var(--primary-rgb),0.18); }
+.rcp-status-glow.tracker-status-pending { box-shadow: 0 0 0 3px rgba(var(--secondary-rgb),0.2); }
+.rcp-status-glow.tracker-status-danger  { box-shadow: 0 0 0 3px rgba(var(--secondary-rgb),0.18); }
+.rcp-status-glow.tracker-status-info    { box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.18); }
 
 /* Meta chips row */
 .rcp-chips {
@@ -2280,10 +2297,10 @@ if (searchTypeEl) {
 
         if (verifyNote) {
             if (needsVerify) {
-                verifyNote.innerHTML = '<i class="fas fa-shield-alt text-warning me-1"></i>'
+                verifyNote.innerHTML = '<i class="fas fa-shield-alt tracker-ico-warn me-1"></i>'
                     + '<?php echo isEnglish() ? "Your phone/email below is used for both search &amp; identity verification." : "तलको फोन/इमेल नै खोज र प्रमाणीकरण दुवैमा प्रयोग हुन्छ।"; ?>';
             } else {
-                verifyNote.innerHTML = '<i class="fas fa-lock text-success me-1"></i>'
+                verifyNote.innerHTML = '<i class="fas fa-lock tracker-ico-ok me-1"></i>'
                     + '<?php echo isEnglish() ? "Tracking ID search — no extra verification needed." : "Tracking ID बाट खोज्दा थप प्रमाणीकरण आवश्यक छैन।"; ?>';
             }
         }

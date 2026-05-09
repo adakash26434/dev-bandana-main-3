@@ -1,6 +1,7 @@
 <?php
 $__t = static function (string $np, string $en): string {
-    return isEnglish() ? $en : $np;
+    $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+    return strtolower($lang) === 'en' ? $en : $np;
 };
 $pageTitle = $__t('प्रतिवेदन व्यवस्थापन', 'Reports Management');
 require_once 'includes/admin-header.php';

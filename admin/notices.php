@@ -5,7 +5,8 @@
  * सबै मिति नेपाली (बि.सं.) मात्र
  */
 $__t = static function (string $np, string $en): string {
-    return isEnglish() ? $en : $np;
+    $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+    return strtolower($lang) === 'en' ? $en : $np;
 };
 $pageTitle = $__t('सूचना व्यवस्थापन', 'Notices Management');
 require_once 'includes/admin-header.php';
@@ -99,19 +100,42 @@ $flash = getFlash();
 ?>
 
 <?php echo adminPageHeader($__t('सूचना व्यवस्थापन', 'Notices Management'), 'fa-bullhorn', $__t('संस्थाका सूचनाहरू — थप्नुहोस्, सम्पादन गर्नुहोस्।', 'Manage organization notices — add and edit.'),
-    '<span class="badge admin-stat-badge bg-success-subtle text-success border border-success border-opacity-25 me-2"><i class="fas fa-layer-group me-1"></i>' . $__t('जम्मा', 'Total') . ': ' . count($notices) . '</span>'
+    '<span class="badge admin-stat-badge ntc-stat-pill me-2"><i class="fas fa-layer-group me-1"></i>' . $__t('जम्मा', 'Total') . ': ' . count($notices) . '</span>'
 );
 ?>
 <?php echo adminHelpTip($__t('यो पृष्ठबाट संस्थाका सूचनाहरू थप्न, सम्पादन गर्न र हटाउन सकिन्छ।', 'Use this page to add, edit and remove notices.'), [$__t('नयाँ सूचना थप्न: माथिको "+" बटन थिच्नुहोस्।', 'To add a new notice: click "+" button above.'), $__t('सूचना publish/unpublish गर्न: Active/Inactive बटन थिच्नुहोस्।', 'To publish/unpublish: use Active/Inactive buttons.'), $__t('सूचना हटाउन: रातो Delete बटन थिच्नुहोस् (यो कार्य पूर्ववत हुन सक्दैन)।', 'To delete: click red Delete button (cannot be undone).')]); ?>
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
+<style>
+.ntc-stat-pill{background:color-mix(in srgb,var(--primary-color) 14%,white);color:var(--primary-dark);border:1px solid color-mix(in srgb,var(--primary-color) 24%,white);}
+.ntc-count-badge{background:var(--primary-color)!important;color:var(--text-on-primary)!important;}
+.ntc-file-icon,.ntc-date-icon,.ntc-title-label i,.ntc-content-label i,.ntc-date-label i,.ntc-attach-label i,.ntc-attach-link{color:var(--primary-color)!important;}
+.ntc-popup-badge{background:color-mix(in srgb,var(--accent-color) 16%,white);color:var(--accent-dark);}
+.ntc-status-on{background:color-mix(in srgb,var(--primary-color) 16%,white);color:var(--primary-dark);}
+.ntc-status-off{background:color-mix(in srgb,var(--secondary-color) 16%,white);color:var(--secondary-dark);}
+.ntc-btn-edit{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.ntc-btn-edit:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.ntc-btn-delete{background:var(--secondary-color);border-color:var(--secondary-color);color:var(--text-on-secondary);}
+.ntc-btn-delete:hover{background:var(--secondary-dark);border-color:var(--secondary-dark);color:var(--text-on-secondary);}
+.ntc-label{color:var(--primary-dark);}
+.ntc-required{color:var(--secondary-color);}
+.ntc-date-trigger{background:var(--primary-color);color:var(--text-on-primary);}
+.ntc-bell-icon{color:var(--secondary-color);}
+.ntc-submit{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.ntc-submit:hover,.ntc-submit:focus{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.ntc-soft-bg{background:color-mix(in srgb,var(--primary-color) 8%,white)!important;}
+.ntc-muted{color:var(--text-muted)!important;}
+.ntc-bulk-active{background:color-mix(in srgb,var(--primary-color) 14%,white);border-color:color-mix(in srgb,var(--primary-color) 24%,white);color:var(--primary-dark);}
+.ntc-bulk-inactive{background:color-mix(in srgb,var(--secondary-color) 14%,white);border-color:color-mix(in srgb,var(--secondary-color) 24%,white);color:var(--secondary-dark);}
+.ntc-no-badge{background:color-mix(in srgb,var(--text-muted) 12%,white);color:var(--text-light);}
+</style>
 
 <!-- Tab Navigation -->
 <ul class="nav nav-tabs admin-nav-tabs mb-0" id="noticeTabs">
     <li class="nav-item">
         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-list" id="tab-list-btn">
             <i class="fas fa-list me-2"></i><?php echo $__t('सूचना सूची', 'Notice List'); ?>
-            <span class="badge bg-success ms-1"><?php echo count($notices); ?></span>
+            <span class="badge ntc-count-badge ms-1"><?php echo count($notices); ?></span>
         </button>
     </li>
     <li class="nav-item">
@@ -131,11 +155,11 @@ $flash = getFlash();
                     <form method="POST">
                         <?php echo csrfField(); ?>
                         <input type="hidden" name="action" value="bulk_status">
-                        <div class="px-3 py-2 border-bottom bg-light d-flex gap-2 justify-content-end">
-                            <button type="submit" name="bulk" value="active" class="btn btn-sm btn-outline-success">
+                        <div class="px-3 py-2 border-bottom ntc-soft-bg d-flex gap-2 justify-content-end">
+                            <button type="submit" name="bulk" value="active" class="btn btn-sm ntc-bulk-active">
                                 <i class="fas fa-check-circle me-1"></i><?php echo $__t('Bulk सक्रिय', 'Bulk Active'); ?>
                             </button>
-                            <button type="submit" name="bulk" value="inactive" class="btn btn-sm btn-outline-secondary">
+                            <button type="submit" name="bulk" value="inactive" class="btn btn-sm ntc-bulk-inactive">
                                 <i class="fas fa-ban me-1"></i><?php echo $__t('Bulk निष्क्रिय', 'Bulk Inactive'); ?>
                             </button>
                         </div>
@@ -165,36 +189,36 @@ $flash = getFlash();
                             <?php foreach ($notices as $idx => $item): ?>
                             <tr>
                                 <td class="text-center"><input type="checkbox" class="nt-select" name="selected_ids[]" value="<?php echo (int)$item['id']; ?>"></td>
-                                <td class="ps-3 text-muted"><?php echo $idx + 1; ?></td>
+                                <td class="ps-3 ntc-muted"><?php echo $idx + 1; ?></td>
                                 <td>
                                     <div class="fw-semibold text-dark"><?php echo htmlspecialchars($item['title']); ?></div>
                                     <?php if ($item['attachment']): ?>
-                                        <small class="text-muted"><i class="fas fa-paperclip me-1 text-success"></i><?php echo $__t('फाइल संलग्न', 'File attached'); ?></small>
+                                        <small class="ntc-muted"><i class="fas fa-paperclip me-1 ntc-file-icon"></i><?php echo $__t('फाइल संलग्न', 'File attached'); ?></small>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <span class="text-secondary">
-                                        <i class="far fa-calendar-alt me-1 text-success"></i>
+                                        <i class="far fa-calendar-alt me-1 ntc-date-icon"></i>
                                         <?php echo htmlspecialchars($item['notice_date'] ?? '—'); ?>
                                     </span>
                                 </td>
                                 <td class="text-center">
                                     <?php if ($item['is_popup']): ?>
-                                        <span class="badge bg-info"><i class="fas fa-bell me-1"></i><?php echo $__t('पप-अप', 'Popup'); ?></span>
+                                        <span class="badge ntc-popup-badge"><i class="fas fa-bell me-1"></i><?php echo $__t('पप-अप', 'Popup'); ?></span>
                                     <?php else: ?>
-                                        <span class="badge bg-light text-muted"><?php echo $__t('होइन', 'No'); ?></span>
+                                        <span class="badge ntc-no-badge"><?php echo $__t('होइन', 'No'); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <?php if ($item['is_active']): ?>
-                                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i><?php echo $__t('सक्रिय', 'Active'); ?></span>
+                                        <span class="badge ntc-status-on"><i class="fas fa-check-circle me-1"></i><?php echo $__t('सक्रिय', 'Active'); ?></span>
                                     <?php else: ?>
-                                        <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i><?php echo $__t('निष्क्रिय', 'Inactive'); ?></span>
+                                        <span class="badge ntc-status-off"><i class="fas fa-times-circle me-1"></i><?php echo $__t('निष्क्रिय', 'Inactive'); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <button type="button"
-                                        class="btn btn-sm btn-primary me-1 btn-edit-notice"
+                                        class="btn btn-sm ntc-btn-edit me-1 btn-edit-notice"
                                         title="<?php echo $__t('सम्पादन', 'Edit'); ?>"
                                         data-id="<?php echo $item['id']; ?>"
                                         data-title="<?php echo htmlspecialchars($item['title'], ENT_QUOTES); ?>"
@@ -209,7 +233,7 @@ $flash = getFlash();
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo (int)$item['id']; ?>">
                                         <?php echo csrfField(); ?>
-                                        <button type="submit" class="btn btn-sm btn-danger" title="<?php echo $__t('मेटाउनुहोस्', 'Delete'); ?>">
+                                        <button type="submit" class="btn btn-sm ntc-btn-delete" title="<?php echo $__t('मेटाउनुहोस्', 'Delete'); ?>">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -231,7 +255,7 @@ $flash = getFlash();
                 <h5 class="mb-0 fw-bold" id="noticeFormTitle">
                     <i class="fas fa-plus-circle me-2"></i><?php echo $__t('नयाँ सूचना थप्नुहोस्', 'Add New Notice'); ?>
                 </h5>
-                <button type="button" class="btn btn-light btn-sm" id="btnCancelNotice">
+                <button type="button" class="btn btn-sm ntc-soft-bg" id="btnCancelNotice">
                     <i class="fas fa-arrow-left me-1"></i><?php echo $__t('सूचीमा फर्कनुहोस्', 'Back to List'); ?>
                 </button>
             </div>
@@ -244,13 +268,13 @@ $flash = getFlash();
                     <div class="row g-3">
                         <div class="col-md-8">
                             <div class="mb-3">
-                                <label class="form-label fw-semibold text-success">
-                                    <i class="fas fa-heading me-1"></i><?php echo $__t('शीर्षक', 'Title'); ?> <span class="text-danger">*</span>
+                                <label class="form-label fw-semibold ntc-label ntc-title-label">
+                                    <i class="fas fa-heading me-1"></i><?php echo $__t('शीर्षक', 'Title'); ?> <span class="ntc-required">*</span>
                                 </label>
                                 <input type="text" name="title" id="ntf_title" class="form-control admin-fancy-input" required placeholder="<?php echo $__t('सूचनाको शीर्षक', 'Notice title'); ?>">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-semibold text-success">
+                                <label class="form-label fw-semibold ntc-label ntc-content-label">
                                     <i class="fas fa-align-left me-1"></i><?php echo $__t('विवरण', 'Description'); ?>
                                 </label>
                                 <textarea name="content" id="ntf_content" class="form-control admin-fancy-input" rows="6" placeholder="<?php echo $__t('सूचनाको विवरण...', 'Notice details...'); ?>"></textarea>
@@ -258,28 +282,28 @@ $flash = getFlash();
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label class="form-label fw-semibold text-success">
+                                <label class="form-label fw-semibold ntc-label ntc-date-label">
                                     <i class="fas fa-calendar-alt me-1"></i><?php echo $__t('मिति (बि.सं.)', 'Date (BS)'); ?>
                                 </label>
                                 <div class="input-group">
                                     <input type="text" name="notice_date" id="ntf_date"
                                            class="form-control admin-fancy-input nepali-datepicker"
                                            placeholder="YYYY-MM-DD" autocomplete="off">
-                                    <span class="input-group-text bg-success text-white ndp-trigger ntf-cursor-pointer">
+                                    <span class="input-group-text ntc-date-trigger ndp-trigger ntf-cursor-pointer">
                                         <i class="fas fa-calendar-alt"></i>
                                     </span>
                                 </div>
-                                <small class="text-muted"><?php echo $__t('बि.सं. मिति (नेपाली क्यालेन्डर)', 'BS date (Nepali calendar)'); ?></small>
+                                <small class="ntc-muted"><?php echo $__t('बि.सं. मिति (नेपाली क्यालेन्डर)', 'BS date (Nepali calendar)'); ?></small>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-semibold text-success">
+                                <label class="form-label fw-semibold ntc-label ntc-attach-label">
                                     <i class="fas fa-paperclip me-1"></i><?php echo $__t('फाइल (वैकल्पिक)', 'File (optional)'); ?>
-                                    <small class="text-muted fw-normal" id="ntf_att_note"></small>
+                                    <small class="ntc-muted fw-normal" id="ntf_att_note"></small>
                                 </label>
                                 <input type="file" name="attachment" class="form-control admin-fancy-input" accept=".pdf,.jpg,.jpeg,.png">
                                 <div id="ntf_att_link" class="mt-1 d-none">
-                                    <small class="text-muted"><?php echo $__t('हालको फाइल', 'Current file'); ?>:
-                                        <a id="ntf_att_href" href="#" target="_blank" class="text-success fw-semibold">
+                                    <small class="ntc-muted"><?php echo $__t('हालको फाइल', 'Current file'); ?>:
+                                        <a id="ntf_att_href" href="#" target="_blank" class="fw-semibold ntc-attach-link">
                                             <i class="fas fa-external-link-alt me-1"></i><?php echo $__t('हेर्नुहोस्', 'View'); ?>
                                         </a>
                                     </small>
@@ -296,7 +320,7 @@ $flash = getFlash();
                                     <input class="form-check-input" type="checkbox" name="is_popup" id="ntf_popup">
                                 </div>
                                 <label class="form-label mb-0 fw-semibold d-flex align-items-center gap-1" for="ntf_popup">
-                                    <i class="fas fa-bell text-warning"></i>
+                                    <i class="fas fa-bell ntc-bell-icon"></i>
                                     <?php echo $__t('पप-अप देखाउनुहोस्', 'Show as popup'); ?>
                                 </label>
                             </div>
@@ -305,7 +329,7 @@ $flash = getFlash();
 
                     <hr class="my-4">
                     <div class="d-flex gap-3">
-                        <button type="submit" id="ntf_submit" class="btn btn-success px-5 fw-semibold">
+                        <button type="submit" id="ntf_submit" class="btn ntc-submit px-5 fw-semibold">
                             <i class="fas fa-plus-circle me-2"></i><?php echo $__t('थप्नुहोस्', 'Add'); ?>
                         </button>
                         <button type="button" id="ntf_cancel2" class="btn btn-outline-secondary px-4">

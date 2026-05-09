@@ -377,15 +377,17 @@ function adminPartitionRowsByIsActive(array $rows): array {
 }
 
 /** उप-ट्याब पिल्स — tab-content मा class "admin-table-subtab-content" थप्नुहोस् */
-function adminListSubtabPills(string $panePrefix, int $liveCount, int $archCount): string {
+function adminListSubtabPills(string $panePrefix, int $liveCount, int $archCount, ?string $liveLabel = null, ?string $archLabel = null): string {
     $p = htmlspecialchars($panePrefix, ENT_QUOTES, 'UTF-8');
+    $liveLbl = htmlspecialchars($liveLabel ?? 'सक्रिय', ENT_QUOTES, 'UTF-8');
+    $archLbl = htmlspecialchars($archLabel ?? 'अभिलेख', ENT_QUOTES, 'UTF-8');
     return '<ul class="nav nav-pills admin-inner-tabstrip flex-wrap gap-2 px-3 py-2 mx-3 mt-2 mb-2" role="tablist">'
         . '<li class="nav-item" role="presentation">'
         . '<button class="nav-link active py-2" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#' . $p . '-live" aria-controls="' . $p . '-live" aria-selected="true">'
-        . '<i class="fas fa-bolt me-1"></i>सक्रिय <span class="badge bg-success ms-1">' . (int) $liveCount . '</span></button></li>'
+        . '<i class="fas fa-bolt me-1"></i>' . $liveLbl . ' <span class="badge adm-subpill-count adm-subpill-count--live ms-1">' . (int) $liveCount . '</span></button></li>'
         . '<li class="nav-item" role="presentation">'
         . '<button class="nav-link py-2" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#' . $p . '-arch" aria-controls="' . $p . '-arch" aria-selected="false">'
-        . '<i class="fas fa-archive me-1"></i>अभिलेख <span class="badge bg-secondary ms-1">' . (int) $archCount . '</span></button></li>'
+        . '<i class="fas fa-archive me-1"></i>' . $archLbl . ' <span class="badge adm-subpill-count adm-subpill-count--arch ms-1">' . (int) $archCount . '</span></button></li>'
         . '</ul>';
 }
 
@@ -429,9 +431,9 @@ function adminListSubtabQueryLinks(
     $paneAttr = ' data-subtab-pane="' . htmlspecialchars($panePrefix, ENT_QUOTES, 'UTF-8') . '"';
     return '<ul class="nav nav-pills admin-inner-tabstrip flex-wrap gap-2 px-3 py-2 mx-3 mt-2 mb-2" role="tablist"' . $paneAttr . '>'
         . '<li class="nav-item" role="presentation"><a class="nav-link py-2' . $liveActive . '" href="' . htmlspecialchars($mk('live'), ENT_QUOTES, 'UTF-8') . '">'
-        . '<i class="fas fa-bolt me-1"></i>सक्रिय <span class="badge bg-success ms-1">' . (int) $liveCount . '</span></a></li>'
+        . '<i class="fas fa-bolt me-1"></i>सक्रिय <span class="badge adm-subpill-count adm-subpill-count--live ms-1">' . (int) $liveCount . '</span></a></li>'
         . '<li class="nav-item" role="presentation"><a class="nav-link py-2' . $archActive . '" href="' . htmlspecialchars($mk('arch'), ENT_QUOTES, 'UTF-8') . '">'
-        . '<i class="fas fa-archive me-1"></i>अभिलेख <span class="badge bg-secondary ms-1">' . (int) $archCount . '</span></a></li>'
+        . '<i class="fas fa-archive me-1"></i>अभिलेख <span class="badge adm-subpill-count adm-subpill-count--arch ms-1">' . (int) $archCount . '</span></a></li>'
         . '</ul>';
 }
 

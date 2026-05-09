@@ -128,7 +128,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     position: relative;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(var(--primary-rgb,26,95,42), 0.15);
+    box-shadow: 0 20px 60px rgba(var(--primary-rgb), 0.15);
 }
 .about-image-box-side {
     min-height: 100%;
@@ -145,8 +145,8 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     border-radius: 999px;
     font-size: 0.72rem;
     font-weight: 700;
-    color: var(--text-on-primary, white);
-    background: color-mix(in srgb, var(--primary-dark,var(--primary-color)) 90%, transparent);
+    color: var(--text-on-primary);
+    background: color-mix(in srgb, var(--primary-dark) 90%, transparent);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
@@ -166,11 +166,11 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     bottom: 20px;
     right: 20px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: var(--text-on-primary, white);
+    color: var(--text-on-primary);
     padding: 15px 25px;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(var(--primary-rgb,26,95,42), 0.3);
+    box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.3);
 }
 
 .about-year-badge .year {
@@ -190,7 +190,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     align-items: center;
     gap: 8px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: #fff;
+    color: var(--text-on-primary);
     padding: 8px 20px;
     border-radius: 25px;
     font-size: 0.9rem;
@@ -215,7 +215,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 }
 
 .intro-text {
-    color: #444;
+    color: var(--text-color);
     line-height: 1.9;
     font-size: 1.05rem;
 }
@@ -223,6 +223,10 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 .intro-text p {
     margin-bottom: 15px;
 }
+.history-empty-photo{ text-align:center; color:var(--text-muted); padding:20px; }
+.history-empty-photo-icon{ opacity:.4; }
+.history-empty-photo-note{ opacity:.5; font-size:.8rem; }
+.history-photo-cover{width:100%;height:350px;object-fit:cover;border-radius:12px;}
 
 /* मुख्य विषयवस्तु: universal.css → .coop-prose */
 
@@ -254,8 +258,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
                 <div class="history-image-box">
                     <img src="<?php echo SITE_URL . $historyPhoto; ?>"
                          alt="<?php echo isEnglish() ? 'Our History' : 'हाम्रो इतिहास'; ?>"
-                         class="img-fluid rounded shadow"
-                         style="width:100%;height:350px;object-fit:cover;border-radius:12px;">
+                         class="img-fluid rounded shadow history-photo-cover">
                     <!-- Established year badge -->
                     <div class="history-year-badge">
                         <?php echo getSetting('established_year', '२०७५'); ?>
@@ -278,9 +281,9 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
                     <div class="history-icon-center">
                         <!-- Admin ले about-settings.php बाट photo upload गर्न सक्छ -->
                         <div class="history-icon-ring"></div>
-                        <div style="text-align:center;color:var(--text-muted,#ccc);padding:20px;">
-                            <i class="fas fa-camera fa-2x mb-2 d-block" style="opacity:0.4;"></i>
-                            <small style="opacity:0.5;font-size:0.8rem;"><?php echo isEnglish() ? 'Photo not available - please upload a photo.' : 'फोटो उपलब्ध छैन — कृपया फोटो थप्नुहोस्'; ?></small>
+                        <div class="history-empty-photo">
+                            <i class="fas fa-camera fa-2x mb-2 d-block history-empty-photo-icon"></i>
+                            <small class="history-empty-photo-note"><?php echo isEnglish() ? 'Photo not available - please upload a photo.' : 'फोटो उपलब्ध छैन — कृपया फोटो थप्नुहोस्'; ?></small>
                         </div>
                     </div>
                 </div>
@@ -382,7 +385,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     right: -20%;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(var(--primary-rgb,26,95,42), 0.08), transparent 70%);
+    background: radial-gradient(circle, rgba(var(--primary-rgb), 0.08), transparent 70%);
     border-radius: 50%;
 }
 
@@ -390,7 +393,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     position: relative;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 25px 80px rgba(var(--primary-rgb,26,95,42), 0.2);
+    box-shadow: 0 25px 80px rgba(var(--primary-rgb), 0.2);
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     min-height: 350px;
 }
@@ -416,7 +419,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 .history-icon-float {
     width: 78px;
     height: 78px;
-    background: rgba(255,255,255,0.15);
+    background: color-mix(in srgb, var(--text-on-primary) 15%, transparent);
     backdrop-filter: blur(10px);
     border-radius: 50%;
     display: flex;
@@ -432,7 +435,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 
 .history-icon-float i {
     font-size: 32px;
-    color: var(--text-on-primary, white);
+    color: var(--text-on-primary);
 }
 
 /* Icon-only history box: फोटो बिना आइकन मात्र देखाउँछ */
@@ -455,10 +458,10 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 
 .history-icon-center i {
     font-size: 48px;
-    color: rgba(255, 255, 255, 0.9);
+    color: color-mix(in srgb, var(--text-on-primary) 90%, transparent);
     position: relative;
     z-index: 2;
-    filter: drop-shadow(0 4px 20px rgba(255,255,255,0.3));
+    filter: drop-shadow(0 4px 20px color-mix(in srgb, var(--text-on-primary) 30%, transparent));
 }
 
 .history-icon-ring {
@@ -466,7 +469,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.25);
+    border: 3px solid color-mix(in srgb, var(--text-on-primary) 25%, transparent);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -489,10 +492,10 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-on-secondary, var(--text-on-primary, white));
+    color: var(--text-on-secondary);
     font-size: 16px;
     z-index: 2;
-    box-shadow: 0 6px 20px rgba(var(--secondary-rgb,192,57,43), 0.35);
+    box-shadow: 0 6px 20px rgba(var(--secondary-rgb), 0.35);
 }
 
 .history-year-badge {
@@ -514,7 +517,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     align-items: center;
     gap: 8px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: var(--text-on-primary, white);
+    color: var(--text-on-primary);
     padding: 8px 20px;
     border-radius: 25px;
     font-size: 0.9rem;
@@ -538,7 +541,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 }
 
 .history-text {
-    color: var(--text-light,#555);
+    color: var(--text-light);
     line-height: 1.9;
     font-size: 1.05rem;
 }
@@ -556,14 +559,14 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     padding: 40px 35px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 15px 60px rgba(var(--primary-rgb,26,95,42),0.12);
+    box-shadow: 0 15px 60px rgba(var(--primary-rgb),0.12);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
 }
 
 .vision-card-v2:hover {
     transform: translateY(-10px);
-    box-shadow: 0 30px 80px rgba(var(--primary-rgb,26,95,42), 0.18);
+    box-shadow: 0 30px 80px rgba(var(--primary-rgb), 0.18);
 }
 
 .vision-card-v2::before {
@@ -577,7 +580,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 }
 
 .vision-card-v2.mission::before {
-    background: linear-gradient(90deg, var(--secondary-color), var(--secondary-dark,var(--secondary-color)));
+    background: linear-gradient(90deg, var(--secondary-color), var(--secondary-dark));
 }
 
 .vision-card-glow {
@@ -586,12 +589,12 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     right: -100px;
     width: 250px;
     height: 250px;
-    background: radial-gradient(circle, rgba(var(--primary-rgb,26,95,42), 0.10), transparent 70%);
+    background: radial-gradient(circle, rgba(var(--primary-rgb), 0.10), transparent 70%);
     border-radius: 50%;
 }
 
 .vision-card-v2.mission .vision-card-glow {
-    background: radial-gradient(circle, rgba(var(--secondary-rgb,192,57,43), 0.12), transparent 70%);
+    background: radial-gradient(circle, rgba(var(--secondary-rgb), 0.12), transparent 70%);
 }
 
 .vision-icon-v2 {
@@ -603,19 +606,19 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     align-items: center;
     justify-content: center;
     margin-bottom: 25px;
-    box-shadow: 0 15px 40px rgba(var(--primary-rgb,26,95,42), 0.25);
+    box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.25);
     position: relative;
     z-index: 1;
 }
 
 .vision-card-v2.mission .vision-icon-v2 {
-    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark,var(--secondary-color)));
-    box-shadow: 0 15px 40px rgba(var(--secondary-rgb,192,57,43), 0.3);
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+    box-shadow: 0 15px 40px rgba(var(--secondary-rgb), 0.3);
 }
 
 .vision-icon-v2 i {
     font-size: 32px;
-    color: var(--text-on-primary, white);
+    color: var(--text-on-primary);
 }
 
 .vision-card-content {
@@ -635,7 +638,7 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 }
 
 .vision-card-content p {
-    color: var(--text-light,#666);
+    color: var(--text-light);
     line-height: 1.8;
     font-size: 1rem;
     margin: 0;
@@ -655,12 +658,12 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
     left: -30px;
     width: 100px;
     height: 100px;
-    border: 3px solid rgba(var(--primary-rgb,26,95,42), 0.14);
+    border: 3px solid rgba(var(--primary-rgb), 0.14);
     border-radius: 50%;
 }
 
 .vision-card-v2.mission .vision-card-decoration {
-    border-color: rgba(var(--secondary-rgb,192,57,43), 0.18);
+    border-color: rgba(var(--secondary-rgb), 0.18);
 }
 
 @media (max-width: 991px) {
@@ -816,13 +819,13 @@ $ceoDesignationEn = trim((string)getSetting('ceo_designation_en', 'Chief Executi
     padding: 30px 20px;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 5px 25px rgba(var(--primary-rgb,26,95,42),0.12);
+    box-shadow: 0 5px 25px rgba(var(--primary-rgb),0.12);
     transition: all 0.3s ease;
 }
 
 .value-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 40px rgba(var(--primary-rgb,26,95,42),0.18);
+    box-shadow: 0 10px 40px rgba(var(--primary-rgb),0.18);
 }
 
 .value-icon {

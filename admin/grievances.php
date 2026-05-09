@@ -6,7 +6,8 @@
  * Modal हटाइयो — ?view=ID बाट detail page खुल्छ।
  */
 $__t = static function (string $np, string $en): string {
-    return isEnglish() ? $en : $np;
+    $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+    return strtolower($lang) === 'en' ? $en : $np;
 };
 $pageTitle   = $__t('गुनासो व्यवस्थापन', 'Grievance Management');
 $currentPage = 'grievances';

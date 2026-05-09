@@ -23,6 +23,12 @@ try {
     $singleNotice = null;
 }
 ?>
+<style>
+.nts-btn-primary{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.nts-btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.nts-empty-icon{color:var(--text-muted);}
+.nts-muted{color:var(--text-muted)!important;}
+</style>
 
 <!-- Page Banner -->
 <section class="page-banner">
@@ -68,7 +74,7 @@ try {
                     </div>
                     <?php if ($singleNotice['attachment']): ?>
                     <div class="notice-attachment">
-                        <a href="<?php echo $singleNotice['attachment']; ?>" class="btn btn-primary" target="_blank">
+                        <a href="<?php echo $singleNotice['attachment']; ?>" class="btn nts-btn-primary" target="_blank">
                             <i class="fas fa-download"></i> फाइल डाउनलोड गर्नुहोस्
                         </a>
                     </div>
@@ -115,9 +121,9 @@ try {
             <?php else: ?>
                 <div class="col-12">
                     <div class="empty-state text-center py-5">
-                        <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                        <i class="fas fa-clipboard-list fa-4x nts-empty-icon mb-3"></i>
                         <h4>कुनै सूचना छैन</h4>
-                        <p class="text-muted">हाल कुनै सूचना उपलब्ध छैन।</p>
+                        <p class="nts-muted">हाल कुनै सूचना उपलब्ध छैन।</p>
                     </div>
                 </div>
             <?php endif; ?>

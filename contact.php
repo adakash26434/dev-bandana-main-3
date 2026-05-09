@@ -57,6 +57,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require_once 'includes/header.php';
 ?>
+<style>
+.ct-success-wrap{background:linear-gradient(135deg,color-mix(in srgb,var(--primary-color) 14%,white),color-mix(in srgb,var(--primary-color) 8%,white));}
+.ct-success-icon{font-size:3.5rem;color:var(--primary-light);}
+.ct-success-title{color:var(--primary-dark);}
+.ct-muted{color:var(--text-muted)!important;}
+.ct-link-dark{color:var(--text-color);text-decoration:none;}
+.ct-btn-primary{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.ct-btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.ct-btn-success{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.ct-btn-success:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.ct-icon-lg{font-size:2.5rem;color:var(--primary-color);}
+.ct-modal-head{background:linear-gradient(135deg,var(--primary-dark),var(--primary-color));color:var(--text-on-primary);}
+.ct-success-block{display:none;}
+.ct-success-bigicon{font-size:4rem;color:var(--primary-color);}
+.ct-map-frame{border:0;}
+.ct-office-bg{background:var(--surface-color);}
+.ct-btn-light{background:color-mix(in srgb,var(--primary-color) 8%,white);border:1px solid color-mix(in srgb,var(--primary-color) 18%,white);color:var(--primary-dark);}
+</style>
 
 <!-- Page Banner -->
 <section class="page-banner">
@@ -72,14 +90,14 @@ require_once 'includes/header.php';
 </section>
 
 <?php if ($success): ?>
-<section class="py-5" style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);">
+<section class="py-5 ct-success-wrap">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-7 text-center">
-                <div style="font-size:3.5rem;color:var(--primary-light);"><i class="fas fa-check-circle"></i></div>
-                <h3 class="mt-3 fw-bold text-success"><?php echo isEnglish() ? 'Message Sent Successfully!' : 'सन्देश सफलतापूर्वक पठाइयो!'; ?></h3>
-                <p class="text-muted mb-4"><?php echo isEnglish() ? 'Thank you for contacting us. We will respond shortly.' : 'सम्पर्क गर्नुभएकोमा धन्यवाद। हामी छिट्टै जवाफ दिनेछौं।'; ?></p>
-                <a href="contact.php" class="btn btn-success px-4 me-2"><i class="fas fa-envelope me-1"></i><?php echo isEnglish() ? 'Send Another' : 'फेरि पठाउनुहोस्'; ?></a>
+                <div class="ct-success-icon"><i class="fas fa-check-circle"></i></div>
+                <h3 class="mt-3 fw-bold ct-success-title"><?php echo isEnglish() ? 'Message Sent Successfully!' : 'सन्देश सफलतापूर्वक पठाइयो!'; ?></h3>
+                <p class="ct-muted mb-4"><?php echo isEnglish() ? 'Thank you for contacting us. We will respond shortly.' : 'सम्पर्क गर्नुभएकोमा धन्यवाद। हामी छिट्टै जवाफ दिनेछौं।'; ?></p>
+                <a href="contact.php" class="btn ct-btn-success px-4 me-2"><i class="fas fa-envelope me-1"></i><?php echo isEnglish() ? 'Send Another' : 'फेरि पठाउनुहोस्'; ?></a>
                 <a href="<?php echo SITE_URL; ?>" class="btn btn-outline-secondary px-4"><i class="fas fa-home me-1"></i><?php echo isEnglish() ? 'Home' : 'गृहपृष्ठ'; ?></a>
             </div>
         </div>
@@ -109,7 +127,7 @@ require_once 'includes/header.php';
                         <div class="contact-details">
                             <h6><?php echo isEnglish() ? 'Phone' : 'फोन'; ?></h6>
                             <?php if ($phone): ?>
-                            <p><a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $phone); ?>" class="text-decoration-none text-dark"><?php echo e($phone); ?></a></p>
+                            <p><a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $phone); ?>" class="ct-link-dark"><?php echo e($phone); ?></a></p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -118,7 +136,7 @@ require_once 'includes/header.php';
                         <div class="contact-details">
                             <h6><?php echo isEnglish() ? 'Mobile' : 'मोबाइल'; ?></h6>
                             <?php if ($mobile): ?>
-                            <p><a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $mobile); ?>" class="text-decoration-none text-dark"><?php echo e($mobile); ?></a></p>
+                            <p><a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $mobile); ?>" class="ct-link-dark"><?php echo e($mobile); ?></a></p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -127,7 +145,7 @@ require_once 'includes/header.php';
                         <div class="contact-details">
                             <h6><?php echo isEnglish() ? 'Email' : 'इमेल'; ?></h6>
                             <?php if ($email): ?>
-                            <p><a href="mailto:<?php echo e($email); ?>" class="text-decoration-none text-dark"><?php echo e($email); ?></a></p>
+                            <p><a href="mailto:<?php echo e($email); ?>" class="ct-link-dark"><?php echo e($email); ?></a></p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -140,7 +158,7 @@ require_once 'includes/header.php';
 
                     <!-- सन्देश पठाउने बटन — modal खोल्छ -->
                     <div class="mt-4">
-                        <button class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#contactModal">
+                        <button class="btn ct-btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#contactModal">
                             <i class="fas fa-envelope me-2"></i>
                             <?php echo isEnglish() ? 'Send Message' : 'सन्देश पठाउनुहोस्'; ?>
                         </button>
@@ -155,11 +173,11 @@ require_once 'includes/header.php';
                     <!-- Online Banking -->
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm h-100 text-center p-4">
-                            <div class="mb-3" style="font-size:2.5rem;color:var(--primary-color);">
+                            <div class="mb-3 ct-icon-lg">
                                 <i class="fas fa-university"></i>
                             </div>
                             <h5><?php echo isEnglish() ? 'Online Banking' : 'अनलाइन बैंकिङ'; ?></h5>
-                            <p class="text-muted small"><?php echo isEnglish() ? 'Access your account anytime, anywhere.' : 'जुनसुकै समय, जहाँबाट पनि खाता हेर्नुहोस्।'; ?></p>
+                            <p class="ct-muted small"><?php echo isEnglish() ? 'Access your account anytime, anywhere.' : 'जुनसुकै समय, जहाँबाट पनि खाता हेर्नुहोस्।'; ?></p>
                             <a href="<?php echo getSetting('internet_banking_url','#'); ?>" target="_blank" class="btn btn-outline-primary btn-sm mt-auto">
                                 <?php echo isEnglish() ? 'Login' : 'लग-इन'; ?> <i class="fas fa-arrow-right ms-1"></i>
                             </a>
@@ -169,11 +187,11 @@ require_once 'includes/header.php';
                     <!-- Appointment -->
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm h-100 text-center p-4">
-                            <div class="mb-3" style="font-size:2.5rem;color:var(--primary-color);">
+                            <div class="mb-3 ct-icon-lg">
                                 <i class="fas fa-calendar-check"></i>
                             </div>
                             <h5><?php echo isEnglish() ? 'Book Appointment' : 'अपोइन्टमेन्ट बुक'; ?></h5>
-                            <p class="text-muted small"><?php echo isEnglish() ? 'Schedule a meeting with our team.' : 'हाम्रो टोलीसँग भेटको समय तय गर्नुहोस्।'; ?></p>
+                            <p class="ct-muted small"><?php echo isEnglish() ? 'Schedule a meeting with our team.' : 'हाम्रो टोलीसँग भेटको समय तय गर्नुहोस्।'; ?></p>
                             <a href="<?php echo SITE_URL; ?>appointment.php" class="btn btn-outline-primary btn-sm mt-auto">
                                 <?php echo isEnglish() ? 'Book Now' : 'बुक गर्नुहोस्'; ?> <i class="fas fa-arrow-right ms-1"></i>
                             </a>
@@ -183,11 +201,11 @@ require_once 'includes/header.php';
                     <!-- Loan Apply -->
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm h-100 text-center p-4">
-                            <div class="mb-3" style="font-size:2.5rem;color:var(--primary-color);">
+                            <div class="mb-3 ct-icon-lg">
                                 <i class="fas fa-hand-holding-usd"></i>
                             </div>
                             <h5><?php echo isEnglish() ? 'Apply for Loan' : 'कर्जा आवेदन'; ?></h5>
-                            <p class="text-muted small"><?php echo isEnglish() ? 'Quick and easy loan application.' : 'सजिलो र छिटो कर्जा आवेदन गर्नुहोस्।'; ?></p>
+                            <p class="ct-muted small"><?php echo isEnglish() ? 'Quick and easy loan application.' : 'सजिलो र छिटो कर्जा आवेदन गर्नुहोस्।'; ?></p>
                             <a href="<?php echo SITE_URL; ?>loan-apply.php" class="btn btn-outline-primary btn-sm mt-auto">
                                 <?php echo isEnglish() ? 'Apply Now' : 'आवेदन गर्नुहोस्'; ?> <i class="fas fa-arrow-right ms-1"></i>
                             </a>
@@ -197,11 +215,11 @@ require_once 'includes/header.php';
                     <!-- Grievance -->
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm h-100 text-center p-4">
-                            <div class="mb-3" style="font-size:2.5rem;color:var(--primary-color);">
+                            <div class="mb-3 ct-icon-lg">
                                 <i class="fas fa-comment-dots"></i>
                             </div>
                             <h5><?php echo isEnglish() ? 'Grievance' : 'गुनासो'; ?></h5>
-                            <p class="text-muted small"><?php echo isEnglish() ? 'Submit your complaint or feedback.' : 'तपाईंको गुनासो वा सुझाव पठाउनुहोस्।'; ?></p>
+                            <p class="ct-muted small"><?php echo isEnglish() ? 'Submit your complaint or feedback.' : 'तपाईंको गुनासो वा सुझाव पठाउनुहोस्।'; ?></p>
                             <a href="<?php echo SITE_URL; ?>grievance.php" class="btn btn-outline-primary btn-sm mt-auto">
                                 <?php echo isEnglish() ? 'Submit' : 'पठाउनुहोस्'; ?> <i class="fas fa-arrow-right ms-1"></i>
                             </a>
@@ -223,7 +241,7 @@ require_once 'includes/header.php';
         <div class="modal-content">
 
             <!-- Modal Header -->
-            <div class="modal-header" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary-color));color:#fff;">
+            <div class="modal-header ct-modal-head">
                 <h5 class="modal-title" id="contactModalLabel">
                     <i class="fas fa-envelope-open-text me-2"></i>
                     <?php echo isEnglish() ? 'Send Message' : 'सन्देश पठाउनुहोस्'; ?>
@@ -235,17 +253,17 @@ require_once 'includes/header.php';
             <div class="modal-body p-4">
 
                 <!-- सफलता सन्देश -->
-                <div id="contactSuccess" class="text-center py-4" style="display:none;">
-                    <div style="font-size:4rem;color:var(--primary-color);">
+                <div id="contactSuccess" class="text-center py-4 ct-success-block">
+                    <div class="ct-success-bigicon">
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <h4 class="mt-3 fw-bold"><?php echo isEnglish() ? 'Message Sent!' : 'सन्देश पठाइयो!'; ?></h4>
-                    <p class="text-muted">
+                    <p class="ct-muted">
                         <?php echo isEnglish()
                             ? 'Thank you for contacting us. We will get back to you shortly.'
                             : 'धन्यवाद! तपाईंको सन्देश प्राप्त भयो। हामी चाँडै सम्पर्क गर्नेछौं।'; ?>
                     </p>
-                    <button class="btn btn-primary mt-2" data-bs-dismiss="modal">
+                    <button class="btn ct-btn-primary mt-2" data-bs-dismiss="modal">
                         <?php echo isEnglish() ? 'Close' : 'बन्द गर्नुहोस्'; ?>
                     </button>
                 </div>
@@ -301,10 +319,10 @@ require_once 'includes/header.php';
                     </div><!-- /row -->
 
                     <div class="modal-footer px-0 pb-0 mt-4">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <button type="button" class="btn ct-btn-light" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i> <?php echo isEnglish() ? 'Cancel' : 'रद्द'; ?>
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn ct-btn-primary">
                             <span class="spinner-border spinner-border-sm d-none me-1" role="status" aria-hidden="true"></span><i class="fas fa-paper-plane me-1"></i>
                             <?php echo isEnglish() ? 'Send Message' : 'सन्देश पठाउनुहोस्'; ?>
                         </button>
@@ -322,14 +340,14 @@ require_once 'includes/header.php';
         <div class="map-wrapper">
             <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.456!2d85.3240!3d27.7172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDQzJzAyLjAiTiA4NcKwMTknMjYuNCJF!5e0!3m2!1sen!2snp!4v1234567890"
-                width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy">
+                width="100%" height="400" class="ct-map-frame" allowfullscreen="" loading="lazy">
             </iframe>
         </div>
     </div>
 </section>
 
 <!-- Office Hours -->
-<section class="office-hours section-padding bg-light">
+<section class="office-hours section-padding ct-office-bg">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">

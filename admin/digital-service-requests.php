@@ -1,6 +1,7 @@
 <?php
 $__t = static function (string $np, string $en): string {
-    return isEnglish() ? $en : $np;
+    $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+    return strtolower($lang) === 'en' ? $en : $np;
 };
 $pageTitle = $__t('डिजिटल सेवा अनुरोधहरू', 'Digital Service Requests');
 require_once 'includes/admin-header.php';
@@ -86,6 +87,30 @@ if (!in_array($action, ['list', 'view'], true)) {
 }
 $id = (int)($_GET['id'] ?? 0);
 ?>
+<style>
+.dsr-remark-box{background:color-mix(in srgb,var(--secondary-color) 12%,white);padding:12px;border-radius:10px;color:var(--secondary-dark);}
+.dsr-update-btn{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.dsr-update-btn:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.dsr-track-text{color:var(--primary-color);}
+.dsr-search-btn{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.dsr-search-btn:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.dsr-head-icon,.dsr-track-inline{color:var(--primary-color);}
+.dsr-view-btn{background:color-mix(in srgb,var(--accent-color) 18%,white);border-color:color-mix(in srgb,var(--accent-color) 28%,white);color:var(--accent-dark);}
+.dsr-view-btn:hover{background:color-mix(in srgb,var(--accent-color) 26%,white);border-color:color-mix(in srgb,var(--accent-color) 36%,white);color:var(--accent-dark);}
+.dsr-attachment-btn{border-color:var(--primary-color);color:var(--primary-color);}
+.dsr-attachment-btn:hover{background:var(--primary-color);color:var(--text-on-primary);}
+.dsr-label-strong{color:var(--primary-dark);}
+.dsr-search-icon{color:var(--text-muted);}
+.dsr-st-badge{font-weight:700;}
+.dsr-st-warning{background:color-mix(in srgb,var(--secondary-color) 16%,white);color:var(--secondary-dark);}
+.dsr-st-info{background:color-mix(in srgb,var(--accent-color) 16%,white);color:var(--accent-dark);}
+.dsr-st-success{background:color-mix(in srgb,var(--primary-color) 16%,white);color:var(--primary-dark);}
+.dsr-st-danger{background:color-mix(in srgb,var(--secondary-color) 20%,white);color:var(--secondary-dark);}
+.dsr-st-primary{background:color-mix(in srgb,var(--primary-color) 22%,white);color:var(--primary-dark);}
+.dsr-st-secondary{background:color-mix(in srgb,var(--text-muted) 16%,white);color:var(--text-light);}
+.dsr-muted{color:var(--text-muted)!important;}
+.dsr-soft-bg{background:color-mix(in srgb,var(--primary-color) 8%,white)!important;}
+</style>
 
 <?php if ($action === 'view' && $id > 0): ?>
 <?php
@@ -140,21 +165,21 @@ if (!$request) {
                     </div>
                     <?php if ($request['request_details']): ?>
                     <p><strong><?php echo $__t('थप विवरण', 'Additional Details'); ?>:</strong></p>
-                    <div class="bg-light p-3 rounded"><?php echo nl2br(e($request['request_details'])); ?></div>
+                    <div class="dsr-soft-bg p-3 rounded"><?php echo nl2br(e($request['request_details'])); ?></div>
                     <?php endif; ?>
                     <?php if ($request['attachment']): ?>
-                    <p class="mt-3"><strong><?php echo $__t('कागजात', 'Attachment'); ?>:</strong> <a href="<?php echo SITE_URL . e($request['attachment']); ?>" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file"></i> <?php echo $__t('हेर्नुहोस्', 'View'); ?></a></p>
+                    <p class="mt-3"><strong class="dsr-label-strong"><?php echo $__t('कागजात', 'Attachment'); ?>:</strong> <a href="<?php echo SITE_URL . e($request['attachment']); ?>" target="_blank" class="btn btn-sm dsr-attachment-btn"><i class="fas fa-file"></i> <?php echo $__t('हेर्नुहोस्', 'View'); ?></a></p>
                     <?php endif; ?>
                 </div>
                 <?php if ($request['admin_remarks']): ?>
                 <div class="info-section">
                     <h6><i class="fas fa-note-sticky"></i> <?php echo $__t('टिप्पणी', 'Remarks'); ?></h6>
-                    <div class="bg-warning-subtle p-3 rounded"><?php echo nl2br(e($request['admin_remarks'])); ?></div>
+                    <div class="dsr-remark-box"><?php echo nl2br(e($request['admin_remarks'])); ?></div>
                 </div>
                 <?php endif; ?>
             </div>
             <div class="col-lg-4">
-                <div class="card bg-light">
+                <div class="card dsr-soft-bg">
                     <div class="card-header"><h6 class="mb-0"><i class="fas fa-edit"></i> <?php echo $__t('स्थिति अपडेट', 'Update Status'); ?></h6></div>
                     <div class="card-body">
                         <form method="POST" enctype="multipart/form-data">
@@ -183,9 +208,9 @@ if (!$request) {
                                 <?php endif; ?>
                                 <input type="file" name="admin_attachment" class="form-control"
                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                                <small class="text-muted"><?php echo $__t('PDF, JPG, PNG, DOC — अधिकतम 5MB', 'PDF, JPG, PNG, DOC — max 5MB'); ?></small>
+                                <small class="dsr-muted"><?php echo $__t('PDF, JPG, PNG, DOC — अधिकतम 5MB', 'PDF, JPG, PNG, DOC — max 5MB'); ?></small>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> <?php echo $__t('अपडेट गर्नुहोस्', 'Update'); ?></button>
+                            <button type="submit" class="btn dsr-update-btn w-100"><i class="fas fa-save"></i> <?php echo $__t('अपडेट गर्नुहोस्', 'Update'); ?></button>
                         </form>
                         <hr>
                         <form method="POST" onsubmit="return confirm('<?php echo $__t('के तपाईं निश्चित हुनुहुन्छ?', 'Are you sure?'); ?>');">
@@ -199,7 +224,7 @@ if (!$request) {
                 <div class="card mt-3">
                     <div class="card-body text-center">
                         <h6><?php echo $__t('Tracking ID', 'Tracking ID'); ?></h6>
-                        <p class="fs-5 font-monospace text-primary"><?php echo e($request['tracking_id']); ?></p>
+                        <p class="fs-5 font-monospace dsr-track-text"><?php echo e($request['tracking_id']); ?></p>
                     </div>
                 </div>
             </div>
@@ -320,12 +345,12 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
         <div class="col-md-6 col-12">
             <label><?php echo $__t('खोज्नुहोस्', 'Search'); ?></label>
             <div class="input-group input-group-sm">
-                <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                <span class="input-group-text bg-white"><i class="fas fa-search dsr-search-icon"></i></span>
                 <input type="text" name="search" class="form-control" value="<?php echo e($search); ?>" placeholder="<?php echo $__t('Tracking ID, नाम, फोन, सदस्य ID...', 'Tracking ID, name, phone, member ID...'); ?>">
             </div>
         </div>
         <div class="col-md-2 col-6">
-            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i><?php echo $__t('खोज', 'Search'); ?></button>
+            <button type="submit" class="btn dsr-search-btn btn-sm w-100"><i class="fas fa-search me-1"></i><?php echo $__t('खोज', 'Search'); ?></button>
             <?php if ($filterStatus||$filterType||$search): ?><a href="digital-service-requests.php" class="btn btn-outline-secondary btn-sm w-100 mt-1"><i class="fas fa-times me-1"></i><?php echo $__t('रिसेट', 'Reset'); ?></a><?php endif; ?>
         </div>
     </form>
@@ -333,7 +358,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
 
 <div class="card border-0 shadow-sm app-rounded-card">
     <div class="tbl-header-bar no-print">
-        <h6><i class="fas fa-mobile-alt me-2 text-primary"></i><?php echo $__t('डिजिटल सेवा अनुरोध सूची', 'Digital Service Requests List'); ?></h6>
+        <h6><i class="fas fa-mobile-alt me-2 dsr-head-icon"></i><?php echo $__t('डिजिटल सेवा अनुरोध सूची', 'Digital Service Requests List'); ?></h6>
         <span class="result-count-badge"><?php echo count($requests); ?> <?php echo $__t('रेकर्ड', 'records'); ?></span>
     </div>
     <div class="table-responsive">
@@ -351,15 +376,15 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                 <tbody>
                     <?php foreach ($requests as $request): ?>
                     <tr>
-                        <td><span class="font-monospace text-primary"><?php echo e($request['tracking_id']); ?></span></td>
+                        <td><span class="font-monospace dsr-track-inline"><?php echo e($request['tracking_id']); ?></span></td>
                         <td>
                             <strong><?php echo e($request['requester_name']); ?></strong>
                             <br><small><i class="fas fa-phone"></i> <?php echo e($request['phone']); ?><?php if ($request['email']): ?> | <i class="fas fa-envelope"></i> <?php echo e($request['email']); ?><?php endif; ?></small>
                         </td>
                         <td><?php echo e($request['service_type_np'] ?: (isset($serviceLabels[$request['service_type']]) ? $__t($serviceLabels[$request['service_type']]['np'], $serviceLabels[$request['service_type']]['en']) : $request['service_type'])); ?></td>
                         <td><?php echo formatNepaliDate($request['created_at']); ?></td>
-                        <td><span class="badge bg-<?php echo $statusLabels[$request['status']]['class'] ?? 'secondary'; ?>"><?php echo isset($statusLabels[$request['status']]) ? $__t($statusLabels[$request['status']]['np'], $statusLabels[$request['status']]['en']) : e($request['status']); ?></span></td>
-                        <td><a href="?action=view&id=<?php echo (int)$request['id']; ?>" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a></td>
+                        <td><span class="badge dsr-st-badge dsr-st-<?php echo $statusLabels[$request['status']]['class'] ?? 'secondary'; ?>"><?php echo isset($statusLabels[$request['status']]) ? $__t($statusLabels[$request['status']]['np'], $statusLabels[$request['status']]['en']) : e($request['status']); ?></span></td>
+                        <td><a href="?action=view&id=<?php echo (int)$request['id']; ?>" class="btn btn-sm dsr-view-btn"><i class="fas fa-eye"></i></a></td>
                     </tr>
                     <?php endforeach; ?>
                     <?php if (empty($requests)): ?>

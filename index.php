@@ -71,7 +71,7 @@ $L = getLangStrings();
                                 <h1><?php echo e($slider['title']); ?></h1>
                                 <p><?php echo e($slider['subtitle']); ?></p>
                                 <?php if ($slider['button_text']): ?>
-                                <a href="<?php echo e($slider['button_url']); ?>" class="btn btn-primary btn-lg">
+                                <a href="<?php echo e($slider['button_url']); ?>" class="btn home-btn-primary btn-lg">
                                     <?php echo e($slider['button_text']); ?> <i class="fas fa-arrow-right"></i>
                                 </a>
                                 <?php endif; ?>
@@ -88,7 +88,7 @@ $L = getLangStrings();
                             <div class="slider-content">
                                 <h1><?php echo $heroTitle; ?></h1>
                                 <p><?php echo $heroSubtitle; ?></p>
-                                <a href="about.php" class="btn btn-primary btn-lg">
+                                <a href="about.php" class="btn home-btn-primary btn-lg">
                                     थप जान्नुहोस् <i class="fas fa-arrow-right"></i>
                                 </a>
                             </div>
@@ -106,6 +106,17 @@ $L = getLangStrings();
         </button>
     </div>
 </section>
+<style>
+.home-btn-primary{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.home-btn-primary:hover,.home-btn-primary:focus{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.home-link-primary{color:var(--primary-color)!important;}
+.home-link-primary:hover{color:var(--primary-dark)!important;}
+.home-btn-outline-primary{border-color:var(--primary-color);color:var(--primary-color);}
+.home-btn-outline-primary:hover{background:var(--primary-color);color:var(--text-on-primary);}
+.home-btn-outline-secondary{border-color:var(--text-muted);color:var(--text-light);}
+.home-btn-outline-secondary:hover{background:var(--text-muted);color:white;}
+.home-muted-icon{color:var(--text-muted)!important;}
+</style>
 
 <!-- Institutional Profile / Reports Section -->
 <?php
@@ -240,7 +251,7 @@ if ($db instanceof PDO) {
         <?php if ($totalServices > count($services)): ?>
         <!-- सबै सेवाहरू हेर्नुहोस् बटन — जब database मा ३ भन्दा बढी सेवाहरू छन् -->
         <div class="text-center mt-4" data-aos="fade-up">
-            <a href="services.php" class="btn btn-primary btn-lg view-all-btn shadow-sm">
+            <a href="services.php" class="btn home-btn-primary btn-lg view-all-btn shadow-sm">
                 <i class="fas fa-th-large me-2"></i>
                 <?php echo isEnglish()
                     ? 'View All Services (' . $totalServices . ')'
@@ -392,7 +403,7 @@ if ($db instanceof PDO) {
                                         <?php endif; ?>
                                     <?php else: ?>
                                     <div class="text-center py-3">
-                                        <a href="interest-rates.php" class="text-primary"><?php echo isEnglish() ? 'View all rates' : 'सबै दरहरू हेर्नुहोस्'; ?> <i class="fas fa-arrow-right"></i></a>
+                                        <a href="interest-rates.php" class="home-link-primary"><?php echo isEnglish() ? 'View all rates' : 'सबै दरहरू हेर्नुहोस्'; ?> <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                     <?php endif; ?>
                                 </div>
@@ -416,7 +427,7 @@ if ($db instanceof PDO) {
                                         <?php endif; ?>
                                     <?php else: ?>
                                     <div class="text-center py-3">
-                                        <a href="interest-rates.php" class="text-primary"><?php echo isEnglish() ? 'View all rates' : 'सबै दरहरू हेर्नुहोस्'; ?> <i class="fas fa-arrow-right"></i></a>
+                                        <a href="interest-rates.php" class="home-link-primary"><?php echo isEnglish() ? 'View all rates' : 'सबै दरहरू हेर्नुहोस्'; ?> <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                     <?php endif; ?>
                                 </div>
@@ -424,7 +435,7 @@ if ($db instanceof PDO) {
                         </div>
 
                         <div class="text-center mt-3">
-                            <a href="interest-rates.php" class="btn btn-primary">
+                            <a href="interest-rates.php" class="btn home-btn-primary">
                                 <i class="fas fa-arrow-right me-2"></i><?php echo isEnglish() ? 'View All Rates' : 'सबै ब्याज दरहरू हेर्नुहोस्'; ?>
                             </a>
                         </div>
@@ -459,9 +470,9 @@ if ($db instanceof PDO) {
 
                             <?php if (empty($notices)): ?>
                             <div class="text-center py-4">
-                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <i class="fas fa-inbox fa-3x home-muted-icon mb-3"></i>
                                 <p class="text-muted mb-2"><?php echo isEnglish() ? 'No notices available' : 'कुनै सूचना छैन'; ?></p>
-                                <a href="notices.php" class="btn btn-sm btn-outline-primary">
+                                <a href="notices.php" class="btn btn-sm home-btn-outline-primary">
                                     <?php echo isEnglish() ? 'View All Notices' : 'सबै सूचनाहरू हेर्नुहोस्'; ?>
                                 </a>
                             </div>
@@ -469,7 +480,7 @@ if ($db instanceof PDO) {
                         </div>
                     </div>
                     <div class="notices-footer">
-                        <a href="notices.php" class="btn btn-outline-primary btn-sm">
+                        <a href="notices.php" class="btn home-btn-outline-primary btn-sm">
                             <i class="fas fa-list me-2"></i><?php echo isEnglish() ? 'View All Notices' : 'सबै सूचनाहरू हेर्नुहोस्'; ?>
                         </a>
                     </div>
@@ -792,12 +803,12 @@ if (empty($appFeatures)) {
 
         <?php if ($totalFeatures > $showInitially): ?>
         <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="150">
-            <button type="button" class="btn btn-primary btn-lg" id="showMoreFeatures">
+            <button type="button" class="btn home-btn-primary btn-lg" id="showMoreFeatures">
                 <i class="fas fa-plus-circle me-2"></i>
                 <?php echo isEnglish() ? 'Show More' : 'थप हेर्नुहोस्'; ?>
                 <span class="feature-count">(<?php echo $totalFeatures - $showInitially; ?>)</span>
             </button>
-            <button type="button" class="btn btn-outline-secondary btn-lg d-none" id="showLessFeatures">
+            <button type="button" class="btn home-btn-outline-secondary btn-lg d-none" id="showLessFeatures">
                 <i class="fas fa-minus-circle me-2"></i>
                 <?php echo isEnglish() ? 'Show Less' : 'कम देखाउनुहोस्'; ?>
             </button>
@@ -805,7 +816,7 @@ if (empty($appFeatures)) {
         <?php endif; ?>
 
         <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="200">
-            <a href="services.php" class="btn btn-outline-primary btn-lg">
+            <a href="services.php" class="btn home-btn-outline-primary btn-lg">
                 <?php echo isEnglish() ? 'View All Services' : 'सबै सेवाहरू हेर्नुहोस्'; ?>
                 <i class="fas fa-arrow-right ms-2"></i>
             </a>
@@ -855,7 +866,7 @@ if (empty($appFeatures)) {
         </div>
 
         <div class="text-center mt-4" data-aos="fade-up">
-            <a href="news.php" class="btn btn-primary btn-lg">
+            <a href="news.php" class="btn home-btn-primary btn-lg">
                 <i class="fas fa-newspaper"></i> <?php echo isEnglish() ? 'View All News' : 'सबै समाचार हेर्नुहोस्'; ?>
             </a>
         </div>
@@ -927,7 +938,7 @@ if ($db instanceof PDO) {
 
         <?php if ($totalAwards > 3): ?>
         <div class="text-center mt-4" data-aos="fade-up">
-            <a href="awards.php" class="btn btn-primary btn-lg">
+            <a href="awards.php" class="btn home-btn-primary btn-lg">
                 <i class="fas fa-trophy"></i> <?php echo isEnglish() ? 'View All Awards' : 'सबै सम्मान हेर्नुहोस्'; ?>
             </a>
         </div>
@@ -1105,20 +1116,20 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 .spotlight-card {
     background: white;
     border-radius: 20px;
-    box-shadow: 0 16px 48px rgba(var(--secondary-rgb,192,57,43),0.14), 0 4px 16px rgba(0,0,0,0.06);
+    box-shadow: 0 16px 48px rgba(var(--secondary-rgb),0.14), 0 4px 16px rgba(0,0,0,0.06);
     overflow: hidden;
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .spotlight-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 24px 64px rgba(var(--secondary-rgb,192,57,43),0.2), 0 8px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 24px 64px rgba(var(--secondary-rgb),0.2), 0 8px 24px rgba(0,0,0,0.08);
 }
 
 /* Gold top accent bar */
 .spotlight-top-bar {
     height: 6px;
-    background: linear-gradient(90deg, var(--secondary-color), color-mix(in srgb, var(--secondary-color) 70%, white), var(--secondary-color), var(--secondary-dark,var(--secondary-color)));
+    background: linear-gradient(90deg, var(--secondary-color), color-mix(in srgb, var(--secondary-color) 70%, white), var(--secondary-color), var(--secondary-dark));
     background-size: 300% 100%;
     animation: shimmer-bar 3s linear infinite;
 }
@@ -1152,7 +1163,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     border-radius: 50%;
     object-fit: cover;
     border: 5px solid var(--secondary-color);
-    box-shadow: 0 0 0 4px rgba(var(--secondary-rgb,192,57,43),0.2), 0 8px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 0 0 4px rgba(var(--secondary-rgb),0.2), 0 8px 20px rgba(0,0,0,0.12);
     display: block;
 }
 
@@ -1165,11 +1176,11 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     align-items: center;
     justify-content: center;
     border: 5px solid var(--secondary-color);
-    box-shadow: 0 0 0 4px rgba(var(--secondary-rgb,192,57,43),0.2);
+    box-shadow: 0 0 0 4px rgba(var(--secondary-rgb),0.2);
 }
 .spotlight-photo-placeholder i {
     font-size: 4rem;
-    color: var(--secondary-dark,var(--secondary-color));
+    color: var(--secondary-dark);
     opacity: 0.6;
 }
 
@@ -1180,13 +1191,13 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg,var(--primary-color),var(--primary-light));
-    color: var(--text-on-primary, #fff);
+    color: var(--text-on-primary);
     font-size: 0.7rem;
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 20px;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(var(--primary-rgb,26,95,42),0.3);
+    box-shadow: 0 2px 8px rgba(var(--primary-rgb),0.3);
 }
 
 /* Info column */
@@ -1200,20 +1211,20 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     display: inline-flex;
     align-items: center;
     background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 18%, white), color-mix(in srgb, var(--secondary-color) 28%, white));
-    color: var(--secondary-dark,var(--secondary-color));
+    color: var(--secondary-dark);
     font-size: 0.78rem;
     font-weight: 700;
     padding: 5px 12px;
     border-radius: 20px;
     margin-bottom: 10px;
-    border: 1px solid rgba(var(--secondary-rgb,192,57,43),0.3);
+    border: 1px solid rgba(var(--secondary-rgb),0.3);
 }
 
 /* Member name */
 .spotlight-name {
     font-size: 1.6rem;
     font-weight: 700;
-    color: var(--text-color,#1a202c);
+    color: var(--text-color);
     margin-bottom: 8px;
     line-height: 1.2;
 }
@@ -1227,7 +1238,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
 }
 .spotlight-meta-item {
     font-size: 0.82rem;
-    color: var(--text-light,#666);
+    color: var(--text-light);
     display: flex;
     align-items: center;
     gap: 5px;
@@ -1251,7 +1262,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     padding: 6px 14px;
     border-radius: 20px;
     margin-bottom: 14px;
-    border: 1px solid rgba(var(--primary-rgb,26,95,42),0.15);
+    border: 1px solid rgba(var(--primary-rgb),0.15);
 }
 .spotlight-achievement i { color: var(--secondary-color); margin-right: 5px; }
 
@@ -1264,7 +1275,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     margin: 0;
     position: relative;
     font-style: italic;
-    color: var(--text-light,#555);
+    color: var(--text-light);
     font-size: 0.9rem;
     line-height: 1.6;
 }
@@ -1286,7 +1297,7 @@ $hasPhoto = !empty($memberSpotlight['photo']) && file_exists(ROOT_PATH . $member
     opacity: 0.12;
     animation: twinkle 3s ease-in-out infinite;
 }
-.section-badge-spotlight { background:linear-gradient(135deg,var(--secondary-color),var(--secondary-dark,var(--secondary-color)));color:var(--text-on-secondary,var(--text-on-primary,#fff)); }
+.section-badge-spotlight { background:linear-gradient(135deg,var(--secondary-color),var(--secondary-dark));color:var(--text-on-secondary); }
 .star-1 { font-size: 2rem; top: 16px; right: 24px; animation-delay: 0s; }
 .star-2 { font-size: 1rem; top: 48px; right: 56px; animation-delay: 0.8s; }
 .star-3 { font-size: 1.5rem; bottom: 20px; right: 40px; animation-delay: 1.4s; }

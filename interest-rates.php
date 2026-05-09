@@ -18,6 +18,10 @@ try {
     $savingRates = $loanRates = [];
 }
 ?>
+<style>
+.ir-cta-btn{background:var(--surface-color);border:1px solid color-mix(in srgb,var(--primary-color) 18%,white);color:var(--primary-dark);}
+.ir-cta-btn:hover{background:color-mix(in srgb,var(--primary-color) 10%,white);border-color:color-mix(in srgb,var(--primary-color) 24%,white);color:var(--primary-dark);}
+</style>
 
 <!-- Page Banner -->
 <section class="page-banner">
@@ -146,7 +150,7 @@ try {
                     <p>हाम्रो कार्यालयमा आउनुहोस् वा सम्पर्क गर्नुहोस्।</p>
                 </div>
                 <div class="col-lg-4 text-lg-end">
-                    <a href="contact.php" class="btn btn-light btn-lg">सम्पर्क गर्नुहोस्</a>
+                    <a href="contact.php" class="btn ir-cta-btn btn-lg">सम्पर्क गर्नुहोस्</a>
                 </div>
             </div>
         </div>

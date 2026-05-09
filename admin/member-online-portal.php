@@ -3,7 +3,8 @@
  * Admin: Member Online Portal — दर्ता अनुमोदन, ID Card, पासवर्ड Reset
  */
 $__t = static function (string $np, string $en): string {
-    return isEnglish() ? $en : $np;
+    $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+    return strtolower($lang) === 'en' ? $en : $np;
 };
 $pageTitle   = $__t('सदस्य अनलाइन पोर्टल', 'Member Online Portal');
 $currentPage = 'member-online-portal';

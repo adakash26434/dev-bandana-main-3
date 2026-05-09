@@ -205,18 +205,18 @@ require_once 'includes/header.php';
         <div class="row justify-content-center">
             <div class="col-lg-7 form-success-card">
                 <div class="form-success-icon"><i class="fas fa-check-circle"></i></div>
-                <h3 class="mt-3 fw-bold text-success"><?php echo isEnglish() ? 'Request Submitted Successfully!' : 'अनुरोध सफलतापूर्वक पेश भयो!'; ?></h3>
-                <p class="text-muted mb-4"><?php echo isEnglish() ? 'Save your Tracking ID to check your request status.' : 'तपाईंको Tracking ID तल छ। Status हेर्न यो ID सुरक्षित राख्नुहोस्।'; ?></p>
+                <h3 class="mt-3 fw-bold ds-title-ok"><?php echo isEnglish() ? 'Request Submitted Successfully!' : 'अनुरोध सफलतापूर्वक पेश भयो!'; ?></h3>
+                <p class="ds-muted mb-4"><?php echo isEnglish() ? 'Save your Tracking ID to check your request status.' : 'तपाईंको Tracking ID तल छ। Status हेर्न यो ID सुरक्षित राख्नुहोस्।'; ?></p>
                 <div class="form-tracking-box">
-                    <div class="text-muted small mb-2"><?php echo isEnglish() ? 'Your Tracking ID — save this!' : 'तपाईंको Tracking ID — सुरक्षित राख्नुहोस्!'; ?></div>
+                    <div class="ds-muted small mb-2"><?php echo isEnglish() ? 'Your Tracking ID — save this!' : 'तपाईंको Tracking ID — सुरक्षित राख्नुहोस्!'; ?></div>
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <div class="form-tracking-id" id="dsTrkId"><?php echo e($trackingId); ?></div>
-                        <button type="button" onclick="copyTrk('dsTrkId',this)" class="btn btn-sm btn-outline-success py-0 px-2" title="Copy" style="font-size:11px;line-height:1.8;"><i class="fas fa-copy"></i></button>
+                        <button type="button" onclick="copyTrk('dsTrkId',this)" class="btn btn-sm btn-outline-success py-0 px-2 ds-track-copy" title="Copy"><i class="fas fa-copy"></i></button>
                     </div>
-                    <div class="form-tracking-help"><a href="application-tracker.php" class="text-success text-decoration-none fw-semibold">यहाँ बाट</a> Application Tracker मा स्थिति हेर्नुहोस्।</div>
+                    <div class="form-tracking-help"><a href="application-tracker.php" class="ds-track-help-link">यहाँ बाट</a> Application Tracker मा स्थिति हेर्नुहोस्।</div>
                 </div>
                 <div class="mt-3">
-                    <a href="application-tracker.php" class="btn btn-success px-4 me-2">
+                    <a href="application-tracker.php" class="btn ds-btn-success px-4 me-2">
                         <i class="fas fa-search me-1"></i><?php echo isEnglish() ? 'Track My Request' : 'अनुरोध ट्र्याक'; ?>
                     </a>
                     <a href="digital-services.php" class="btn btn-outline-secondary px-4">
@@ -236,12 +236,12 @@ require_once 'includes/header.php';
                 <div class="section-header text-center mb-3">
                     <h2><?php echo isEnglish() ? 'Digital Services at Your Fingertips' : 'डिजिटल सेवाहरू, घरैबाट'; ?></h2>
                 </div>
-                <p class="text-muted mb-4">
+                <p class="ds-muted mb-4">
                     <?php echo isEnglish()
                         ? 'Request any digital banking service online — no need to visit the office. Select a service below, fill the form, and track your request anytime.'
                         : 'कुनै पनि डिजिटल बैंकिङ सेवा अनलाइनै अनुरोध गर्नुहोस् — कार्यालय आउन परदैन। तलबाट सेवा छानेर फारम भर्नुहोस् र जुनसुकै बेला track गर्नुहोस्।'; ?>
                 </p>
-                <a href="#ds-form-section" class="btn btn-primary btn-lg px-5">
+                <a href="#ds-form-section" class="btn ds-btn-primary btn-lg px-5">
                     <i class="fas fa-paper-plane me-2"></i>
                     <?php echo isEnglish() ? 'Request a Service' : 'सेवा अनुरोध गर्नुहोस्'; ?>
                 </a>
@@ -258,30 +258,30 @@ require_once 'includes/header.php';
         <div class="row g-4 mb-5">
             <div class="col-md-3 col-6">
                 <div class="card border-0 shadow-sm text-center p-3 h-100">
-                    <div class="mb-2" style="font-size:2rem;color:var(--primary-color);"><i class="fas fa-th-large"></i></div>
+                    <div class="mb-2 ds-step-icon ds-step-icon-primary"><i class="fas fa-th-large"></i></div>
                     <h6 class="fw-600"><?php echo isEnglish() ? '1. Choose Service' : '१. सेवा छान्नुहोस्'; ?></h6>
-                    <p class="text-muted small mb-0"><?php echo isEnglish() ? 'Pick the service you need.' : 'चाहिएको डिजिटल सेवा छान्नुहोस्।'; ?></p>
+                    <p class="ds-muted small mb-0"><?php echo isEnglish() ? 'Pick the service you need.' : 'चाहिएको डिजिटल सेवा छान्नुहोस्।'; ?></p>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="card border-0 shadow-sm text-center p-3 h-100">
-                    <div class="mb-2" style="font-size:2rem;color:var(--secondary-color);"><i class="fas fa-edit"></i></div>
+                    <div class="mb-2 ds-step-icon ds-step-icon-secondary"><i class="fas fa-edit"></i></div>
                     <h6 class="fw-600"><?php echo isEnglish() ? '2. Fill Form' : '२. फारम भर्नुहोस्'; ?></h6>
-                    <p class="text-muted small mb-0"><?php echo isEnglish() ? 'Submit your request details.' : 'आफ्नो विवरण भर्नुहोस्।'; ?></p>
+                    <p class="ds-muted small mb-0"><?php echo isEnglish() ? 'Submit your request details.' : 'आफ्नो विवरण भर्नुहोस्।'; ?></p>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="card border-0 shadow-sm text-center p-3 h-100">
-                    <div class="mb-2" style="font-size:2rem;color:var(--accent-color,#17a2b8);"><i class="fas fa-id-card"></i></div>
+                    <div class="mb-2 ds-step-icon ds-step-icon-accent"><i class="fas fa-id-card"></i></div>
                     <h6 class="fw-600"><?php echo isEnglish() ? '3. Get Tracking ID' : '३. Tracking ID पाउनुहोस्'; ?></h6>
-                    <p class="text-muted small mb-0"><?php echo isEnglish() ? 'A unique code is issued instantly.' : 'तुरुन्तै unique code पाउनुहुन्छ।'; ?></p>
+                    <p class="ds-muted small mb-0"><?php echo isEnglish() ? 'A unique code is issued instantly.' : 'तुरुन्तै unique code पाउनुहुन्छ।'; ?></p>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="card border-0 shadow-sm text-center p-3 h-100">
-                    <div class="mb-2" style="font-size:2rem;color:var(--primary-light);"><i class="fas fa-check-circle"></i></div>
+                    <div class="mb-2 ds-step-icon ds-step-icon-light"><i class="fas fa-check-circle"></i></div>
                     <h6 class="fw-600"><?php echo isEnglish() ? '4. Service Delivered' : '४. सेवा पाउनुहोस्'; ?></h6>
-                    <p class="text-muted small mb-0"><?php echo isEnglish() ? 'We contact you to fulfill the request.' : 'हामी सम्पर्क गरेर सेवा दिन्छौं।'; ?></p>
+                    <p class="ds-muted small mb-0"><?php echo isEnglish() ? 'We contact you to fulfill the request.' : 'हामी सम्पर्क गरेर सेवा दिन्छौं।'; ?></p>
                 </div>
             </div>
         </div>
@@ -289,7 +289,7 @@ require_once 'includes/header.php';
         <!-- Service cards grid — प्रत्येक सेवा एउटा card -->
         <div class="section-header text-center mb-4">
             <h3><?php echo isEnglish() ? 'Available Digital Services' : 'उपलब्ध डिजिटल सेवाहरू'; ?></h3>
-            <p class="text-muted"><?php echo isEnglish() ? 'Click any card to jump to the request form for that service.' : 'जुन सेवा चाहिएको छ, त्यो card मा click गर्नुहोस् — तलको फारममा सिधै जान्छ।'; ?></p>
+            <p class="ds-muted"><?php echo isEnglish() ? 'Click any card to jump to the request form for that service.' : 'जुन सेवा चाहिएको छ, त्यो card मा click गर्नुहोस् — तलको फारममा सिधै जान्छ।'; ?></p>
         </div>
         <div class="row g-3 mb-2">
             <?php foreach ($serviceTypes as $key => $type): ?>
@@ -331,15 +331,14 @@ require_once 'includes/header.php';
                 </div>
                 <?php endif; ?>
 
-                <div class="card shadow-sm border-0" style="border-radius:14px;overflow:hidden;">
+                <div class="card shadow-sm border-0 ds-form-card-shell">
                     <!-- Card header -->
-                    <div class="card-header py-3 px-4 text-white"
-                         style="background:linear-gradient(135deg,var(--primary-dark),var(--primary-color));">
+                    <div class="card-header py-3 px-4 text-white ds-form-card-head">
                         <h5 class="mb-0">
                             <i class="fas fa-paper-plane me-2"></i>
                             <?php echo isEnglish() ? 'Digital Service Request Form' : 'डिजिटल सेवा अनुरोध फारम'; ?>
                         </h5>
-                        <p class="mb-0 mt-1 opacity-75" style="font-size:0.85rem;">
+                        <p class="mb-0 mt-1 opacity-75 ds-form-card-sub">
                             <?php echo isEnglish()
                                 ? 'Fill in the details below. You will receive a Tracking ID on submission.'
                                 : 'तलको फारम भर्नुहोस्। पेश गरेपछि Tracking ID पाउनुहुन्छ।'; ?>
@@ -355,7 +354,7 @@ require_once 'includes/header.php';
                         <i class="fas fa-user-check me-1"></i><?php echo isEnglish() ? 'Logged in — your name, member no., phone and email are taken from your profile / KYC.' : 'लगइन हुनुहुन्छ — नाम, सदस्य नं., मोबाइल र इमेल प्रोफाइल / KYC बाट लिइन्छ।'; ?>
                     </div>
                     <?php else: ?>
-                    <div class="border rounded-3 p-3 mb-3 bg-light">
+                    <div class="border rounded-3 p-3 mb-3 ds-soft-bg">
                         <label class="form-label fw-semibold d-block mb-2"><?php echo isEnglish() ? 'Are you a cooperative member?' : 'तपाईं सहकारी सदस्य हुनुहुन्छ?'; ?></label>
                         <div class="d-flex flex-wrap gap-3">
                             <label class="form-check-label"><input type="radio" name="is_coop_member" value="no" class="form-check-input me-1 js-ds-coop" <?php echo (($_POST['is_coop_member'] ?? 'no') === 'yes') ? '' : 'checked'; ?>> <?php echo isEnglish() ? 'No' : 'होइन'; ?></label>
@@ -381,8 +380,8 @@ require_once 'includes/header.php';
                         <div class="col-md-6">
                             <label class="form-label">
                                 <?php echo isEnglish() ? 'Member No.' : 'सदस्य नं.'; ?>
-                                <span class="text-danger js-ds-mid-req" style="display:none;">*</span>
-                                <small class="text-muted js-ds-mid-opt">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
+                                <span class="ds-req-mark js-ds-mid-req ds-mid-req">*</span>
+                                <small class="ds-muted js-ds-mid-opt">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
                             </label>
                             <input type="text" name="member_id" class="form-control js-ds-mid"
                                    placeholder="<?php echo isEnglish() ? 'e.g. 12345' : 'जस्तै: १२३४५'; ?>"
@@ -397,7 +396,7 @@ require_once 'includes/header.php';
                                        placeholder="9827157000" pattern="[0-9]{10}" maxlength="10"
                                        value="<?php echo e($_POST['phone'] ?? ($loggedMember['phone'] ?? '')); ?>" <?php echo $lockedMemberFields; ?>>
                             </div>
-                            <small class="text-muted"><?php echo isEnglish() ? '10-digit mobile number' : '१० अंकको मोबाइल नम्बर'; ?></small>
+                            <small class="ds-muted"><?php echo isEnglish() ? '10-digit mobile number' : '१० अंकको मोबाइल नम्बर'; ?></small>
                         </div>
                         <!-- इमेल -->
                         <div class="col-md-6 js-hide-if-ds-coop-yes">
@@ -408,7 +407,7 @@ require_once 'includes/header.php';
                                        placeholder="akashpame@gmail.com"
                                        value="<?php echo e($_POST['email'] ?? ($loggedMember['email'] ?? '')); ?>" <?php echo $lockedMemberFields; ?>>
                             </div>
-                            <small class="text-muted"><?php echo isEnglish() ? 'Required for status notifications' : 'Status सूचनाको लागि अनिवार्य'; ?></small>
+                            <small class="ds-muted"><?php echo isEnglish() ? 'Required for status notifications' : 'Status सूचनाको लागि अनिवार्य'; ?></small>
                         </div>
                     </div>
                     <?php if (!$loggedMember): ?>
@@ -467,7 +466,7 @@ require_once 'includes/header.php';
                         <div class="col-md-6">
                             <label class="form-label">
                                 <?php echo isEnglish() ? 'Account No.' : 'खाता नं.'; ?>
-                                <small class="text-muted">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
+                                <small class="ds-muted">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
                             </label>
                             <input type="text" name="account_number" class="form-control"
                                    placeholder="<?php echo isEnglish() ? 'Account number' : 'खाता नम्बर'; ?>"
@@ -476,7 +475,7 @@ require_once 'includes/header.php';
                     </div>
 
                     <!-- Conditional: Statement fields (statement_request छानेमा मात्र देखिन्छ) -->
-                    <div class="conditional-fields statement-fields" style="display:none;">
+                    <div class="conditional-fields statement-fields">
                         <div class="ds-conditional-box">
                             <div class="ds-conditional-label">
                                 <i class="fas fa-file-invoice me-1"></i>
@@ -498,7 +497,7 @@ require_once 'includes/header.php';
                     </div>
 
                     <!-- Conditional: Bill Payment fields -->
-                    <div class="conditional-fields bill-fields" style="display:none;">
+                    <div class="conditional-fields bill-fields">
                         <div class="ds-conditional-box">
                             <div class="ds-conditional-label">
                                 <i class="fas fa-receipt me-1"></i>
@@ -521,7 +520,7 @@ require_once 'includes/header.php';
                     </div>
 
                     <!-- Conditional: Mobile Recharge fields -->
-                    <div class="conditional-fields recharge-fields" style="display:none;">
+                    <div class="conditional-fields recharge-fields">
                         <div class="ds-conditional-box">
                             <div class="ds-conditional-label">
                                 <i class="fas fa-mobile-screen me-1"></i>
@@ -545,7 +544,7 @@ require_once 'includes/header.php';
                     </div>
 
                     <!-- Conditional: Share services fields -->
-                    <div class="conditional-fields share-fields" style="display:none;">
+                    <div class="conditional-fields share-fields">
                         <div class="ds-conditional-box">
                             <div class="ds-conditional-label">
                                 <i class="fas fa-money-bill-transfer me-1"></i>
@@ -557,7 +556,7 @@ require_once 'includes/header.php';
                                     <input type="number" name="service_amount" class="form-control"
                                            min="0" step="1" placeholder="1000"
                                            value="<?php echo e($_POST['service_amount'] ?? ''); ?>">
-                                    <small class="text-muted"><?php echo isEnglish() ? 'Enter requested share refund/increase amount.' : 'मागिएको शेयर refund/increase रकम राख्नुहोस्।'; ?></small>
+                                    <small class="ds-muted"><?php echo isEnglish() ? 'Enter requested share refund/increase amount.' : 'मागिएको शेयर refund/increase रकम राख्नुहोस्।'; ?></small>
                                 </div>
                             </div>
                         </div>
@@ -574,7 +573,7 @@ require_once 'includes/header.php';
                         <div class="col-md-6">
                             <label class="form-label">
                                 <?php echo isEnglish() ? 'Attachment' : 'संलग्न कागजात'; ?>
-                                <small class="text-muted">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
+                                <small class="ds-muted">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
                             </label>
                             <input type="file" name="attachment" class="form-control"
                                    accept="image/*,.pdf,.doc,.docx">
@@ -590,7 +589,7 @@ require_once 'includes/header.php';
                     </div>
 
                     <div class="d-grid mt-4">
-                        <button type="submit" id="dsSubmitBtn" class="btn btn-primary btn-lg">
+                        <button type="submit" id="dsSubmitBtn" class="btn ds-btn-primary btn-lg">
                             <i class="fas fa-paper-plane me-2"></i>
                             <?php echo isEnglish() ? 'Submit Digital Service Request' : 'डिजिटल सेवा अनुरोध पेश गर्नुहोस्'; ?>
                         </button>
@@ -608,16 +607,16 @@ require_once 'includes/header.php';
     gap: 14px;
     padding: 16px 18px;
     background: white;
-    border: 1.5px solid color-mix(in srgb, var(--primary-color) 14%, #e9ecef);
+    border: 1.5px solid color-mix(in srgb, var(--primary-color) 14%, var(--gray-200));
     border-radius: 14px;
     cursor: pointer;
     transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(var(--primary-rgb,26,95,42),.08);
+    box-shadow: 0 2px 8px rgba(var(--primary-rgb),.08);
 }
 .ds-service-card:hover,
 .ds-service-card:focus {
-    border-color: var(--card-color, var(--primary-color));
-    box-shadow: 0 6px 20px rgba(var(--primary-rgb,26,95,42),.14);
+    border-color: var(--card-color);
+    box-shadow: 0 6px 20px rgba(var(--primary-rgb),.14);
     transform: translateY(-3px);
     outline: none;
 }
@@ -629,8 +628,8 @@ require_once 'includes/header.php';
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
-    background: color-mix(in srgb, var(--card-color, var(--primary-color)) 12%, white);
-    color: var(--card-color, var(--primary-color));
+    background: color-mix(in srgb, var(--card-color) 12%, white);
+    color: var(--card-color);
     flex-shrink: 0;
 }
 .ds-label {
@@ -639,10 +638,10 @@ require_once 'includes/header.php';
     flex-direction: column;
     text-align: left;
 }
-.ds-label strong { font-size: 0.95rem; color: var(--text-color,#222); line-height: 1.3; }
-.ds-label small  { font-size: 0.78rem; color: var(--text-light,#888); margin-top: 2px; }
-.ds-arrow { color: var(--text-muted,#ccc); font-size: 0.85rem; flex-shrink: 0; }
-.ds-service-card:hover .ds-arrow { color: var(--card-color, var(--primary-color)); }
+.ds-label strong { font-size: 0.95rem; color: var(--text-color); line-height: 1.3; }
+.ds-label small  { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
+.ds-arrow { color: var(--text-muted); font-size: 0.85rem; flex-shrink: 0; }
+.ds-service-card:hover .ds-arrow { color: var(--card-color); }
 
 /* ── Conditional field highlight box ── */
 .ds-conditional-box {
@@ -671,11 +670,31 @@ require_once 'includes/header.php';
     font-size: 0.95rem;
     color: var(--primary-color);
     padding-bottom: 8px;
-    border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 14%, #e9ecef);
+    border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 14%, var(--gray-200));
 }
 
 /* ── Font monospace tracking ID ── */
 .font-monospace { font-family: 'Courier New', monospace; letter-spacing: 0.08em; }
+.ds-muted{color:var(--text-muted)!important;}
+.ds-title-ok{color:var(--primary-dark);}
+.ds-btn-primary{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.ds-btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.ds-btn-success{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
+.ds-btn-success:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
+.ds-track-copy{font-size:11px;line-height:1.8;}
+.ds-track-help-link{color:var(--primary-color);text-decoration:none;font-weight:700;}
+.ds-step-icon{font-size:2rem;}
+.ds-step-icon-primary{color:var(--primary-color);}
+.ds-step-icon-secondary{color:var(--secondary-color);}
+.ds-step-icon-accent{color:var(--accent-color);}
+.ds-step-icon-light{color:var(--primary-light);}
+.ds-form-card-shell{border-radius:14px;overflow:hidden;}
+.ds-form-card-head{background:linear-gradient(135deg,var(--primary-dark),var(--primary-color));}
+.ds-form-card-sub{font-size:.85rem;}
+.ds-soft-bg{background:color-mix(in srgb, var(--primary-color) 8%, white);}
+.ds-req-mark{color:var(--secondary-color);}
+.ds-mid-req{display:none;}
+.conditional-fields{display:none;}
 </style>
 
 <!-- JS — service card → scroll to form + pre-select, conditional fields, copy tracking ID -->

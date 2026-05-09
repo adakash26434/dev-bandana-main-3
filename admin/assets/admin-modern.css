@@ -1324,7 +1324,18 @@ textarea.form-control:focus {
 
 .svc-form-header-grad {
     background: linear-gradient(135deg,var(--primary-color),var(--primary-light));
-    color: #fff;
+    color: var(--text-on-primary);
+}
+
+.svc-form-header-grad .btn-light {
+    background: color-mix(in srgb, var(--text-on-primary) 14%, transparent);
+    border-color: color-mix(in srgb, var(--text-on-primary) 28%, transparent);
+    color: var(--text-on-primary);
+}
+
+.svc-form-header-grad .btn-light:hover {
+    background: color-mix(in srgb, var(--text-on-primary) 22%, transparent);
+    color: var(--text-on-primary);
 }
 
 /* Settings page structure cleanup */
@@ -1615,19 +1626,178 @@ body.admin-auth-page {
     margin-left: 8px;
 }
 
-/* Team page inline-style cleanup */
+/* Team page — theme tokens only (no hardcoded badge / chip colors) */
+.tm-search-wrap {
+    background: var(--bg-soft) !important;
+    border-color: var(--border-color) !important;
+}
+
+.tm-search-wrap .tm-input-addon {
+    background: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+.tm-search-wrap .search-count {
+    color: var(--text-muted) !important;
+}
+
+.tm-search-ico {
+    color: var(--text-muted);
+}
+
+.tm-tab-count {
+    background: color-mix(in srgb, var(--primary-color) 85%, var(--primary-dark)) !important;
+    color: var(--text-on-primary) !important;
+    font-weight: 600;
+}
+
+.tm-stat-badge {
+    font-weight: 600;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+.tm-stat-badge--total {
+    background: color-mix(in srgb, var(--primary-color) 12%, var(--bg-card));
+    color: var(--primary-color);
+    border-color: color-mix(in srgb, var(--primary-color) 22%, transparent);
+}
+
+.tm-stat-badge--active {
+    background: color-mix(in srgb, var(--primary-color) 18%, var(--bg-card));
+    color: var(--primary-dark);
+    border-color: color-mix(in srgb, var(--primary-color) 28%, transparent);
+}
+
+.tm-stat-badge--arch {
+    background: color-mix(in srgb, var(--text-muted) 10%, var(--bg-card));
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+.tm-form-label {
+    color: var(--primary-color) !important;
+}
+
+.tm-req-star {
+    color: var(--secondary-color);
+    font-weight: 800;
+}
+
+.tm-meta-muted {
+    color: var(--text-muted) !important;
+}
+
+.tm-inline-link {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.tm-inline-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.tm-ico-accent {
+    color: var(--primary-color) !important;
+}
+
+.tm-empty-state-ico {
+    color: color-mix(in srgb, var(--primary-color) 45%, var(--text-muted)) !important;
+}
+
+.tm-role-badge {
+    font-weight: 600;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+}
+
+.tm-role-badge--info {
+    background: color-mix(in srgb, var(--primary-color) 12%, var(--bg-card));
+    color: var(--primary-color);
+    border-color: color-mix(in srgb, var(--primary-color) 25%, transparent);
+}
+
+.tm-role-badge--griev {
+    background: color-mix(in srgb, var(--secondary-color) 12%, var(--bg-card));
+    color: var(--secondary-color);
+    border-color: color-mix(in srgb, var(--secondary-color) 28%, transparent);
+}
+
+.tm-status--on {
+    background: var(--primary-color) !important;
+    color: var(--text-on-primary) !important;
+}
+
+.tm-status--off {
+    background: color-mix(in srgb, var(--text-muted) 12%, var(--bg-card)) !important;
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.tm-btn-edit {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-on-primary) !important;
+}
+
+.tm-btn-edit:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: var(--text-on-primary) !important;
+}
+
+.tm-btn-del {
+    border-color: color-mix(in srgb, var(--secondary-color) 55%, var(--border-color)) !important;
+    color: var(--secondary-color) !important;
+}
+
+.tm-btn-del:hover {
+    background: color-mix(in srgb, var(--secondary-color) 10%, var(--bg-card)) !important;
+    color: var(--secondary-dark) !important;
+}
+
+.tm-btn-submit {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-on-primary) !important;
+}
+
+.tm-btn-submit:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: var(--text-on-primary) !important;
+}
+
+.tm-btn-cancel {
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    background: var(--bg-card) !important;
+}
+
+.tm-btn-cancel:hover {
+    border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color)) !important;
+    color: var(--primary-dark) !important;
+    background: var(--bg-soft) !important;
+}
+
 .tm-avatar-photo {
     width: 50px;
     height: 50px;
     object-fit: cover;
     border-radius: 50%;
-    border: 2px solid #e0f0e8;
+    border: 2px solid color-mix(in srgb, var(--primary-color) 22%, var(--border-color));
 }
 
 .tm-avatar-fallback {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg,rgba(26,95,42,.15),rgba(40,167,69,.2));
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.14), rgba(var(--primary-rgb), 0.22));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1638,6 +1808,10 @@ body.admin-auth-page {
     font-weight: 600;
     font-size: .78rem;
     padding: 5px 10px;
+    --tm-cat: var(--primary-color);
+    background: color-mix(in srgb, var(--tm-cat) 16%, var(--bg-card));
+    color: var(--tm-cat);
+    border: 1px solid color-mix(in srgb, var(--tm-cat) 32%, transparent);
 }
 
 .tm-status-toggle-btn {
@@ -1654,7 +1828,7 @@ body.admin-auth-page {
     height: 70px;
     object-fit: cover;
     border-radius: 50%;
-    border: 2px solid #e0f0e8;
+    border: 2px solid color-mix(in srgb, var(--primary-color) 22%, var(--border-color));
 }
 
 /* Committees page inline-style cleanup */
@@ -2081,9 +2255,9 @@ form.kyc-form .row > [class*="col-"],
     border-color: rgba(255,255,255,0.28) !important;
 }
 
-/* भित्रको उप-ट्याब — हरियो ट्रे + सेतो सक्रिय (Member Online Portal / सूची उप-ट्याब) */
+/* भित्रको उप-ट्याब — ब्रान्ड ट्रे + सेतो सक्रिय (Member Online Portal / सूची उप-ट्याब) */
 .main-content ul.nav.nav-pills.admin-inner-tabstrip {
-    background: linear-gradient(135deg, var(--primary-color, #1a5f2a), #145a32) !important;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
     border-radius: 10px !important;
     border: none !important;
 }
@@ -2092,7 +2266,7 @@ form.kyc-form .row > [class*="col-"],
 }
 .main-content ul.nav.admin-inner-tabstrip .nav-link {
     background: transparent !important;
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: color-mix(in srgb, var(--text-on-primary) 94%, transparent) !important;
     border: 1px solid transparent !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
@@ -2101,37 +2275,51 @@ form.kyc-form .row > [class*="col-"],
     opacity: 1 !important;
 }
 .main-content ul.nav.admin-inner-tabstrip .nav-link:hover {
-    background: rgba(255, 255, 255, 0.14) !important;
-    color: #ffffff !important;
+    background: color-mix(in srgb, var(--text-on-primary) 14%, transparent) !important;
+    color: var(--text-on-primary) !important;
     border-color: transparent !important;
 }
 .main-content ul.nav.admin-inner-tabstrip .nav-link.active,
 .main-content ul.nav.admin-inner-tabstrip .show > .nav-link {
-    background: #ffffff !important;
-    color: #1f2937 !important;
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
     border-color: transparent !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 1px 4px rgba(var(--primary-rgb), 0.12) !important;
 }
-.main-content ul.nav.admin-inner-tabstrip .nav-link .badge {
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+.main-content ul.nav.admin-inner-tabstrip .nav-link .badge.adm-subpill-count {
+    font-weight: 700 !important;
+    font-size: 0.72rem !important;
+    padding: 0.2rem 0.45rem !important;
+    border-radius: 999px !important;
 }
-.main-content ul.nav.admin-inner-tabstrip .nav-link.active .badge.bg-success,
-.main-content ul.nav.admin-inner-tabstrip .show > .nav-link .badge.bg-success {
-    background: #22c55e !important;
-    color: #ffffff !important;
-    border-color: #16a34a !important;
+/* Inactive tab (on brand strip): soft pill counts */
+.main-content ul.nav.admin-inner-tabstrip .nav-link:not(.active) .adm-subpill-count {
+    background: color-mix(in srgb, var(--text-on-primary) 18%, transparent) !important;
+    color: var(--text-on-primary) !important;
+    border: 1px solid color-mix(in srgb, var(--text-on-primary) 28%, transparent) !important;
 }
-.main-content ul.nav.admin-inner-tabstrip .nav-link.active .badge.bg-secondary,
-.main-content ul.nav.admin-inner-tabstrip .show > .nav-link .badge.bg-secondary {
-    background: #64748b !important;
-    color: #ffffff !important;
-    border-color: #475569 !important;
+.main-content ul.nav.admin-inner-tabstrip .nav-link:not(.active) .adm-subpill-count--live {
+    background: color-mix(in srgb, var(--text-on-primary) 22%, transparent) !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link:not(.active) .adm-subpill-count--arch {
+    background: color-mix(in srgb, var(--text-on-primary) 14%, transparent) !important;
+}
+/* Active tab (white chip): counts use brand / muted tokens */
+.main-content ul.nav.admin-inner-tabstrip .nav-link.active .adm-subpill-count--live,
+.main-content ul.nav.admin-inner-tabstrip .show > .nav-link .adm-subpill-count--live {
+    background: color-mix(in srgb, var(--primary-color) 16%, var(--bg-card)) !important;
+    color: var(--primary-dark) !important;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent) !important;
+}
+.main-content ul.nav.admin-inner-tabstrip .nav-link.active .adm-subpill-count--arch,
+.main-content ul.nav.admin-inner-tabstrip .show > .nav-link .adm-subpill-count--arch {
+    background: color-mix(in srgb, var(--text-muted) 12%, var(--bg-card)) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
 .main-content .admin-inner-tabstrip-tray {
-    background: linear-gradient(135deg, var(--primary-color, #1a5f2a), #145a32);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     border-radius: 10px;
     padding: 6px 8px;
 }

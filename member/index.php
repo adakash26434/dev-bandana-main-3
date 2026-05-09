@@ -128,7 +128,7 @@ $greeting = $hour < 12 ? $_t('शुभ बिहान', 'Good Morning') : ($ho
 $quickActions = [
     ['href' => $siteUrl.'member/apply-frame.php?p=appointment', 'icon' => 'fa-calendar-check',     'color' => 'var(--primary-color)', 'label' => $_t('भेटघाट', 'Appointment')],
     ['href' => $siteUrl.'member/kyc.php',                        'icon' => 'fa-id-card',             'color' => 'var(--secondary-color)', 'label' => $_t('KYC दर्ता', 'KYC Registration')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark,var(--secondary-color))', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
+    ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark)', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
     ['href' => $siteUrl.'member/apply-frame.php?p=account',     'icon' => 'fa-university',          'color' => 'var(--primary-color)', 'label' => $_t('खाता खोल्ने', 'Open Account')],
     ['href' => $siteUrl.'member/apply-frame.php?p=digital',     'icon' => 'fa-laptop',              'color' => 'var(--secondary-color)', 'label' => $_t('डिजिटल सेवा', 'Digital Service')],
     ['href' => $siteUrl.'member/apply-frame.php?p=grievance',   'icon' => 'fa-comment-exclamation', 'color' => 'var(--secondary-color)', 'label' => $_t('गुनासो', 'Grievance')],
@@ -139,7 +139,7 @@ $quickActions = [
 $iconMap = [
     'success'=>['fas fa-circle-check','var(--primary-color)','color-mix(in srgb, var(--primary-color) 12%, white)'],
     'error'  =>['fas fa-circle-xmark','var(--secondary-color)','color-mix(in srgb, var(--secondary-color) 14%, white)'],
-    'warning'=>['fas fa-triangle-exclamation','var(--secondary-dark,var(--secondary-color))','color-mix(in srgb, var(--secondary-color) 14%, white)'],
+    'warning'=>['fas fa-triangle-exclamation','var(--secondary-dark)','color-mix(in srgb, var(--secondary-color) 14%, white)'],
     'info'   =>['fas fa-circle-info','var(--accent-color)','color-mix(in srgb, var(--accent-color) 12%, white)']
 ];
 $pageTitle = $_t('सदस्य ड्यासबोर्ड', 'Member Dashboard') . ' — ' . $siteName;
@@ -148,45 +148,45 @@ require __DIR__ . '/includes/chrome.php';
 <style>
 .midx-greeting{margin-bottom:16px;}
 .midx-greeting-title{margin:0;color:var(--primary-color);}
-.midx-greeting-date{margin:4px 0 0;color:var(--text-light,#6b7280);font-size:.88rem;}
-.midx-stat-pending{color:var(--secondary-dark,var(--secondary-color));}
+.midx-greeting-date{margin:4px 0 0;color:var(--text-light);font-size:.88rem;}
+.midx-stat-pending{color:var(--secondary-dark);}
 .midx-stat-approved{color:var(--primary-color);}
 .midx-stat-notif{color:var(--secondary-color);}
 .midx-stat-partner{color:var(--accent-color);}
 .midx-ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
 .midx-ds-card{border-radius:12px;padding:14px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;transition:transform .15s,box-shadow .15s;}
-.midx-ds-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(var(--primary-rgb,26,95,42),.12);}
+.midx-ds-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(var(--primary-rgb),.12);}
 .midx-ds-icon-wrap{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
-.midx-ds-icon{color:var(--text-on-primary,white);font-size:1.1rem;}
-.midx-ds-label{font-size:.8rem;font-weight:700;color:var(--text-color,#1f2937);}
-.midx-ds-desc{font-size:.68rem;color:var(--text-light,#6b7280);}
+.midx-ds-icon{color:var(--text-on-primary);font-size:1.1rem;}
+.midx-ds-label{font-size:.8rem;font-weight:700;color:var(--text-color);}
+.midx-ds-desc{font-size:.68rem;color:var(--text-light);}
 .midx-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 .midx-link{font-size:.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;}
 .midx-body-pad-sm{padding-top:6px;}
 .midx-filter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-.midx-filter-pill{padding:4px 10px;border-radius:18px;font-size:.7rem;font-weight:700;text-decoration:none;border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, #e5e7eb);background:white;color:var(--text-light,#6b7280);}
-.midx-filter-pill.is-active{border-color:var(--mem-primary);background:var(--mem-primary);color:var(--text-on-primary,white);}
+.midx-filter-pill{padding:4px 10px;border-radius:18px;font-size:.7rem;font-weight:700;text-decoration:none;border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, var(--gray-200));background:white;color:var(--text-light);}
+.midx-filter-pill.is-active{border-color:var(--mem-primary);background:var(--mem-primary);color:var(--text-on-primary);}
 .midx-search-form{display:flex;gap:6px;align-items:center;margin-bottom:10px;}
-.midx-search-input{flex:1;min-width:0;border:1px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db);border-radius:8px;padding:6px 9px;font-size:.76rem;}
-.midx-search-btn{padding:6px 10px;border:none;border-radius:8px;background:var(--mem-primary);color:var(--text-on-primary,white);font-size:.74rem;font-weight:700;}
-.midx-reset-btn{padding:6px 10px;border:1px solid color-mix(in srgb, var(--primary-color) 20%, #d1d5db);border-radius:8px;background:white;color:var(--text-light,#6b7280);font-size:.74rem;font-weight:700;text-decoration:none;}
+.midx-search-input{flex:1;min-width:0;border:1px solid color-mix(in srgb, var(--primary-color) 20%, var(--gray-300));border-radius:8px;padding:6px 9px;font-size:.76rem;}
+.midx-search-btn{padding:6px 10px;border:none;border-radius:8px;background:var(--mem-primary);color:var(--text-on-primary);font-size:.74rem;font-weight:700;}
+.midx-reset-btn{padding:6px 10px;border:1px solid color-mix(in srgb, var(--primary-color) 20%, var(--gray-300));border-radius:8px;background:white;color:var(--text-light);font-size:.74rem;font-weight:700;text-decoration:none;}
 .midx-empty-sub{margin-top:8px;font-size:.78rem;}
-.midx-track{font-size:.68rem;color:var(--text-light,#6b7280);font-family:monospace;}
+.midx-track{font-size:.68rem;color:var(--text-light);font-family:monospace;}
 .midx-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--mem-accent);flex-shrink:0;margin-top:6px;}
 .midx-card-mt{margin-top:18px;}
-.midx-muted-count{font-size:.75rem;color:var(--text-light,#6b7280);font-weight:600;}
-.midx-empty-note{margin-top:6px;font-size:.78rem;color:var(--text-muted,#9ca3af);}
+.midx-muted-count{font-size:.75rem;color:var(--text-light);font-weight:600;}
+.midx-empty-note{margin-top:6px;font-size:.78rem;color:var(--text-muted);}
 .midx-ph-taken{color:var(--primary-color);}
 .midx-ph-org{color:var(--accent-color);font-size:.72rem;margin-right:4px;}
 .midx-ph-mini{font-size:.72rem;}
 .midx-alert-gap{margin-bottom:16px;}
 .midx-stat-brand{color:var(--primary-color);}
 .midx-card-gap{margin-bottom:18px;}
-.midx-action-icon{background:var(--midx-action-color,var(--primary-color));}
-.midx-ds-card-bg{background:var(--midx-ds-bg,color-mix(in srgb, var(--primary-color) 10%, white));}
-.midx-ds-icon-bg{background:var(--midx-ds-color,var(--primary-color));}
+.midx-action-icon{background:var(--midx-action-color);}
+.midx-ds-card-bg{background:var(--midx-ds-bg);}
+.midx-ds-icon-bg{background:var(--midx-ds-color);}
 .midx-notif-item{border-radius:8px;}
-.midx-notif-dot-icon{background:var(--midx-ic-bg,color-mix(in srgb, var(--primary-color) 10%, white));color:var(--midx-ic-color,var(--primary-color));}
+.midx-notif-dot-icon{background:var(--midx-ic-bg);color:var(--midx-ic-color);}
 .midx-flex-grow{flex:1;min-width:0;}
 .midx-notif-dot-inline{position:static;}
 </style>
@@ -263,13 +263,13 @@ require __DIR__ . '/includes/chrome.php';
                 $andUrl = getSetting('play_store_url', '');
                 $digitalServices = [];
                 if ($ibUrl)  $digitalServices[] = ['icon'=>'fa-laptop',      'color'=>'var(--accent-color)','bg'=>'color-mix(in srgb, var(--accent-color) 12%, white)','label'=>'Internet Banking','href'=>$ibUrl, 'desc'=>$_t('Online खाता व्यवस्थापन','Online account management'),'target'=>'_blank'];
-                if ($iosUrl) $digitalServices[] = ['icon'=>'fa-apple','iconLib'=>'fab','color'=>'var(--text-color,#111827)','bg'=>'color-mix(in srgb, var(--primary-color) 10%, white)','label'=>'iOS App','href'=>$iosUrl,'desc'=>$_t('App Store बाट डाउनलोड','Download from App Store'),'target'=>'_blank'];
+                if ($iosUrl) $digitalServices[] = ['icon'=>'fa-apple','iconLib'=>'fab','color'=>'var(--text-color)','bg'=>'color-mix(in srgb, var(--primary-color) 10%, white)','label'=>'iOS App','href'=>$iosUrl,'desc'=>$_t('App Store बाट डाउनलोड','Download from App Store'),'target'=>'_blank'];
                 if ($andUrl) $digitalServices[] = ['icon'=>'fa-google-play','iconLib'=>'fab','color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>'Android App','href'=>$andUrl,'desc'=>$_t('Play Store बाट डाउनलोड','Download from Play Store'),'target'=>'_blank'];
                 $digitalServices = array_merge($digitalServices, [
                     ['icon'=>'fa-mobile-screen-button','color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>'Mobile Banking',   'href'=>$siteUrl.'digital-services.php#mobile-banking','desc'=>$_t('कुनै पनि समय बैंकिङ','Anytime banking')],
-                    ['icon'=>'fa-qrcode',              'color'=>'var(--secondary-dark,var(--secondary-color))','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>'QR Payment',       'href'=>$siteUrl.'digital-services.php#qr-payment',   'desc'=>$_t('छिटो भुक्तानी','Quick payment')],
+                    ['icon'=>'fa-qrcode',              'color'=>'var(--secondary-dark)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>'QR Payment',       'href'=>$siteUrl.'digital-services.php#qr-payment',   'desc'=>$_t('छिटो भुक्तानी','Quick payment')],
                     ['icon'=>'fa-file-invoice-dollar', 'color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>'Online Loan',       'href'=>$siteUrl.'member/apply-frame.php?p=loan',     'desc'=>$_t('घरबाटै ऋण आवेदन','Apply loan from home')],
-                    ['icon'=>'fa-piggy-bank',          'color'=>'var(--secondary-dark,var(--secondary-color))','bg'=>'color-mix(in srgb, var(--secondary-color) 10%, white)','label'=>'Online Bachat',     'href'=>$siteUrl.'digital-services.php#bachat',       'desc'=>$_t('बचत खाता Online','Online savings account')],
+                    ['icon'=>'fa-piggy-bank',          'color'=>'var(--secondary-dark)','bg'=>'color-mix(in srgb, var(--secondary-color) 10%, white)','label'=>'Online Bachat',     'href'=>$siteUrl.'digital-services.php#bachat',       'desc'=>$_t('बचत खाता Online','Online savings account')],
                     ['icon'=>'fa-headset',             'color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>'24/7 Support',      'href'=>$siteUrl.'digital-services.php#support',      'desc'=>$_t('सहायता केन्द्र','Support center')],
                     ['icon'=>'fa-id-card',             'color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>'Digital ID Card',   'href'=>$siteUrl.'member/id-card.php',
                      'desc'=>$mem['id_card_generated'] ? $_t('ID Card हेर्नुहोस्','View ID card') : $_t('Admin Generate गर्दैछन्','Pending admin generation')],
@@ -328,7 +328,7 @@ require __DIR__ . '/includes/chrome.php';
                 <div class="mem-app-item">
                     <div class="mem-app-icon midx-action-icon" style="--midx-action-color:<?php echo htmlspecialchars($app['service_color'], ENT_QUOTES, 'UTF-8'); ?>;"><i class="fas <?php echo $app['service_icon']; ?>"></i></div>
                     <div class="mem-app-info">
-                        <div class="mem-app-service midx-stat-brand" style="--midx-action-color:<?php echo htmlspecialchars($app['service_color'], ENT_QUOTES, 'UTF-8'); ?>;color:var(--midx-action-color,var(--primary-color));"><?php echo htmlspecialchars($app['service_name']); ?></div>
+                        <div class="mem-app-service midx-stat-brand" style="--midx-action-color:<?php echo htmlspecialchars($app['service_color'], ENT_QUOTES, 'UTF-8'); ?>;color:var(--midx-action-color);"><?php echo htmlspecialchars($app['service_name']); ?></div>
                         <div class="mem-app-detail"><?php echo htmlspecialchars($app['detail'] ?: '—'); ?></div>
                         <div class="mem-app-date"><?php echo formatNepaliDate($app['created_at'], true); ?></div>
                     </div>
