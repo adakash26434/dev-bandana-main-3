@@ -124,6 +124,10 @@ if (isset($_GET['edit'])) {
     $stmt->execute([(int) $_GET['edit']]);
     $editReport = $stmt->fetch();
 }
+$panel = (string)($_GET['panel'] ?? ($editReport ? 'form' : 'list'));
+if (!in_array($panel, ['list', 'form'], true)) {
+    $panel = 'list';
+}
 
 // Get report type labels
 function getReportTypeLabel($type) {
@@ -150,10 +154,24 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
         <div class="col-12"></div>
     </div>
 
+    <ul class="nav nav-tabs admin-nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link <?php echo $panel === 'list' ? 'active' : ''; ?>" href="reports.php?<?php echo htmlspecialchars(http_build_query(array_filter(['type' => $filterType !== 'all' ? $filterType : null, 'panel' => 'list'])), ENT_QUOTES, 'UTF-8'); ?>">
+                <i class="fas fa-list me-2"></i><?php echo $__t('सूची', 'List'); ?>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?php echo $panel === 'form' ? 'active' : ''; ?>" href="reports.php?panel=form">
+                <i class="fas fa-pen me-2"></i><?php echo $editReport ? $__t('सम्पादन', 'Edit') : $__t('फर्म', 'Form'); ?>
+            </a>
+        </li>
+    </ul>
+
+    <?php if ($panel === 'form'): ?>
     <div class="row">
         <!-- Form Section -->
-        <div class="col-lg-5">
-            <div class="card">
+        <div class="col-12">
+            <div class="card admin-table-card">
                 <div class="card-header">
                     <h5><?php echo $editReport ? $__t('प्रतिवेदन सम्पादन', 'Edit Report') : $__t('नयाँ प्रतिवेदन थप्नुहोस्', 'Add New Report'); ?></h5>
                 </div>
@@ -255,10 +273,13 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                 </div>
             </div>
         </div>
+    </div>
+    <?php else: ?>
 
         <!-- List Section -->
-        <div class="col-lg-7">
-            <div class="card">
+    <div class="row">
+        <div class="col-12">
+            <div class="card admin-table-card">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <h5 class="mb-0 flex-shrink-0"><?php echo $__t('प्रतिवेदन सूची', 'Report List'); ?></h5>
                     <div class="filter-buttons d-flex flex-wrap gap-2">
@@ -356,6 +377,7 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -363,6 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const reportType = document.getElementById('reportType');
     const monthField = document.getElementById('monthField');
     const quarterField = document.getElementById('quarterField');
+    if (!reportType || !monthField || !quarterField) return;
 
     function toggleFields() {
         const type = reportType.value;
