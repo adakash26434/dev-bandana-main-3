@@ -253,7 +253,7 @@ body.auth-portal-page .security-note {
    Unified compact auth design system (admin/member/verify)
    Keeps per-page logic unchanged; only visual alignment.
 ------------------------------------------------------------------- */
-body.auth-portal-page .page-back {
+body.auth-portal-page:not(.verify-auth-page) .page-back {
   position: fixed;
   top: 18px;
   right: 20px;
@@ -273,7 +273,7 @@ body.auth-portal-page .page-back {
   box-shadow: 0 1px 4px color-mix(in srgb, var(--text-primary) 6%, transparent);
 }
 
-body.auth-portal-page .page-back:hover {
+body.auth-portal-page:not(.verify-auth-page) .page-back:hover {
   border-color: color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
   background: var(--bg-card);
 }
@@ -613,7 +613,11 @@ body.auth-portal-page.verify-auth-page .auth-portal-toolbar {
 }
 
 body.auth-portal-page.verify-auth-page .auth-portal-toolbar .page-back {
+  position: static;
+  top: auto;
+  right: auto;
   margin-bottom: 0;
+  backdrop-filter: none;
 }
 
 body.auth-portal-page.verify-auth-page .auth-lang-toggle {
