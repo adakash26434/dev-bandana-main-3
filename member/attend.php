@@ -43,14 +43,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
         $checkInErr = $_t('सुरक्षा जाँच असफल।', 'Security check failed.');
     } else {
         $progId = (int)($_POST['program_id'] ?? 0);
+        $qrToken = trim((string)($_POST['qr_token'] ?? ''));
+        $source = 'member_portal';
+        
         if ($progId > 0) {
             try {
                 /* Verify program exists and is active */
-                $prog = $db->prepare("SELECT id, title, is_active FROM upcoming_programs WHERE id=? LIMIT 1");
+                $prog = $db->prepare("SELECT id, title, is_active, qr_token, qr_enabled FROM upcoming_programs WHERE id=? LIMIT 1");
                 $prog->execute([$progId]);
                 $progRow = $prog->fetch(PDO::FETCH_ASSOC);
+                
                 if (!$progRow || !$progRow['is_active']) {
                     $checkInErr = $_t('यो कार्यक्रम उपलब्ध छैन।', 'This program is not available.');
+                } elseif ($qrToken && $progRow['qr_enabled'] && $qrToken !== $progRow['qr_token']) {
+                    $checkInErr = $_t('QR token अमान्य छ।', 'Invalid QR token.');
                 } else {
                     /* Check duplicate */
                     $dup = $db->prepare("SELECT id FROM member_program_attendance WHERE member_id=? AND program_id=? LIMIT 1");
@@ -58,11 +64,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
                     if ($dup->fetchColumn()) {
                         $checkInErr = $_t('तपाईं यो कार्यक्रममा पहिल्यै check-in हुनुभएको छ।', 'You are already checked in for this program.');
                     } else {
+                        // Set source based on QR usage
+                        if ($qrToken) {
+                            $source = 'qr_scan_auto';
+                        }
+                        
                         $ins = $db->prepare("INSERT INTO member_program_attendance
-                            (member_id, member_card_no, program_id, program_title, source, verified_by_ip)
-                            VALUES (?,?,?,?,?,?)");
-                        $ins->execute([$memberId, $memCard, $progId, $progRow['title'], 'member_portal', $_SERVER['REMOTE_ADDR'] ?? '']);
-                        $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा उपस्थिति दर्ता भयो!', 'attendance recorded successfully!');
+                            (member_id, member_card_no, program_id, program_title, source, verified_by_ip, notes)
+                            VALUES (?,?,?,?,?,?,?)");
+                        $ins->execute([
+                            $memberId, 
+                            $memCard, 
+                            $progId, 
+                            $progRow['title'], 
+                            $source, 
+                            $_SERVER['REMOTE_ADDR'] ?? '',
+                            $qrToken ? json_encode(['qr_token' => $qrToken, 'scan_time' => date('Y-m-d H:i:s')]) : null
+                        ]);
+                        
+                        if ($qrToken) {
+                            $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा QR स्क्यानबाट उपस्थिति दर्ता भयो!', 'attendance recorded via QR scan!');
+                        } else {
+                            $checkInMsg = '"' . htmlspecialchars($progRow['title']) . '" ' . $_t('मा उपस्थिति दर्ता भयो!', 'attendance recorded successfully!');
+                        }
                     }
                 }
             } catch (Throwable $e) {
@@ -256,7 +280,7 @@ HTML;
   <?php endif; ?>
 
   <?php if ($qrProgramRow): ?>
-  <div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1.5px solid #6ee7b7;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 4px 14px rgba(16,185,129,.12);">
+  <div class="attend-hero">
     <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">
       <div style="width:48px;height:48px;border-radius:12px;background:var(--primary-color,#1a8754);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;"><i class="fas fa-qrcode"></i></div>
       <div style="flex:1;min-width:200px;">
@@ -291,7 +315,61 @@ HTML;
   </div>
   <?php endif; ?>
 
-  <!-- Member QR + stats bar -->
+  <!-- Mobile Program Flow -->
+<div class="program-flow-container">
+  <div class="program-flow-card">
+    <div class="program-flow-header">
+      <div class="program-flow-icon">
+        <i class="fas fa-qrcode"></i>
+      </div>
+      <h3 class="program-flow-title"><?php echo $_t('QR स्क्यान गर्नुहोस्', 'QR Scan'); ?></h3>
+    </div>
+    <p class="program-flow-description">
+      <?php echo $_t('कार्यक्रम स्थलमा राखिएको QR कोड स्क्यान गरी तुरुन्त check-in गर्नुहोस्।', 'Scan QR code at program venue to check-in automatically.'); ?>
+    </p>
+    <div class="program-flow-actions">
+      <a href="scan.php" class="program-flow-btn primary">
+        <i class="fas fa-camera me-2"></i><?php echo $_t('स्क्यान गर्नुहोस्', 'Scan Now'); ?>
+      </a>
+    </div>
+  </div>
+
+  <div class="program-flow-card">
+    <div class="program-flow-header">
+      <div class="program-flow-icon" style="background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 15%, white), color-mix(in srgb, var(--secondary-color) 25%, white)); color: var(--secondary-color);">
+        <i class="fas fa-hand-pointer"></i>
+      </div>
+      <h3 class="program-flow-title"><?php echo $_t('म्यानुअल Check-in', 'Manual Check-in'); ?></h3>
+    </div>
+    <p class="program-flow-description">
+      <?php echo $_t('उपलब्ध कार्यक्रमहरूको सूचीबाट छानेर check-in गर्नुहोस्।', 'Select from available programs and check-in manually.'); ?>
+    </p>
+    <div class="program-flow-actions">
+      <button type="button" class="program-flow-btn secondary" onclick="scrollToPrograms()">
+        <i class="fas fa-list me-2"></i><?php echo $_t('कार्यक्रमहरू हेर्नुहोस्', 'View Programs'); ?>
+      </button>
+    </div>
+  </div>
+
+  <div class="program-flow-card">
+    <div class="program-flow-header">
+      <div class="program-flow-icon" style="background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 15%, white), color-mix(in srgb, var(--accent-color) 25%, white)); color: var(--accent-color);">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <h3 class="program-flow-title"><?php echo $_t('उपस्थिति इतिहास', 'Attendance History'); ?></h3>
+    </div>
+    <p class="program-flow-description">
+      <?php echo $_t('आफ्नो सबै कार्यक्रम उपस्थिति रेकर्डहरू हेर्नुहोस्।', 'View all your program attendance records.'); ?>
+    </p>
+    <div class="program-flow-actions">
+      <a href="#attendance-history" class="program-flow-btn secondary">
+        <i class="fas fa-history me-2"></i><?php echo $_t('इतिहास हेर्नुहोस्', 'View History'); ?>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Member QR + stats bar -->
   <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
     <div style="text-align:center;">
       <img src="<?= htmlspecialchars($memberQr) ?>" alt="QR" width="70" height="70" style="border-radius:6px;border:1px solid #e5e7eb;">
@@ -303,6 +381,14 @@ HTML;
       <div style="font-size:.78rem;color:#6b7280;font-family:monospace;"><?= htmlspecialchars($memCard) ?></div>
       <?php endif; ?>
       <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+      <script>
+      function scrollToPrograms() {
+        const programsSection = document.getElementById('upcoming-programs');
+        if (programsSection) {
+          programsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+      </script>
         <div style="text-align:center;">
           <div style="font-size:1.3rem;font-weight:800;color:var(--primary-color,#1a8754);"><?= count($myAttendance) ?></div>
           <div style="font-size:.7rem;color:#9ca3af;">उपस्थित कार्यक्रम</div>

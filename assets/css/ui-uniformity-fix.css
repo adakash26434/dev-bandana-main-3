@@ -1,0 +1,410 @@
+/**
+ * UI UNIFORMITY FIX — Global Consistency Patch
+ * ============================================
+ * Fixes inconsistent font sizes, colors, and styling across
+ * admin, member, and public interfaces.
+ * 
+ * Load this file AFTER all other CSS files to ensure it takes precedence.
+ */
+
+/* ═══════════════════════════════════════════════════
+   1. GLOBAL FONT SIZE STANDARDIZATION
+   ═══════════════════════════════════════════════════ */
+
+/* Base font size reset - ensure consistency */
+html {
+    font-size: 14px !important;
+}
+
+/* Standard font sizes for all interfaces */
+:root {
+    --font-xs: 0.75rem;    /* 12px */
+    --font-sm: 0.875rem;   /* 14px */
+    --font-base: 1rem;     /* 16px */
+    --font-lg: 1.125rem;   /* 18px */
+    --font-xl: 1.25rem;    /* 20px */
+    --font-2xl: 1.5rem;    /* 24px */
+    --font-3xl: 1.875rem;  /* 30px */
+}
+
+/* Body text - consistent across all panels */
+body, .mem-wrapper, .main-content {
+    font-family: var(--font-primary, 'Mukta', 'Noto Sans Devanagari', 'Segoe UI', sans-serif) !important;
+    font-size: var(--font-base) !important;
+    line-height: 1.6 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   2. HEADING UNIFORMITY
+   ═══════════════════════════════════════════════════ */
+
+/* Page titles - consistent size */
+h1, .page-title, .dash-title-main {
+    font-size: var(--font-2xl) !important;
+    font-weight: 700 !important;
+    color: var(--primary-color, #1a5f2a) !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Section headers */
+h2, .card-header h5, .card-header h6 {
+    font-size: var(--font-xl) !important;
+    font-weight: 600 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+}
+
+/* Subsection headers */
+h3, .section-header h2, .section-header h3 {
+    font-size: var(--font-lg) !important;
+    font-weight: 600 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+}
+
+/* Small headings */
+h4, h5, h6 {
+    font-size: var(--font-base) !important;
+    font-weight: 600 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   3. ADMIN INTERFACE SPECIFIC FIXES
+   ═══════════════════════════════════════════════════ */
+
+/* Sidebar navigation */
+.sidebar-nav a {
+    font-size: var(--font-sm) !important;
+    font-weight: 500 !important;
+}
+
+.nav-group-header {
+    font-size: var(--font-xs) !important;
+    font-weight: 700 !important;
+}
+
+/* Card headers */
+.card-header {
+    font-size: var(--font-sm) !important;
+    font-weight: 600 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+}
+
+/* Tables */
+.table {
+    font-size: var(--font-sm) !important;
+}
+
+.table th {
+    font-size: var(--font-xs) !important;
+    font-weight: 600 !important;
+}
+
+/* Forms */
+.form-label {
+    font-size: var(--font-sm) !important;
+    font-weight: 500 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+}
+
+.form-control, .form-select {
+    font-size: var(--font-base) !important;
+}
+
+/* Buttons */
+.btn {
+    font-size: var(--font-sm) !important;
+    font-weight: 500 !important;
+}
+
+.btn-sm {
+    font-size: var(--font-xs) !important;
+}
+
+/* Badges */
+.badge {
+    font-size: var(--font-xs) !important;
+    font-weight: 600 !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   4. MEMBER INTERFACE SPECIFIC FIXES
+   ═══════════════════════════════════════════════════ */
+
+/* Member container headings */
+.mem-container h1 {
+    font-size: var(--font-2xl) !important;
+}
+
+.mem-container h2 {
+    font-size: var(--font-xl) !important;
+}
+
+/* Member topbar */
+.mem-topbar-brand .mem-brand-name {
+    font-size: var(--font-sm) !important;
+    font-weight: 700 !important;
+}
+
+.mem-topbar-brand .mem-brand-sub {
+    font-size: var(--font-xs) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   5. COLOR CONSISTENCY
+   ═══════════════════════════════════════════════════ */
+
+/* Primary color consistency */
+.text-primary, .btn-primary, .page-title, .dash-title-main {
+    color: var(--primary-color, #1a5f2a) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color, #1a5f2a) !important;
+    border-color: var(--primary-color, #1a5f2a) !important;
+}
+
+/* Secondary text colors */
+.text-muted, .form-text, .empty-state p {
+    color: var(--text-muted, #6b7280) !important;
+    font-size: var(--font-sm) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   6. UTILITY CLASSES FOR CONSISTENCY
+   ═══════════════════════════════════════════════════ */
+
+/* Consistent spacing */
+.section-spacing {
+    margin-bottom: 2rem !important;
+}
+
+.subsection-spacing {
+    margin-bottom: 1rem !important;
+}
+
+/* Consistent card styling */
+.unified-card {
+    background: var(--bg-card, #ffffff) !important;
+    border: 1px solid var(--border-color, #e5e7eb) !important;
+    border-radius: var(--radius-lg, 16px) !important;
+    box-shadow: var(--shadow-sm, 0 4px 16px rgba(0,0,0,0.08)) !important;
+    padding: 1.5rem !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   7. RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    html {
+        font-size: 13px !important;
+    }
+    
+    h1, .page-title, .dash-title-main {
+        font-size: var(--font-xl) !important;
+    }
+    
+    h2, .card-header h5, .card-header h6 {
+        font-size: var(--font-lg) !important;
+    }
+}
+
+@media (max-width: 576px) {
+    html {
+        font-size: 12px !important;
+    }
+    
+    h1, .page-title, .dash-title-main {
+        font-size: var(--font-lg) !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   8. ADMIN DASHBOARD SPECIFIC FIXES
+   ═══════════════════════════════════════════════════ */
+
+/* Dashboard main title - consistent sizing */
+.dash-title-main {
+    font-size: var(--font-2xl) !important;
+    font-weight: 800 !important;
+    color: var(--primary-color, #1a5f2a) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.2 !important;
+}
+
+/* Dashboard section titles */
+.dash-section-title {
+    font-size: var(--font-xl) !important;
+    font-weight: 700 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Dashboard tabs - consistent styling */
+.ds-tabs {
+    background: var(--bg-card, #ffffff) !important;
+    border: 1px solid var(--border-color, #e5e7eb) !important;
+    border-radius: var(--radius-lg, 16px) !important;
+    padding: 4px !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: var(--shadow-sm, 0 4px 16px rgba(0,0,0,0.08)) !important;
+}
+
+.ds-tab {
+    font-size: var(--font-sm) !important;
+    font-weight: 600 !important;
+    color: var(--text-muted, #6b7280) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: var(--radius-md, 10px) !important;
+    transition: all 0.3s ease !important;
+}
+
+.ds-tab.active {
+    background: var(--primary-color, #1a5f2a) !important;
+    color: var(--text-on-primary, #ffffff) !important;
+    font-weight: 700 !important;
+}
+
+/* Dashboard cards - consistent sizing */
+.ds-card {
+    font-size: var(--font-base) !important;
+    border-radius: var(--radius-lg, 16px) !important;
+    padding: 1.25rem 1rem !important;
+    background: var(--bg-card, #ffffff) !important;
+    border: 2px solid var(--border-color, #e5e7eb) !important;
+    color: var(--text-primary, #1a2e1f) !important;
+}
+
+.ds-val {
+    font-size: var(--font-3xl) !important;
+    font-weight: 900 !important;
+    color: var(--primary-color, #1a5f2a) !important;
+    line-height: 1 !important;
+}
+
+.ds-lbl {
+    font-size: var(--font-xs) !important;
+    font-weight: 600 !important;
+    color: var(--text-muted, #6b7280) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+}
+
+/* Welfare claims section specific fixes */
+.wf-summary-bar {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    flex-wrap: wrap !important;
+}
+
+.wf-stat-chip {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 1rem !important;
+    background: var(--bg-card, #ffffff) !important;
+    border: 1px solid var(--border-color, #e5e7eb) !important;
+    border-radius: var(--radius-lg, 16px) !important;
+    text-decoration: none !important;
+    color: var(--text-primary, #1a2e1f) !important;
+    transition: all 0.3s ease !important;
+    min-width: 120px !important;
+}
+
+.wf-stat-chip:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md, 0 4px 16px rgba(0,0,0,0.1)) !important;
+}
+
+.wf-stat-chip .val {
+    font-size: var(--font-2xl) !important;
+    font-weight: 800 !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.wf-stat-chip .lbl {
+    font-size: var(--font-sm) !important;
+    font-weight: 600 !important;
+    color: var(--text-muted, #6b7280) !important;
+}
+
+/* Welfare claim type rows */
+.wf-type-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    background: var(--bg-card, #ffffff) !important;
+    border: 1px solid var(--border-color, #e5e7eb) !important;
+    border-radius: var(--radius-lg, 16px) !important;
+    margin-bottom: 0.75rem !important;
+}
+
+.wf-type-name {
+    font-size: var(--font-base) !important;
+    font-weight: 600 !important;
+    color: var(--text-primary, #1a2e1f) !important;
+    flex: 1 !important;
+}
+
+.dash-type-total {
+    font-size: var(--font-sm) !important;
+    color: var(--text-muted, #6b7280) !important;
+    margin-top: 0.25rem !important;
+}
+
+/* Empty state messages */
+.dash-empty-note,
+.dash-empty-note-lg {
+    font-size: var(--font-base) !important;
+    color: var(--text-muted, #6b7280) !important;
+    padding: 2rem 1rem !important;
+    text-align: center !important;
+}
+
+/* Dashboard buttons */
+.dash-btn-primary,
+.dash-btn-outline-primary,
+.dash-btn-outline-secondary,
+.dash-btn-outline-warn {
+    font-size: var(--font-sm) !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--radius-md, 10px) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Dashboard badges */
+.dash-badge-alert,
+.dash-badge-primary {
+    font-size: var(--font-xs) !important;
+    font-weight: 600 !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: var(--radius-sm, 6px) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   9. DARK MODE CONSISTENCY
+   ═══════════════════════════════════════════════════ */
+
+@media (prefers-color-scheme: dark) {
+    body, .mem-wrapper, .main-content {
+        background: var(--bg-page, #1a1a1a) !important;
+        color: var(--text-primary, #e0e0e0) !important;
+    }
+    
+    .unified-card {
+        background: var(--bg-card, #2a2a2a) !important;
+        border-color: var(--border-color, #3a3a3a) !important;
+    }
+    
+    .ds-tabs,
+    .ds-card,
+    .wf-stat-chip,
+    .wf-type-row {
+        background: var(--bg-card, #2a2a2a) !important;
+        border-color: var(--border-color, #3a3a3a) !important;
+    }
+}

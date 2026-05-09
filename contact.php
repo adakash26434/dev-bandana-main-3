@@ -74,18 +74,274 @@ require_once 'includes/header.php';
 .ct-map-frame{border:0;}
 .ct-office-bg{background:var(--surface-color);}
 .ct-btn-light{background:color-mix(in srgb,var(--primary-color) 8%,white);border:1px solid color-mix(in srgb,var(--primary-color) 18%,white);color:var(--primary-dark);}
+
+/* Modern Contact Page Styles */
+.page-banner-modern {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-banner-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: bannerShimmer 4s infinite;
+}
+
+@keyframes bannerShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.banner-content-modern {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.page-title-modern {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from { text-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    to { text-shadow: 0 4px 24px rgba(255,255,255,0.2); }
+}
+
+.breadcrumb-modern {
+    background: rgba(255,255,255,0.1);
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    display: inline-flex;
+    backdrop-filter: blur(10px);
+}
+
+.breadcrumb-modern .breadcrumb-item {
+    color: rgba(255,255,255,0.8);
+    font-weight: 600;
+}
+
+.breadcrumb-modern .breadcrumb-item a {
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+.breadcrumb-modern .breadcrumb-item a:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+}
+
+.breadcrumb-modern .breadcrumb-item.active {
+    color: white;
+    font-weight: 700;
+}
+
+.breadcrumb-link-modern {
+    color: rgba(255,255,255,0.9);
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-link-modern:hover {
+    color: white;
+    transform: translateX(2px);
+}
+
+/* Contact Form Modernization */
+.contact-form-modern {
+    background: var(--surface-color);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 12%, white);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(var(--primary-rgb), .15);
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-form-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary-color) 8%, white), transparent);
+    transition: left 0.6s ease;
+}
+
+.contact-form-modern:hover::before {
+    left: 100%;
+}
+
+.contact-form-modern:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 16px 48px rgba(var(--primary-rgb), .25);
+    border-color: var(--primary-color);
+}
+
+.contact-input-modern {
+    background: var(--surface-color);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 8%, white);
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.contact-input-modern:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), .1);
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.contact-textarea-modern {
+    background: var(--surface-color);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 8%, white);
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+}
+
+.contact-textarea-modern:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), .1);
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.contact-btn-modern {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: var(--text-on-primary);
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(var(--primary-rgb), .3);
+}
+
+.contact-btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.contact-btn-modern:hover::before {
+    left: 100%;
+}
+
+.contact-btn-modern:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(var(--primary-rgb), .4);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .page-banner-modern {
+        padding: 3rem 0;
+    }
+    
+    .page-title-modern {
+        font-size: 2rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .contact-form-modern {
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .breadcrumb-modern {
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .contact-input-modern,
+    .contact-textarea-modern {
+        font-size: 0.95rem;
+        padding: 0.7rem 0.8rem;
+    }
+    
+    .contact-btn-modern {
+        padding: 0.7rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-banner-modern {
+        padding: 2rem 0;
+    }
+    
+    .page-title-modern {
+        font-size: 1.8rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .contact-form-modern {
+        padding: 1.5rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .breadcrumb-modern {
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .contact-input-modern,
+    .contact-textarea-modern {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.7rem;
+    }
+    
+    .contact-btn-modern {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        border-radius: 18px;
+    }
+}
 </style>
 
 <!-- Page Banner -->
-<section class="page-banner">
+<section class="page-banner page-banner-modern">
     <div class="container">
-        <h1><?php echo isEnglish() ? 'Contact Us' : 'सम्पर्क गर्नुहोस्'; ?></h1>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>"><?php echo $L['home']; ?></a></li>
-                <li class="breadcrumb-item active"><?php echo $L['contact'] ?? 'सम्पर्क'; ?></li>
-            </ol>
-        </nav>
+        <div class="banner-content-modern">
+            <h1 class="page-title-modern"><?php echo isEnglish() ? 'Contact Us' : 'सम्पर्क गर्नुहोस्'; ?></h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-modern">
+                    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>" class="breadcrumb-link-modern"><?php echo $L['home']; ?></a></li>
+                    <li class="breadcrumb-item active"><?php echo $L['contact'] ?? 'सम्पर्क'; ?></li>
+                </ol>
+            </nav>
+        </div>
     </div>
 </section>
 

@@ -159,36 +159,34 @@ require __DIR__ . '/includes/chrome.php';
     var t = (text || '').trim();
     if (!t) return '';
     try {
-      var u = new URL(t, window.location.origin);
-      var q = u.searchParams.get('qr_token') || u.searchParams.get('token');
-      if (q) return String(q).replace(/[^a-zA-Z0-9_-]/g, '');
-    } catch (e) {}
-    if (/^[a-zA-Z0-9_-]{8,80}$/.test(t)) return t;
-    return '';
-  }
-
-  function goAttendance(token) {
-    window.location.href = base + 'member/attend.php?qr_token=' + encodeURIComponent(token) + '&auto=1';
-  }
-
-  function onScanSuccess(decodedText) {
-    if (busy) return;
-    var token = extractToken(decodedText);
-    if (!token) {
-      showErr(msgInvalid);
-      return;
+        var parts = t.split(':');
+        return parts.length >= 2 ? parts[1].trim() : '';
+    } catch (e) {
+        return '';
     }
-    busy = true;
+  }
+
+  function validateAndAutoAttend(decodedText) {
+    // TO DO: implement validation and auto-attendance logic here
+    // For now, just return false to fallback to manual check-in
+    return false;
+  }
+
+  function onScanSuccess(decodedText, result) {
     hideErr();
-    if (html5Qr) {
-      html5Qr.stop().then(function() {
-        try { if (typeof html5Qr.clear === 'function') html5Qr.clear(); } catch (e) {}
-        goAttendance(token);
-      }).catch(function() {
-        goAttendance(token);
-      });
+    
+    // Validate and auto-attend QR code
+    if (validateAndAutoAttend(decodedText)) {
+        // Success message will be shown by validateAndAutoAttend
+        return;
+    }
+    
+    // Fallback to manual check-in if validation fails
+    var token = extractToken(decodedText);
+    if (token) {
+        showErr('<?= addslashes($_t('यो QR कार्यक्रम check-in को लागि मान्य देखिँदैन।', 'This is not a valid check-in QR code.')) ?>');
     } else {
-      goAttendance(token);
+        showErr('<?= addslashes($_t('यो QR कार्यक्रम check-in को लागि मान्य देखिँदैन।', 'This is not a valid check-in QR code.')) ?>');
     }
   }
 

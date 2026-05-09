@@ -69,6 +69,8 @@ try {
 <title><?= htmlspecialchars($page_title) ?> · <?= htmlspecialchars($siteName) ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- UI Uniformity Fix — Global consistency across all interfaces -->
+<link rel="stylesheet" href="<?= defined('SITE_URL') ? SITE_URL : '/' ?>assets/css/ui-uniformity-fix.css?v=1">
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Mukta','Noto Sans Devanagari',sans-serif; background: #f7f9f8; color: #111827; }

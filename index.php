@@ -4,11 +4,310 @@ require_once __DIR__ . '/includes/simple-cache.php';
 $pageTitle = isEnglish() ? 'Home' : 'गृहपृष्ठ';
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/ensure-tables.php';
-ensurePublicTables();
 
-// Get homepage data with caching (cache for 30 minutes)
-$homepageData = getCachedData('homepage_data', 1800, function() {
-    $data = [];
+<style>
+/* Modern Hero Slider Styles */
+.hero-carousel-modern {
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(var(--primary-rgb), .15);
+}
+
+.hero-indicators-modern {
+    bottom: 20px;
+    z-index: 10;
+}
+
+.hero-indicator-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    margin: 0 6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-indicator-btn:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.2);
+}
+
+.hero-indicator-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: scale(1.3);
+}
+
+.hero-indicator-btn.active .indicator-dot {
+    background: white;
+    width: 6px;
+    height: 6px;
+}
+
+.indicator-dot {
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+}
+
+.hero-inner-modern {
+    height: 500px;
+    border-radius: 0;
+}
+
+.hero-slide-modern {
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-bg-modern {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-bg-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+    z-index: 1;
+}
+
+.hero-overlay-modern {
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.7), rgba(var(--primary-rgb), 0.3));
+    z-index: 2;
+}
+
+.hero-content-modern {
+    z-index: 3;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.hero-text-wrapper {
+    max-width: 600px;
+    animation: heroTextSlide 1s ease-out;
+}
+
+@keyframes heroTextSlide {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-title-modern {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.2;
+    animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from { text-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    to { text-shadow: 0 4px 20px rgba(var(--primary-rgb), 0.4); }
+}
+
+.hero-subtitle-modern {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    line-height: 1.4;
+}
+
+.hero-actions-modern {
+    animation: actionsSlide 1.2s ease-out 0.3s both;
+}
+
+@keyframes actionsSlide {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-btn-modern {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 8px 24px rgba(var(--primary-rgb), .3);
+}
+
+.hero-btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.hero-btn-modern:hover::before {
+    left: 100%;
+}
+
+.hero-btn-modern:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(var(--primary-rgb), .4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-content {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-icon {
+    transition: transform 0.3s ease;
+}
+
+.hero-btn-modern:hover .btn-icon {
+    transform: translateX(4px);
+}
+
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.hero-btn-modern:hover .btn-shine {
+    left: 100%;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .hero-inner-modern {
+        height: 400px;
+    }
+    
+    .hero-slide-modern {
+        height: 400px;
+    }
+    
+    .hero-content-modern {
+        padding: 1.5rem;
+    }
+    
+    .hero-title-modern {
+        font-size: 2rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .hero-subtitle-modern {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-btn-modern {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 40px;
+    }
+    
+    .hero-indicators-modern {
+        bottom: 15px;
+    }
+    
+    .hero-indicator-btn {
+        width: 10px;
+        height: 10px;
+        margin: 0 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-inner-modern {
+        height: 350px;
+    }
+    
+    .hero-slide-modern {
+        height: 350px;
+    }
+    
+    .hero-content-modern {
+        padding: 1rem;
+    }
+    
+    .hero-title-modern {
+        font-size: 1.8rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .hero-subtitle-modern {
+        font-size: 0.9rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .hero-btn-modern {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+        border-radius: 35px;
+    }
+}
+
+/* Modern Service Cards Styles */
+.service-card-modern {
+    background: var(--surface-color);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 12%, white);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(var(--primary-rgb), .1);
+}
     try {
         $db = getDB();
         $data['sliders'] = $db->query("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order, id")->fetchAll();
@@ -67,31 +366,43 @@ $L = getLangStrings();
 
 <!-- Hero Slider Section -->
 <section class="hero-slider">
-    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
+    <div id="heroCarousel" class="carousel slide hero-carousel-modern" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators hero-indicators-modern">
             <?php foreach ($sliders as $index => $slider): ?>
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="<?php echo $index; ?>"
-                    <?php echo $index === 0 ? 'class="active"' : ''; ?>></button>
+                    class="hero-indicator-btn <?php echo $index === 0 ? 'active' : ''; ?>">
+                <span class="indicator-dot"></span>
+            </button>
             <?php endforeach; ?>
             <?php if (empty($sliders)): ?>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active">
+                <span class="indicator-dot"></span>
+            </button>
             <?php endif; ?>
         </div>
 
-        <div class="carousel-inner">
+        <div class="carousel-inner hero-inner-modern">
             <?php if (!empty($sliders)): ?>
                 <?php foreach ($sliders as $index => $slider): ?>
-                <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
-                    <div class="slider-bg" style="background-image: url('<?php echo e($slider['image']); ?>');">
-                        <div class="slider-overlay"></div>
+                <div class="carousel-item hero-slide-modern <?php echo $index === 0 ? 'active' : ''; ?>">
+                    <div class="slider-bg hero-bg-modern" style="background-image: url('<?php echo e($slider['image']); ?>');">
+                        <div class="slider-overlay hero-overlay-modern"></div>
                         <div class="container">
-                            <div class="slider-content">
-                                <h1><?php echo e($slider['title']); ?></h1>
-                                <p><?php echo e($slider['subtitle']); ?></p>
+                            <div class="slider-content hero-content-modern">
+                                <div class="hero-text-wrapper">
+                                    <h1 class="hero-title-modern"><?php echo e($slider['title']); ?></h1>
+                                    <p class="hero-subtitle-modern"><?php echo e($slider['subtitle']); ?></p>
+                                </div>
                                 <?php if ($slider['button_text']): ?>
-                                <a href="<?php echo e($slider['button_url']); ?>" class="btn home-btn-primary btn-lg">
-                                    <?php echo e($slider['button_text']); ?> <i class="fas fa-arrow-right"></i>
-                                </a>
+                                <div class="hero-actions-modern">
+                                    <a href="<?php echo e($slider['button_url']); ?>" class="btn hero-btn-modern">
+                                        <span class="btn-content">
+                                            <?php echo e($slider['button_text']); ?>
+                                            <i class="fas fa-arrow-right btn-icon"></i>
+                                        </span>
+                                        <span class="btn-shine"></span>
+                                    </a>
+                                </div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -224,16 +535,19 @@ if ($db instanceof PDO) {
         <div class="row justify-content-center">
             <?php foreach ($services as $index => $service): ?>
             <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo $index * 100; ?>">
-                <div class="service-card">
+                <div class="service-card service-card-modern">
                     <?php if (!empty($service['show_new_badge'])): ?>
-                    <span class="new-badge"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></span>
+                    <span class="new-badge new-badge-modern"><?php echo isEnglish() ? 'New' : 'नयाँ'; ?></span>
                     <?php endif; ?>
-                    <div class="service-icon">
+                    <div class="service-icon service-icon-modern">
                         <i class="<?php echo $service['icon']; ?>"></i>
                     </div>
-                    <h4><?php echo isEnglish() ? ($service['title'] ?: $service['title_np']) : ($service['title_np'] ?: $service['title']); ?></h4>
-                    <p><?php echo isEnglish() ? ($service['description'] ?: $service['description_np']) : ($service['description_np'] ?: $service['description']); ?></p>
-                    <a href="services.php" class="service-link"><?php echo isEnglish() ? 'Learn More' : 'थप जान्नुहोस्'; ?> <i class="fas fa-arrow-right"></i></a>
+                    <h4 class="service-title-modern"><?php echo isEnglish() ? ($service['title'] ?: $service['title_np']) : ($service['title_np'] ?: $service['title']); ?></h4>
+                    <p class="service-description-modern"><?php echo isEnglish() ? ($service['description'] ?: $service['description_np']) : ($service['description_np'] ?: $service['description']); ?></p>
+                    <a href="services.php" class="service-link service-link-modern">
+                        <span class="link-text"><?php echo isEnglish() ? 'Learn More' : 'थप जान्नुहोस्'; ?></span>
+                        <i class="fas fa-arrow-right link-icon"></i>
+                    </a>
                 </div>
             </div>
             <?php endforeach; ?>

@@ -529,6 +529,8 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
         }
     </style>
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/public-modern.css?v=1">
+    <!-- UI Uniformity Fix — Global consistency across all interfaces -->
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/ui-uniformity-fix.css?v=1">
     <meta name="csrf-token" content="<?php echo generateCSRFToken(); ?>">
     <?php if (!empty($__embed_frame)): ?>
     <style id="public-embed-frame-css">

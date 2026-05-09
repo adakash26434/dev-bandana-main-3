@@ -3,6 +3,237 @@ require_once 'includes/config.php';
 $pageTitle = isEnglish() ? 'About Us' : 'हाम्रो बारेमा';
 require_once 'includes/header.php';
 
+<style>
+/* Modern About Page Styles */
+.page-banner-modern {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-banner-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: bannerShimmer 4s infinite;
+}
+
+@keyframes bannerShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.banner-content-modern {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.page-title-modern {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from { text-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    to { text-shadow: 0 4px 24px rgba(255,255,255,0.2); }
+}
+
+.breadcrumb-modern {
+    background: rgba(255,255,255,0.1);
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    display: inline-flex;
+    backdrop-filter: blur(10px);
+}
+
+.breadcrumb-modern .breadcrumb-item {
+    color: rgba(255,255,255,0.8);
+    font-weight: 600;
+}
+
+.breadcrumb-modern .breadcrumb-item a {
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+.breadcrumb-modern .breadcrumb-item a:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+}
+
+.breadcrumb-modern .breadcrumb-item.active {
+    color: white;
+    font-weight: 700;
+}
+
+.breadcrumb-link-modern {
+    color: rgba(255,255,255,0.9);
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-link-modern:hover {
+    color: white;
+    transform: translateX(2px);
+}
+
+/* About Content Section */
+.about-content-box {
+    background: var(--surface-color);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 12%, white);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(var(--primary-rgb), .15);
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+}
+
+.about-content-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary-color) 8%, white), transparent);
+    transition: left 0.6s ease;
+}
+
+.about-content-box:hover::before {
+    left: 100%;
+}
+
+.about-content-box:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 16px 48px rgba(var(--primary-rgb), .25);
+    border-color: var(--primary-color);
+}
+
+.section-tag {
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+    color: var(--text-on-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(var(--secondary-rgb), .3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.about-divider {
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary-color) 20%, transparent), transparent);
+    height: 2px;
+    width: 60px;
+    border-radius: 1px;
+    margin: 1rem 0;
+}
+
+.intro-text {
+    line-height: 1.7;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    text-align: justify;
+}
+
+.coop-prose {
+    font-style: italic;
+    color: var(--primary-dark);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 5%, white), color-mix(in srgb, var(--primary-color) 10%, white));
+    padding: 1.5rem;
+    border-radius: 15px;
+    border-left: 4px solid var(--primary-color);
+    margin: 1.5rem 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .page-banner-modern {
+        padding: 3rem 0;
+    }
+    
+    .page-title-modern {
+        font-size: 2rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .about-content-box {
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .breadcrumb-modern {
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .section-tag {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .intro-text {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .coop-prose {
+        padding: 1.2rem;
+        margin: 1.2rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-banner-modern {
+        padding: 2rem 0;
+    }
+    
+    .page-title-modern {
+        font-size: 1.8rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .about-content-box {
+        padding: 1.5rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .breadcrumb-modern {
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .section-tag {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .intro-text {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .coop-prose {
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+}
+</style>
+
 // Get about page content
 try {
     $db = getDB();
@@ -58,15 +289,17 @@ $valuesTitleEn = getSetting('values_content_title_en', 'Our Core Values');
 ?>
 
 <!-- Page Banner -->
-<section class="page-banner">
+<section class="page-banner page-banner-modern">
     <div class="container">
-        <h1><?php echo htmlspecialchars(is_array($page) ? ($page['title_np'] ?? 'हाम्रो बारेमा') : 'हाम्रो बारेमा', ENT_QUOTES, 'UTF-8'); ?></h1>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>"><?php echo $L['home']; ?></a></li>
-                <li class="breadcrumb-item active"><?php echo $L['about'] ?? 'हाम्रो बारेमा'; ?></li>
-            </ol>
-        </nav>
+        <div class="banner-content-modern">
+            <h1 class="page-title-modern"><?php echo htmlspecialchars(is_array($page) ? ($page['title_np'] ?? 'हाम्रो बारेमा') : 'हाम्रो बारेमा', ENT_QUOTES, 'UTF-8'); ?></h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-modern">
+                    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>" class="breadcrumb-link-modern"><?php echo $L['home']; ?></a></li>
+                    <li class="breadcrumb-item active"><?php echo $L['about'] ?? 'हाम्रो बारेमा'; ?></li>
+                </ol>
+            </nav>
+        </div>
     </div>
 </section>
 
