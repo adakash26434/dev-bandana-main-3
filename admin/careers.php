@@ -119,13 +119,11 @@ foreach ($careers as $c) {
  */
 function careers_admin_render_rows(array $list): void
 {
-    global $__t;
-    if (!is_callable($__t)) {
-        $__t = static function (string $np, string $en): string {
-            $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
-            return strtolower($lang) === 'en' ? $en : $np;
-        };
-    }
+    // Define translation function inside this scope
+    $__t = static function (string $np, string $en): string {
+        $lang = (string)($_SESSION['admin_lang'] ?? $_SESSION['lang'] ?? 'np');
+        return strtolower($lang) === 'en' ? $en : $np;
+    };
     foreach ($list as $c) {
         ?>
                             <tr>
