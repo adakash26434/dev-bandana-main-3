@@ -1221,9 +1221,9 @@ if (!function_exists('portalLangToggleBadge')) {
     }
 }
 
-// Get translated text - uses _np field for Nepali, original field for English
-if (!function_exists('getText')) {
-    function getText($nepaliText, $englishText = null) {
+// Get translated text - use appGetText to avoid PHP gettext() name collision
+if (!function_exists('appGetText')) {
+    function appGetText($nepaliText, $englishText = null) {
         if (isEnglish() && $englishText !== null) {
             return $englishText;
         }
