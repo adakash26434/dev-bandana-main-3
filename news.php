@@ -106,65 +106,21 @@ try {
         <?php endif; ?>
 
         <?php else: ?>
-        <!-- Empty State with Sample News -->
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="news-card">
+        <!-- Empty State -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="news-card text-center">
                     <div class="news-image">
                         <div class="news-placeholder">
                             <i class="fas fa-newspaper"></i>
                         </div>
-                        <div class="news-date">
-                            <span class="day">15</span>
-                            <span class="month">Mar</span>
-                        </div>
                     </div>
-                    <div class="news-content">
-                        <h4><?php echo isEnglish() ? 'Annual General Meeting Successfully Completed' : 'वार्षिक साधारण सभा सफलतापूर्वक सम्पन्न'; ?></h4>
-                        <p><?php echo isEnglish() ? 'Our annual general meeting was held successfully with participation of all members...' : 'हाम्रो वार्षिक साधारण सभा सबै सदस्यहरूको सहभागितामा सफलतापूर्वक सम्पन्न भयो...'; ?></p>
-                        <span class="read-more text-muted" style="cursor:default;opacity:.55;">
-                            <?php echo isEnglish() ? 'Read More' : 'थप पढ्नुहोस्'; ?> <i class="fas fa-arrow-right"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="news-card">
-                    <div class="news-image">
-                        <div class="news-placeholder">
-                            <i class="fas fa-newspaper"></i>
-                        </div>
-                        <div class="news-date">
-                            <span class="day">10</span>
-                            <span class="month">Feb</span>
-                        </div>
-                    </div>
-                    <div class="news-content">
-                        <h4><?php echo isEnglish() ? 'New Branch Inauguration' : 'नयाँ शाखा उद्घाटन'; ?></h4>
-                        <p><?php echo isEnglish() ? 'We are delighted to announce the opening of our new branch...' : 'हामी हाम्रो नयाँ शाखा उद्घाटन भएको जानकारी गराउँछौं...'; ?></p>
-                        <span class="read-more text-muted" style="cursor:default;opacity:.55;">
-                            <?php echo isEnglish() ? 'Read More' : 'थप पढ्नुहोस्'; ?> <i class="fas fa-arrow-right"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="news-card">
-                    <div class="news-image">
-                        <div class="news-placeholder">
-                            <i class="fas fa-newspaper"></i>
-                        </div>
-                        <div class="news-date">
-                            <span class="day">05</span>
-                            <span class="month">Jan</span>
-                        </div>
-                    </div>
-                    <div class="news-content">
-                        <h4><?php echo isEnglish() ? 'Community Health Camp Organized' : 'सामुदायिक स्वास्थ्य शिविर आयोजना'; ?></h4>
-                        <p><?php echo isEnglish() ? 'Free health check-up camp was organized for our members and community...' : 'हाम्रा सदस्य र समुदायका लागि निःशुल्क स्वास्थ्य जाँच शिविर आयोजना गरियो...'; ?></p>
-                        <span class="read-more text-muted" style="cursor:default;opacity:.55;">
-                            <?php echo isEnglish() ? 'Read More' : 'थप पढ्नुहोस्'; ?> <i class="fas fa-arrow-right"></i>
-                        </span>
+                    <div class="news-content py-4">
+                        <h4><?php echo isEnglish() ? 'No news published yet' : 'अहिलेसम्म समाचार प्रकाशित छैन'; ?></h4>
+                        <p><?php echo isEnglish() ? 'Please check back later for latest updates and activities.' : 'नयाँ अपडेट तथा गतिविधिका लागि केही समयपछि पुनः हेर्नुहोस्।'; ?></p>
+                        <a href="<?php echo SITE_URL; ?>notices.php" class="read-more">
+                            <?php echo isEnglish() ? 'View Notices' : 'सूचनाहरू हेर्नुहोस्'; ?> <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
