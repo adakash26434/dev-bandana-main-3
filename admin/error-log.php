@@ -72,30 +72,36 @@ if (file_exists($logFile)) {
     </div>
     <?php endif; ?>
 
-    <!-- Common Fix Tips -->
-    <div class="card mt-4">
-        <div class="card-header"><i class="fas fa-lightbulb me-2 text-warning"></i>सामान्य Error Fix गर्ने तरिका</div>
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="p-3 border rounded">
-                        <strong class="text-danger"><i class="fas fa-database me-1"></i>Database Error</strong>
-                        <p class="small mt-1 mb-0">includes/database.local.php मा DB_NAME, DB_USER, DB_PASS confirm गर्नुस्।
-                        cPanel → MySQL Databases मा user permissions check गर्नुस्।</p>
+    <!-- Common Fix Tips (collapsed by default for clean UI) -->
+    <div class="d-flex align-items-center gap-2 mt-4 mb-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#errorFixTips" aria-expanded="false" aria-controls="errorFixTips">
+            <i class="fas fa-lightbulb me-1 text-warning"></i>सामान्य Error Fix गर्ने तरिका
+        </button>
+    </div>
+    <div class="collapse" id="errorFixTips">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded h-100">
+                            <strong class="text-danger"><i class="fas fa-database me-1"></i>Database Error</strong>
+                            <p class="small mt-1 mb-0">includes/database.local.php मा DB_NAME, DB_USER, DB_PASS confirm गर्नुस्।
+                            cPanel → MySQL Databases मा user permissions check गर्नुस्।</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3 border rounded">
-                        <strong class="text-warning"><i class="fas fa-folder me-1"></i>File Permission Error</strong>
-                        <p class="small mt-1 mb-0">assets/uploads/ र logs/ folder को permission 755 राख्नुस्।
-                        cPanel → File Manager → Permission मा जानुस्।</p>
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded h-100">
+                            <strong class="text-warning"><i class="fas fa-folder me-1"></i>File Permission Error</strong>
+                            <p class="small mt-1 mb-0">assets/uploads/ र logs/ folder को permission 755 राख्नुस्।
+                            cPanel → File Manager → Permission मा जानुस्।</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3 border rounded">
-                        <strong class="text-info"><i class="fas fa-table me-1"></i>Table Missing Error</strong>
-                        <p class="small mt-1 mb-0">Admin → DB Setup वा Run Migration मा जानुस्।
-                        install.sql phpMyAdmin मा re-import गर्नुस्।</p>
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded h-100">
+                            <strong class="text-info"><i class="fas fa-table me-1"></i>Table Missing Error</strong>
+                            <p class="small mt-1 mb-0">Admin → DB Setup वा Run Migration मा जानुस्।
+                            install.sql phpMyAdmin मा re-import गर्नुस्।</p>
+                        </div>
                     </div>
                 </div>
             </div>

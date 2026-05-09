@@ -31,7 +31,7 @@ if (!function_exists('memberHeadAssets')) {
         echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
         echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
         echo '<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">' . "\n";
-        echo '<link rel="stylesheet" href="' . htmlspecialchars($base, ENT_QUOTES) . 'assets/css/design-tokens.css?v=3">' . "\n";
+        echo '<link rel="stylesheet" href="' . htmlspecialchars($base, ENT_QUOTES) . 'assets/css/design-tokens.css?v=5">' . "\n";
         echo '<link rel="stylesheet" href="' . htmlspecialchars($base, ENT_QUOTES) . 'assets/css/universal.css?v=2">' . "\n";
         echo '<link rel="stylesheet" href="' . htmlspecialchars($base, ENT_QUOTES) . 'assets/css/v9-mobile-fix.css?v=9.7">' . "\n";
         $cv = __DIR__ . '/../assets/css/_color-vars.php';

@@ -4046,18 +4046,71 @@ aside.sidebar .sidebar-nav .nav-submenu li.active > a i {
 .main-content .adm-filter-bar button[type="submit"].btn-primary {
     width: 46px !important;
     min-width: 46px !important;
-    height: 40px !important;
+    height: 38px !important;
     padding: 0 !important;
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     font-size: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    margin: 0 !important;
 }
 .main-content .adm-filter-bar button[type="submit"].btn-primary i {
     margin: 0 !important;
     font-size: 1rem !important;
     line-height: 1 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Filter-bar duplicate search icon fix:
+   Pages have <span class="input-group-text"><i class="fa-search"></i></span>
+   inside the input-group AND a separate green submit button.
+   That's two search icons. Hide the redundant prepend.
+   ────────────────────────────────────────────────────────── */
+.main-content .adm-filter-bar .input-group .input-group-text:has(> .fa-search),
+.main-content .adm-filter-bar .input-group .input-group-text:has(> i.fa-search),
+.main-content .adm-filter-bar .input-group .input-group-text:has(> .fas.fa-search) {
+    display: none !important;
+}
+/* Once the prepend is gone, the input must regain full radius and full borders. */
+.main-content .adm-filter-bar .input-group .form-control {
+    border-radius: 10px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-left-width: 1.5px !important;
+}
+.main-content .adm-filter-bar .input-group .form-control.border-start-0 {
+    border-left-width: 1.5px !important;
+}
+
+/* Align all filter rows so labels + fields + submit button sit on one line. */
+.main-content .adm-filter-bar form.row,
+.main-content .adm-filter-bar > form > .row {
+    align-items: end !important;
+    row-gap: 8px !important;
+}
+.main-content .adm-filter-bar .form-select-sm,
+.main-content .adm-filter-bar .form-control-sm,
+.main-content .adm-filter-bar .form-control,
+.main-content .adm-filter-bar .form-select,
+.main-content .adm-filter-bar .input-group {
+    height: 38px !important;
+}
+/* The submit button column should not push the button up — keep flush with row */
+.main-content .adm-filter-bar form.row > [class*="col-"]:last-child {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    gap: 4px !important;
+}
+/* "हटाउनुहोस्" reset link, when present, keeps a small height too. */
+.main-content .adm-filter-bar a.btn.btn-outline-secondary.btn-sm {
+    height: 32px !important;
+    border-radius: 8px !important;
+    padding: 0 10px !important;
+    font-size: .75rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 /* ──────────────────────────────────────────────────────────

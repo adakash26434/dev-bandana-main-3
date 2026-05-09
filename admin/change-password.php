@@ -76,11 +76,18 @@ echo adminPageHeader('पासवर्ड परिवर्तन', 'fa-key',
             </div>
             <div class="card-body">
                 <?php if ($fileManagedSuperadmin && !$success): ?>
-                <div class="alert alert-info border-info">
-                    <i class="fas fa-file-code me-1"></i>
-                    <strong>Superadmin</strong> को पासवर्ड <code>includes/superadmin-config.local.php</code> मा
-                    <code>SUPER_ADMIN_INITIAL_PASSWORD</code> edit गरेर बदल्नुहोस् — login गर्दा DB सँग sync हुन्छ।
-                    यो फारम admin panel बाट पासवर्ड बदल्न <em>चाहनुभए</em> मात्र प्रयोग गर्नुहोस् (फाइलमा पासवर्ड खाली पारेपछि)।
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-2 py-1" data-bs-toggle="collapse" data-bs-target="#superadminPwHelp" aria-expanded="false" aria-controls="superadminPwHelp">
+                        <i class="fas fa-circle-question me-1"></i>Superadmin पासवर्ड कसरी बदल्ने?
+                    </button>
+                </div>
+                <div class="collapse mb-3" id="superadminPwHelp">
+                    <div class="alert alert-info border-info small mb-0">
+                        <i class="fas fa-file-code me-1"></i>
+                        <strong>Superadmin</strong> को पासवर्ड <code>includes/superadmin-config.local.php</code> मा
+                        <code>SUPER_ADMIN_INITIAL_PASSWORD</code> edit गरेर बदल्नुहोस् — login गर्दा DB सँग sync हुन्छ।
+                        यो फारम admin panel बाट पासवर्ड बदल्न <em>चाहनुभए</em> मात्र प्रयोग गर्नुहोस् (फाइलमा पासवर्ड खाली पारेपछि)।
+                    </div>
                 </div>
                 <?php endif; ?>
                 <?php if ($mustChangeBanner && !$success && !$fileManagedSuperadmin): ?>

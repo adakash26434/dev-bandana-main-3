@@ -256,13 +256,13 @@ set_exception_handler(function (\Throwable $ex) {
     <link rel="stylesheet" href="../assets/css/nepali.datepicker.min.css">
 
     <!-- 🎨 Design Tokens (universal) + Admin tokens overlay — सबै panel मा एकै font/color/spacing -->
-    <link rel="stylesheet" href="../assets/css/design-tokens.css?v=3">
+    <link rel="stylesheet" href="../assets/css/design-tokens.css?v=5">
     <link rel="stylesheet" href="../assets/css/admin-tokens.css?v=3">
     <?php @require_once __DIR__ . '/../../assets/css/_color-vars.php'; ?>
 
     <!-- Admin CSS -->
     <link rel="stylesheet" href="assets/admin.css?v=9.7">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=6.2">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=6.3">
     <link rel="stylesheet" href="../assets/css/v9-mobile-fix.css?v=9.7">
     <link rel="stylesheet" href="../assets/css/site-banner-logo.css?v=1">
 

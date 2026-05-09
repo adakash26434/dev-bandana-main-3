@@ -189,10 +189,17 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
 
 <?php if ($isSuperAdmin && file_managed_superadmin_username() !== null): ?>
-<div class="alert alert-info border-info border-start border-4 mb-3 small" role="note">
-    <strong><i class="fas fa-user-shield me-1"></i>फाइल-सुपरएडमिन:</strong>
-    User/password <code class="user-select-all">includes/superadmin-config.local.php</code> मा हुन्छ।
-    <strong>यो सूचीमा देखिँदैन</strong> (DB मा भए पनि) — तल admin/editor मात्र। पासवर्ड बदल्न cPanel मा फाइल edit + login।
+<div class="d-flex align-items-center gap-2 mb-2">
+    <button type="button" class="btn btn-sm btn-outline-secondary px-2 py-1" data-bs-toggle="collapse" data-bs-target="#superadminFileHelp" aria-expanded="false" aria-controls="superadminFileHelp" title="फाइल-सुपरएडमिन के हो?">
+        <i class="fas fa-circle-question me-1"></i>फाइल-सुपरएडमिन के हो?
+    </button>
+</div>
+<div class="collapse mb-3" id="superadminFileHelp">
+    <div class="alert alert-info border-info border-start border-4 small mb-0" role="note">
+        <strong><i class="fas fa-user-shield me-1"></i>फाइल-सुपरएडमिन:</strong>
+        User/password <code class="user-select-all">includes/superadmin-config.local.php</code> मा हुन्छ।
+        <strong>यो सूचीमा देखिँदैन</strong> (DB मा भए पनि) — तल admin/editor मात्र। पासवर्ड बदल्न cPanel मा फाइल edit + login।
+    </div>
 </div>
 <?php endif; ?>
 
@@ -493,10 +500,16 @@ $activeTab = in_array($tabRaw, ['list', 'add'], true) ? $tabRaw : 'list';
             </div>
 
             <?php if ($isSuperAdmin): ?>
-            <div class="card-footer py-2 small text-muted bg-light">
-                <i class="fas fa-info-circle me-1 text-primary"></i>
-                फाइल-सुपरएडमिन (<code>superadmin-config.local.php</code>) यो सूचीमा लुकेको छ।
-                अरू admin लाई Password Reset गर्दा उनीहरूले अर्को login मा नयाँ पासवर्ड राख्नुपर्छ; public reset URL छैन।
+            <div class="card-footer py-2 small text-muted bg-light d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#manageAdminsFooterHelp" aria-expanded="false" aria-controls="manageAdminsFooterHelp">
+                    <i class="fas fa-circle-info me-1"></i>नोट
+                </button>
+                <div class="collapse w-100" id="manageAdminsFooterHelp">
+                    <div class="pt-2 small">
+                        फाइल-सुपरएडमिन (<code>superadmin-config.local.php</code>) यो सूचीमा लुकेको छ।
+                        अरू admin लाई Password Reset गर्दा उनीहरूले अर्को login मा नयाँ पासवर्ड राख्नुपर्छ; public reset URL छैन।
+                    </div>
+                </div>
             </div>
             <?php endif; ?>
         </div>

@@ -124,6 +124,231 @@ input, select, textarea, button {
 .btn-success, .bg-success { background-color: var(--color-success) !important; border-color: var(--color-success) !important; }
 .text-success { color: var(--color-success) !important; }
 
+/* ════════════════════════════════════════════════════════════════
+   🌐 GLOBAL UNIFY PASS v2 — Bootstrap variants → site palette
+   Public + Admin + Member सबैमा एकनासको colour/icon/feedback
+   Admin (.main-content) र Member (.mem-wrapper) मा यिनको
+   higher-specificity scoped overrides अघि नै छन्, त्यसैले
+   यो pass मुख्यतः public-side को inconsistency मेटाउँछ।
+   ════════════════════════════════════════════════════════════════ */
+
+/* — Buttons (remaining variants) — */
+.btn-info {
+    background-color: #0e7490 !important;
+    border-color: #0e7490 !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+.btn-info:hover, .btn-info:focus {
+    background-color: #0a5a73 !important; border-color: #0a5a73 !important; color: #fff !important;
+}
+.btn-warning {
+    background-color: #b45309 !important;
+    border-color: #b45309 !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+.btn-warning:hover, .btn-warning:focus {
+    background-color: #92400e !important; border-color: #92400e !important; color: #fff !important;
+}
+.btn-danger {
+    background-color: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+.btn-danger:hover, .btn-danger:focus {
+    background-color: #991b1b !important; border-color: #991b1b !important; color: #fff !important;
+}
+.btn-outline-success { color: var(--color-success) !important; border-color: var(--color-success) !important; background: transparent !important; }
+.btn-outline-success:hover { background: var(--color-success) !important; color: #fff !important; }
+.btn-outline-info { color: #0e7490 !important; border-color: #0e7490 !important; background: transparent !important; }
+.btn-outline-info:hover { background: #0e7490 !important; color: #fff !important; }
+.btn-outline-warning { color: #b45309 !important; border-color: #b45309 !important; background: transparent !important; }
+.btn-outline-warning:hover { background: #b45309 !important; color: #fff !important; }
+.btn-outline-danger { color: #b91c1c !important; border-color: #b91c1c !important; background: transparent !important; }
+.btn-outline-danger:hover { background: #b91c1c !important; color: #fff !important; }
+
+/* — Bootstrap badge utilities → soft pill, theme-aligned — */
+.badge.bg-success, .badge.bg-primary {
+    background: #f0fdf4 !important; color: var(--primary-color) !important;
+    border: 1px solid #bbf7d0; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+.badge.bg-info {
+    background: #ecfeff !important; color: #0e7490 !important;
+    border: 1px solid #a5f3fc; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+.badge.bg-warning, .badge.bg-warning.text-dark {
+    background: #fffbeb !important; color: #b45309 !important;
+    border: 1px solid #fde68a; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+.badge.bg-danger {
+    background: #fef2f2 !important; color: #b91c1c !important;
+    border: 1px solid #fecaca; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+.badge.bg-secondary {
+    background: #f1f5f9 !important; color: #475569 !important;
+    border: 1px solid #cbd5e1; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+.badge.bg-light {
+    background: #f8fafc !important; color: #334155 !important;
+    border: 1px solid #e2e8f0; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+.badge.bg-dark {
+    background: #1e293b !important; color: #fff !important;
+    border: 1px solid #1e293b; font-weight: 700; border-radius: 999px; padding: 4px 10px;
+}
+
+/* — Bootstrap alerts → theme palette — */
+.alert { border-radius: 12px; border-width: 1px; padding: 12px 14px; line-height: 1.5; }
+.alert-success, .alert-primary {
+    background: #f0fdf4 !important; color: var(--primary-color) !important;
+    border-color: #bbf7d0 !important;
+}
+.alert-info {
+    background: #ecfeff !important; color: #0e7490 !important;
+    border-color: #a5f3fc !important;
+}
+.alert-warning {
+    background: #fffbeb !important; color: #b45309 !important;
+    border-color: #fde68a !important;
+}
+.alert-danger {
+    background: #fef2f2 !important; color: #b91c1c !important;
+    border-color: #fecaca !important;
+}
+.alert-secondary {
+    background: #f1f5f9 !important; color: #475569 !important;
+    border-color: #cbd5e1 !important;
+}
+.alert-light {
+    background: #f8fafc !important; color: #334155 !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* — Text utility colours — */
+.text-info    { color: #0e7490 !important; }
+.text-warning { color: #b45309 !important; }
+.text-danger  { color: #b91c1c !important; }
+.text-secondary { color: #475569 !important; }
+
+/* — Background utility colours (for inline pill/chip) — */
+.bg-info    { background-color: #0e7490 !important; color: #fff !important; }
+.bg-warning { background-color: #b45309 !important; color: #fff !important; }
+.bg-danger  { background-color: #b91c1c !important; color: #fff !important; }
+
+/* — Modal styling: scoped per-panel (admin: admin-modern.css, member: member.css).
+     Public pages keep Bootstrap default — radius polish from public-modern.css. — */
+
+/* — Form focus uses theme — */
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 .2rem rgba(var(--primary-rgb, 26,95,42), .18);
+}
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* ═══════════════════════════════════════════════════
+   ✅ CHECKBOX / RADIO / SWITCH — generous gap + clean align
+   Bootstrap's default 1.5em padding leaves a tight 4px gap
+   between the box and the label. Bump to 1.85em (≈10px gap).
+   Switches need more (2.8em) since the track is wider.
+   Inline variants get clear horizontal spacing so labels never
+   feel glued to checkboxes.
+   ═══════════════════════════════════════════════════ */
+.form-check {
+    padding-left: 1.85em !important;
+    min-height: 1.6rem !important;
+    margin-bottom: .35rem !important;
+}
+.form-check .form-check-input {
+    margin-left: -1.85em !important;
+    margin-top: .2em !important;
+    flex-shrink: 0;
+}
+.form-check-label {
+    cursor: pointer;
+    line-height: 1.45;
+    padding-left: 4px;
+}
+
+/* Inline (horizontal) — give breathing room between options */
+.form-check-inline {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-right: 1.1rem !important;
+    padding-left: 1.85em !important;
+    margin-bottom: .35rem !important;
+}
+.form-check-inline .form-check-input {
+    margin-left: -1.85em !important;
+    margin-top: 0 !important;
+    margin-right: .55em !important;
+}
+.form-check-inline .form-check-label { padding-left: 0; margin-bottom: 0; }
+
+/* Switch (toggle) — wider track needs wider gutter */
+.form-switch {
+    padding-left: 2.8em !important;
+    min-height: 1.6rem !important;
+}
+.form-switch .form-check-input {
+    margin-left: -2.8em !important;
+    width: 2.2em !important;
+    height: 1.15em !important;
+    margin-top: .15em !important;
+}
+.form-switch.form-check-inline {
+    padding-left: 2.8em !important;
+}
+.form-switch.form-check-inline .form-check-input {
+    margin-left: -2.8em !important;
+    margin-right: .55em !important;
+}
+
+/* Disabled state — clear visual cue */
+.form-check-input:disabled ~ .form-check-label,
+.form-check-input[disabled] ~ .form-check-label {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+/* Invalid state — keep theme-aligned */
+.form-check-input.is-invalid {
+    border-color: #b91c1c !important;
+}
+.form-check-input.is-invalid:checked {
+    background-color: #b91c1c !important;
+}
+
+/* — List-group active uses theme — */
+.list-group-item.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* — Pagination active state — */
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.page-link { color: var(--primary-color); }
+.page-link:hover { color: var(--primary-dark); }
+
+/* — Nav-pills active uses theme — */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--primary-color);
+}
+
+/* — Spinner uses theme — */
+.spinner-border.text-primary, .spinner-grow.text-primary { color: var(--primary-color) !important; }
+
+/* — Progress bar uses theme — */
+.progress-bar { background-color: var(--primary-color); }
+
 /* ── Mobile responsive ── */
 @media (max-width: 768px) {
     :root { --container-pad: 14px; }

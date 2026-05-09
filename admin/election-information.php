@@ -261,13 +261,20 @@ echo adminPageHeader(
 ?>
 <?php if ($f = getFlash()): ?><div class="mb-3"><?php echo adminAlert($f['type'], $f['message']); ?></div><?php endif; ?>
 
-<div class="alert alert-info border-0 shadow-sm mb-4">
-    <strong>मेनु:</strong> एउटा वा बढी चक्रमा <em>प्रकाशित</em> + <em>सूचना मेनुमा देखाउनुहोस्</em> चेक भए सूचना ड्रपडाउनमा «निर्वाचन जानकारी» देखिन्छ। निर्वाचन सकिएपछि यो चेक हटाए पुग्छ।
+<div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
     <?php if ($navOnCount > 0): ?>
-        <span class="badge bg-success ms-1">मेनुमा सक्रिय: <?php echo $navOnCount; ?></span>
+        <span class="badge bg-success-subtle text-success border border-success border-opacity-25"><i class="fas fa-bars me-1"></i>मेनुमा सक्रिय: <?php echo $navOnCount; ?></span>
     <?php else: ?>
-        <span class="badge bg-secondary ms-1">मेनुमा लिंक अहिले लुकेको</span>
+        <span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25"><i class="fas fa-eye-slash me-1"></i>मेनुमा लुकेको</span>
     <?php endif; ?>
+    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 ms-1" data-bs-toggle="collapse" data-bs-target="#electionMenuHelp" aria-expanded="false" aria-controls="electionMenuHelp" title="कसरी मेनुमा देखाउने?">
+        <i class="fas fa-circle-question"></i>
+    </button>
+</div>
+<div class="collapse mb-3" id="electionMenuHelp">
+    <div class="alert alert-info border-0 shadow-sm small mb-0">
+        <strong>मेनु कहिले देखिन्छ?</strong> कुनै पनि चक्रमा <em>प्रकाशित</em> र <em>सूचना मेनुमा देखाउनुहोस्</em> दुवै चेक भए सूचना ड्रपडाउनमा «निर्वाचन जानकारी» देखिन्छ। निर्वाचन सकिएपछि चेक हटाए पुग्छ।
+    </div>
 </div>
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">

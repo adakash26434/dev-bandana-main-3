@@ -296,7 +296,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
     <!-- Universal CSS — सबै पृष्ठमा uniform font/colour/form/card -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/universal.css?v=4">
     <!-- 🎨 Design Tokens — Public + Member + Admin एकै font/color/spacing -->
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=3">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=5">
     <?php @require_once __DIR__ . '/../assets/css/_color-vars.php'; ?>
     <!-- Header v2 — Pokhara Finance Style (Testing) -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/header-v2.css?v=24">
