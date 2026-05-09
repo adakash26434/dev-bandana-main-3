@@ -446,3 +446,67 @@ body.auth-portal-page .verify-form-card__head .vp-sub b {
     text-align: center;
   }
 }
+
+/* ── Language toggle (admin login / member login — fixed corners) ── */
+body.auth-portal-page:not(.verify-auth-page) .auth-lang-toggle {
+  position: fixed;
+  top: 18px;
+  left: 20px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  color: var(--primary-color);
+  box-shadow: 0 1px 6px color-mix(in srgb, var(--text-primary) 8%, transparent);
+  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+body.auth-portal-page:not(.verify-auth-page) .auth-lang-toggle:hover {
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-card));
+  transform: translateX(2px);
+  border-color: color-mix(in srgb, var(--primary-color) 22%, var(--border-color));
+  color: var(--primary-dark);
+}
+
+/* Verify: top row (home + language) */
+body.auth-portal-page.verify-auth-page .auth-portal-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+body.auth-portal-page.verify-auth-page .auth-portal-toolbar .page-back {
+  margin-bottom: 0;
+}
+
+body.auth-portal-page.verify-auth-page .auth-lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-decoration: none;
+  color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 16%, var(--border-color));
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--text-primary) 10%, transparent);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+body.auth-portal-page.verify-auth-page .auth-lang-toggle:hover {
+  background: color-mix(in srgb, var(--primary-color) 8%, white);
+  transform: translateX(-2px);
+}

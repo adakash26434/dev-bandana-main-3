@@ -236,7 +236,7 @@ if ($result && !empty($result['ok'])) {
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=3">
-<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=4">
+<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=5">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/eye-candy-verify-v7.css?v=10">
 <?php @require_once __DIR__ . '/assets/css/_color-vars.php'; ?>
 <style>
@@ -432,7 +432,12 @@ h1 { text-align:center; margin:0 0 6px; font-size:1.45rem; font-weight:800; line
 <body class="auth-portal-page verify-auth-page">
 <div class="vp-outer">
 
-    <a href="<?php echo SITE_URL; ?>" class="page-back"><i class="fas fa-arrow-left"></i> <?php echo $_t('मुख्य पृष्ठ', 'Home'); ?></a>
+    <div class="auth-portal-toolbar">
+        <a href="<?php echo SITE_URL; ?>" class="page-back"><i class="fas fa-arrow-left"></i> <?php echo $_t('मुख्य पृष्ठ', 'Home'); ?></a>
+        <a href="<?php echo htmlspecialchars(portalLangToggleUrl(), ENT_QUOTES, 'UTF-8'); ?>" class="auth-lang-toggle" title="<?php echo htmlspecialchars($_t('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($_t('भाषा परिवर्तन', 'Switch language'), ENT_QUOTES, 'UTF-8'); ?>">
+            <i class="fas fa-language"></i> <?php echo htmlspecialchars(portalLangToggleBadge()); ?>
+        </a>
+    </div>
 
     <?php
     $v7vLogoAlt = function_exists('getSetting') ? getSetting('site_name','सहकारी') : 'सहकारी';

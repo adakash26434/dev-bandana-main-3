@@ -1193,6 +1193,28 @@ function isEnglish() {
     return getCurrentLang() === 'en';
 }
 
+/**
+ * Public / login / verify surfaces — तपाईं यही URL मा रही `?lang=` बाट भाषा बदल्न सक्नुहुन्छ।
+ */
+if (!function_exists('portalLangToggleUrl')) {
+    function portalLangToggleUrl(): string {
+        $uri = (string)($_SERVER['REQUEST_URI'] ?? '/');
+        $path = strtok($uri, '?');
+        if ($path === false || $path === '') {
+            $path = '/';
+        }
+        $q = $_GET;
+        $q['lang'] = isEnglish() ? 'np' : 'en';
+        return $path . '?' . http_build_query($q);
+    }
+}
+
+if (!function_exists('portalLangToggleBadge')) {
+    function portalLangToggleBadge(): string {
+        return isEnglish() ? 'NP' : 'EN';
+    }
+}
+
 // Get translated text - uses _np field for Nepali, original field for English
 if (!function_exists('getText')) {
     function getText($nepaliText, $englishText = null) {
