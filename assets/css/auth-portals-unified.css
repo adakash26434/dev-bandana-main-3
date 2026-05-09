@@ -1,15 +1,13 @@
 /**
  * Unified auth surfaces — member/login, admin/index (login), verify.php
- * Typography (NE + EN mix), spacing, card alignment, alerts.
+ * Simple, clean card on neutral page bg (tokens from Settings / design-tokens).
  */
 body.auth-portal-page {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background:
-    radial-gradient(ellipse 82% 54% at 16% -8%, rgba(26,135,84,.10) 0%, transparent 52%),
-    radial-gradient(ellipse 68% 48% at 100% 0%, rgba(59,130,246,.08) 0%, transparent 48%),
-    linear-gradient(165deg,#f0fdf4 0%,#ecfdf5 40%,#f0f9ff 100%);
+  background: var(--bg-page) !important;
+  color: var(--text-primary);
 }
 
 /* Compact centered auth shell for member/admin login */
@@ -129,11 +127,22 @@ body.auth-portal-page .tabs {
   margin-bottom: 18px;
   padding: 5px;
   gap: 5px;
+  background: var(--bg-soft) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 12px !important;
 }
 
 body.auth-portal-page .tab-btn {
+  border-radius: 10px !important;
+  color: var(--text-muted);
   letter-spacing: 0.04em;
   word-spacing: 0.05em;
+}
+
+body.auth-portal-page .tab-btn.active {
+  background: var(--bg-card) !important;
+  color: var(--primary-color) !important;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text-primary) 7%, transparent) !important;
 }
 
 /* Alerts (member) + admin error */
@@ -254,54 +263,134 @@ body.auth-portal-page .page-back {
   gap: 6px;
   padding: 7px 15px;
   border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: rgba(255,255,255,.92);
-  color: var(--primary-color,#1a8754);
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--bg-card) 94%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--primary-color);
   text-decoration: none;
-  font-size: .78rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--text-primary) 6%, transparent);
+}
+
+body.auth-portal-page .page-back:hover {
+  border-color: color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+  background: var(--bg-card);
 }
 
 body.auth-portal-page .auth-card,
 body.auth-portal-page .verify-form-card {
   width: 100%;
-  max-width: 396px;
-  border-radius: 20px !important;
-  border: 1px solid rgba(226,232,240,.92) !important;
-  box-shadow: 0 4px 6px rgba(0,0,0,.04), 0 24px 52px rgba(13,92,46,.12) !important;
-  background: #fff !important;
+  max-width: 400px;
+  border-radius: 14px !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--text-primary) 5%, transparent),
+    0 14px 36px color-mix(in srgb, var(--primary-color) 8%, transparent) !important;
+  background: var(--bg-card) !important;
   overflow: hidden;
+}
+
+body.auth-portal-page.admin-auth-page .auth-card {
+  max-width: 420px;
 }
 
 body.auth-portal-page .card-header,
 body.auth-portal-page .verify-form-card__head {
-  padding: 16px 18px 12px !important;
-  text-align: center;
-  border-bottom: 1px solid #f1f5f9 !important;
-  background: linear-gradient(180deg, rgba(240,253,244,.5) 0%, #fff 100%) !important;
-  color: inherit !important;
+  padding: 1.35rem 1.25rem 1rem !important;
+  text-align: center !important;
+  border-bottom: 1px solid var(--border-soft) !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
 }
 
 body.auth-portal-page .card-body,
 body.auth-portal-page .verify-form-card__body {
-  padding: 16px 18px 18px !important;
+  padding: 1.1rem 1.25rem 1.35rem !important;
 }
 
 body.auth-portal-page .card-portal-label {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-height: 28px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1px solid #bbf7d0;
-  background: #f0fdf4;
-  color: var(--primary-color,#1a8754);
-  font-size: .7rem !important;
-  font-weight: 700;
-  letter-spacing: .9px;
-  text-transform: uppercase;
+  min-height: 0;
+  padding: 4px 0 !important;
+  border-radius: 0;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* Circular brand icon — reference-style */
+body.auth-portal-page .card-logo-icon,
+body.auth-portal-page .vp-page-logo-icon {
+  width: 68px !important;
+  height: 68px !important;
+  min-width: 68px;
+  border-radius: 50% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 0.65rem !important;
+  background: var(--primary-color) !important;
+  background-image: none !important;
+  color: var(--text-on-primary) !important;
+  font-size: 1.55rem !important;
+  box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.22) !important;
+  border: none !important;
+}
+
+body.auth-portal-page .verify-form-card__head .vp-icon {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  margin: 0 auto 0.85rem !important;
+  background: var(--primary-color) !important;
+  color: var(--text-on-primary) !important;
+  font-size: 1.45rem !important;
+  box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.2) !important;
+}
+
+body.auth-portal-page .card-title {
+  text-align: center !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--text-primary) !important;
+  margin-bottom: 0.25rem !important;
+}
+
+body.auth-portal-page .card-sub {
+  text-align: center !important;
+  font-size: 0.78rem !important;
+  color: var(--text-muted) !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.55 !important;
+}
+
+body.auth-portal-page .card-body > .card-title {
+  padding-top: 0.35rem;
+}
+
+body.auth-portal-page .foot-link {
+  text-align: center !important;
+  margin-top: 1rem !important;
+  font-size: 0.78rem !important;
+  color: var(--text-muted) !important;
+  line-height: 1.5 !important;
+}
+
+body.auth-portal-page .foot-link a {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+body.auth-portal-page .foot-link a:hover {
+  text-decoration: underline;
 }
 
 body.auth-portal-page .field input,
@@ -311,19 +400,55 @@ body.auth-portal-page .vp-field select,
 body.auth-portal-page .vp-field-input {
   min-height: 44px !important;
   border-radius: 10px !important;
-  font-size: .89rem !important;
-  border: 1.5px solid #e5e7eb !important;
-  background: #fafbfc !important;
+  font-size: 0.9rem !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+body.auth-portal-page .field input:focus,
+body.auth-portal-page .vp-field input:focus {
+  border-color: var(--primary-color) !important;
+  background: var(--bg-card) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 18%, transparent) !important;
+}
+
+body.auth-portal-page .field label,
+body.auth-portal-page .vp-field label {
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
 }
 
 body.auth-portal-page .submit-btn,
 body.auth-portal-page .vp-btn {
   min-height: 44px !important;
+  width: 100% !important;
   border-radius: 10px !important;
-  font-size: .9rem !important;
+  font-size: 0.92rem !important;
   font-weight: 700 !important;
-  padding: 10px 14px !important;
-  color: var(--text-on-primary, #fff) !important;
+  padding: 11px 16px !important;
+  border: none !important;
+  color: var(--text-on-primary) !important;
+  background: var(--primary-color) !important;
+  box-shadow: 0 2px 10px rgba(var(--primary-rgb), 0.2) !important;
+  transition:
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
+}
+
+body.auth-portal-page .submit-btn:hover,
+body.auth-portal-page .vp-btn:hover {
+  filter: none !important;
+  background: var(--primary-dark) !important;
+  box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.26) !important;
+  transform: translateY(-1px);
+}
+
+body.auth-portal-page .submit-btn:active,
+body.auth-portal-page .vp-btn:active {
+  transform: none !important;
 }
 
 body.auth-portal-page .alert,
@@ -334,32 +459,22 @@ body.auth-portal-page .vp-result-fail {
 
 /* Pixel-perfect lock: fixed scale across admin/member/verify */
 body.auth-portal-page {
-  --auth-icon-size: 52px;
-  --auth-icon-font: 1.35rem;
-  --auth-title-size: 1.02rem;
+  --auth-icon-size: 68px;
+  --auth-icon-font: 1.55rem;
+  --auth-title-size: 1.05rem;
   --auth-title-gap: 2px;
-  --auth-sub-size: .76rem;
+  --auth-sub-size: 0.78rem;
   --auth-sub-gap: 12px;
   --auth-alert-icon-size: 14px;
   --auth-alert-icon-top: 2px;
   --auth-tab-height: 38px;
 }
 
-body.auth-portal-page .card-logo-icon,
-body.auth-portal-page .vp-page-logo-icon,
-body.auth-portal-page .verify-form-card__head .vp-icon,
-body.auth-portal-page .vp-icon {
-  width: var(--auth-icon-size) !important;
-  height: var(--auth-icon-size) !important;
-  font-size: var(--auth-icon-font) !important;
-}
-
 body.auth-portal-page .card-title,
-body.auth-portal-page .verify-form-card__head h1,
-body.auth-portal-page h1 {
+body.auth-portal-page .verify-form-card__head h1 {
   font-size: var(--auth-title-size) !important;
   margin-bottom: var(--auth-title-gap) !important;
-  line-height: 1.2 !important;
+  line-height: 1.25 !important;
 }
 
 body.auth-portal-page .card-sub,
@@ -416,17 +531,20 @@ body.auth-portal-page.verify-auth-page .vp-outer {
   }
 }
 
-/* Verify page: keep original strong header contrast */
-body.auth-portal-page .verify-form-card__head {
-  background: linear-gradient(135deg,var(--primary-dark,#0f4f20),var(--primary-color,#1a8754)) !important;
-  color: var(--text-on-primary,#fff) !important;
-  border-bottom-color: transparent !important;
+/* Verify form card header — same simple white strip as login */
+body.auth-portal-page .verify-form-card__head h1 {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
 }
 
-body.auth-portal-page .verify-form-card__head h1,
 body.auth-portal-page .verify-form-card__head .vp-sub,
 body.auth-portal-page .verify-form-card__head .vp-sub b {
-  color: var(--text-on-primary,#fff) !important;
+  color: var(--text-muted) !important;
+}
+
+body.auth-portal-page .verify-form-card__head .vp-sub b {
+  color: var(--text-secondary) !important;
+  font-weight: 600 !important;
 }
 
 @media (max-width: 900px) {
