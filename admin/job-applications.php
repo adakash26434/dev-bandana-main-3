@@ -2,10 +2,12 @@
 $pageTitle = 'आवेदनहरू व्यवस्थापन';
 require_once 'includes/admin-header.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 /* RBAC: staff hercha matra; mutate admin+ matra */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') require_role('admin');
 
 $db = getDB();
+ensureRequestStatusHistoryTable($db);
 $jobAppStatuses = ['pending', 'shortlisted', 'interviewed', 'selected', 'rejected'];
 
 /* पुरानो DB compatibility: job_applications.is_read column नहुन सक्छ */
@@ -30,6 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $status = 'pending';
             }
             $notes = $_POST['admin_notes'] ?? '';
+            $oldStatus = '';
+            try {
+                $oldSt = $db->prepare("SELECT status FROM job_applications WHERE id=? LIMIT 1");
+                $oldSt->execute([$id]);
+                $oldStatus = (string)($oldSt->fetchColumn() ?: '');
+            } catch (Exception $e) {}
+            $notifySent = false;
 
             if ($hasIsRead) {
                 $stmt = $db->prepare("UPDATE job_applications SET status = ?, admin_notes = ?, is_read = 1 WHERE id = ?");
@@ -45,8 +54,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $nr->execute([$id]); $nd = $nr->fetch();
                 if ($nd && function_exists('sendMemberStatusUpdate')) {
                     sendMemberStatusUpdate('job', $nd['email']??'', $nd['phone']??'', $nd['full_name']??'', $status, $notes, '');
+                    $notifySent = true;
                 }
             } catch (Exception $ex) {}
+
+            try {
+                logRequestStatusHistory(
+                    $db,
+                    'job_application',
+                    $id,
+                    $oldStatus !== '' ? $oldStatus : null,
+                    $status,
+                    (string)$notes,
+                    $notifySent,
+                    (int)($_SESSION['admin_id'] ?? 0),
+                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                );
+            } catch (Exception $e) {}
 
             setFlash('success', 'आवेदन स्थिति अपडेट भयो।');
         } elseif ($action === 'delete') {
@@ -140,6 +164,14 @@ if (isset($_GET['view'])) {
     // Mark as read
     if ($hasIsRead && $viewApplication && !$viewApplication['is_read']) {
         $db->prepare("UPDATE job_applications SET is_read = 1 WHERE id = ?")->execute([$viewId]);
+    }
+}
+$jobHistory = [];
+if ($viewApplication && !empty($viewApplication['id'])) {
+    try {
+        $jobHistory = fetchRequestStatusHistory($db, 'job_application', (int)$viewApplication['id'], 40);
+    } catch (Exception $e) {
+        $jobHistory = [];
     }
 }
 ?>
@@ -369,6 +401,24 @@ if (isset($_GET['view'])) {
                                     </form>
                                 </div>
                             </div>
+                            <?php if (!empty($jobHistory)): ?>
+                            <div class="card mt-3">
+                                <div class="card-header"><h6 class="mb-0">Status / Comment History</h6></div>
+                                <div class="card-body">
+                                    <?php foreach ($jobHistory as $h): ?>
+                                    <div class="border rounded p-2 mb-2 bg-light">
+                                        <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                                        <?php if (!empty($h['admin_comment'])): ?>
+                                        <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
+                                        <?php endif; ?>
+                                        <div class="small text-muted mt-1">
+                                            <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

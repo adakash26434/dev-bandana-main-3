@@ -21,7 +21,7 @@ checkCSRF();
 
         // Update text settings
         /* site_version थपियो — admin ले version number अपडेट गर्न सक्छ */
-        $textSettings = ['site_name', 'site_name_en', 'site_slogan', 'site_slogan_en', 'meta_description', 'meta_description_en', 'meta_keywords', 'phone', 'mobile', 'email', 'address', 'facebook_url', 'youtube_url', 'twitter_url', 'instagram_url', 'whatsapp_number', 'about_short', 'hero_title', 'hero_subtitle', 'footer_text', 'internet_banking_url', 'play_store_url', 'app_store_url', 'developer_name', 'developer_url', 'supported_name', 'supported_url', 'google_map_url', 'working_hours', 'saturday_hours', 'primary_color', 'secondary_color', 'header_color', 'footer_color', 'topbar_color', 'chairman_name', 'ceo_name', 'ceo_designation_np', 'ceo_designation_en', 'site_version', 'site_launch_date', 'google_client_id', 'google_client_secret', 'facebook_app_id', 'facebook_app_secret', 'twofa_admin_required', 'twofa_member_required'];
+        $textSettings = ['site_name', 'site_name_en', 'site_slogan', 'site_slogan_en', 'meta_description', 'meta_description_en', 'meta_keywords', 'phone', 'mobile', 'email', 'address', 'facebook_url', 'youtube_url', 'twitter_url', 'instagram_url', 'whatsapp_number', 'about_short', 'hero_title', 'hero_subtitle', 'footer_text', 'internet_banking_url', 'play_store_url', 'app_store_url', 'developer_name', 'developer_url', 'supported_name', 'supported_url', 'google_map_url', 'working_hours', 'saturday_hours', 'office_time_start', 'office_time_end', 'primary_color', 'secondary_color', 'header_color', 'footer_color', 'topbar_color', 'chairman_name', 'ceo_name', 'ceo_designation_np', 'ceo_designation_en', 'site_version', 'site_launch_date', 'google_client_id', 'google_client_secret', 'facebook_app_id', 'facebook_app_secret', 'twofa_admin_required', 'twofa_member_required'];
 
         /* Color inputs सुरक्षित/valid hex मा मात्र save गर्ने:
            invalid value ले UI text invisible/unstyled बनाउने risk कम हुन्छ। */
@@ -682,6 +682,26 @@ if (!in_array($panel, ['general', 'branding'], true)) {
                                 <input type="text" name="saturday_hours" class="form-control"
                                        placeholder="बिहान १०:०० - दिउँसो १:००"
                                        value="<?php echo $settings['saturday_hours'] ?? 'बिहान १०:०० - दिउँसो १:००'; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="stg-title-accent fw-bold mb-3"><i class="fas fa-clock me-2"></i><?php echo $__t('Selection Time (कार्यालय समय)', 'Selection Time (Office Hours)'); ?></h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><?php echo $__t('कार्यालय समय सुरु', 'Office Time Start'); ?></label>
+                                <input type="time" name="office_time_start" class="form-control" step="1800"
+                                       value="<?php echo htmlspecialchars($settings['office_time_start'] ?? '10:00', ENT_QUOTES, 'UTF-8'); ?>">
+                                <small class="stg-muted"><?php echo $__t('समय selection मा यहीँबाट सुरु हुन्छ', 'Time selections start from this value'); ?></small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><?php echo $__t('कार्यालय समय अन्त्य', 'Office Time End'); ?></label>
+                                <input type="time" name="office_time_end" class="form-control" step="1800"
+                                       value="<?php echo htmlspecialchars($settings['office_time_end'] ?? '17:00', ENT_QUOTES, 'UTF-8'); ?>">
+                                <small class="stg-muted"><?php echo $__t('समय selection यहीँसम्म सीमित हुन्छ', 'Time selections end at this value'); ?></small>
                             </div>
                         </div>
                     </div>

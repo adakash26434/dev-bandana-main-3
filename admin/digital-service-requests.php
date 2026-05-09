@@ -8,11 +8,13 @@ require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
 require_once __DIR__ . '/../includes/digital-service-requests-tables.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 /* RBAC: staff hercha matra; mutate admin+ matra */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') require_role('admin');
 
 $db = getDB();
 ensureDigitalServiceRequestsTables($db);
+ensureRequestStatusHistoryTable($db);
 
 /* CSRF सुरक्षा: POST अनुरोध प्रमाणित गर्नुहोस् */
 checkCSRF();
@@ -46,6 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status    = clean_text($_POST['status'] ?? 'pending');
             $remarks   = clean_text($_POST['admin_remarks'] ?? '');
             if (!isset($statusLabels[$status])) { $status = 'pending'; }
+            $oldStatus = '';
+            try {
+                $oldSt = $db->prepare("SELECT status FROM digital_service_requests WHERE id=? LIMIT 1");
+                $oldSt->execute([$requestId]);
+                $oldStatus = (string)($oldSt->fetchColumn() ?: '');
+            } catch (Exception $e) {}
+            $notifySent = false;
             /* File upload — admin ले letter/document attach गर्न सक्छ */
             $newFile = adminUploadFile('admin_attachment');
             if ($newFile) {
@@ -64,8 +73,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     sendMemberStatusUpdate('digital_service',
                         $nData['email'] ?? '', $nData['phone'] ?? '', $nData['requester_name'] ?? '',
                         $status, $remarks, $nData['tracking_id'] ?? '');
+                    $notifySent = true;
                 }
             } catch (Exception $e) { /* notification fail भए पनि main काम रोकिँदैन */ }
+            try {
+                logRequestStatusHistory(
+                    $db,
+                    'digital_service',
+                    $requestId,
+                    $oldStatus !== '' ? $oldStatus : null,
+                    $status,
+                    (string)$remarks,
+                    $notifySent,
+                    (int)($_SESSION['admin_id'] ?? 0),
+                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                );
+            } catch (Exception $e) {}
             setFlash('success', $__t('डिजिटल सेवा अनुरोध अपडेट भयो।', 'Digital service request updated.'));
             redirect('digital-service-requests.php');
         }
@@ -120,6 +143,12 @@ $request = $stmt->fetch();
 if (!$request) {
     setFlash('error', $__t('अनुरोध फेला परेन।', 'Request not found.'));
     redirect('digital-service-requests.php');
+}
+$dsrHistory = [];
+try {
+    $dsrHistory = fetchRequestStatusHistory($db, 'digital_service', (int)$request['id'], 40);
+} catch (Exception $e) {
+    $dsrHistory = [];
 }
 ?>
 <div class="card admin-table-card mb-4">
@@ -227,6 +256,25 @@ if (!$request) {
                         <p class="fs-5 font-monospace dsr-track-text"><?php echo e($request['tracking_id']); ?></p>
                     </div>
                 </div>
+                <?php if (!empty($dsrHistory)): ?>
+                <div class="card mt-3">
+                    <div class="card-header"><h6 class="mb-0"><i class="fas fa-clock-rotate-left me-1"></i><?php echo $__t('Status / Comment History', 'Status / Comment History'); ?></h6></div>
+                    <div class="card-body">
+                        <?php foreach ($dsrHistory as $h): ?>
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
+                            <?php if (!empty($h['admin_comment'])): ?>
+                            <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
+                            <?php endif; ?>
+                            <div class="small text-muted mt-1">
+                                <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> ·
+                                <?php echo !empty($h['notify_sent']) ? $__t('Notify पठाइयो', 'Notified') : $__t('Notify छैन', 'No notify'); ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

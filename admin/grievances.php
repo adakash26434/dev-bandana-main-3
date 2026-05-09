@@ -12,12 +12,14 @@ $__t = static function (string $np, string $en): string {
 $pageTitle   = $__t('गुनासो व्यवस्थापन', 'Grievance Management');
 $currentPage = 'grievances';
 require_once '../includes/config.php';
+require_once __DIR__ . '/../includes/request-status-history.php';
 
 if (!isAdminLoggedIn()) {
     redirect(ADMIN_URL . 'index.php');
 }
 
 $db = getDB();
+ensureRequestStatusHistoryTable($db);
 
 /* CSRF सुरक्षा: POST अनुरोध प्रमाणित गर्नुहोस् */
 checkCSRF();
@@ -50,6 +52,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $adminNote   = trim($_POST['admin_note'] ?? '');
         $newFile     = adminUploadFile('admin_attachment');
         $resolvedAt  = ($status === 'resolved' || $status === 'closed') ? date('Y-m-d H:i:s') : null;
+        $oldStatus   = '';
+        try {
+            $oldStQ = $db->prepare("SELECT status FROM grievances WHERE id=? LIMIT 1");
+            $oldStQ->execute([$id]);
+            $oldStatus = (string)($oldStQ->fetchColumn() ?: '');
+        } catch (Exception $e) {}
+        $notifySent = false;
 
         try {
             if ($newFile) {
@@ -69,7 +78,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     sendMemberStatusUpdate('grievance',
                         $nData['email'] ?? '', $nData['phone'] ?? '', $nData['name'] ?? '',
                         $status, $adminResp, 'GRV-' . $id);
+                    $notifySent = true;
                 }
+            } catch (Exception $e) {}
+
+            try {
+                logRequestStatusHistory(
+                    $db,
+                    'grievance',
+                    $id,
+                    $oldStatus !== '' ? $oldStatus : null,
+                    $status,
+                    (string)($adminResp !== '' ? $adminResp : $adminNote),
+                    $notifySent,
+                    (int)($_SESSION['admin_id'] ?? 0),
+                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                );
             } catch (Exception $e) {}
 
             setFlash('success', $__t('गुनासो अपडेट भयो।', 'Grievance updated.'));
@@ -161,6 +185,14 @@ if (isset($_GET['view'])) {
     $s = $db->prepare("SELECT * FROM grievances WHERE id=?");
     $s->execute([(int)$_GET['view']]);
     $viewGrv = $s->fetch();
+}
+$grvHistory = [];
+if ($viewGrv && !empty($viewGrv['id'])) {
+    try {
+        $grvHistory = fetchRequestStatusHistory($db, 'grievance', (int)$viewGrv['id'], 40);
+    } catch (Exception $e) {
+        $grvHistory = [];
+    }
 }
 
 /* ── Helpers ── */
@@ -315,6 +347,29 @@ if ($viewGrv):
                             <input type="hidden" name="id" value="<?php echo $viewGrv['id']; ?>">
                             <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
                         </form>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <?php if (!empty($grvHistory)): ?>
+                <div class="adm-info-group">
+                    <div class="adm-info-group-header"><i class="fas fa-clock-rotate-left"></i><?php echo $__t('Status / Comment History', 'Status / Comment History'); ?></div>
+                    <div class="p-3">
+                        <?php foreach ($grvHistory as $h): ?>
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <div class="small fw-semibold text-dark">
+                                <?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?>
+                            </div>
+                            <?php if (!empty($h['admin_comment'])): ?>
+                            <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
+                            <?php endif; ?>
+                            <div class="small text-muted mt-1">
+                                <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> ·
+                                <?php echo formatNepaliDate((string)$h['created_at'], true); ?> ·
+                                <?php echo !empty($h['notify_sent']) ? $__t('Notify पठाइयो', 'Notified') : $__t('Notify छैन', 'No notify'); ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <?php endif; ?>

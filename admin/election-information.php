@@ -35,8 +35,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 /* मतदान schedule (Nepal Time) */
                 $vs = trim((string)($_POST['vote_start_at'] ?? ''));
                 $ve = trim((string)($_POST['vote_end_at'] ?? ''));
+                if ($vs === '') {
+                    $vsDate = trim((string)($_POST['vote_start_date'] ?? ''));
+                    $vsTime = trim((string)($_POST['vote_start_time'] ?? ''));
+                    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $vsDate) && preg_match('/^\d{1,2}:\d{2}\s?(AM|PM)$/i', $vsTime)) {
+                        $vs = $vsDate . ' ' . strtoupper(str_replace(' ', '', $vsTime));
+                    }
+                }
+                if ($ve === '') {
+                    $veDate = trim((string)($_POST['vote_end_date'] ?? ''));
+                    $veTime = trim((string)($_POST['vote_end_time'] ?? ''));
+                    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $veDate) && preg_match('/^\d{1,2}:\d{2}\s?(AM|PM)$/i', $veTime)) {
+                        $ve = $veDate . ' ' . strtoupper(str_replace(' ', '', $veTime));
+                    }
+                }
                 $vs = preg_match('/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/', $vs) ? str_replace('T', ' ', $vs) : null;
                 $ve = preg_match('/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/', $ve) ? str_replace('T', ' ', $ve) : null;
+                if ($vs === null && isset($_POST['vote_start_date'], $_POST['vote_start_time'])) {
+                    $vsDate = trim((string)($_POST['vote_start_date'] ?? ''));
+                    $vsTime = trim((string)($_POST['vote_start_time'] ?? ''));
+                    $ts = strtotime($vsDate . ' ' . $vsTime);
+                    if ($ts !== false) $vs = date('Y-m-d H:i:s', $ts);
+                }
+                if ($ve === null && isset($_POST['vote_end_date'], $_POST['vote_end_time'])) {
+                    $veDate = trim((string)($_POST['vote_end_date'] ?? ''));
+                    $veTime = trim((string)($_POST['vote_end_time'] ?? ''));
+                    $te = strtotime($veDate . ' ' . $veTime);
+                    if ($te !== false) $ve = date('Y-m-d H:i:s', $te);
+                }
                 $vEnabled = isset($_POST['voting_enabled']) ? 1 : 0;
                 if ($cid > 0) {
                     $db->prepare(
@@ -185,6 +211,29 @@ if ($milestonesFor > 0) {
     $milestoneRows = $ms->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 $navOnCount = (int)$db->query('SELECT COUNT(*) FROM election_cycles WHERE is_published=1 AND show_in_navbar=1')->fetchColumn();
+$voteTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions('06:00', '20:00', 30) : [];
+$voteStartDateVal = '';
+$voteEndDateVal = '';
+$voteStartTimeVal = '';
+$voteEndTimeVal = '';
+if ($editRow) {
+    $vsRaw = trim((string)($editRow['vote_start_at'] ?? ''));
+    $veRaw = trim((string)($editRow['vote_end_at'] ?? ''));
+    if ($vsRaw !== '') {
+        $ts = strtotime($vsRaw);
+        if ($ts !== false) {
+            $voteStartDateVal = date('Y-m-d', $ts);
+            $voteStartTimeVal = date('h:i A', $ts);
+        }
+    }
+    if ($veRaw !== '') {
+        $te = strtotime($veRaw);
+        if ($te !== false) {
+            $voteEndDateVal = date('Y-m-d', $te);
+            $voteEndTimeVal = date('h:i A', $te);
+        }
+    }
+}
 
 /* status badge helper */
 $statusBadge = function (array $c) use ($tz, $now): string {
@@ -260,8 +309,8 @@ echo adminPageHeader(
                 <form method="get" class="row g-2 align-items-end">
                     <input type="hidden" name="tab" value="<?php echo htmlspecialchars($tab); ?>">
                     <div class="col-12"><input type="search" class="form-control form-control-sm" name="q" value="<?php echo htmlspecialchars($qSearch); ?>" placeholder="शीर्षक/अवधि खोज्नुहोस्..."></div>
-                    <div class="col-6"><input type="date" class="form-control form-control-sm" name="from" value="<?php echo htmlspecialchars($qFrom); ?>" title="मिति देखि"></div>
-                    <div class="col-6"><input type="date" class="form-control form-control-sm" name="to" value="<?php echo htmlspecialchars($qTo); ?>" title="मिति सम्म"></div>
+                    <div class="col-6"><input type="text" class="form-control form-control-sm nepali-datepicker" name="from" value="<?php echo htmlspecialchars($qFrom); ?>" title="मिति देखि" placeholder="YYYY-MM-DD" autocomplete="off"></div>
+                    <div class="col-6"><input type="text" class="form-control form-control-sm nepali-datepicker" name="to" value="<?php echo htmlspecialchars($qTo); ?>" title="मिति सम्म" placeholder="YYYY-MM-DD" autocomplete="off"></div>
                     <div class="col-12 d-flex gap-1">
                         <button class="btn btn-sm btn-primary flex-grow-1"><i class="fas fa-filter me-1"></i>फिल्टर</button>
                         <a class="btn btn-sm btn-outline-secondary" href="election-information.php" title="रिसेट"><i class="fas fa-undo"></i></a>
@@ -366,11 +415,29 @@ echo adminPageHeader(
                     <div class="col-12"><hr class="my-2"><h6 class="small text-muted mb-2"><i class="fas fa-clock me-1"></i>मतदान समय (नेपाल समय) — सञ्चालक/लेखा समिति निर्वाचन</h6></div>
                     <div class="col-md-5">
                         <label class="form-label small">मतदान सुरु (NPT)</label>
-                        <input type="datetime-local" class="form-control" name="vote_start_at" value="<?php echo htmlspecialchars(str_replace(' ', 'T', (string)($editRow['vote_start_at'] ?? ''))); ?>">
+                        <div class="input-group mb-1">
+                            <input type="text" class="form-control nepali-datepicker" name="vote_start_date" autocomplete="off" placeholder="YYYY-MM-DD" value="<?php echo htmlspecialchars($voteStartDateVal); ?>">
+                            <span class="input-group-text cursor-pointer" role="button" tabindex="0" title="पात्रो"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                        <select class="form-select form-select-sm" name="vote_start_time">
+                            <option value="">समय छान्नुहोस्</option>
+                            <?php foreach ($voteTimeOptions as $tv => $tl): ?>
+                            <option value="<?php echo htmlspecialchars($tv, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $voteStartTimeVal === $tv ? 'selected' : ''; ?>><?php echo htmlspecialchars($tl, ENT_QUOTES, 'UTF-8'); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-md-5">
                         <label class="form-label small">मतदान समाप्ति (NPT)</label>
-                        <input type="datetime-local" class="form-control" name="vote_end_at" value="<?php echo htmlspecialchars(str_replace(' ', 'T', (string)($editRow['vote_end_at'] ?? ''))); ?>">
+                        <div class="input-group mb-1">
+                            <input type="text" class="form-control nepali-datepicker" name="vote_end_date" autocomplete="off" placeholder="YYYY-MM-DD" value="<?php echo htmlspecialchars($voteEndDateVal); ?>">
+                            <span class="input-group-text cursor-pointer" role="button" tabindex="0" title="पात्रो"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                        <select class="form-select form-select-sm" name="vote_end_time">
+                            <option value="">समय छान्नुहोस्</option>
+                            <?php foreach ($voteTimeOptions as $tv => $tl): ?>
+                            <option value="<?php echo htmlspecialchars($tv, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $voteEndTimeVal === $tv ? 'selected' : ''; ?>><?php echo htmlspecialchars($tl, ENT_QUOTES, 'UTF-8'); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <div class="form-check">

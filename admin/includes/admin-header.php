@@ -667,7 +667,7 @@ set_exception_handler(function (\Throwable $ex) {
                             <li class="<?php echo $currentPage=='kyc-risk-reviews' ? 'active' : ''; ?>">
                                 <a href="kyc-risk-reviews.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-shield-halved"></i></span>
-                                    <span>KYC Risk Review</span>
+                                    <span><?php echo $adminT('KYC जोखिम समीक्षा', 'KYC Risk Review'); ?></span>
                                     <?php if ($adminAlertCounts['kyc_risk'] > 0): ?><span class="badge"><?php echo $adminAlertCounts['kyc_risk']; ?></span><?php endif; ?>
                                 </a>
                             </li>
@@ -726,26 +726,26 @@ set_exception_handler(function (\Throwable $ex) {
                             <li class="<?php echo $currentPage=='programs' ? 'active' : ''; ?>">
                                 <a href="programs.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-calendar-plus"></i></span>
-                                    <span>Program Create / List</span>
+                                    <span><?php echo $adminT('कार्यक्रम बनाउने / सूची', 'Program Create / List'); ?></span>
                                 </a>
                             </li>
                             <li class="<?php echo $currentPage=='program-attendance-verify' ? 'active' : ''; ?>">
                                 <a href="../program-attendance-verify.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-user-check"></i></span>
-                                    <span>Attendance Verify</span>
+                                    <span><?php echo $adminT('उपस्थिति प्रमाणिकरण', 'Attendance Verify'); ?></span>
                                 </a>
                             </li>
                             <li class="<?php echo $currentPage=='program-attendance' ? 'active' : ''; ?>">
                                 <a href="program-attendance.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-clipboard-check"></i></span>
-                                    <span>Attendance Report</span>
+                                    <span><?php echo $adminT('उपस्थिति रिपोर्ट', 'Attendance Report'); ?></span>
                                 </a>
                             </li>
                             <?php /* निर्वाचन जानकारी छुट्टै group मा सरेको */ ?>
                             <li class="<?php echo $currentPage=='analytics' ? 'active' : ''; ?>">
                                 <a href="analytics.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-chart-line"></i></span>
-                                    <span>Analytics Dashboard</span>
+                                    <span><?php echo $adminT('विश्लेषण ड्यासबोर्ड', 'Analytics Dashboard'); ?></span>
                                 </a>
                             </li>
                         </ul>
@@ -826,13 +826,13 @@ set_exception_handler(function (\Throwable $ex) {
                             <li class="<?php echo $currentPage=='members' ? 'active' : ''; ?>">
                                 <a href="members.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-user-check nav-icon-accent nav-icon-primary"></i></span>
-                                    <span>Member Portal</span>
+                                    <span><?php echo $adminT('सदस्य पोर्टल', 'Member Portal'); ?></span>
                                 </a>
                             </li>
                             <li class="<?php echo $currentPage=='member-activities' ? 'active' : ''; ?>">
                                 <a href="member-activities.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-magnifying-glass-chart nav-icon-accent nav-icon-amber"></i></span>
-                                    <span>Member Activities Search</span>
+                                    <span><?php echo $adminT('सदस्य गतिविधि खोज', 'Member Activities Search'); ?></span>
                                 </a>
                             </li>
                         </ul>
@@ -843,7 +843,7 @@ set_exception_handler(function (\Throwable $ex) {
                         <?php $memPortalBadgeTotal = $memPortalBadge ?? 0; ?>
                         <div class="nav-group-header <?php echo $activeGroup=='memportal' ? 'open' : ''; ?>" data-group="memportal">
                             <span class="nav-group-icon"><i class="fas fa-globe"></i></span>
-                            <span class="nav-group-label">Member Online Portal</span>
+                            <span class="nav-group-label"><?php echo $adminT('सदस्य अनलाइन पोर्टल', 'Member Online Portal'); ?></span>
                             <?php if ($memPortalBadgeTotal > 0): ?><span class="group-badge"><?php echo $memPortalBadgeTotal; ?></span><?php endif; ?>
                             <i class="fas fa-chevron-right nav-arrow"></i>
                         </div>
@@ -942,7 +942,7 @@ set_exception_handler(function (\Throwable $ex) {
                             <li class="<?php echo $currentPage=='error-log' ? 'active' : ''; ?>">
                                 <a href="error-log.php">
                                     <span class="nav-icon-wrap"><i class="fas fa-bug nav-icon-accent nav-icon-red"></i></span>
-                                    <span>Error Log</span>
+                                    <span><?php echo $adminT('त्रुटि लग', 'Error Log'); ?></span>
                                 </a>
                             </li>
                             <!-- v5: In-app User Manual / Help & Guide (non-developer friendly) -->
@@ -1000,7 +1000,7 @@ set_exception_handler(function (\Throwable $ex) {
                         <?php echo htmlspecialchars($adminName ?? 'Admin'); ?>
                     </div>
                     <div class="sidebar-user-role">
-                        <?php echo !empty($_SESSION['is_superadmin']) ? 'Superadmin' : 'Administrator'; ?>
+                        <?php echo !empty($_SESSION['is_superadmin']) ? $adminT('सुपर एडमिन', 'Superadmin') : $adminT('प्रशासक', 'Administrator'); ?>
                     </div>
                 </div>
                 <a href="logout.php" title="<?php echo $adminT('लगआउट', 'Logout'); ?>" class="sidebar-strip-logout">
@@ -1022,7 +1022,7 @@ set_exception_handler(function (\Throwable $ex) {
                         <img src="<?php echo SITE_URL . htmlspecialchars($siteLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8'); ?>">
                         <?php else: ?>
                         <div class="admin-logo-fallback"><i class="fas fa-landmark"></i></div>
-                        <span class="brand-text">Admin</span>
+                        <span class="brand-text"><?php echo $adminT('एडमिन', 'Admin'); ?></span>
                         <?php endif; ?>
                     </a>
                     <div class="page-title-wrap">
@@ -1095,7 +1095,7 @@ set_exception_handler(function (\Throwable $ex) {
                             <div class="notif-dropdown-header">
                                 <span><i class="fas fa-bell me-1"></i><?php echo $adminT('सूचनाहरू', 'Notifications'); ?></span>
                                 <?php if ($totalAlerts > 0): ?>
-                                <span class="notif-total-badge"><?php echo $totalAlerts; ?> pending</span>
+                                <span class="notif-total-badge"><?php echo $totalAlerts; ?> <?php echo $adminT('पेन्डिङ', 'pending'); ?></span>
                                 <?php endif; ?>
                             </div>
                             <div class="notif-dropdown-body">
@@ -1138,7 +1138,7 @@ set_exception_handler(function (\Throwable $ex) {
                                 <?php echo htmlspecialchars($adminName); ?>
                                 <?php if (!empty($_SESSION['is_superadmin'])): ?>
                                     <!-- Superadmin badge — superadmin login गर्दा देखिन्छ -->
-                                    <span class="superadmin-pill">SUPERADMIN</span>
+                                    <span class="superadmin-pill"><?php echo $adminT('सुपर एडमिन', 'SUPERADMIN'); ?></span>
                                 <?php endif; ?>
                             </span>
                             <div class="admin-menu">

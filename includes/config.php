@@ -1221,6 +1221,17 @@ if (!function_exists('getUnifiedTimeOptions')) {
     }
 }
 
+// Office time options (all booking/request time selections should use this)
+if (!function_exists('getOfficeTimeOptions')) {
+    function getOfficeTimeOptions(int $stepMinutes = 30): array {
+        $start = function_exists('getSetting') ? trim((string)getSetting('office_time_start', '10:00')) : '10:00';
+        $end   = function_exists('getSetting') ? trim((string)getSetting('office_time_end', '17:00')) : '17:00';
+        if ($start === '') $start = '10:00';
+        if ($end === '') $end = '17:00';
+        return getUnifiedTimeOptions($start, $end, $stepMinutes);
+    }
+}
+
 /**
  * Public / login / verify surfaces — तपाईं यही URL मा रही `?lang=` बाट भाषा बदल्न सक्नुहुन्छ।
  */
