@@ -97,6 +97,15 @@ if ($statusFilter !== '' && !in_array($statusFilter, $jobAppStatuses, true)) {
 }
 $jobSearch = mb_substr(trim((string)($_GET['search'] ?? '')), 0, 200, 'UTF-8');
 
+/* ── Bucket: सक्रिय (कारबाही चाहिने) vs टुङ्गिएका vs सबै ── */
+$jobActiveStatuses = ['pending', 'shortlisted', 'interviewed'];
+$jobDoneStatuses   = ['selected', 'rejected'];
+$bucket = $_GET['bucket'] ?? '';
+if (!in_array($bucket, ['active', 'done', 'all'], true)) {
+    /* explicit status filter set भए सबै देखाउने, नभए default = active */
+    $bucket = $statusFilter !== '' ? 'all' : 'active';
+}
+
 // Build query
 $query = "SELECT ja.*, c.title as job_title, c.deadline
           FROM job_applications ja
@@ -112,6 +121,14 @@ if ($careerId) {
 if ($statusFilter) {
     $query .= " AND ja.status = ?";
     $params[] = $statusFilter;
+} elseif ($bucket === 'active') {
+    $ph = implode(',', array_fill(0, count($jobActiveStatuses), '?'));
+    $query .= " AND ja.status IN ($ph)";
+    $params = array_merge($params, $jobActiveStatuses);
+} elseif ($bucket === 'done') {
+    $ph = implode(',', array_fill(0, count($jobDoneStatuses), '?'));
+    $query .= " AND ja.status IN ($ph)";
+    $params = array_merge($params, $jobDoneStatuses);
 }
 
 if ($jobSearch !== '') {
@@ -119,7 +136,8 @@ if ($jobSearch !== '') {
     $jt = "%$jobSearch%"; $params = array_merge($params, [$jt,$jt,$jt]);
 }
 
-$query .= " ORDER BY ja.created_at DESC";
+/* Smart sort: pending पहिले, अनि नयाँ-अनुसार */
+$query .= " ORDER BY FIELD(ja.status, 'pending', 'shortlisted', 'interviewed', 'selected', 'rejected'), ja.created_at DESC";
 
 $stmt = $db->prepare($query);
 $stmt->execute($params);
@@ -150,6 +168,11 @@ if ($hasIsRead) {
         0 as unread
         FROM job_applications")->fetch();
 }
+$bucketCounts = [
+    'active' => (int)($stats['pending'] ?? 0) + (int)($stats['shortlisted'] ?? 0) + (int)($stats['interviewed'] ?? 0),
+    'done'   => (int)($stats['selected'] ?? 0) + (int)($stats['rejected'] ?? 0),
+    'all'    => (int)($stats['total'] ?? 0),
+];
 
 // View single application
 $viewApplication = null;
@@ -196,27 +219,27 @@ if ($viewApplication && !empty($viewApplication['id'])) {
             <div class="sm-val"><?php echo $stats['total'] ?? 0; ?></div>
             <div class="sm-lbl">जम्मा</div>
         </a>
-        <a href="?status=pending" class="stat-mini <?php echo $statusFilter==='pending'?'active-filter':''; ?>">
+        <a href="?bucket=all&amp;status=pending" class="stat-mini <?php echo $statusFilter==='pending'?'active-filter':''; ?>">
             <div class="sm-icon ic-pending"><i class="fas fa-clock"></i></div>
             <div class="sm-val"><?php echo $stats['pending'] ?? 0; ?></div>
             <div class="sm-lbl">पेन्डिङ</div>
         </a>
-        <a href="?status=shortlisted" class="stat-mini <?php echo $statusFilter==='shortlisted'?'active-filter':''; ?>">
+        <a href="?bucket=all&amp;status=shortlisted" class="stat-mini <?php echo $statusFilter==='shortlisted'?'active-filter':''; ?>">
             <div class="sm-icon ic-process"><i class="fas fa-list-check"></i></div>
             <div class="sm-val"><?php echo $stats['shortlisted'] ?? 0; ?></div>
             <div class="sm-lbl">छनोट</div>
         </a>
-        <a href="?status=interviewed" class="stat-mini <?php echo $statusFilter==='interviewed'?'active-filter':''; ?>">
+        <a href="?bucket=all&amp;status=interviewed" class="stat-mini <?php echo $statusFilter==='interviewed'?'active-filter':''; ?>">
             <div class="sm-icon job-icon-interview-bg"><i class="fas fa-comments job-icon-interview-fg"></i></div>
             <div class="sm-val"><?php echo $stats['interviewed'] ?? 0; ?></div>
             <div class="sm-lbl">अन्तर्वार्ता</div>
         </a>
-        <a href="?status=selected" class="stat-mini <?php echo $statusFilter==='selected'?'active-filter':''; ?>">
+        <a href="?bucket=all&amp;status=selected" class="stat-mini <?php echo $statusFilter==='selected'?'active-filter':''; ?>">
             <div class="sm-icon ic-approved"><i class="fas fa-user-check"></i></div>
             <div class="sm-val"><?php echo $stats['selected'] ?? 0; ?></div>
             <div class="sm-lbl">चयन</div>
         </a>
-        <a href="?status=rejected" class="stat-mini <?php echo $statusFilter==='rejected'?'active-filter':''; ?>">
+        <a href="?bucket=all&amp;status=rejected" class="stat-mini <?php echo $statusFilter==='rejected'?'active-filter':''; ?>">
             <div class="sm-icon ic-rejected"><i class="fas fa-times-circle"></i></div>
             <div class="sm-val"><?php echo $stats['rejected'] ?? 0; ?></div>
             <div class="sm-lbl">अस्वीकृत</div>
@@ -336,9 +359,55 @@ if ($viewApplication && !empty($viewApplication['id'])) {
     ]);
     ?>
     <?php else: ?>
+    <!-- ── Bucket Tabs (Active / Done / All) ── -->
+    <?php
+    $jobBucketBaseQs = [];
+    if ($careerId)              $jobBucketBaseQs['career_id'] = $careerId;
+    if ($jobSearch !== '')      $jobBucketBaseQs['search']    = $jobSearch;
+    /* explicit status filter clears when switching bucket — bucket sets its own scope */
+    $jobBucketUrl = static function (string $b) use ($jobBucketBaseQs): string {
+        $qs = $jobBucketBaseQs + ['bucket' => $b];
+        return 'job-applications.php?' . http_build_query($qs);
+    };
+    ?>
+    <div class="job-bucket-bar no-print">
+        <a href="<?php echo htmlspecialchars($jobBucketUrl('active')); ?>" class="job-bucket job-bucket--active <?php echo $bucket==='active'?'is-on':''; ?>">
+            <i class="fas fa-bolt"></i> सक्रिय आवेदन
+            <span class="job-bucket-count"><?php echo (int)$bucketCounts['active']; ?></span>
+        </a>
+        <a href="<?php echo htmlspecialchars($jobBucketUrl('done')); ?>" class="job-bucket job-bucket--done <?php echo $bucket==='done'?'is-on':''; ?>">
+            <i class="fas fa-check-double"></i> टुङ्गिएका
+            <span class="job-bucket-count"><?php echo (int)$bucketCounts['done']; ?></span>
+        </a>
+        <a href="<?php echo htmlspecialchars($jobBucketUrl('all')); ?>" class="job-bucket job-bucket--all <?php echo $bucket==='all'?'is-on':''; ?>">
+            <i class="fas fa-list"></i> सबै
+            <span class="job-bucket-count"><?php echo (int)$bucketCounts['all']; ?></span>
+        </a>
+    </div>
+    <style>
+    .job-bucket-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+    .job-bucket{
+        display:inline-flex;align-items:center;gap:8px;
+        padding:9px 16px;border-radius:999px;
+        background:#fff;border:1.5px solid #e5e7eb;
+        color:#374151;font-size:.85rem;font-weight:600;text-decoration:none;
+        transition:all .15s;
+    }
+    .job-bucket:hover{border-color:var(--primary-color,#1a5f2a);color:var(--primary-color,#1a5f2a);transform:translateY(-1px);}
+    .job-bucket-count{
+        display:inline-grid;place-items:center;min-width:22px;height:22px;
+        padding:0 7px;border-radius:999px;
+        background:#f3f4f6;color:#374151;font-size:.72rem;font-weight:700;
+    }
+    .job-bucket.is-on{background:var(--primary-color,#1a5f2a);border-color:var(--primary-color,#1a5f2a);color:#fff;box-shadow:0 4px 14px rgba(26,95,42,.18);}
+    .job-bucket.is-on .job-bucket-count{background:rgba(255,255,255,.22);color:#fff;}
+    .job-bucket--done.is-on{background:#0f766e;border-color:#0f766e;}
+    .job-bucket--all.is-on{background:#374151;border-color:#374151;}
+    </style>
     <!-- ── Applications Filter Bar ── -->
     <div class="adm-filter-bar no-print">
         <form method="GET" class="row g-2 align-items-end">
+            <input type="hidden" name="bucket" value="<?php echo htmlspecialchars($bucket); ?>">
             <div class="col-md-3 col-6">
                 <label>पद</label>
                 <select name="career_id" class="form-select form-select-sm" onchange="this.closest('form').submit()">
@@ -368,14 +437,17 @@ if ($viewApplication && !empty($viewApplication['id'])) {
             </div>
             <div class="col-md-2 col-6">
                 <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i>खोज</button>
-                <?php if ($careerId||$statusFilter||$jobSearch !== ''): ?><a href="job-applications.php" class="btn btn-outline-secondary btn-sm w-100 mt-1"><i class="fas fa-times me-1"></i>हटाउनुहोस्</a><?php endif; ?>
+                <?php if ($careerId||$statusFilter||$jobSearch !== ''): ?><a href="<?php echo htmlspecialchars($jobBucketUrl($bucket)); ?>" class="btn btn-outline-secondary btn-sm w-100 mt-1"><i class="fas fa-times me-1"></i>हटाउनुहोस्</a><?php endif; ?>
             </div>
         </form>
     </div>
     <!-- ── Applications List ── -->
+    <?php
+    $bucketLabel = ['active'=>'सक्रिय आवेदन', 'done'=>'टुङ्गिएका', 'all'=>'सबै आवेदन'][$bucket] ?? 'सबै आवेदन';
+    ?>
     <div class="card border-0 shadow-sm app-rounded-card">
         <div class="tbl-header-bar no-print">
-            <h6><i class="fas fa-briefcase me-2 text-primary"></i>रोजगार आवेदन सूची</h6>
+            <h6><i class="fas fa-briefcase me-2 text-primary"></i>रोजगार आवेदन सूची <small class="text-muted ms-2 fw-normal">— <?php echo htmlspecialchars($bucketLabel); ?></small></h6>
             <span class="result-count-badge"><?php echo count($applications); ?> आवेदन</span>
         </div>
         <div class="table-responsive">
