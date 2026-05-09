@@ -2,7 +2,7 @@
 require_once 'includes/config.php';
 $pageTitle = isEnglish() ? 'About Us' : 'हाम्रो बारेमा';
 require_once 'includes/header.php';
-
+?>
 <style>
 /* Modern About Page Styles */
 .page-banner-modern {

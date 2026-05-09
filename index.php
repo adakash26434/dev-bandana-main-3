@@ -5,7 +5,7 @@ $pageTitle = isEnglish() ? 'Home' : 'गृहपृष्ठ';
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/ensure-tables.php';
 ensurePublicTables();
-
+?>
 <style>
 /* Modern Hero Slider Styles */
 .hero-carousel-modern {
