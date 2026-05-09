@@ -1199,6 +1199,28 @@ function isEnglish() {
     return getCurrentLang() === 'en';
 }
 
+// Unified time options (dropdown only; avoid free-typed time strings)
+if (!function_exists('getUnifiedTimeOptions')) {
+    function getUnifiedTimeOptions(string $start = '06:00', string $end = '20:00', int $stepMinutes = 30): array {
+        $step = max(5, $stepMinutes);
+        $s = DateTimeImmutable::createFromFormat('H:i', $start);
+        $e = DateTimeImmutable::createFromFormat('H:i', $end);
+        if (!$s || !$e) {
+            return [];
+        }
+        if ($s > $e) {
+            [$s, $e] = [$e, $s];
+        }
+
+        $out = [];
+        for ($t = $s; $t <= $e; $t = $t->modify('+' . $step . ' minutes')) {
+            $v = $t->format('h:i A');
+            $out[$v] = $v;
+        }
+        return $out;
+    }
+}
+
 /**
  * Public / login / verify surfaces — तपाईं यही URL मा रही `?lang=` बाट भाषा बदल्न सक्नुहुन्छ।
  */

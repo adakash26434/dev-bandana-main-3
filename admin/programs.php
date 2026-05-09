@@ -126,7 +126,23 @@ foreach ($rows as $_r) {
             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
           </div>
         </div>
-        <div class="col-md-3"><label class="form-label">समय</label><input name="event_time" class="form-control" placeholder="उदा: 11:00 AM" value="<?php echo htmlspecialchars($edit['event_time'] ?? ''); ?>"></div>
+        <div class="col-md-3">
+          <label class="form-label">समय</label>
+          <?php $eventTimeValue = trim((string)($edit['event_time'] ?? '')); $eventTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions() : []; ?>
+          <select name="event_time" class="form-select">
+            <option value="">— समय छान्नुहोस् —</option>
+            <?php foreach ($eventTimeOptions as $optVal => $optLabel): ?>
+              <option value="<?php echo htmlspecialchars($optVal, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $eventTimeValue === $optVal ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endforeach; ?>
+            <?php if ($eventTimeValue !== '' && !isset($eventTimeOptions[$eventTimeValue])): ?>
+              <option value="<?php echo htmlspecialchars($eventTimeValue, ENT_QUOTES, 'UTF-8'); ?>" selected>
+                <?php echo htmlspecialchars($eventTimeValue, ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endif; ?>
+          </select>
+        </div>
         <div class="col-md-6"><label class="form-label">स्थान</label><input name="location" class="form-control" value="<?php echo htmlspecialchars($edit['location'] ?? ''); ?>"></div>
         <div class="col-md-6"><label class="form-label">विवरण</label><input name="description" class="form-control" value="<?php echo htmlspecialchars($edit['description'] ?? ''); ?>"></div>
         <div class="col-12 d-flex flex-wrap gap-3">

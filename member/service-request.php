@@ -253,13 +253,19 @@ HTML;
       </div>
       <div class="form-group">
         <label><i class="fas fa-clock sr-icon-brand"></i><?php echo $_t('मनपर्ने समय', 'Preferred Time'); ?></label>
+        <?php $preferredTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $preferredTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions('10:00', '17:00', 30) : []; ?>
         <select name="preferred_time" class="form-control">
           <option value="">— <?php echo $_t('समय छान्नुहोस्', 'Select time'); ?> —</option>
-          <option>10:00 AM - 11:00 AM</option>
-          <option>11:00 AM - 12:00 PM</option>
-          <option>1:00 PM - 2:00 PM</option>
-          <option>2:00 PM - 3:00 PM</option>
-          <option>3:00 PM - 4:00 PM</option>
+          <?php foreach ($preferredTimeOptions as $optVal => $optLabel): ?>
+          <option value="<?php echo htmlspecialchars($optVal, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $preferredTimeValue === $optVal ? 'selected' : ''; ?>>
+            <?php echo htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8'); ?>
+          </option>
+          <?php endforeach; ?>
+          <?php if ($preferredTimeValue !== '' && !isset($preferredTimeOptions[$preferredTimeValue])): ?>
+          <option value="<?php echo htmlspecialchars($preferredTimeValue, ENT_QUOTES, 'UTF-8'); ?>" selected>
+            <?php echo htmlspecialchars($preferredTimeValue, ENT_QUOTES, 'UTF-8'); ?>
+          </option>
+          <?php endif; ?>
         </select>
       </div>
     </div>

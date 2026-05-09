@@ -398,12 +398,20 @@ body.auth-portal-page .field select,
 body.auth-portal-page .vp-field input,
 body.auth-portal-page .vp-field select,
 body.auth-portal-page .vp-field-input {
+  width: 100% !important;
+  display: block;
   min-height: 44px !important;
   border-radius: 10px !important;
   font-size: 0.9rem !important;
   border: 1px solid var(--border-color) !important;
   background: var(--bg-soft) !important;
   color: var(--text-primary) !important;
+}
+
+body.auth-portal-page .field,
+body.auth-portal-page .input-icon,
+body.auth-portal-page .vp-field {
+  width: 100%;
 }
 
 body.auth-portal-page .field input:focus,

@@ -317,7 +317,7 @@ require_once 'includes/header.php';
                                             $sel = (($_POST['purpose'] ?? '') === $val) ? 'selected' : '';
                                         ?>
                                         <option value="<?php echo $val; ?>" <?php echo $sel; ?>><?php echo $label; ?></option>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -356,13 +356,18 @@ require_once 'includes/header.php';
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label"><?php echo isEnglish() ? 'Preferred Time' : 'रुचाइएको समय'; ?> <span class="req">*</span></label>
+                                    <?php $apptTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $apptTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions('10:00', '17:00', 30) : []; ?>
                                     <select name="preferred_time" class="form-select" required>
-                                        <?php
-                                        $times = ['10:00 AM'=>'10:00–11:00 AM','11:00 AM'=>'11:00–12:00 PM','12:00 PM'=>'12:00–1:00 PM','2:00 PM'=>'2:00–3:00 PM','3:00 PM'=>'3:00–4:00 PM','4:00 PM'=>'4:00–5:00 PM'];
-                                        foreach ($times as $val => $label):
-                                            $sel = (($_POST['preferred_time'] ?? '') === $val) ? 'selected' : '';
-                                        ?>
-                                        <option value="<?php echo $val; ?>" <?php echo $sel; ?>><?php echo $label; ?></option>
+                                        <option value=""><?php echo isEnglish() ? 'Select time' : 'समय छान्नुहोस्'; ?></option>
+                                        <?php foreach ($apptTimeOptions as $optVal => $optLabel): ?>
+                                        <option value="<?php echo htmlspecialchars($optVal, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $apptTimeValue === $optVal ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8'); ?>
+                                        </option>
+                                        <?php endforeach; ?>
+                                        <?php if ($apptTimeValue !== '' && !isset($apptTimeOptions[$apptTimeValue])): ?>
+                                        <option value="<?php echo htmlspecialchars($apptTimeValue, ENT_QUOTES, 'UTF-8'); ?>" selected>
+                                            <?php echo htmlspecialchars($apptTimeValue, ENT_QUOTES, 'UTF-8'); ?>
+                                        </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>

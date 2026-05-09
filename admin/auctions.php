@@ -329,9 +329,20 @@ if ($action === 'edit' || $action === 'add') {
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">समय</label>
-                        <input type="text" name="auction_time" class="form-control"
-                               value="<?php echo htmlspecialchars($auction['auction_time'] ?? ''); ?>"
-                               placeholder="बिहान ११:०० बजे">
+                        <?php $auctionTimeValue = trim((string)($auction['auction_time'] ?? '')); $auctionTimeOptions = function_exists('getUnifiedTimeOptions') ? getUnifiedTimeOptions() : []; ?>
+                        <select name="auction_time" class="form-select">
+                            <option value="">— समय छान्नुहोस् —</option>
+                            <?php foreach ($auctionTimeOptions as $optVal => $optLabel): ?>
+                            <option value="<?php echo htmlspecialchars($optVal, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $auctionTimeValue === $optVal ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                            <?php endforeach; ?>
+                            <?php if ($auctionTimeValue !== '' && !isset($auctionTimeOptions[$auctionTimeValue])): ?>
+                            <option value="<?php echo htmlspecialchars($auctionTimeValue, ENT_QUOTES, 'UTF-8'); ?>" selected>
+                                <?php echo htmlspecialchars($auctionTimeValue, ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                            <?php endif; ?>
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">सम्पर्क व्यक्ति</label>
