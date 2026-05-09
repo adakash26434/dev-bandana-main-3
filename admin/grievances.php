@@ -39,6 +39,7 @@ require_once __DIR__ . '/../includes/auth-roles.php';
 /* RBAC: staff hercha matra; mutate admin+ matra */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') require_role('admin');
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/includes/admin-request-view.php';
 
 /* ─── POST handlers ─── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -51,13 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newFile     = adminUploadFile('admin_attachment');
         $resolvedAt  = ($status === 'resolved' || $status === 'closed') ? date('Y-m-d H:i:s') : null;
         $oldStatus   = '';
+        $notifyOptIn = !empty($_POST['notify_member']) && $_POST['notify_member'] === '1';
+        $notifyOutcome = [
+            'admin_chose' => $notifyOptIn,
+            'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+            'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+        ];
         try {
             $oldStQ = $db->prepare("SELECT status FROM grievances WHERE id=? LIMIT 1");
             $oldStQ->execute([$id]);
             $oldStatus = (string)($oldStQ->fetchColumn() ?: '');
         } catch (Exception $e) {}
-        $notifySent = false;
-
         try {
             if ($newFile) {
                 $stmt = $db->prepare("UPDATE grievances SET status=?, admin_response=?, admin_note=?, resolved_at=?, admin_attachment=?, updated_at=NOW() WHERE id=?");
@@ -73,12 +78,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $nRow->execute([$id]);
                 $nData = $nRow->fetch();
                 if ($nData) {
-                    sendMemberStatusUpdate('grievance',
+                    $r = sendMemberStatusUpdate('grievance',
                         $nData['email'] ?? '', $nData['phone'] ?? '', $nData['name'] ?? '',
-                        $status, $adminResp, 'GRV-' . $id);
-                    $notifySent = true;
+                        $status, $adminResp, 'GRV-' . $id, !$notifyOptIn);
+                    if (is_array($r)) {
+                        $notifyOutcome['email'] = $r['email'] ?? $notifyOutcome['email'];
+                        $notifyOutcome['sms']   = $r['sms']   ?? $notifyOutcome['sms'];
+                    }
                 }
             } catch (Exception $e) {}
+            $notifySent = ($notifyOutcome['email']['status'] === 'sent') || ($notifyOutcome['sms']['status'] === 'sent');
 
             try {
                 logRequestStatusHistory(
@@ -90,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (string)($adminResp !== '' ? $adminResp : $adminNote),
                     $notifySent,
                     (int)($_SESSION['admin_id'] ?? 0),
-                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                    (string)($_SESSION['admin_name'] ?? 'Admin'),
+                    $notifyOutcome
                 );
             } catch (Exception $e) {}
 
@@ -390,21 +400,7 @@ if ($viewGrv):
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-clock-rotate-left"></i><?php echo $__t('Status / Comment History', 'Status / Comment History'); ?></div>
                     <div class="p-3">
-                        <?php foreach ($grvHistory as $h): ?>
-                        <div class="border rounded p-2 mb-2 bg-light">
-                            <div class="small fw-semibold text-dark">
-                                <?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?>
-                            </div>
-                            <?php if (!empty($h['admin_comment'])): ?>
-                            <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
-                            <?php endif; ?>
-                            <div class="small text-muted mt-1">
-                                <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> ·
-                                <?php echo formatNepaliDate((string)$h['created_at'], true); ?> ·
-                                <?php echo !empty($h['notify_sent']) ? $__t('Notify पठाइयो', 'Notified') : $__t('Notify छैन', 'No notify'); ?>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
+                        <?php echo arvLogList($grvHistory); ?>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -445,6 +441,18 @@ if ($viewGrv):
                                 <textarea name="admin_response" class="form-control" rows="3"
                                     placeholder="सदस्यलाई प्रतिक्रिया लेख्नुहोस्..."
                                 ><?php echo htmlspecialchars($viewGrv['admin_response'] ?? ''); ?></textarea>
+                            </div>
+
+                            <?php $hasEmail = !empty($viewGrv['email']); $hasPhone = !empty($viewGrv['phone']); ?>
+                            <div class="arv-notify-row mb-3">
+                                <label class="arv-notify-toggle">
+                                    <input type="checkbox" name="notify_member" value="1" <?php echo ($hasEmail || $hasPhone) ? 'checked' : ''; ?>>
+                                    <span><i class="fas fa-paper-plane"></i> Member लाई SMS/Email पठाउनुहोस्</span>
+                                </label>
+                                <div class="arv-notify-channels">
+                                    <span class="<?php echo $hasEmail ? 'is-on' : 'is-off'; ?>"><i class="fas fa-envelope"></i> Email <?php echo $hasEmail ? '✓' : '—'; ?></span>
+                                    <span class="<?php echo $hasPhone ? 'is-on' : 'is-off'; ?>"><i class="fas fa-mobile-screen"></i> SMS <?php echo $hasPhone ? '✓' : '—'; ?></span>
+                                </div>
                             </div>
 
                             <!-- Admin Internal Note — member देख्दैन -->
@@ -616,8 +624,8 @@ if ($viewGrv):
                 <td><div class="cell-sub"><?php echo isset($grv['created_at']) ? formatNepaliDate($grv['created_at'], true) : ''; ?></div></td>
                 <td><span class="badge-status badge-<?php echo htmlspecialchars($grv['status']); ?>"><?php echo $statusLabel[$grv['status']] ?? $grv['status']; ?></span></td>
                 <td class="no-print">
-                    <div class="d-flex gap-1 flex-wrap">
-                        <a href="grievances.php?view=<?php echo $grv['id']; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="<?php echo $__t('विस्तृत / अपडेट', 'Details / Update'); ?>"><i class="fas fa-eye"></i></a>
+                    <div class="adm-action-icons">
+                        <a href="grievances.php?view=<?php echo $grv['id']; ?>" class="adm-icon-btn adm-icon-btn--view" title="<?php echo $__t('विस्तृत / अपडेट', 'Details / Update'); ?>" aria-label="View"><i class="fas fa-eye"></i></a>
                         <?php if ($grv['status'] === 'pending' || $grv['status'] === 'in_progress'): ?>
                         <form method="POST" class="qaction-form" onsubmit="return confirm('<?php echo $__t('यो गुनासो समाधान भएको मान्नुहुन्छ?', 'Mark this grievance as resolved?'); ?>')">
                             <?php echo csrfField(); ?>

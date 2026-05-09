@@ -6,6 +6,7 @@
 $pageTitle = 'सदस्य कल्याण दाबीहरू';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/includes/admin-request-view.php';
 require_once __DIR__ . '/../includes/welfare-claims-tables.php';
 require_once __DIR__ . '/../includes/request-status-history.php';
 
@@ -30,7 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $approved_amount = floatval($_POST['approved_amount'] ?? 0);
             $admin_remarks = clean_text($_POST['admin_remarks'] ?? '');
             $oldStatus = '';
-            $notifySent = false;
+            $notifyOptIn = !empty($_POST['notify_member']) && $_POST['notify_member'] === '1';
+            $notifyOutcome = [
+                'admin_chose' => $notifyOptIn,
+                'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+                'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+            ];
             try {
                 $os = $db->prepare("SELECT status FROM member_welfare_claims WHERE id=? LIMIT 1");
                 $os->execute([$claim_id]);
@@ -52,10 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $nr = $db->prepare("SELECT member_name, full_name, email, phone FROM member_welfare_claims WHERE id=?");
                 $nr->execute([$claim_id]); $nd = $nr->fetch();
                 if ($nd && function_exists('sendMemberStatusUpdate')) {
-                    sendMemberStatusUpdate('welfare', $nd['email']??'', $nd['phone']??'', $nd['full_name'] ?? $nd['member_name'] ?? '', $status, $admin_remarks, '');
-                    $notifySent = true;
+                    $r = sendMemberStatusUpdate('welfare', $nd['email']??'', $nd['phone']??'', $nd['full_name'] ?? $nd['member_name'] ?? '', $status, $admin_remarks, '', !$notifyOptIn);
+                    if (is_array($r)) {
+                        $notifyOutcome['email'] = $r['email'] ?? $notifyOutcome['email'];
+                        $notifyOutcome['sms']   = $r['sms']   ?? $notifyOutcome['sms'];
+                    }
                 }
             } catch (Exception $ex) {}
+            $notifySent = ($notifyOutcome['email']['status'] === 'sent') || ($notifyOutcome['sms']['status'] === 'sent');
             try {
                 logRequestStatusHistory(
                     $db,
@@ -66,7 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (string)$admin_remarks,
                     $notifySent,
                     (int)($_SESSION['admin_id'] ?? 0),
-                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                    (string)($_SESSION['admin_name'] ?? 'Admin'),
+                    $notifyOutcome
                 );
             } catch (Exception $e) {}
 
@@ -298,13 +309,7 @@ if (!$claim) {
                 <?php if (!empty($claimHistory)): ?>
                 <div class="info-section">
                     <h6><i class="fas fa-clock-rotate-left"></i> Status / Comment History</h6>
-                    <?php foreach ($claimHistory as $h): ?>
-                    <div class="border rounded p-2 mb-2 bg-white">
-                        <div class="small fw-semibold"><?php echo e((string)($h['old_status'] ?: '—')); ?> → <?php echo e((string)($h['new_status'] ?: '—')); ?></div>
-                        <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(e((string)$h['admin_comment'])); ?></div><?php endif; ?>
-                        <div class="small text-muted mt-1"><?php echo e((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
-                    </div>
-                    <?php endforeach; ?>
+                    <?php echo arvLogList($claimHistory); ?>
                 </div>
                 <?php endif; ?>
             </div>
@@ -340,6 +345,18 @@ if (!$claim) {
                             <div class="mb-3">
                                 <label class="form-label">टिप्पणी/कारण</label>
                                 <textarea name="admin_remarks" class="form-control" rows="3"><?php echo e($claim['admin_remarks']); ?></textarea>
+                            </div>
+
+                            <?php $hasEmail = !empty($claim['email']); $hasPhone = !empty($claim['phone']); ?>
+                            <div class="arv-notify-row mb-3">
+                                <label class="arv-notify-toggle">
+                                    <input type="checkbox" name="notify_member" value="1" <?php echo ($hasEmail || $hasPhone) ? 'checked' : ''; ?>>
+                                    <span><i class="fas fa-paper-plane"></i> Member लाई SMS/Email पठाउनुहोस्</span>
+                                </label>
+                                <div class="arv-notify-channels">
+                                    <span class="<?php echo $hasEmail ? 'is-on' : 'is-off'; ?>"><i class="fas fa-envelope"></i> Email <?php echo $hasEmail ? '✓' : '—'; ?></span>
+                                    <span class="<?php echo $hasPhone ? 'is-on' : 'is-off'; ?>"><i class="fas fa-mobile-screen"></i> SMS <?php echo $hasPhone ? '✓' : '—'; ?></span>
+                                </div>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">
@@ -570,17 +587,19 @@ if ($flash = getFlash()):
                             <?php echo formatNepaliDate($claim['created_at']); ?>
                         </td>
                         <td>
-                            <a href="welfare-claims.php?action=view&id=<?php echo $claim['id']; ?>" class="btn btn-sm btn-info" title="हेर्नुहोस्">
+                            <div class="adm-action-icons">
+                            <a href="welfare-claims.php?action=view&id=<?php echo $claim['id']; ?>" class="adm-icon-btn adm-icon-btn--view" title="हेर्नुहोस्" aria-label="View">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <form method="POST" style="display:inline;" onsubmit="return confirm('हटाउने?');">
+                            <form method="POST" class="adm-icon-form" onsubmit="return confirm('हटाउने?');">
                                 <?php echo csrfField(); ?>
                                 <input type="hidden" name="delete_claim" value="1">
                                 <input type="hidden" name="claim_id" value="<?php echo $claim['id']; ?>">
-                                <button type="submit" class="btn btn-sm btn-danger" title="हटाउनुहोस्">
-                                    <i class="fas fa-trash"></i>
+                                <button type="submit" class="adm-icon-btn adm-icon-btn--delete" title="हटाउनुहोस्" aria-label="Delete">
+                                    <i class="fas fa-trash-can"></i>
                                 </button>
                             </form>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

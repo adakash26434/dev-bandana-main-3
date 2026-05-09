@@ -13,6 +13,7 @@ $pageTitle   = $__t('ऋण आवेदन व्यवस्थापन', 'Lo
 $currentPage = 'loans';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/includes/admin-request-view.php';
 require_once __DIR__ . '/../includes/request-status-history.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
 /* RBAC: staff hercha matra; mutate (approve/reject/delete) admin+ matra */
@@ -32,7 +33,12 @@ if (isset($_POST['update_status'])) {
     $remarks = clean_text($_POST['remarks'] ?? '');
     $newFile = adminUploadFile('admin_attachment');
     $oldStatus = '';
-    $notifySent = false;
+    $notifyOptIn = !empty($_POST['notify_member']) && $_POST['notify_member'] === '1';
+    $notifyOutcome = [
+        'admin_chose' => $notifyOptIn,
+        'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+        'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+    ];
     try {
         $os = $db->prepare("SELECT status FROM loan_applications WHERE id=? LIMIT 1");
         $os->execute([$id]);
@@ -47,18 +53,22 @@ if (isset($_POST['update_status'])) {
             $stmt = $db->prepare("UPDATE loan_applications SET status=?, remarks=?, updated_at=NOW() WHERE id=?");
             $stmt->execute([$status, $remarks, $id]);
         }
-        /* Member लाई status notification — email/SMS */
+        /* Member लाई status notification — email/SMS, channel-wise audit */
         try {
             $nRow = $db->prepare("SELECT full_name, email, phone, tracking_id FROM loan_applications WHERE id=?");
             $nRow->execute([$id]);
             $nData = $nRow->fetch();
             if ($nData) {
-                sendMemberStatusUpdate('loan',
+                $r = sendMemberStatusUpdate('loan',
                     $nData['email'] ?? '', $nData['phone'] ?? '', $nData['full_name'] ?? '',
-                    $status, $remarks, $nData['tracking_id'] ?? '');
-                $notifySent = true;
+                    $status, $remarks, $nData['tracking_id'] ?? '', !$notifyOptIn);
+                if (is_array($r)) {
+                    $notifyOutcome['email'] = $r['email'] ?? $notifyOutcome['email'];
+                    $notifyOutcome['sms']   = $r['sms']   ?? $notifyOutcome['sms'];
+                }
             }
         } catch (Exception $e) {}
+        $notifySent = ($notifyOutcome['email']['status'] === 'sent') || ($notifyOutcome['sms']['status'] === 'sent');
         try {
             logRequestStatusHistory(
                 $db,
@@ -69,7 +79,8 @@ if (isset($_POST['update_status'])) {
                 (string)$remarks,
                 $notifySent,
                 (int)($_SESSION['admin_id'] ?? 0),
-                (string)($_SESSION['admin_name'] ?? 'Admin')
+                (string)($_SESSION['admin_name'] ?? 'Admin'),
+                $notifyOutcome
             );
         } catch (Exception $e) {}
         setFlash('success', $__t('स्थिति अपडेट गरियो।', 'Status updated.'));
@@ -328,13 +339,7 @@ if ($viewApp):
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-clock-rotate-left"></i>Status / Comment History</div>
                     <div class="p-3">
-                        <?php foreach ($loanHistory as $h): ?>
-                        <div class="border rounded p-2 mb-2 bg-light">
-                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
-                            <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div><?php endif; ?>
-                            <div class="small text-muted mt-1"><?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
-                        </div>
-                        <?php endforeach; ?>
+                        <?php echo arvLogList($loanHistory); ?>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -368,6 +373,18 @@ if ($viewApp):
                                 <textarea name="remarks" class="form-control" rows="4"
                                     placeholder="<?php echo $__t('स्वीकृति/अस्वीकृतिको कारण, सर्तहरू...', 'Reason for approval/rejection, conditions...'); ?>"
                                 ><?php echo htmlspecialchars($viewApp['remarks'] ?? ''); ?></textarea>
+                            </div>
+
+                            <?php $hasEmail = !empty($viewApp['email']); $hasPhone = !empty($viewApp['phone'] ?? $viewApp['mobile'] ?? ''); ?>
+                            <div class="arv-notify-row mb-3">
+                                <label class="arv-notify-toggle">
+                                    <input type="checkbox" name="notify_member" value="1" <?php echo ($hasEmail || $hasPhone) ? 'checked' : ''; ?>>
+                                    <span><i class="fas fa-paper-plane"></i> Member लाई SMS/Email पठाउनुहोस्</span>
+                                </label>
+                                <div class="arv-notify-channels">
+                                    <span class="<?php echo $hasEmail ? 'is-on' : 'is-off'; ?>"><i class="fas fa-envelope"></i> Email <?php echo $hasEmail ? '✓' : '—'; ?></span>
+                                    <span class="<?php echo $hasPhone ? 'is-on' : 'is-off'; ?>"><i class="fas fa-mobile-screen"></i> SMS <?php echo $hasPhone ? '✓' : '—'; ?></span>
+                                </div>
                             </div>
 
                             <!-- Admin ले approval letter वा rejection notice attach गर्न सक्छ -->
@@ -555,8 +572,8 @@ if ($viewApp):
                     </span>
                 </td>
                 <td class="no-print">
-                    <div class="d-flex gap-1 flex-wrap align-items-center">
-                        <a href="loan-applications.php?view=<?php echo $app['id']; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="<?php echo $__t('विस्तृत हेर्नुहोस्', 'View details'); ?>">
+                    <div class="adm-action-icons">
+                        <a href="loan-applications.php?view=<?php echo $app['id']; ?>" class="adm-icon-btn adm-icon-btn--view" title="<?php echo $__t('विस्तृत हेर्नुहोस्', 'View details'); ?>" aria-label="View">
                             <i class="fas fa-eye"></i>
                         </a>
                         <?php if ($app['status'] === 'pending' || $app['status'] === 'processing'): ?>

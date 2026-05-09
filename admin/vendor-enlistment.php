@@ -293,8 +293,8 @@ $businessLabels = [
                     </span>
                 </td>
                 <td class="no-print">
-                    <div class="d-flex gap-1 flex-wrap">
-                        <a href="?view=<?php echo $v['id']; ?>&tab=<?php echo $tab; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="विवरण"><i class="fas fa-eye"></i></a>
+                    <div class="adm-action-icons">
+                        <a href="?view=<?php echo $v['id']; ?>&tab=<?php echo $tab; ?>" class="adm-icon-btn adm-icon-btn--view" title="विवरण" aria-label="View"><i class="fas fa-eye"></i></a>
                         <?php if ($v['status'] === 'pending'): ?>
                         <form method="POST" class="qaction-form" onsubmit="return confirm('भेन्डर स्वीकृत गर्नुहुन्छ?')">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">

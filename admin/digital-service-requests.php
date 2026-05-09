@@ -6,6 +6,7 @@ $__t = static function (string $np, string $en): string {
 $pageTitle = $__t('डिजिटल सेवा अनुरोधहरू', 'Digital Service Requests');
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/includes/admin-request-view.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
 require_once __DIR__ . '/../includes/digital-service-requests-tables.php';
 require_once __DIR__ . '/../includes/request-status-history.php';
@@ -49,12 +50,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $remarks   = clean_text($_POST['admin_remarks'] ?? '');
             if (!isset($statusLabels[$status])) { $status = 'pending'; }
             $oldStatus = '';
+            $notifyOptIn = !empty($_POST['notify_member']) && $_POST['notify_member'] === '1';
+            $notifyOutcome = [
+                'admin_chose' => $notifyOptIn,
+                'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+                'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+            ];
             try {
                 $oldSt = $db->prepare("SELECT status FROM digital_service_requests WHERE id=? LIMIT 1");
                 $oldSt->execute([$requestId]);
                 $oldStatus = (string)($oldSt->fetchColumn() ?: '');
             } catch (Exception $e) {}
-            $notifySent = false;
             /* File upload — admin ले letter/document attach गर्न सक्छ */
             $newFile = adminUploadFile('admin_attachment');
             if ($newFile) {
@@ -70,12 +76,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $nRow->execute([$requestId]);
                 $nData = $nRow->fetch();
                 if ($nData) {
-                    sendMemberStatusUpdate('digital_service',
+                    $r = sendMemberStatusUpdate('digital_service',
                         $nData['email'] ?? '', $nData['phone'] ?? '', $nData['requester_name'] ?? '',
-                        $status, $remarks, $nData['tracking_id'] ?? '');
-                    $notifySent = true;
+                        $status, $remarks, $nData['tracking_id'] ?? '', !$notifyOptIn);
+                    if (is_array($r)) {
+                        $notifyOutcome['email'] = $r['email'] ?? $notifyOutcome['email'];
+                        $notifyOutcome['sms']   = $r['sms']   ?? $notifyOutcome['sms'];
+                    }
                 }
             } catch (Exception $e) { /* notification fail भए पनि main काम रोकिँदैन */ }
+            $notifySent = ($notifyOutcome['email']['status'] === 'sent') || ($notifyOutcome['sms']['status'] === 'sent');
             try {
                 logRequestStatusHistory(
                     $db,
@@ -86,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (string)$remarks,
                     $notifySent,
                     (int)($_SESSION['admin_id'] ?? 0),
-                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                    (string)($_SESSION['admin_name'] ?? 'Admin'),
+                    $notifyOutcome
                 );
             } catch (Exception $e) {}
             setFlash('success', $__t('डिजिटल सेवा अनुरोध अपडेट भयो।', 'Digital service request updated.'));
@@ -227,6 +238,17 @@ try {
                                 <label class="form-label"><?php echo $__t('Admin टिप्पणी', 'Admin Remarks'); ?></label>
                                 <textarea name="admin_remarks" class="form-control" rows="4"><?php echo e($request['admin_remarks']); ?></textarea>
                             </div>
+                            <?php $hasEmail = !empty($request['email']); $hasPhone = !empty($request['phone']); ?>
+                            <div class="arv-notify-row mb-3">
+                                <label class="arv-notify-toggle">
+                                    <input type="checkbox" name="notify_member" value="1" <?php echo ($hasEmail || $hasPhone) ? 'checked' : ''; ?>>
+                                    <span><i class="fas fa-paper-plane"></i> Member लाई SMS/Email पठाउनुहोस्</span>
+                                </label>
+                                <div class="arv-notify-channels">
+                                    <span class="<?php echo $hasEmail ? 'is-on' : 'is-off'; ?>"><i class="fas fa-envelope"></i> Email <?php echo $hasEmail ? '✓' : '—'; ?></span>
+                                    <span class="<?php echo $hasPhone ? 'is-on' : 'is-off'; ?>"><i class="fas fa-mobile-screen"></i> SMS <?php echo $hasPhone ? '✓' : '—'; ?></span>
+                                </div>
+                            </div>
                             <!-- Admin ले सेवा सम्बन्धी document वा instruction attach गर्न सक्छ -->
                             <div class="mb-3">
                                 <label class="form-label">
@@ -260,18 +282,7 @@ try {
                 <div class="card mt-3">
                     <div class="card-header"><h6 class="mb-0"><i class="fas fa-clock-rotate-left me-1"></i><?php echo $__t('Status / Comment History', 'Status / Comment History'); ?></h6></div>
                     <div class="card-body">
-                        <?php foreach ($dsrHistory as $h): ?>
-                        <div class="border rounded p-2 mb-2 bg-light">
-                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
-                            <?php if (!empty($h['admin_comment'])): ?>
-                            <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
-                            <?php endif; ?>
-                            <div class="small text-muted mt-1">
-                                <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> ·
-                                <?php echo !empty($h['notify_sent']) ? $__t('Notify पठाइयो', 'Notified') : $__t('Notify छैन', 'No notify'); ?>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
+                        <?php echo arvLogList($dsrHistory); ?>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -432,7 +443,11 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
                         <td><?php echo e($request['service_type_np'] ?: (isset($serviceLabels[$request['service_type']]) ? $__t($serviceLabels[$request['service_type']]['np'], $serviceLabels[$request['service_type']]['en']) : $request['service_type'])); ?></td>
                         <td><?php echo formatNepaliDate($request['created_at']); ?></td>
                         <td><span class="badge dsr-st-badge dsr-st-<?php echo $statusLabels[$request['status']]['class'] ?? 'secondary'; ?>"><?php echo isset($statusLabels[$request['status']]) ? $__t($statusLabels[$request['status']]['np'], $statusLabels[$request['status']]['en']) : e($request['status']); ?></span></td>
-                        <td><a href="?action=view&id=<?php echo (int)$request['id']; ?>" class="btn btn-sm dsr-view-btn"><i class="fas fa-eye"></i></a></td>
+                        <td>
+                            <div class="adm-action-icons">
+                                <a href="?action=view&id=<?php echo (int)$request['id']; ?>" class="adm-icon-btn adm-icon-btn--view" title="<?php echo $__t('विवरण', 'Details'); ?>" aria-label="View"><i class="fas fa-eye"></i></a>
+                            </div>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                     <?php if (empty($requests)): ?>

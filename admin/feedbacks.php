@@ -13,6 +13,7 @@
 $pageTitle = 'Feedback / सुझाव व्यवस्थापन';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/includes/admin-request-view.php';
 require_once __DIR__ . '/../includes/request-status-history.php';
 
 $db = getDB();
@@ -43,7 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $adminReply = trim($_POST['admin_reply']  ?? '');
             $adminNote  = trim($_POST['admin_note']   ?? '');
             $oldStatus = '';
-            $notifySent = false;
+            $notifyOptIn = !empty($_POST['notify_member']) && $_POST['notify_member'] === '1';
+            $notifyOutcome = [
+                'admin_chose' => $notifyOptIn,
+                'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+                'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+            ];
             try {
                 $os = $db->prepare("SELECT status FROM member_feedback WHERE id=? LIMIT 1");
                 $os->execute([$id]);
@@ -74,18 +80,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $nr->execute([$id]);
                 $nd = $nr->fetch();
                 if ($nd && function_exists('sendMemberStatusUpdate')) {
-                    sendMemberStatusUpdate(
+                    $r = sendMemberStatusUpdate(
                         'feedback',
                         (string)($nd['email'] ?? ''),
                         (string)($nd['phone'] ?? ''),
                         (string)($nd['name'] ?? ''),
                         (string)$status,
                         (string)$adminReply,
-                        (string)($nd['tracking_id'] ?? '')
+                        (string)($nd['tracking_id'] ?? ''),
+                        !$notifyOptIn
                     );
-                    $notifySent = true;
+                    if (is_array($r)) {
+                        $notifyOutcome['email'] = $r['email'] ?? $notifyOutcome['email'];
+                        $notifyOutcome['sms']   = $r['sms']   ?? $notifyOutcome['sms'];
+                    }
                 }
             } catch (Throwable $e) {}
+            $notifySent = ($notifyOutcome['email']['status'] === 'sent') || ($notifyOutcome['sms']['status'] === 'sent');
             try {
                 logRequestStatusHistory(
                     $db,
@@ -96,7 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (string)$adminReply,
                     $notifySent,
                     (int)($_SESSION['admin_id'] ?? 0),
-                    (string)($_SESSION['admin_name'] ?? 'Admin')
+                    (string)($_SESSION['admin_name'] ?? 'Admin'),
+                    $notifyOutcome
                 );
             } catch (Exception $e) {}
             setFlash('success', 'Feedback सफलतापूर्वक अपडेट भयो।');
@@ -377,13 +389,7 @@ function attachmentName($path) {
                     <?php if (!empty($feedbackHistory)): ?>
                     <h6 class="fw-bold mb-2 text-primary"><i class="fas fa-clock-rotate-left me-1"></i>Status / Comment History</h6>
                     <div class="mb-3">
-                        <?php foreach ($feedbackHistory as $h): ?>
-                        <div class="border rounded p-2 mb-2 bg-light">
-                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
-                            <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div><?php endif; ?>
-                            <div class="small text-muted mt-1"><?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
-                        </div>
-                        <?php endforeach; ?>
+                        <?php echo arvLogList($feedbackHistory); ?>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -435,6 +441,18 @@ function attachmentName($path) {
                                     <textarea name="admin_reply" class="form-control" rows="3"
                                         placeholder="सदस्यलाई जवाफ लेख्नुहोस् (optional)..."
                                     ><?php echo htmlspecialchars($viewFeedback['admin_reply'] ?? ''); ?></textarea>
+                                </div>
+
+                                <?php $hasEmail = !empty($viewFeedback['email']); $hasPhone = !empty($viewFeedback['phone']); ?>
+                                <div class="arv-notify-row mb-3">
+                                    <label class="arv-notify-toggle">
+                                        <input type="checkbox" name="notify_member" value="1" <?php echo ($hasEmail || $hasPhone) ? 'checked' : ''; ?>>
+                                        <span><i class="fas fa-paper-plane"></i> Member लाई SMS/Email पठाउनुहोस्</span>
+                                    </label>
+                                    <div class="arv-notify-channels">
+                                        <span class="<?php echo $hasEmail ? 'is-on' : 'is-off'; ?>"><i class="fas fa-envelope"></i> Email <?php echo $hasEmail ? '✓' : '—'; ?></span>
+                                        <span class="<?php echo $hasPhone ? 'is-on' : 'is-off'; ?>"><i class="fas fa-mobile-screen"></i> SMS <?php echo $hasPhone ? '✓' : '—'; ?></span>
+                                    </div>
                                 </div>
 
                                 <!-- Admin Internal Note — केवल admin को लागि -->
@@ -634,10 +652,12 @@ function attachmentName($path) {
 
                             <!-- Actions -->
                             <td>
+                                <div class="adm-action-icons">
                                 <a href="?view=<?php echo $fb['id']; ?>"
-                                   class="btn btn-sm btn-info mb-1" title="विवरण हेर्नुहोस् / अपडेट गर्नुहोस्">
+                                   class="adm-icon-btn adm-icon-btn--view" title="विवरण हेर्नुहोस् / अपडेट गर्नुहोस्" aria-label="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
+                                </div>
                                 <form method="POST" style="display:inline;"
                                       onsubmit="return confirm('यो feedback मेटाउने?');">
                                     <input type="hidden" name="action" value="delete">

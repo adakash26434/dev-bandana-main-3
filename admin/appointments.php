@@ -9,6 +9,7 @@ $pageTitle   = 'भेटघाट व्यवस्थापन';
 $currentPage = 'appointments';
 require_once 'includes/admin-header.php';
 require_once 'includes/admin-ui.php';
+require_once __DIR__ . '/includes/admin-request-view.php';
 require_once __DIR__ . '/../includes/request-status-history.php';
 
 /* ── Auto-ALTER: admin_attachment column थप्ने — MySQL 5.7+ compatible ── */
@@ -25,7 +26,12 @@ if (isset($_POST['update_status'])) {
     $remarks = clean_text($_POST['remarks'] ?? '');
     $newFile = adminUploadFile('admin_attachment');
     $oldStatus = '';
-    $notifySent = false;
+    $notifyOptIn = !empty($_POST['notify_member']) && $_POST['notify_member'] === '1';
+    $notifyOutcome = [
+        'admin_chose' => $notifyOptIn,
+        'email' => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+        'sms'   => ['status' => 'not_attempted', 'reason' => '', 'to' => ''],
+    ];
     try {
         $os = $db->prepare("SELECT status FROM appointments WHERE id=? LIMIT 1");
         $os->execute([$id]);
@@ -46,12 +52,16 @@ if (isset($_POST['update_status'])) {
         $nRow->execute([$id]);
         $nData = $nRow->fetch();
         if ($nData) {
-            sendMemberStatusUpdate('appointment',
+            $r = sendMemberStatusUpdate('appointment',
                 $nData['email'] ?? '', $nData['phone'] ?? '', $nData['name'] ?? '',
-                $status, $remarks, 'APT-' . $id);
-            $notifySent = true;
+                $status, $remarks, 'APT-' . $id, !$notifyOptIn);
+            if (is_array($r)) {
+                $notifyOutcome['email'] = $r['email'] ?? $notifyOutcome['email'];
+                $notifyOutcome['sms']   = $r['sms']   ?? $notifyOutcome['sms'];
+            }
         }
     } catch (Exception $e) { /* notification fail भए पनि main काम रोकिँदैन */ }
+    $notifySent = ($notifyOutcome['email']['status'] === 'sent') || ($notifyOutcome['sms']['status'] === 'sent');
     try {
         logRequestStatusHistory(
             $db,
@@ -62,7 +72,8 @@ if (isset($_POST['update_status'])) {
             (string)$remarks,
             $notifySent,
             (int)($_SESSION['admin_id'] ?? 0),
-            (string)($_SESSION['admin_name'] ?? 'Admin')
+            (string)($_SESSION['admin_name'] ?? 'Admin'),
+            $notifyOutcome
         );
     } catch (Exception $e) {}
     setFlash('success', 'स्थिति अपडेट भयो।');
@@ -292,13 +303,7 @@ if ($viewApt):
                 <div class="adm-info-group">
                     <div class="adm-info-group-header"><i class="fas fa-clock-rotate-left"></i>Status / Comment History</div>
                     <div class="p-3">
-                        <?php foreach ($appointmentHistory as $h): ?>
-                        <div class="border rounded p-2 mb-2 bg-light">
-                            <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
-                            <?php if (!empty($h['admin_comment'])): ?><div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div><?php endif; ?>
-                            <div class="small text-muted mt-1"><?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?></div>
-                        </div>
-                        <?php endforeach; ?>
+                        <?php echo arvLogList($appointmentHistory); ?>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -334,6 +339,18 @@ if ($viewApt):
                                 <textarea name="remarks" class="form-control" rows="4"
                                     placeholder="Confirmation को विवरण, cancelled भएको कारण..."
                                 ><?php echo htmlspecialchars($viewApt['remarks'] ?? ''); ?></textarea>
+                            </div>
+
+                            <?php $hasEmail = !empty($viewApt['email']); $hasPhone = !empty($viewApt['phone']); ?>
+                            <div class="arv-notify-row mb-3">
+                                <label class="arv-notify-toggle">
+                                    <input type="checkbox" name="notify_member" value="1" <?php echo ($hasEmail || $hasPhone) ? 'checked' : ''; ?>>
+                                    <span><i class="fas fa-paper-plane"></i> Member लाई SMS/Email पठाउनुहोस्</span>
+                                </label>
+                                <div class="arv-notify-channels">
+                                    <span class="<?php echo $hasEmail ? 'is-on' : 'is-off'; ?>"><i class="fas fa-envelope"></i> Email <?php echo $hasEmail ? '✓' : '—'; ?></span>
+                                    <span class="<?php echo $hasPhone ? 'is-on' : 'is-off'; ?>"><i class="fas fa-mobile-screen"></i> SMS <?php echo $hasPhone ? '✓' : '—'; ?></span>
+                                </div>
                             </div>
 
                             <!-- Admin ले appointment confirmation letter attach गर्न सक्छ -->
@@ -500,8 +517,8 @@ if ($viewApt):
                     </span>
                 </td>
                 <td class="no-print">
-                    <div class="d-flex gap-1 flex-wrap">
-                        <a href="appointments.php?view=<?php echo $apt['id']; ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="विवरण"><i class="fas fa-eye"></i></a>
+                    <div class="adm-action-icons">
+                        <a href="appointments.php?view=<?php echo $apt['id']; ?>" class="adm-icon-btn adm-icon-btn--view" title="विवरण" aria-label="View"><i class="fas fa-eye"></i></a>
                         <?php if ($apt['status'] === 'pending'): ?>
                         <form method="POST" class="d-inline">
                             <?php echo csrfField(); ?>

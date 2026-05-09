@@ -461,7 +461,7 @@ if (!function_exists('arvLogList')) {
                  . '<i class="fas ' . $icon . '"></i> ' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
         };
 
-        $out = '<div class="arv-log-list">';
+        $out = arvAssetsOnce() . '<div class="arv-log-list">';
         foreach ($rows as $h) {
             $from   = htmlspecialchars((string)($h['old_status']    ?? '') ?: '—', ENT_QUOTES, 'UTF-8');
             $to     = htmlspecialchars((string)($h['new_status']    ?? '') ?: '—', ENT_QUOTES, 'UTF-8');
