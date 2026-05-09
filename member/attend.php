@@ -250,6 +250,145 @@ $extraHead = <<<HTML
 .tab-btn.active { color:var(--primary-color,#1a8754);border-bottom-color:var(--primary-color,#1a8754); }
 .tab-pane { display:none; }
 .tab-pane.active { display:block; }
+
+/* Attend Hero Styles */
+.attend-hero {
+  background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+  border:1.5px solid #6ee7b7;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 4px 14px rgba(16,185,129,.12);
+}
+
+/* Program Flow Styles */
+.program-flow-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.program-flow-card {
+  background: var(--surface-color, #fff);
+  border: 2px solid color-mix(in srgb, var(--primary-color) 12%, white);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(var(--primary-rgb), .1);
+}
+
+.program-flow-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(var(--primary-rgb), .15);
+  border-color: var(--primary-color);
+}
+
+.program-flow-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.program-flow-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 15%, white), color-mix(in srgb, var(--primary-color) 25%, white));
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.program-flow-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.program-flow-description {
+  color: var(--text-muted, #6b7280);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.program-flow-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.program-flow-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.program-flow-btn.primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: var(--text-on-primary);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), .3);
+}
+
+.program-flow-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), .4);
+}
+
+.program-flow-btn.secondary {
+  background: var(--surface-color);
+  color: var(--text-color);
+  border-color: color-mix(in srgb, var(--primary-color) 20%, white);
+}
+
+.program-flow-btn.secondary:hover {
+  background: color-mix(in srgb, var(--primary-color) 10%, white);
+  border-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .program-flow-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .program-flow-card {
+    padding: 1.25rem;
+  }
+  
+  .program-flow-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .program-flow-title {
+    font-size: 1rem;
+  }
+  
+  .program-flow-description {
+    font-size: 0.85rem;
+  }
+  
+  .program-flow-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
 </style>
 HTML;
 ?>

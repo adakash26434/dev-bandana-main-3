@@ -159,6 +159,15 @@ require __DIR__ . '/includes/chrome.php';
     var t = (text || '').trim();
     if (!t) return '';
     try {
+      // Check if it's a URL with qr_token parameter
+      var u = new URL(t, window.location.origin);
+      var q = u.searchParams.get('qr_token') || u.searchParams.get('token');
+      if (q) return String(q).replace(/[^a-zA-Z0-9_-]/g, '');
+    } catch (e) {}
+    // Fallback to colon-separated format
+    if (/^[a-zA-Z0-9_-]{8,80}$/.test(t)) return t;
+    // Try colon format
+    try {
         var parts = t.split(':');
         return parts.length >= 2 ? parts[1].trim() : '';
     } catch (e) {
@@ -167,27 +176,27 @@ require __DIR__ . '/includes/chrome.php';
   }
 
   function validateAndAutoAttend(decodedText) {
-    // TO DO: implement validation and auto-attendance logic here
-    // For now, just return false to fallback to manual check-in
-    return false;
+    var token = extractToken(decodedText);
+    if (!token) return false;
+    
+    // Redirect to attend.php with QR token for auto-processing
+    window.location.href = base + 'member/attend.php?qr_token=' + encodeURIComponent(token) + '&auto=1';
+    return true;
   }
 
   function onScanSuccess(decodedText, result) {
+    if (busy) return;
+    busy = true;
     hideErr();
     
     // Validate and auto-attend QR code
     if (validateAndAutoAttend(decodedText)) {
-        // Success message will be shown by validateAndAutoAttend
         return;
     }
     
-    // Fallback to manual check-in if validation fails
-    var token = extractToken(decodedText);
-    if (token) {
-        showErr('<?= addslashes($_t('यो QR कार्यक्रम check-in को लागि मान्य देखिँदैन।', 'This is not a valid check-in QR code.')) ?>');
-    } else {
-        showErr('<?= addslashes($_t('यो QR कार्यक्रम check-in को लागि मान्य देखिँदैन।', 'This is not a valid check-in QR code.')) ?>');
-    }
+    // If validation fails, show error and reset busy state
+    showErr(msgInvalid);
+    busy = false;
   }
 
   btnStart.addEventListener('click', function() {
