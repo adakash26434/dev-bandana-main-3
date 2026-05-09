@@ -34,24 +34,57 @@ $extraHead = <<<'HTML'
   line-height: 1.5;
 }
 #scan-reader {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  background: #0f172a;
-  min-height: 280px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid var(--primary-color);
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    min-height: 300px;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(var(--primary-rgb), .2);
 }
-#scan-reader video { border-radius: 12px; }
+#scan-reader::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: scan-shimmer 3s infinite;
+}
+@keyframes scan-shimmer {
+    0% { transform: translateX(-100%) translateY(-100%); }
+    100% { transform: translateX(100%) translateY(100%); }
+}
+#scan-reader video { 
+    border-radius: 12px; 
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
 .scan-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 .scan-actions button {
-  flex: 1;
-  min-width: 140px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: .9rem;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
+    flex: 1;
+    min-width: 140px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: .95rem;
+    border: 2px solid transparent;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+}
+.scan-actions button::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left .5s;
+}
+.scan-actions button:hover::before {
+    left: 100%;
+}
+.scan-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
 }
 .scan-btn-start { background: var(--primary-color,#1a8754); color: #fff; }
 .scan-btn-stop { background: #e5e7eb; color: #374151; }
@@ -114,8 +147,8 @@ require __DIR__ . '/includes/chrome.php';
   var msgCam = <?= json_encode($_t('क्यामेरा खोल्न सकिएन। अनुमति दिनुहोस् वा HTTPS प्रयोग गर्नुहोस्।', 'Unable to open camera. Allow permission or use HTTPS.')) ?>;
 
   function showErr(msg) {
-    errEl.style.display = 'block';
     errEl.textContent = msg;
+    errEl.style.display = 'block';
   }
   function hideErr() {
     errEl.style.display = 'none';

@@ -17,7 +17,7 @@ try {
     $db = getDB();
     ensurePartnerFacilitiesTables($db);
 
-    $facilities = $db->query("SELECT * FROM partner_facilities WHERE is_active=1 ORDER BY display_order ASC, partner_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $facilities = $db->query("SELECT * FROM partner_facilities WHERE is_active=1 ORDER BY display_order ASC, partner_name ASC LIMIT 50")->fetchAll(PDO::FETCH_ASSOC);
     $types      = array_unique(array_filter(array_column($facilities, 'facility_type')));
     sort($types);
 } catch (\Throwable $e) { $facilities = []; $types = []; }

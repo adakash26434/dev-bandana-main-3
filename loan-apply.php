@@ -23,8 +23,8 @@ $branches = [];
 $loanRates = [];
 try {
     $db = getDB();
-    $branches = $db->query("SELECT * FROM service_centers WHERE is_active = 1 ORDER BY is_main_branch DESC, display_order ASC, name ASC")->fetchAll();
-    $loanRates = $db->query("SELECT * FROM interest_rates WHERE type = 'loan' AND is_active = 1 ORDER BY display_order ASC")->fetchAll();
+    $branches = $db->query("SELECT * FROM service_centers WHERE is_active = 1 ORDER BY is_main_branch DESC, display_order ASC, name ASC LIMIT 20")->fetchAll();
+    $loanRates = $db->query("SELECT * FROM interest_rates WHERE type = 'loan' AND is_active = 1 ORDER BY display_order ASC LIMIT 10")->fetchAll();
 } catch (Exception $e) {
     $branches = [];
     $loanRates = [];

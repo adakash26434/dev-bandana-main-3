@@ -11,7 +11,7 @@ try {
     $page = $stmt->fetch();
 
     // Get team members (board)
-    $boardMembers = $db->query("SELECT * FROM team_members WHERE category = 'board' AND is_active = 1 ORDER BY display_order")->fetchAll();
+    $boardMembers = $db->query("SELECT * FROM team_members WHERE category = 'board' AND is_active = 1 ORDER BY display_order LIMIT 20")->fetchAll();
 } catch (Exception $e) {
     $page = null;
     $boardMembers = [];

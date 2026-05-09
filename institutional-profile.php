@@ -20,7 +20,7 @@ try {
     $tableExists = ($r->rowCount() > 0);
     if ($tableExists) {
         $profiles = $db->query(
-            "SELECT * FROM institutional_profile WHERE is_active = 1 ORDER BY fiscal_year DESC"
+            "SELECT * FROM institutional_profile WHERE is_active = 1 ORDER BY fiscal_year DESC LIMIT 10"
         )->fetchAll();
     }
 } catch (Exception $e) {

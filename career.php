@@ -8,7 +8,7 @@ $L = getLangStrings();
 
 try {
     $db   = getDB();
-    $jobs = $db->query("SELECT * FROM careers WHERE is_active = 1 ORDER BY created_at DESC")->fetchAll();
+    $jobs = $db->query("SELECT * FROM careers WHERE is_active = 1 ORDER BY created_at DESC LIMIT 20")->fetchAll();
 } catch (Exception $e) {
     $jobs = [];
 }
@@ -149,87 +149,173 @@ $totalDepts = count($deptSet);
 /* ── Job Cards ── */
 .cr-job-card {
     background: var(--surface-color);
-    border-radius: 14px;
-    box-shadow: 0 2px 14px rgba(var(--primary-rgb), .09);
-    border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white);
-    border-left: 5px solid var(--primary-color);
-    margin-bottom: 1.1rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(var(--primary-rgb), .12);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 15%, white);
+    border-left: 6px solid var(--primary-color);
+    margin-bottom: 1.5rem;
     overflow: hidden;
-    transition: transform .2s, box-shadow .2s;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
     position: relative;
+    transform: translateY(0);
 }
 .cr-job-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgba(var(--primary-rgb), .16);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 40px rgba(var(--primary-rgb), .20);
+    border-color: var(--primary-color);
 }
 .cr-job-card.cr-closed {
     border-left-color: var(--text-muted);
-    opacity: .75;
+    opacity: .8;
+    transform: none !important;
 }
-.cr-job-card.cr-urgent { border-left-color: var(--secondary-color); }
+.cr-job-card.cr-closed:hover {
+    transform: none !important;
+    box-shadow: 0 4px 20px rgba(var(--primary-rgb), .12);
+}
+.cr-job-card.cr-urgent { 
+    border-left-color: var(--secondary-color);
+    border-color: color-mix(in srgb, var(--secondary-color) 25%, white);
+}
+.cr-job-card.cr-urgent:hover {
+    border-color: var(--secondary-color);
+    box-shadow: 0 12px 40px rgba(var(--secondary-rgb), .25);
+}
 
 /* Urgent ribbon */
 .cr-urgent-tag {
     position: absolute; top: 0; right: 0;
     background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
-    color: var(--text-on-secondary); font-size: .68rem; font-weight: 800;
-    padding: .25rem .75rem; border-radius: 0 0 0 10px;
-    text-transform: uppercase; letter-spacing: .4px;
-    display: flex; align-items: center; gap: .3rem;
+    color: var(--text-on-secondary); font-size: .72rem; font-weight: 800;
+    padding: .3rem .85rem; border-radius: 0 0 0 12px;
+    text-transform: uppercase; letter-spacing: .5px;
+    display: flex; align-items: center; gap: .4rem;
+    box-shadow: 0 2px 8px rgba(var(--secondary-rgb), .3);
+    animation: pulse-urgent 2s infinite;
+}
+@keyframes pulse-urgent {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
 }
 
 /* Card inner */
-.cr-card-inner { padding: 1.2rem 1.4rem; }
+.cr-card-inner { padding: 1.5rem 1.6rem; }
 
 /* Top row */
 .cr-card-top {
     display: flex; align-items: flex-start;
-    gap: 1rem; margin-bottom: .9rem;
+    gap: 1.2rem; margin-bottom: 1rem;
 }
 .cr-dept-avatar {
-    width: 50px; height: 50px; flex-shrink: 0;
-    border-radius: 12px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 12%, white), color-mix(in srgb, var(--primary-color) 24%, white));
+    width: 56px; height: 56px; flex-shrink: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 15%, white), color-mix(in srgb, var(--primary-color) 28%, white));
     display: flex; align-items: center; justify-content: center;
-    color: var(--primary-color); font-size: 1.2rem;
+    color: var(--primary-color); font-size: 1.4rem;
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), .15);
+    transition: all .3s;
 }
-.cr-job-card.cr-closed .cr-dept-avatar { background: color-mix(in srgb, var(--text-muted) 14%, white); color: var(--text-muted); }
-.cr-job-card.cr-urgent .cr-dept-avatar { background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 14%, white), color-mix(in srgb, var(--secondary-color) 28%, white)); color: var(--secondary-dark); }
+.cr-job-card:hover .cr-dept-avatar {
+    transform: scale(1.05) rotate(5deg);
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb), .25);
+}
+.cr-job-card.cr-closed .cr-dept-avatar { 
+    background: color-mix(in srgb, var(--text-muted) 18%, white); 
+    color: var(--text-muted); 
+    box-shadow: 0 4px 12px rgba(var(--text-muted-rgb), .15);
+}
+.cr-job-card.cr-urgent .cr-dept-avatar { 
+    background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 18%, white), color-mix(in srgb, var(--secondary-color) 32%, white)); 
+    color: var(--secondary-dark); 
+    box-shadow: 0 4px 12px rgba(var(--secondary-rgb), .25);
+}
 
 .cr-card-heading { flex: 1; }
 .cr-job-title {
-    font-size: 1.05rem; font-weight: 700;
-    color: var(--primary-dark); margin-bottom: .3rem; line-height: 1.3;
+    font-size: 1.15rem; font-weight: 800;
+    color: var(--primary-dark); margin-bottom: .4rem; line-height: 1.3;
+    transition: color .3s;
 }
-.cr-job-card.cr-closed .cr-job-title { text-decoration: line-through; color: var(--text-muted); }
+.cr-job-card:hover .cr-job-title {
+    color: var(--primary-color);
+}
+.cr-job-card.cr-closed .cr-job-title { 
+    text-decoration: line-through; 
+    color: var(--text-muted); 
+    opacity: .7;
+}
 
-.cr-badge-row { display: flex; gap: .4rem; flex-wrap: wrap; }
+/* Badge improvements */
+.cr-badge-row { display: flex; gap: .5rem; flex-wrap: wrap; }
 .cr-tag {
-    font-size: .7rem; font-weight: 700;
-    padding: .18em .65em; border-radius: 20px;
-    text-transform: uppercase; letter-spacing: .3px;
+    font-size: .72rem; font-weight: 800;
+    padding: .22em .75em; border-radius: 22px;
+    text-transform: uppercase; letter-spacing: .4px;
+    border: 1px solid transparent;
+    transition: all .3s;
+    cursor: default;
 }
-.cr-tag.type  { background: color-mix(in srgb, var(--primary-color) 12%, white); color: var(--primary-dark); }
-.cr-tag.dept  { background: color-mix(in srgb, var(--accent-color) 18%, white); color: var(--accent-dark); }
-.cr-tag.open  { background: color-mix(in srgb, var(--accent-color) 28%, white); color: var(--accent-dark); }
-.cr-tag.closed-tag { background: color-mix(in srgb, var(--text-muted) 16%, white); color: var(--text-muted); }
-.cr-tag.urgent-tag { background: color-mix(in srgb, var(--secondary-color) 16%, white); color: var(--secondary-dark); }
+.cr-tag.type  { 
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 15%, white), color-mix(in srgb, var(--primary-color) 25%, white)); 
+    color: var(--primary-dark); 
+    border-color: color-mix(in srgb, var(--primary-color) 20%, white);
+}
+.cr-tag.dept  { 
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 22%, white), color-mix(in srgb, var(--accent-color) 32%, white)); 
+    color: var(--accent-dark); 
+    border-color: color-mix(in srgb, var(--accent-color) 28%, white);
+}
+.cr-tag.open  { 
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 32%, white), color-mix(in srgb, var(--accent-color) 42%, white)); 
+    color: var(--accent-dark); 
+    border-color: color-mix(in srgb, var(--accent-color) 38%, white);
+}
+.cr-tag.closed-tag { 
+    background: linear-gradient(135deg, color-mix(in srgb, var(--text-muted) 20%, white), color-mix(in srgb, var(--text-muted) 30%, white)); 
+    color: var(--text-muted); 
+    border-color: color-mix(in srgb, var(--text-muted) 25%, white);
+}
+.cr-tag.urgent-tag { 
+    background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 20%, white), color-mix(in srgb, var(--secondary-color) 30%, white)); 
+    color: var(--secondary-dark); 
+    border-color: color-mix(in srgb, var(--secondary-color) 25%, white);
+    animation: pulse-urgent 2s infinite;
+}
 
 /* Meta info chips */
 .cr-meta {
-    display: flex; flex-wrap: wrap; gap: .5rem 1.2rem;
-    margin-bottom: .85rem;
+    display: flex; flex-wrap: wrap; gap: .6rem 1.4rem;
+    margin-bottom: 1rem;
 }
 .cr-meta-item {
-    display: flex; align-items: center; gap: .4rem;
-    font-size: .82rem; color: var(--text-color);
+    display: flex; align-items: center; gap: .5rem;
+    font-size: .84rem; color: var(--text-color);
+    background: color-mix(in srgb, var(--primary-color) 6%, white);
+    padding: .3rem .7rem;
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 12%, white);
+    transition: all .3s;
+}
+.cr-meta-item:hover {
+    background: color-mix(in srgb, var(--primary-color) 12%, white);
+    border-color: color-mix(in srgb, var(--primary-color) 20%, white);
+    transform: translateY(-1px);
 }
 .cr-meta-item i {
     width: 14px; text-align: center;
-    color: var(--text-muted); font-size: .8rem; flex-shrink: 0;
+    color: var(--primary-color); font-size: .82rem; flex-shrink: 0;
 }
-.cr-meta-item.deadline-near { color: var(--secondary-dark); font-weight: 600; }
-.cr-meta-item.deadline-gone { color: var(--text-muted); }
+.cr-meta-item.deadline-near { 
+    color: var(--secondary-dark); 
+    font-weight: 600; 
+    background: color-mix(in srgb, var(--secondary-color) 15%, white);
+    border-color: color-mix(in srgb, var(--secondary-color) 25%, white);
+}
+.cr-meta-item.deadline-gone { 
+    color: var(--text-muted); 
+    background: color-mix(in srgb, var(--text-muted) 8%, white);
+    border-color: color-mix(in srgb, var(--text-muted) 15%, white);
+}
 .cr-meta-deadline-strong{margin-left:.3rem;}
 
 /* Description */
@@ -242,37 +328,93 @@ $totalDepts = count($deptSet);
 
 /* Actions */
 .cr-actions {
-    display: flex; gap: .5rem; flex-wrap: wrap;
-    padding-top: .85rem;
-    border-top: 1px solid color-mix(in srgb, var(--primary-color) 10%, white);
+    display: flex; gap: .75rem; flex-wrap: wrap;
+    padding-top: 1rem;
+    border-top: 2px solid color-mix(in srgb, var(--primary-color) 12%, white);
+    align-items: center;
 }
 .cr-btn-detail {
-    padding: .5rem 1.1rem; border-radius: 8px;
-    font-size: .82rem; font-weight: 600;
-    border: 1.5px solid var(--primary-color); color: var(--primary-color);
+    padding: .6rem 1.3rem; border-radius: 10px;
+    font-size: .86rem; font-weight: 600;
+    border: 2px solid var(--primary-color); color: var(--primary-color);
     background: transparent; cursor: pointer;
-    text-decoration: none; display: inline-flex; align-items: center; gap: .35rem;
-    transition: all .2s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
 }
-.cr-btn-detail:hover { background: var(--primary-color); color: var(--text-on-primary); }
+.cr-btn-detail::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--primary-color);
+    transition: left .3s cubic-bezier(.4,0,.2,1);
+    z-index: -1;
+}
+.cr-btn-detail:hover::before {
+    left: 0;
+}
+.cr-btn-detail:hover { 
+    color: var(--text-on-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), .3);
+}
 .cr-btn-apply {
-    padding: .5rem 1.2rem; border-radius: 8px;
-    font-size: .82rem; font-weight: 700;
-    background: linear-gradient(135deg, var(--accent-dark), var(--primary-dark));
+    padding: .65rem 1.4rem; border-radius: 10px;
+    font-size: .86rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
     color: var(--text-on-primary); border: none; cursor: pointer;
-    text-decoration: none; display: inline-flex; align-items: center; gap: .35rem;
-    transition: all .2s; box-shadow: 0 2px 8px rgba(var(--primary-rgb),.28);
+    text-decoration: none; display: inline-flex; align-items: center; gap: .5rem;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb),.35);
+    position: relative;
+    overflow: hidden;
+    animation: apply-glow 2s ease-in-out infinite;
 }
-.cr-btn-apply:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(var(--primary-rgb),.36); color: var(--text-on-primary); }
+@keyframes apply-glow {
+    0%, 100% { box-shadow: 0 4px 15px rgba(var(--primary-rgb),.35); }
+    50% { box-shadow: 0 6px 20px rgba(var(--primary-rgb),.5); }
+}
+.cr-btn-apply::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    transition: left .3s cubic-bezier(.4,0,.2,1);
+    z-index: 0;
+}
+.cr-btn-apply:hover::before {
+    left: 0;
+}
+.cr-btn-apply:hover { 
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(var(--primary-rgb),.45);
+    color: var(--text-on-primary);
+}
+.cr-btn-apply i {
+    position: relative; z-index: 1;
+    transition: transform .3s;
+}
+.cr-btn-apply:hover i {
+    transform: translateX(2px);
+}
+.cr-btn-apply span {
+    position: relative; z-index: 1;
+}
 .cr-btn-dl {
-    padding: .5rem .9rem; border-radius: 8px;
-    font-size: .82rem; font-weight: 600;
-    border: 1.5px solid color-mix(in srgb, var(--primary-color) 14%, white); color: var(--text-light);
-    background: color-mix(in srgb, var(--primary-color) 6%, white); cursor: pointer;
-    text-decoration: none; display: inline-flex; align-items: center; gap: .35rem;
-    transition: all .2s;
+    padding: .6rem 1rem; border-radius: 10px;
+    font-size: .86rem; font-weight: 600;
+    border: 2px solid color-mix(in srgb, var(--primary-color) 18%, white); color: var(--text-light);
+    background: color-mix(in srgb, var(--primary-color) 8%, white); cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    transition: all .3s;
 }
-.cr-btn-dl:hover { background: color-mix(in srgb, var(--primary-color) 12%, white); color: var(--text-color); }
+.cr-btn-dl:hover { 
+    background: color-mix(in srgb, var(--primary-color) 18%, white); 
+    color: var(--text-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), .2);
+}
 
 /* Deadline progress bar */
 .cr-deadline-bar {
@@ -330,16 +472,37 @@ $totalDepts = count($deptSet);
 /* ── Sidebar on mobile: collapsible ── */
 .cr-sidebar-toggle {
     display: none; width: 100%; background: var(--surface-color);
-    border: 1.5px solid color-mix(in srgb, var(--primary-color) 12%, white); border-radius: 12px;
-    padding: .75rem 1.1rem; font-size: .88rem; font-weight: 700;
-    color: var(--primary-dark); cursor: pointer; margin-bottom: .75rem;
-    text-align: left; align-items: center; gap: .5rem;
-    box-shadow: 0 2px 10px rgba(var(--primary-rgb),.08);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 15%, white); border-radius: 14px;
+    padding: .85rem 1.2rem; font-size: .92rem; font-weight: 700;
+    color: var(--primary-dark); cursor: pointer; margin-bottom: 1rem;
+    text-align: left; align-items: center; gap: .6rem;
+    box-shadow: 0 3px 12px rgba(var(--primary-rgb),.12);
+    transition: all .3s;
+}
+.cr-sidebar-toggle:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(var(--primary-rgb),.18);
 }
 @media (max-width: 991px) {
     .cr-sidebar-toggle { display: flex; }
     .cr-sidebar-content { display: none; }
     .cr-sidebar-content.open { display: block; }
+    .cr-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .cr-btn-detail, .cr-btn-apply, .cr-btn-dl {
+        width: 100%;
+        justify-content: center;
+        padding: .7rem 1.2rem;
+        font-size: .9rem;
+    }
+    .cr-job-card {
+        margin-bottom: 1.2rem;
+    }
+    .cr-card-inner {
+        padding: 1.2rem 1.3rem;
+    }
 }
 @media (min-width: 992px) {
     .cr-sidebar-content { display: block !important; }
@@ -641,7 +804,7 @@ $totalDepts = count($deptSet);
                 <?php if (!$deadlinePassed && ($job['allow_online_apply'] ?? 1)): ?>
                 <a href="career-detail.php?id=<?php echo $job['id']; ?>#apply-form" class="cr-btn-apply">
                     <i class="fas fa-paper-plane"></i>
-                    <?php echo isEnglish() ? 'Apply Now' : 'अहिले आवेदन'; ?>
+                    <span><?php echo isEnglish() ? 'Apply Now' : 'अहिले आवेदन'; ?></span>
                 </a>
                 <?php endif; ?>
                 <?php if (!empty($job['attachment'])): ?>

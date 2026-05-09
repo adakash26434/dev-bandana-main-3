@@ -118,7 +118,7 @@ if (!defined('CRED_MASTER_KEY')) {
  * यो Production को लागि सही सेटिङ हो।
  * =====================================================
  */
-error_reporting(E_ALL);           /* कुन-कुन errors log गर्ने — E_ALL = सबै */
+error_reporting(0);              /* Production मा सबै errors hide गर्ने - security को लागि */
 ini_set('display_errors', 0);     /* Screen मा error देखाउने? 0 = नदेखाउने (production) */
 ini_set('log_errors', 1);         /* Log file मा errors save गर्ने? 1 = हो */
 

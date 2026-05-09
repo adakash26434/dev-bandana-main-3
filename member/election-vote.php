@@ -14,6 +14,68 @@ $_t = static function (string $np, string $en): string {
 requireMemberLogin();
 memberSecurityHeaders();
 
+/**
+ * Analyze voting pattern for member behavior tracking
+ */
+function analyzeVotingPattern($selectedCandidates, $positions, $cycle) {
+    $pattern = [
+        'type' => 'mixed',
+        'score' => 50,
+        'diversity_score' => 0
+    ];
+    
+    // Count candidates per position
+    $candidatesPerPosition = [];
+    foreach ($positions as $pos) {
+        $candidatesPerPosition[(int)$pos['id']] = 0;
+    }
+    
+    // Analyze selection pattern
+    $totalPositions = count($positions);
+    $filledPositions = 0;
+    
+    foreach ($selectedCandidates as $candId) {
+        // Find which position this candidate belongs to
+        foreach ($positions as $pos) {
+            if (isset($candByPos[(int)$pos['id']])) {
+                foreach ($candByPos[(int)$pos['id']] as $candidate) {
+                    if ((int)$candidate['id'] === (int)$candId) {
+                        $candidatesPerPosition[(int)$pos['id']]++;
+                        if ($candidatesPerPosition[(int)$pos['id']] > 0) {
+                            $filledPositions++;
+                        }
+                        break 2;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    
+    // Calculate pattern score and diversity
+    if ($totalPositions > 0) {
+        $fillRate = $filledPositions / $totalPositions;
+        $candidateCount = count(array_unique($selectedCandidates));
+        
+        // Pattern types
+        if ($fillRate >= 0.8) {
+            $pattern['type'] = 'comprehensive';
+            $pattern['score'] = 85 + ($candidateCount * 3);
+        } elseif ($fillRate >= 0.5) {
+            $pattern['type'] = 'selective';
+            $pattern['score'] = 60 + ($candidateCount * 2);
+        } else {
+            $pattern['type'] = 'minimal';
+            $pattern['score'] = 30 + $candidateCount;
+        }
+        
+        // Diversity bonus
+        $pattern['diversity_score'] = min($candidateCount * 10, 50);
+    }
+    
+    return $pattern;
+}
+
 $db = getDB();
 ensureElectionTables($db);
 ensureElectionVotingTables($db);
@@ -98,6 +160,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
             }
             $db->commit();
             $alreadyVoted = true;
+            
+            // Record attendance for voting with pattern tracking
+            try {
+                // Get selected candidates for pattern analysis
+                $selectedCandidates = [];
+                foreach ($_POST['picks'] as $posId => $candList) {
+                    if (is_array($candList)) {
+                        $selectedCandidates = array_merge($selectedCandidates, $candList);
+                    }
+                }
+                
+                // Analyze voting pattern
+                $votingPattern = analyzeVotingPattern($selectedCandidates, $positions, $cycle);
+                
+                $db->prepare("INSERT INTO member_program_attendance (member_id, program_title, attended_at, notes) VALUES (?, ?, ?, ?)")
+                   ->execute([
+                       $memberId, 
+                       'Election Voting - ' . ($cycle['title_np'] ?? 'Election'), 
+                       date('Y-m-d H:i:s'),
+                       json_encode([
+                           'pattern_type' => $votingPattern['type'],
+                           'pattern_score' => $votingPattern['score'],
+                           'selected_candidates' => $selectedCandidates,
+                           'diversity_score' => $votingPattern['diversity']
+                       ])
+                   ]);
+            } catch (Throwable $e) {
+                error_log("Failed to record election attendance: " . $e->getMessage());
+            }
             $flash = $_t('तपाईंको मत सफलतापूर्वक रेकर्ड भयो। धन्यवाद!', 'Your vote has been recorded successfully. Thank you!');
             $flashType = 'success';
         } catch (Throwable $e) {

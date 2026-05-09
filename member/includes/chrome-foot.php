@@ -16,48 +16,74 @@ $_footT = static function (string $np, string $en) use ($_footIsEn): string {
 <!-- Mobile bottom navigation (hidden on desktop ≥900px) -->
 <nav class="mp-bottom-nav">
   <a href="<?php echo SITE_URL; ?>member/"><i class="fas fa-house"></i><span><?php echo $_footT('गृह', 'Home'); ?></span></a>
-  <a href="<?php echo SITE_URL; ?>member/welfare.php"><i class="fas fa-heart-pulse"></i><span><?php echo $_footT('कल्याण', 'Welfare'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/notices.php"><i class="fas fa-bullhorn"></i><span><?php echo $_footT('सूचना', 'Notices'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/programs.php"><i class="fas fa-calendar-alt"></i><span><?php echo $_footT('कार्यक्रम', 'Programs'); ?></span></a>
   <a href="<?php echo SITE_URL; ?>member/scan.php" class="mp-nav-scan" aria-label="<?php echo $_footT('कार्यक्रम QR स्क्यान', 'Scan QR'); ?>"><i class="fas fa-qrcode"></i><span><?php echo $_footT('स्क्यान', 'Scan'); ?></span></a>
-  <a href="<?php echo SITE_URL; ?>member/attend.php"><i class="fas fa-calendar-check"></i><span><?php echo $_footT('उपस्थिति', 'Attend'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/id-card.php"><i class="fas fa-id-card"></i><span><?php echo $_footT('आईडी कार्ड', 'ID Card'); ?></span></a>
   <a href="<?php echo SITE_URL; ?>member/profile.php"><i class="fas fa-user-circle"></i><span><?php echo $_footT('प्रोफाइल', 'Profile'); ?></span></a>
 </nav>
 
 <style>
 .mp-bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: #fff; border-top: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa); border-top: 2px solid var(--primary-color);
     display: flex; justify-content: space-around;
     padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
-    box-shadow: 0 -2px 8px rgba(0,0,0,.06);
+    box-shadow: 0 -4px 16px rgba(var(--primary-rgb), .15);
     z-index: 40;
+    backdrop-filter: blur(10px);
 }
 .mp-bottom-nav a {
-    flex: 1; text-decoration: none; color: #6b7280;
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-    font-size: 10px; font-weight: 600;
-    transition: color .15s;
+    flex: 1; text-decoration: none; color: var(--text-muted);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
     min-width: 0;
-}
-.mp-bottom-nav a i { font-size: 17px; }
-.mp-bottom-nav a.mp-nav-scan {
-    color: var(--primary-color, #1a8754);
+    padding: 8px 4px;
+    border-radius: 12px;
     position: relative;
+    overflow: hidden;
 }
-.mp-bottom-nav a.mp-nav-scan i {
-    width: 46px; height: 46px; margin-top: -20px; margin-bottom: 1px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color,#1a8754), #15803d);
-    color: #fff !important;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 4px 14px rgba(26,135,84,0.38);
+.mp-bottom-nav a::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary-color) 15%, white), transparent);
+    transition: left .5s;
 }
-.mp-bottom-nav a.mp-nav-scan span { font-size: 10px; font-weight: 800; }
+.mp-bottom-nav a:hover::before {
+    left: 100%;
+}
+.mp-bottom-nav a i { 
+    font-size: 18px; 
+    transition: all .3s; 
+    position: relative; z-index: 1;
+}
+.mp-bottom-nav a:hover i {
+    transform: scale(1.1) rotate(5deg);
+}
 .mp-bottom-nav a:hover,
-.mp-bottom-nav a.active { color: var(--primary-color, #1a8754); }
-.mp-bottom-nav a.mp-nav-scan.active i { box-shadow: 0 4px 16px rgba(26,135,84,0.5); }
-body { padding-bottom: 76px; }
+.mp-bottom-nav a.active { 
+    color: var(--primary-color); 
+    background: color-mix(in srgb, var(--primary-color) 10%, white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), .2);
+}
+body { padding-bottom: 80px; }
 @media (min-width: 900px) { .mp-bottom-nav { display: none; } body { padding-bottom: 0; } }
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    .mp-bottom-nav a {
+        font-size: 10px;
+        padding: 6px 2px;
+        gap: 3px;
+    }
+    .mp-bottom-nav a i {
+        font-size: 16px;
+    }
+    body { padding-bottom: 70px; }
+}
 </style>
 
 <script src="<?php echo SITE_URL; ?>assets/js/v9-mobile-fix.js?v=9.7" defer></script>

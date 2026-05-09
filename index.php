@@ -1,28 +1,46 @@
 <?php
 require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/simple-cache.php';
 $pageTitle = isEnglish() ? 'Home' : 'गृहपृष्ठ';
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/ensure-tables.php';
 ensurePublicTables();
 
-// Get sliders
-try {
-    $db = getDB();
-    $sliders = $db->query("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order, id")->fetchAll();
-    /* Homepage मा सिर्फ ३ सेवाहरू देखाउने — बाँकी services.php मा */
-    $services = $db->query("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order LIMIT 3")->fetchAll();
-    $totalServicesRow = $db->query("SELECT COUNT(*) as cnt FROM services WHERE is_active = 1")->fetch();
-    $totalServices = $totalServicesRow ? (int)$totalServicesRow['cnt'] : count($services);
-    $notices = $db->query("SELECT * FROM notices WHERE is_active = 1 ORDER BY id DESC LIMIT 5")->fetchAll();
-    $savingRates = $db->query("SELECT * FROM interest_rates WHERE category = 'saving' AND is_active = 1 ORDER BY display_order LIMIT 5")->fetchAll();
-    $loanRates = $db->query("SELECT * FROM interest_rates WHERE category = 'loan' AND is_active = 1 ORDER BY display_order LIMIT 5")->fetchAll();
-    // Get latest 3 news
-    $latestNews = $db->query("SELECT * FROM news WHERE is_active = 1 ORDER BY created_at DESC LIMIT 3")->fetchAll();
-} catch (Throwable $e) {
-    $sliders = $services = $notices = $savingRates = $loanRates = $latestNews = [];
-    $totalServices = 0;
-    $db = null;
-}
+// Get homepage data with caching (cache for 30 minutes)
+$homepageData = getCachedData('homepage_data', 1800, function() {
+    $data = [];
+    try {
+        $db = getDB();
+        $data['sliders'] = $db->query("SELECT * FROM sliders WHERE is_active = 1 ORDER BY display_order, id")->fetchAll();
+        /* Homepage मा सिर्फ ३ सेवाहरू देखाउने — बाँकी services.php मा */
+        $data['services'] = $db->query("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order LIMIT 3")->fetchAll();
+        $totalServicesRow = $db->query("SELECT COUNT(*) as cnt FROM services WHERE is_active = 1")->fetch();
+        $data['totalServices'] = $totalServicesRow ? (int)$totalServicesRow['cnt'] : count($data['services']);
+        $data['notices'] = $db->query("SELECT * FROM notices WHERE is_active = 1 ORDER BY id DESC LIMIT 5")->fetchAll();
+        $data['savingRates'] = $db->query("SELECT * FROM interest_rates WHERE category = 'saving' AND is_active = 1 ORDER BY display_order LIMIT 5")->fetchAll();
+        $data['loanRates'] = $db->query("SELECT * FROM interest_rates WHERE category = 'loan' AND is_active = 1 ORDER BY display_order LIMIT 5")->fetchAll();
+        // Get latest 3 news
+        $data['latestNews'] = $db->query("SELECT * FROM news WHERE is_active = 1 ORDER BY created_at DESC LIMIT 3")->fetchAll();
+        $data['db'] = $db; // Keep DB connection for member spotlight
+    } catch (Throwable $e) {
+        $data = [
+            'sliders' => [], 'services' => [], 'notices' => [], 
+            'savingRates' => [], 'loanRates' => [], 'latestNews' => [],
+            'totalServices' => 0, 'db' => null
+        ];
+    }
+    return $data;
+});
+
+// Extract data from cache
+$sliders = $homepageData['sliders'] ?? [];
+$services = $homepageData['services'] ?? [];
+$notices = $homepageData['notices'] ?? [];
+$savingRates = $homepageData['savingRates'] ?? [];
+$loanRates = $homepageData['loanRates'] ?? [];
+$latestNews = $homepageData['latestNews'] ?? [];
+$totalServices = $homepageData['totalServices'] ?? 0;
+$db = $homepageData['db'] ?? null;
 
 /* Member of the Year — current year को active record ल्याउनुहोस्
    Admin: admin/member-of-year.php बाट manage गरिन्छ */

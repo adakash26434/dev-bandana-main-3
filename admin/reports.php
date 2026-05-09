@@ -259,81 +259,95 @@ $_flash = getFlash(); if ($_flash) echo adminAlert($_flash['type'], $_flash['mes
         <!-- List Section -->
         <div class="col-lg-7">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><?php echo $__t('प्रतिवेदन सूची', 'Report List'); ?></h5>
-                    <div class="filter-buttons">
-                        <a href="?type=all" class="btn btn-sm <?php echo $filterType === 'all' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('सबै', 'All'); ?></a>
-                        <a href="?type=monthly" class="btn btn-sm <?php echo $filterType === 'monthly' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('मासिक', 'Monthly'); ?></a>
-                        <a href="?type=quarterly" class="btn btn-sm <?php echo $filterType === 'quarterly' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('त्रैमासिक', 'Quarterly'); ?></a>
-                        <a href="?type=progress" class="btn btn-sm <?php echo $filterType === 'progress' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('प्रगति', 'Progress'); ?></a>
-                        <a href="?type=annual" class="btn btn-sm <?php echo $filterType === 'annual' ? 'btn-primary' : 'btn-outline-secondary'; ?>"><?php echo $__t('वार्षिक', 'Annual'); ?></a>
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <h5 class="mb-0 flex-shrink-0"><?php echo $__t('प्रतिवेदन सूची', 'Report List'); ?></h5>
+                    <div class="filter-buttons d-flex flex-wrap gap-2">
+                        <a href="?type=all" class="btn btn-sm <?php echo $filterType === 'all' ? 'btn-primary' : 'btn-outline-primary'; ?>"><?php echo $__t('सबै', 'All'); ?></a>
+                        <a href="?type=monthly" class="btn btn-sm <?php echo $filterType === 'monthly' ? 'btn-primary' : 'btn-outline-primary'; ?>"><?php echo $__t('मासिक', 'Monthly'); ?></a>
+                        <a href="?type=quarterly" class="btn btn-sm <?php echo $filterType === 'quarterly' ? 'btn-primary' : 'btn-outline-primary'; ?>"><?php echo $__t('त्रैमासिक', 'Quarterly'); ?></a>
+                        <a href="?type=progress" class="btn btn-sm <?php echo $filterType === 'progress' ? 'btn-primary' : 'btn-outline-primary'; ?>"><?php echo $__t('प्रगति', 'Progress'); ?></a>
+                        <a href="?type=annual" class="btn btn-sm <?php echo $filterType === 'annual' ? 'btn-primary' : 'btn-outline-primary'; ?>"><?php echo $__t('वार्षिक', 'Annual'); ?></a>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped table-responsive">
-                            <thead>
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>शीर्षक</th>
-                                    <th><?php echo $__t('प्रकार','Type'); ?></th>
-                                    <th><?php echo $__t('अवधि','Period'); ?></th>
-                                    <th><?php echo $__t('स्थिति','Status'); ?></th>
-                                    <th><?php echo $__t('कार्य','Actions'); ?></th>
+                                    <th class="border-0"><?php echo $__t('शीर्षक', 'Title'); ?></th>
+                                    <th class="border-0"><?php echo $__t('प्रकार','Type'); ?></th>
+                                    <th class="border-0"><?php echo $__t('अवधि','Period'); ?></th>
+                                    <th class="border-0"><?php echo $__t('स्थिति','Status'); ?></th>
+                                    <th class="border-0 text-center"><?php echo $__t('कार्य','Actions'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($reports as $report): ?>
                                 <tr>
-                                    <td>
-                                        <?php echo truncateText($report['title_np'] ?: $report['title'], 35); ?>
+                                    <td class="align-middle">
+                                        <div class="fw-medium text-truncate" style="max-width: 200px;" title="<?php echo htmlspecialchars($report['title_np'] ?: $report['title']); ?>">
+                                            <?php echo truncateText($report['title_np'] ?: $report['title'], 35); ?>
+                                        </div>
                                     </td>
-                                    <td>
-                                        <span class="badge bg-<?php
-                                            echo $report['report_type'] === 'monthly' ? 'info' :
-                                                ($report['report_type'] === 'quarterly' ? 'warning' :
-                                                ($report['report_type'] === 'annual' ? 'success' : 'secondary'));
+                                    <td class="align-middle">
+                                        <span class="badge rounded-pill <?php
+                                            echo $report['report_type'] === 'monthly' ? 'bg-info' :
+                                                ($report['report_type'] === 'quarterly' ? 'bg-warning' :
+                                                ($report['report_type'] === 'annual' ? 'bg-success' : 'bg-secondary'));
                                         ?>">
                                             <?php echo getReportTypeLabel($report['report_type']); ?>
                                         </span>
                                     </td>
-                                    <td>
-                                        <?php
-                                        echo $report['report_year'];
-                                        if ($report['report_month']) {
-                                            echo ' / ' . ($nepaliMonths[$report['report_month']] ?? $report['report_month']);
-                                        }
-                                        if ($report['report_quarter']) {
-                                            echo ' / ' . $report['report_quarter'];
-                                        }
-                                        ?>
+                                    <td class="align-middle">
+                                        <span class="text-muted small">
+                                            <?php
+                                            echo $report['report_year'];
+                                            if ($report['report_month']) {
+                                                echo ' / ' . ($nepaliMonths[$report['report_month']] ?? $report['report_month']);
+                                            }
+                                            if ($report['report_quarter']) {
+                                                echo ' / ' . $report['report_quarter'];
+                                            }
+                                            ?>
+                                        </span>
                                     </td>
-                                    <td>
-                                        <span class="badge bg-<?php echo $report['is_active'] ? 'success' : 'secondary'; ?>">
+                                    <td class="align-middle">
+                                        <span class="badge rounded-pill <?php echo $report['is_active'] ? 'bg-success' : 'bg-secondary'; ?>">
                                             <?php echo $report['is_active'] ? 'सक्रिय' : 'निष्क्रिय'; ?>
                                         </span>
                                     </td>
-                                    <td>
-                                        <?php if ($report['file_path']): ?>
-                                        <a href="../<?php echo $report['file_path']; ?>" class="btn btn-sm btn-success" target="_blank" title="<?php echo $__t('हेर्नुहोस्','View'); ?>">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <?php endif; ?>
-                                        <a href="?edit=<?php echo $report['id']; ?>" class="btn btn-sm btn-primary" title="<?php echo $__t('सम्पादन','Edit'); ?>">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form method="POST" class="svc-inline-form" onsubmit="return confirm('<?php echo $__t('के तपाईं निश्चित हुनुहुन्छ?', 'Are you sure?'); ?>')">
-                                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                    <td class="align-middle">
+                                        <div class="btn-group" role="group">
+                                            <?php if ($report['file_path']): ?>
+                                            <a href="../<?php echo $report['file_path']; ?>" class="btn btn-sm btn-success" target="_blank" title="<?php echo $__t('हेर्नुहोस्','View'); ?>">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <?php endif; ?>
+                                            <a href="?edit=<?php echo $report['id']; ?>" class="btn btn-sm btn-primary" title="<?php echo $__t('सम्पादन','Edit'); ?>">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" class="svc-inline-form" onsubmit="return confirm('<?php echo $__t('के तपाईं निश्चित हुनुहुन्छ?', 'Are you sure?'); ?>')">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
     <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="id" value="<?php echo $report['id']; ?>">
-                                            <button type="submit" class="btn btn-sm btn-danger" title="<?php echo $__t('मेटाउनुहोस्','Delete'); ?>">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                                <input type="hidden" name="id" value="<?php echo $report['id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="<?php echo $__t('मेटाउनुहोस्','Delete'); ?>">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
                                 <?php if (empty($reports)): ?>
-                                <tr><td colspan="5" class="text-center"><?php echo $__t('कुनै प्रतिवेदन छैन','No reports found'); ?></td></tr>
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="fas fa-inbox fa-3x mb-3 d-block opacity-50"></i>
+                                            <h6><?php echo $__t('कुनै प्रतिवेदन छैन','No reports found'); ?></h6>
+                                            <small><?php echo $__t('पहिले प्रतिवेदन थप्नुहोस्','Add a report first'); ?></small>
+                                        </div>
+                                    </td>
+                                </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -360,5 +374,134 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleFields();
 });
 </script>
+
+<style>
+/* Admin Reports Page Custom Styling */
+.filter-buttons .btn {
+    border-radius: 20px;
+    font-weight: 600;
+    padding: 0.375rem 0.875rem;
+    transition: all 0.2s ease;
+    border-width: 1.5px;
+}
+
+.filter-buttons .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.filter-buttons .btn-primary {
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    border-color: #0d6efd;
+    box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+}
+
+.filter-buttons .btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.filter-buttons .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.table th {
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.badge.rounded-pill {
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.btn-group .btn {
+    border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+.btn-group .btn:not(:last-child) {
+    border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .filter-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filter-buttons .btn {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+    }
+    
+    .table {
+        font-size: 0.875rem;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Empty state styling */
+.text-muted .fa-inbox {
+    color: #6c757d !important;
+}
+
+/* Card header improvements */
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-bottom: 2px solid #dee2e6;
+    padding: 1rem 1.25rem;
+}
+
+/* Table improvements */
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(248, 249, 250, 0.5);
+}
+
+/* Action buttons styling */
+.btn-group .btn-success {
+    background: linear-gradient(135deg, #198754, #157347);
+    border-color: #198754;
+}
+
+.btn-group .btn-primary {
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    border-color: #0d6efd;
+}
+
+.btn-group .btn-danger {
+    background: linear-gradient(135deg, #dc3545, #bb2d3b);
+    border-color: #dc3545;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+</style>
 
 <?php require_once 'includes/admin-footer.php'; ?>

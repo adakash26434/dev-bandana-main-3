@@ -215,7 +215,7 @@ try {
 $partners = [];
 if ($result && !empty($result['ok'])) {
     try {
-        $partners = $pdo->query("SELECT id, partner_name FROM partner_facilities WHERE is_active=1 ORDER BY partner_name ASC")
+        $partners = $pdo->query("SELECT id, partner_name FROM partner_facilities WHERE is_active=1 ORDER BY partner_name ASC LIMIT 50")
                         ->fetchAll(PDO::FETCH_ASSOC);
     } catch (\Throwable $e) { $partners = []; }
 }
