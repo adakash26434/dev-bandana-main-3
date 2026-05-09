@@ -3,6 +3,7 @@ $pageTitle = 'आवेदनहरू व्यवस्थापन';
 require_once 'includes/admin-header.php';
 require_once __DIR__ . '/../includes/auth-roles.php';
 require_once __DIR__ . '/../includes/request-status-history.php';
+require_once __DIR__ . '/includes/admin-request-view.php';
 /* RBAC: staff hercha matra; mutate admin+ matra */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') require_role('admin');
 
@@ -223,208 +224,117 @@ if ($viewApplication && !empty($viewApplication['id'])) {
     </div>
 
     <?php if ($viewApplication): ?>
-    <!-- View Application Detail -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-user"></i>
-                        <?php echo htmlspecialchars($viewApplication['full_name']); ?>
-                        <?php
-                        $viewStatus = (string)($viewApplication['status'] ?? '');
-                        $statusClassMap = [
-                            'pending' => 'warning',
-                            'shortlisted' => 'info',
-                            'interviewed' => 'secondary',
-                            'selected' => 'success',
-                            'rejected' => 'danger',
-                        ];
-                        $viewStatusClass = $statusClassMap[$viewStatus] ?? 'secondary';
-                        ?>
-                        <span class="badge bg-<?php echo $viewStatusClass; ?>">
-                            <?php echo ucfirst($viewApplication['status']); ?>
-                        </span>
-                    </h5>
-                    <a href="job-applications.php<?php echo $careerId ? '?career_id=' . $careerId : ''; ?>" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left"></i> फिर्ता
-                    </a>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <!-- Application Details -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <h6 class="text-primary">व्यक्तिगत जानकारी</h6>
-                                    <table class="table-hover table table-sm">
-                                        <tr>
-                                            <td><strong>पूरा नाम:</strong></td>
-                                            <td><?php echo htmlspecialchars($viewApplication['full_name']); ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>इमेल:</strong></td>
-                                            <td><a href="mailto:<?php echo $viewApplication['email']; ?>"><?php echo $viewApplication['email']; ?></a></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>फोन:</strong></td>
-                                            <td><a href="tel:<?php echo $viewApplication['phone']; ?>"><?php echo $viewApplication['phone']; ?></a></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>ठेगाना:</strong></td>
-                                            <td><?php echo htmlspecialchars($viewApplication['address'] ?? '-'); ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>जन्म मिति:</strong></td>
-                                            <td><?php echo $viewApplication['date_of_birth'] ?? '-'; ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>लिङ्ग:</strong></td>
-                                            <td><?php echo ucfirst($viewApplication['gender'] ?? '-'); ?></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="text-primary">शिक्षा र अनुभव</h6>
-                                    <table class="table-hover table table-sm">
-                                        <tr>
-                                            <td><strong>शिक्षा:</strong></td>
-                                            <td><?php echo htmlspecialchars($viewApplication['education'] ?? '-'); ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>अनुभव:</strong></td>
-                                            <td><?php echo htmlspecialchars($viewApplication['experience'] ?? '-'); ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>हालको रोजगारदाता:</strong></td>
-                                            <td><?php echo htmlspecialchars($viewApplication['current_employer'] ?? '-'); ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>अपेक्षित तलब:</strong></td>
-                                            <td><?php echo htmlspecialchars($viewApplication['expected_salary'] ?? '-'); ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>आवेदन मिति:</strong></td>
-                                            <td><?php echo formatNepaliDate($viewApplication['created_at'], true); ?></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
+    <?php
+    /* ── Unified Request Detail View ────────────────────────────── */
+    $jobBack = 'job-applications.php' . ($careerId ? '?career_id=' . $careerId : '');
 
-                            <!-- Cover Letter -->
-                            <?php if (!empty($viewApplication['cover_letter'])): ?>
-                            <div class="mb-4">
-                                <h6 class="text-primary">आवेदन पत्र / Cover Letter</h6>
-                                <div class="p-3 bg-light rounded">
-                                    <?php echo nl2br(htmlspecialchars($viewApplication['cover_letter'])); ?>
-                                </div>
-                            </div>
-                            <?php endif; ?>
+    /* Tab 1: Overview — personal + role + cover letter */
+    $overviewHtml  = '<div class="row g-3">';
+    $overviewHtml .= '<div class="col-md-6"><div class="arv-section"><h3 class="arv-section-title"><i class="fas fa-user"></i> व्यक्तिगत जानकारी</h3>';
+    $overviewHtml .= arvKvTable([
+        'पूरा नाम'   => htmlspecialchars($viewApplication['full_name'] ?? ''),
+        'इमेल'        => $viewApplication['email']
+                          ? '<a href="mailto:' . htmlspecialchars($viewApplication['email'], ENT_QUOTES) . '">' . htmlspecialchars($viewApplication['email']) . '</a>'
+                          : '',
+        'फोन'         => $viewApplication['phone']
+                          ? '<a href="tel:' . htmlspecialchars($viewApplication['phone'], ENT_QUOTES) . '">' . htmlspecialchars($viewApplication['phone']) . '</a>'
+                          : '',
+        'ठेगाना'      => htmlspecialchars((string)($viewApplication['address'] ?? '')),
+        'जन्म मिति'  => htmlspecialchars((string)($viewApplication['date_of_birth'] ?? '')),
+        'लिङ्ग'       => $viewApplication['gender'] ? htmlspecialchars(ucfirst((string)$viewApplication['gender'])) : '',
+    ]);
+    $overviewHtml .= '</div></div>';
 
-                            <!-- Documents -->
-                            <div class="mb-4">
-                                <h6 class="text-primary">कागजातहरू</h6>
-                                <div class="row">
-                                    <?php if (!empty($viewApplication['resume_path'])): ?>
-                                    <div class="col-md-3 col-6 mb-2">
-                                        <a href="<?php echo SITE_URL . $viewApplication['resume_path']; ?>" class="btn btn-outline-primary btn-sm w-100" target="_blank">
-                                            <i class="fas fa-file-pdf"></i> Resume/CV
-                                        </a>
-                                    </div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($viewApplication['photo_path'])): ?>
-                                    <div class="col-md-3 col-6 mb-2">
-                                        <a href="<?php echo SITE_URL . $viewApplication['photo_path']; ?>" class="btn btn-outline-primary btn-sm w-100" target="_blank">
-                                            <i class="fas fa-image"></i> फोटो
-                                        </a>
-                                    </div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($viewApplication['citizenship_path'])): ?>
-                                    <div class="col-md-3 col-6 mb-2">
-                                        <a href="<?php echo SITE_URL . $viewApplication['citizenship_path']; ?>" class="btn btn-outline-primary btn-sm w-100" target="_blank">
-                                            <i class="fas fa-id-card"></i> नागरिकता
-                                        </a>
-                                    </div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($viewApplication['certificates_path'])): ?>
-                                    <div class="col-md-3 col-6 mb-2">
-                                        <a href="<?php echo SITE_URL . $viewApplication['certificates_path']; ?>" class="btn btn-outline-primary btn-sm w-100" target="_blank">
-                                            <i class="fas fa-certificate"></i> प्रमाणपत्र
-                                        </a>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
+    $overviewHtml .= '<div class="col-md-6"><div class="arv-section"><h3 class="arv-section-title"><i class="fas fa-graduation-cap"></i> शिक्षा र अनुभव</h3>';
+    $overviewHtml .= arvKvTable([
+        'शिक्षा'                => htmlspecialchars((string)($viewApplication['education']         ?? '')),
+        'अनुभव'                 => htmlspecialchars((string)($viewApplication['experience']        ?? '')),
+        'हालको रोजगारदाता' => htmlspecialchars((string)($viewApplication['current_employer'] ?? '')),
+        'अपेक्षित तलब'       => htmlspecialchars((string)($viewApplication['expected_salary']  ?? '')),
+        'आवेदन मिति'         => formatNepaliDate($viewApplication['created_at'], true),
+    ]);
+    $overviewHtml .= '</div></div></div>';
 
-                        <div class="col-lg-4">
-                            <!-- Applied For -->
-                            <div class="card bg-light mb-4">
-                                <div class="card-body">
-                                    <h6 class="text-primary mb-3">आवेदित पद</h6>
-                                    <h5><?php echo htmlspecialchars($viewApplication['job_title']); ?></h5>
-                                    <p class="mb-1"><i class="fas fa-building"></i> <?php echo $viewApplication['department'] ?? 'General'; ?></p>
-                                    <p class="mb-0"><i class="fas fa-calendar"></i> म्याद: <?php echo $viewApplication['deadline']; ?></p>
-                                </div>
-                            </div>
+    if (!empty($viewApplication['cover_letter'])) {
+        $overviewHtml .= '<div class="arv-section"><h3 class="arv-section-title"><i class="fas fa-envelope-open-text"></i> आवेदन पत्र / Cover Letter</h3>';
+        $overviewHtml .= '<div class="arv-text-block">' . nl2br(htmlspecialchars((string)$viewApplication['cover_letter'])) . '</div></div>';
+    }
 
-                            <!-- Update Status Form -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6 class="mb-0">स्थिति अपडेट</h6>
-                                </div>
-                                <div class="card-body">
-                                    <form method="POST">
-    <?php echo csrfField(); ?>
-                                        <input type="hidden" name="action" value="update_status">
-                                        <input type="hidden" name="id" value="<?php echo $viewApplication['id']; ?>">
+    /* Tab 2: Documents */
+    $docsHtml = arvDocsGrid([
+        ['url' => !empty($viewApplication['resume_path'])       ? SITE_URL . $viewApplication['resume_path']       : '', 'label' => 'Resume / CV',    'icon' => 'fa-file-pdf'],
+        ['url' => !empty($viewApplication['photo_path'])        ? SITE_URL . $viewApplication['photo_path']        : '', 'label' => 'फोटो',           'icon' => 'fa-image'],
+        ['url' => !empty($viewApplication['citizenship_path'])  ? SITE_URL . $viewApplication['citizenship_path']  : '', 'label' => 'नागरिकता',     'icon' => 'fa-id-card'],
+        ['url' => !empty($viewApplication['certificates_path']) ? SITE_URL . $viewApplication['certificates_path'] : '', 'label' => 'प्रमाणपत्र', 'icon' => 'fa-certificate'],
+    ]);
 
-                                        <div class="mb-3">
-                                            <label class="form-label">स्थिति</label>
-                                            <select name="status" class="form-select">
-                                                <option value="pending" <?php echo $viewApplication['status'] === 'pending' ? 'selected' : ''; ?>>Pending (पेन्डिङ)</option>
-                                                <option value="shortlisted" <?php echo $viewApplication['status'] === 'shortlisted' ? 'selected' : ''; ?>>Shortlisted (छनोट)</option>
-                                                <option value="interviewed" <?php echo $viewApplication['status'] === 'interviewed' ? 'selected' : ''; ?>>Interviewed (अन्तर्वार्ता)</option>
-                                                <option value="selected" <?php echo $viewApplication['status'] === 'selected' ? 'selected' : ''; ?>>Selected (चयन)</option>
-                                                <option value="rejected" <?php echo $viewApplication['status'] === 'rejected' ? 'selected' : ''; ?>>Rejected (अस्वीकृत)</option>
-                                            </select>
-                                        </div>
+    /* Tab 3: Activity Log */
+    $logHtml = arvLogList($jobHistory);
 
-                                        <div class="mb-3">
-                                            <label class="form-label">नोटहरू</label>
-                                            <textarea name="admin_notes" class="form-control" rows="3"><?php echo htmlspecialchars($viewApplication['admin_notes'] ?? ''); ?></textarea>
-                                        </div>
-
-                                        <button type="submit" class="btn btn-primary w-100">
-                                            <i class="fas fa-save"></i> अपडेट गर्नुहोस्
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            <?php if (!empty($jobHistory)): ?>
-                            <div class="card mt-3">
-                                <div class="card-header"><h6 class="mb-0">Status / Comment History</h6></div>
-                                <div class="card-body">
-                                    <?php foreach ($jobHistory as $h): ?>
-                                    <div class="border rounded p-2 mb-2 bg-light">
-                                        <div class="small fw-semibold"><?php echo htmlspecialchars((string)($h['old_status'] ?: '—')); ?> → <?php echo htmlspecialchars((string)($h['new_status'] ?: '—')); ?></div>
-                                        <?php if (!empty($h['admin_comment'])): ?>
-                                        <div class="small mt-1"><?php echo nl2br(htmlspecialchars((string)$h['admin_comment'])); ?></div>
-                                        <?php endif; ?>
-                                        <div class="small text-muted mt-1">
-                                            <?php echo htmlspecialchars((string)($h['actor_name'] ?: 'Admin')); ?> · <?php echo formatNepaliDate((string)$h['created_at'], true); ?> · Notify: <?php echo !empty($h['notify_sent']) ? 'Sent' : 'Not sent'; ?>
-                                        </div>
-                                    </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    /* Sidebar: applied position + status update form */
+    ob_start(); ?>
+    <div class="arv-action-card">
+        <h4 class="arv-action-title"><i class="fas fa-briefcase"></i> आवेदित पद</h4>
+        <div class="arv-meta-list">
+            <div><b><?php echo htmlspecialchars((string)($viewApplication['job_title'] ?? 'N/A')); ?></b></div>
+            <div><i class="fas fa-building"></i> <?php echo htmlspecialchars((string)($viewApplication['department'] ?? 'General')); ?></div>
+            <?php if (!empty($viewApplication['deadline'])): ?>
+            <div><i class="fas fa-calendar"></i> म्याद: <?php echo htmlspecialchars((string)$viewApplication['deadline']); ?></div>
+            <?php endif; ?>
         </div>
     </div>
+    <div class="arv-action-card">
+        <h4 class="arv-action-title"><i class="fas fa-pen-to-square"></i> स्थिति अपडेट</h4>
+        <form method="POST">
+            <?php echo csrfField(); ?>
+            <input type="hidden" name="action" value="update_status">
+            <input type="hidden" name="id" value="<?php echo (int)$viewApplication['id']; ?>">
+            <div class="mb-3">
+                <label class="form-label">स्थिति</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="pending"     <?php echo $viewApplication['status']==='pending'    ?'selected':''; ?>>⏳ पेन्डिङ</option>
+                    <option value="shortlisted" <?php echo $viewApplication['status']==='shortlisted'?'selected':''; ?>>📋 छनोट</option>
+                    <option value="interviewed" <?php echo $viewApplication['status']==='interviewed'?'selected':''; ?>>💬 अन्तर्वार्ता</option>
+                    <option value="selected"    <?php echo $viewApplication['status']==='selected'   ?'selected':''; ?>>✅ चयन</option>
+                    <option value="rejected"    <?php echo $viewApplication['status']==='rejected'   ?'selected':''; ?>>❌ अस्वीकृत</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">नोट / टिप्पणी</label>
+                <textarea name="admin_notes" class="form-control form-control-sm" rows="3"
+                    placeholder="(वैकल्पिक) यो स्थिति परिवर्तनको कारण..."><?php echo htmlspecialchars((string)($viewApplication['admin_notes'] ?? '')); ?></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+                <i class="fas fa-save"></i> अपडेट गर्नुहोस्
+            </button>
+        </form>
+    </div>
+    <?php $sidebarHtml = (string)ob_get_clean();
+
+    $jobStatusMap = [
+        'pending'     => ['warning', 'पेन्डिङ'],
+        'shortlisted' => ['info',    'छनोट'],
+        'interviewed' => ['secondary','अन्तर्वार्ता'],
+        'selected'    => ['success', 'चयन'],
+        'rejected'    => ['danger',  'अस्वीकृत'],
+    ];
+
+    echo renderAdminRequestView([
+        'title'      => $viewApplication['full_name'] ?? '—',
+        'subtitle'   => 'पद: <b>' . htmlspecialchars((string)($viewApplication['job_title'] ?? 'N/A')) . '</b>'
+                      . ' · <i class="fas fa-clock"></i> ' . formatNepaliDate($viewApplication['created_at']),
+        'status'     => (string)($viewApplication['status'] ?? ''),
+        'statusMap'  => $jobStatusMap,
+        'backUrl'    => $jobBack,
+        'avatarIcon' => 'user-tie',
+        'tabs'       => [
+            ['id'=>'overview','label'=>'अवलोकन',     'icon'=>'fa-circle-info',         'html'=>$overviewHtml],
+            ['id'=>'docs',    'label'=>'कागजात',     'icon'=>'fa-folder-open',         'html'=>$docsHtml],
+            ['id'=>'log',     'label'=>'गतिविधि लग','icon'=>'fa-clock-rotate-left',   'html'=>$logHtml],
+        ],
+        'sidebar'    => $sidebarHtml,
+    ]);
+    ?>
     <?php else: ?>
     <!-- ── Applications Filter Bar ── -->
     <div class="adm-filter-bar no-print">

@@ -137,8 +137,8 @@ $isCached    = ($source === 'nrb_cached');
                                     </p>
                                     <p class="mb-0 text-muted small">
                                         <?php echo isEnglish()
-                                            ? 'Note: These are official NRB rates. Cooperative transactions may vary slightly.'
-                                            : 'नोट: यी नेपाल राष्ट्र बैंकका आधिकारिक दरहरू हुन्। सहकारीको वास्तविक कारोबार दर थोरै भिन्न हुन सक्छ।'; ?>
+                                            ? 'Note: These are official NRB rates. Transaction rates may vary slightly.'
+                                            : 'नोट: यी नेपाल राष्ट्र बैंकका आधिकारिक दरहरू हुन्। कारोबार दर थोरै भिन्न हुन सक्छ।'; ?>
                                     </p>
                                 </div>
                             </div>
