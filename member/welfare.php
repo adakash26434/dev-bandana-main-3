@@ -168,12 +168,6 @@ $statusLabels = [
 ];
 $extraHead = <<<HTML
 <style>
-.wf-tabs { display:flex; gap:0; border-bottom:2px solid var(--gray-100); margin-bottom:20px; }
-.wf-tab  { padding:10px 20px; font-size:.9rem; font-weight:600; cursor:pointer; border:none; background:none;
-           color:var(--text-light); border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
-.wf-tab.active { color:var(--primary-color); border-bottom-color:var(--primary-color); }
-.wf-pane { display:none; }
-.wf-pane.active { display:block; }
 .claim-card { background:white; border:1px solid color-mix(in srgb, var(--primary-color) 14%, var(--gray-200)); border-radius:12px; padding:16px; margin-bottom:14px; }
 .claim-card:hover { box-shadow:0 4px 12px rgba(var(--primary-rgb),.12); }
 .status-pill { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:20px; font-size:.78rem; font-weight:700; }

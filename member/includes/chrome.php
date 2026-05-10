@@ -112,7 +112,7 @@ $_active = $_self === 'index.php' || $_self === ''  ? 'dashboard'
         : ($_self === 'appointment.php'             ? 'apply-appointment'
         : ($_self === 'loan-apply.php'              ? 'apply-loan'
         : ($_self === 'account-apply.php'           ? 'apply-account'
-        : ($_applyFrameP === 'grievance'            ? 'apply-grievance'
+        : ($_self === 'grievance.php'               ? 'apply-grievance'
         : ($_applyFrameP === 'digital'              ? 'apply-digital' : ''))))))))))))));
 
 /* Notifications for bell */
@@ -317,7 +317,7 @@ try {
         <a href="<?php echo $_siteUrl; ?>member/loan-apply.php" class="mem-nav-item <?php echo $_active==='apply-loan'?'active':''; ?>"><i class="fas fa-hand-holding-dollar"></i><?php echo $_t('ऋण आवेदन', 'Loan Apply'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/account-apply.php" class="mem-nav-item <?php echo $_active==='apply-account'?'active':''; ?>"><i class="fas fa-landmark"></i><?php echo $_t('खाता खोल्ने', 'Open Account'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=digital" class="mem-nav-item <?php echo $_active==='apply-digital'?'active':''; ?>"><i class="fas fa-laptop"></i><?php echo $_t('डिजिटल सेवा', 'Digital Service'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=grievance" class="mem-nav-item <?php echo $_active==='apply-grievance'?'active':''; ?>"><i class="fas fa-comment-exclamation"></i><?php echo $_t('गुनासो', 'Grievance'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/grievance.php" class="mem-nav-item <?php echo $_active==='apply-grievance'?'active':''; ?>"><i class="fas fa-comment-exclamation"></i><?php echo $_t('गुनासो', 'Grievance'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/certificate.php" class="mem-nav-item <?php echo $_active==='certificate'?'active':''; ?>"><i class="fas fa-certificate"></i><?php echo $_t('प्रमाणपत्र', 'Certificates'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/profile.php" class="mem-nav-item <?php echo $_active==='profile'?'active':''; ?>"><i class="fas fa-user-circle"></i><?php echo $_t('प्रोफाइल', 'Profile'); ?></a>
         <a href="<?php echo $_siteUrl; ?>" class="mem-nav-item" target="_blank" rel="noopener"><i class="fas fa-globe"></i><?php echo $_t('मुख्य साइट', 'Main Site'); ?></a>
