@@ -161,6 +161,8 @@ require __DIR__ . '/includes/chrome.php';
 .midx-ds-label{font-size:.8rem;font-weight:700;color:var(--text-color);}
 .midx-ds-desc{font-size:.68rem;color:var(--text-light);}
 .midx-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:700px){.midx-grid-2{grid-template-columns:1fr;}}
+/* stat cards rendered as <a> — child colors set via explicit class rules */
 .midx-link{font-size:.78rem;color:var(--mem-primary);font-weight:700;text-decoration:none;}
 .midx-body-pad-sm{padding-top:6px;}
 .midx-filter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
@@ -204,33 +206,33 @@ require __DIR__ . '/includes/chrome.php';
         <p class="midx-greeting-date"><?php echo $_t('आजको मिति', 'Today'); ?>: <?php echo formatNepaliDate(date('Y-m-d')); ?></p>
     </div>
 
-    <!-- Stat cards (Programs हटाइयो) -->
+    <!-- Stat cards -->
     <div class="mem-stats">
-        <div class="mem-stat">
+        <a href="<?php echo $siteUrl; ?>member/tracker.php" class="mem-stat">
             <div class="mem-stat-icon midx-stat-brand">📋</div>
             <div class="mem-stat-num midx-stat-brand"><?php echo $totalApps; ?></div>
             <div class="mem-stat-label"><?php echo $_t('कुल आवेदन', 'Total Applications'); ?></div>
-        </div>
-        <div class="mem-stat">
+        </a>
+        <a href="?ra_status=pending#recent-apps" class="mem-stat">
             <div class="mem-stat-icon midx-stat-pending">⏳</div>
             <div class="mem-stat-num midx-stat-pending"><?php echo $pending; ?></div>
             <div class="mem-stat-label"><?php echo $_t('पेन्डिङ', 'Pending'); ?></div>
-        </div>
-        <div class="mem-stat">
+        </a>
+        <a href="?ra_status=approved#recent-apps" class="mem-stat">
             <div class="mem-stat-icon midx-stat-approved">✅</div>
             <div class="mem-stat-num midx-stat-approved"><?php echo $approved; ?></div>
             <div class="mem-stat-label"><?php echo $_t('स्वीकृत', 'Approved'); ?></div>
-        </div>
-        <div class="mem-stat">
+        </a>
+        <a href="<?php echo $siteUrl; ?>member/notifications.php" class="mem-stat">
             <div class="mem-stat-icon midx-stat-notif">🔔</div>
             <div class="mem-stat-num midx-stat-notif"><?php echo $unread; ?></div>
             <div class="mem-stat-label"><?php echo $_t('नयाँ सूचना', 'New Notifications'); ?></div>
-        </div>
-        <div class="mem-stat">
+        </a>
+        <a href="#partner-section" class="mem-stat">
             <div class="mem-stat-icon midx-stat-partner">🏥</div>
             <div class="mem-stat-num midx-stat-partner"><?php echo count($partnerHistory); ?></div>
             <div class="mem-stat-label"><?php echo $_t('साझेदार सेवा', 'Partner Services'); ?></div>
-        </div>
+        </a>
     </div>
 
     <!-- Quick Actions -->
@@ -291,7 +293,7 @@ require __DIR__ . '/includes/chrome.php';
     </div>
 
     <!-- Two-column: Recent apps + Notifications -->
-    <div class="mem-grid-2 midx-grid-2">
+    <div class="mem-grid-2 midx-grid-2" id="recent-apps">
 
         <div class="mem-card">
             <div class="mem-card-header">
@@ -372,7 +374,7 @@ require __DIR__ . '/includes/chrome.php';
     <!-- ══════════════════════════════════════════════════════
          साझेदार संस्था सेवा इतिहास — v6 redesigned
     ═══════════════════════════════════════════════════════════ -->
-    <div class="mem-card midx-card-mt">
+    <div class="mem-card midx-card-mt" id="partner-section">
         <div class="mem-card-header">
             <div class="mem-card-title"><i class="fas fa-hospital"></i><?php echo $_t('साझेदार संस्था सेवा इतिहास', 'Partner Service History'); ?></div>
             <?php if (!empty($partnerHistory)): ?>

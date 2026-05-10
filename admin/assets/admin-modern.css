@@ -1187,6 +1187,7 @@ textarea.form-control:focus {
     margin: 0;
     color: var(--primary-color);
     font-weight: 700;
+    line-height: 1.6;
 }
 
 .dash-icon-purple {
@@ -1234,6 +1235,19 @@ textarea.form-control:focus {
 
 .dash-section-title {
     margin: 0;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    line-height: 1.6 !important;
+    color: var(--primary-color) !important;
+}
+
+/* ds-section direct h2 — override global h2 size for admin dashboard sections */
+.ds-section > h2 {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    line-height: 1.6 !important;
+    color: var(--primary-color) !important;
+    margin: 0 0 12px 0 !important;
 }
 
 .dash-flex-grow {

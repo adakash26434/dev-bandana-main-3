@@ -3582,7 +3582,7 @@ th.action-col {
     font-size: 1.25rem;
     font-weight: 700;
     color: #1a3a25;
-    line-height: 1.3;
+    line-height: 1.6;
 }
 .admin-page-header small {
     font-size: 0.82rem;
@@ -5160,7 +5160,7 @@ textarea.form-control {
 .admin-page-header h2 {
     font-size: 1.05rem !important;
     font-weight: 700 !important;
-    line-height: 1.3 !important;
+    line-height: 1.6 !important;
     margin: 0 !important;
 }
 .admin-page-header small,
@@ -7729,7 +7729,7 @@ input[type="file"].form-control {
   }
   .admin-page-header h1, .admin-page-header .h1 {
     font-size: 1.1rem !important;
-    line-height: 1.3 !important;
+    line-height: 1.6 !important;
   }
   .admin-page-header .admin-page-subtitle,
   .admin-page-header p {
@@ -7815,7 +7815,7 @@ input[type="file"].form-control {
    ════════════════════════════════════════════════════════════ */
 .admin-content .page-header h1 {
   font-size: 1.55rem !important;
-  line-height: 1.2 !important;
+  line-height: 1.6 !important;
   font-weight: 700 !important;
 }
 .admin-content .page-header p {

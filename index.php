@@ -15,7 +15,7 @@ ensurePublicTables();
 }
 
 .hero-indicators-modern {
-    bottom: 20px;
+    bottom: 35px;
     z-index: 10;
 }
 
@@ -128,7 +128,7 @@ ensurePublicTables();
     color: white;
     margin-bottom: 1rem;
     text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    line-height: 1.2;
+    line-height: 1.6;
     animation: titleGlow 2s ease-in-out infinite alternate;
 }
 
@@ -143,7 +143,7 @@ ensurePublicTables();
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: 2rem;
     text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    line-height: 1.4;
+    line-height: 1.7;
 }
 
 .hero-actions-modern {

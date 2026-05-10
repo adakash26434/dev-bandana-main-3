@@ -180,7 +180,7 @@ body.auth-portal-page .vp-field label {
   margin-bottom: 8px;
   letter-spacing: 0.04em;
   word-spacing: 0.05em;
-  line-height: 1.35;
+  line-height: 1.6;
 }
 
 body.auth-portal-page .field input,
@@ -236,9 +236,9 @@ body.auth-portal-page .oauth-divider {
   letter-spacing: 0.08em;
 }
 
-/* Left panel feature chips — tighten mixed script */
+/* Left panel feature chips — mixed script */
 body.auth-portal-page .sl-feat span {
-  line-height: 1.35;
+  line-height: 1.6;
   word-spacing: 0.05em;
 }
 
@@ -482,7 +482,7 @@ body.auth-portal-page .card-title,
 body.auth-portal-page .verify-form-card__head h1 {
   font-size: var(--auth-title-size) !important;
   margin-bottom: var(--auth-title-gap) !important;
-  line-height: 1.25 !important;
+  line-height: 1.6 !important;
 }
 
 body.auth-portal-page .card-sub,
