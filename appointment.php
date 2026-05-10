@@ -218,11 +218,11 @@ require_once 'includes/header.php';
 
                         <form method="POST" id="appointmentForm" class="needs-validation" novalidate>
                             <?php echo csrfField(); ?>
-                            <?php if ($loggedMember): ?>
-                            <div class="alert alert-success py-2 small mb-3">
-                                <i class="fas fa-user-check me-1"></i><?php echo isEnglish() ? 'Logged in — contact details from your profile / KYC.' : 'लगइन — सम्पर्क विवरण प्रोफाइल / KYC बाट।'; ?>
-                            </div>
-                            <?php else: ?>
+                            <?php if ($loggedMember):
+                                $kycForDisplay = null;
+                                try { $kycForDisplay = loadKycRowForLoggedMemberPublic(getDB(), $loggedMember); } catch(Throwable $e) {}
+                                require ROOT_PATH . 'includes/member-prefill-block.php';
+                            else: ?>
                             <div class="border rounded-3 p-3 mb-3 bg-light">
                                 <label class="form-label fw-semibold d-block mb-2"><?php echo isEnglish() ? 'Cooperative member?' : 'सहकारी सदस्य?'; ?></label>
                                 <div class="d-flex flex-wrap gap-3">
@@ -232,7 +232,8 @@ require_once 'includes/header.php';
                             </div>
                             <?php endif; ?>
 
-                            <!-- व्यक्तिगत जानकारी -->
+                            <!-- व्यक्तिगत जानकारी — guest only -->
+                            <?php if (!$loggedMember): ?>
                             <div class="form-card-title mb-3">
                                 <i class="fas fa-user"></i>
                                 <?php echo isEnglish() ? 'Personal Information' : 'व्यक्तिगत जानकारी'; ?>
@@ -241,28 +242,27 @@ require_once 'includes/header.php';
                                 <div class="col-md-6 js-appt-name-wrap">
                                     <label class="form-label"><?php echo isEnglish() ? 'Full Name' : 'पूरा नाम'; ?> <span class="req">*</span></label>
                                     <input type="text" name="name" class="form-control js-appt-personal" required
-                                           value="<?php echo htmlspecialchars($_POST['name'] ?? ($loggedMember['name'] ?? ''), ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>
+                                           value="<?php echo htmlspecialchars($_POST['name'] ?? '', ENT_QUOTES); ?>"
                                            placeholder="<?php echo isEnglish() ? 'Your full name' : 'तपाईंको पूरा नाम'; ?>">
                                 </div>
                                 <div class="col-md-6 js-hide-if-appt-coop-yes">
                                     <label class="form-label"><?php echo isEnglish() ? 'Phone Number' : 'फोन नम्बर'; ?> <span class="req">*</span></label>
                                     <input type="tel" name="phone" class="form-control js-appt-personal" required
                                            maxlength="10" pattern="[0-9]{10}" placeholder="98XXXXXXXX"
-                                           value="<?php echo htmlspecialchars($_POST['phone'] ?? ($loggedMember['phone'] ?? ''), ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                           value="<?php echo htmlspecialchars($_POST['phone'] ?? '', ENT_QUOTES); ?>">
                                 </div>
                                 <div class="col-md-6 js-hide-if-appt-coop-yes">
                                     <label class="form-label"><?php echo isEnglish() ? 'Email' : 'इमेल'; ?> <span class="req">*</span></label>
                                     <input type="email" name="email" class="form-control js-appt-personal" required
                                            placeholder="example@gmail.com"
-                                           value="<?php echo htmlspecialchars($_POST['email'] ?? ($loggedMember['email'] ?? ''), ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                           value="<?php echo htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES); ?>">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label"><?php echo isEnglish() ? 'Member ID' : 'सदस्य नं.'; ?> <span class="text-danger js-appt-mid-req" style="display:none;">*</span><span class="text-muted small js-appt-mid-opt">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</span></label>
+                                    <label class="form-label"><?php echo isEnglish() ? 'Member ID' : 'सदस्य नं.'; ?> <span class="text-danger js-appt-mid-req" style="display:none;">*</span><span class="text-muted small js-appt-mid-opt">(<?php echo isEnglish() ? 'optional' : 'ऌच्छिक'; ?>)</span></label>
                                     <input type="text" name="member_id" class="form-control js-appt-mid"
-                                           value="<?php echo htmlspecialchars($_POST['member_id'] ?? ($loggedMember['sadasyata_number'] ?? ''), ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                           value="<?php echo htmlspecialchars($_POST['member_id'] ?? '', ENT_QUOTES); ?>">
                                 </div>
                             </div>
-                            <?php if (!$loggedMember): ?>
                             <script>
                             (function(){
                               function syncApptCoop(){

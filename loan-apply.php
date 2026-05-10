@@ -325,11 +325,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- ════════════════════ STEP 1: APPLICANT ════════════════════ -->
 <div class="loan-step-pane" id="loanPane1">
 
-    <?php if ($loggedMember): ?>
-    <div class="alert alert-success py-2 small mb-4">
-        <i class="fas fa-user-check me-1"></i><?php echo isEnglish() ? 'You are logged in — name, member ID, phone and email are prefilled from your KYC / profile.' : 'लगइन हुनुहुन्छ — नाम, सदस्यता नम्बर, मोबाइल र इमेल KYC / प्रोफाइलबाट भरिएको छ।'; ?>
-    </div>
-    <?php else: ?>
+    <?php if ($loggedMember):
+        $kycForDisplay = isset($kycMerge) ? $kycMerge : null;
+        if (!$kycForDisplay) {
+            try { $kycForDisplay = loadKycRowForLoggedMemberPublic(getDB(), $loggedMember); } catch(Throwable $e) {}
+        }
+        require ROOT_PATH . 'includes/member-prefill-block.php';
+    else: ?>
     <!-- Member check -->
     <div class="form-section-card mb-3">
         <div class="form-section-card-hdr">
@@ -351,6 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <!-- Applicant details card -->
+    <?php if (!$loggedMember): ?>
     <div class="form-section-card">
         <div class="form-section-card-hdr mb-3">
             <span class="form-section-icon bg-primary-soft"><i class="fas fa-id-card"></i></span>
@@ -359,9 +362,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row g-3">
             <div class="col-md-6 js-loan-fullname-wrap">
                 <label class="form-label"><?php echo isEnglish() ? 'Full Name' : 'पूरा नाम'; ?> <span class="text-danger">*</span></label>
-                <input type="text" name="full_name" class="form-control js-loan-personal"
-                    <?php echo $lockedMemberFields; ?> required
-                    value="<?php echo htmlspecialchars($loggedMember['name'] ?? ($_POST['full_name'] ?? '')); ?>"
+                <input type="text" name="full_name" class="form-control js-loan-personal" required
+                    value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>"
                     placeholder="<?php echo isEnglish() ? 'Your full name' : 'पूरा नाम लेख्नुहोस्'; ?>">
                 <div class="invalid-feedback"><?php echo isEnglish() ? 'Full name is required.' : 'पूरा नाम अनिवार्य छ।'; ?></div>
             </div>
@@ -371,44 +373,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span class="text-danger js-mid-req" style="display:none;">*</span>
                 </label>
                 <input type="text" name="member_id" class="form-control js-loan-mid"
-                    <?php echo $lockedMemberFields; ?>
-                    value="<?php echo htmlspecialchars($loggedMember['sadasyata_number'] ?? ($_POST['member_id'] ?? '')); ?>"
+                    value="<?php echo htmlspecialchars($_POST['member_id'] ?? ''); ?>"
                     placeholder="MEM-XXXX">
                 <div class="invalid-feedback"><?php echo isEnglish() ? 'Member ID is required for verification.' : 'सदस्यता नम्बर अनिवार्य छ।'; ?></div>
             </div>
             <div class="col-md-4 js-hide-if-coop-yes">
                 <label class="form-label"><?php echo isEnglish() ? 'Mobile Number' : 'मोबाइल नम्बर'; ?> <span class="text-danger">*</span></label>
-                <input type="tel" name="mobile" class="form-control js-loan-personal"
-                    maxlength="15" <?php echo $lockedMemberFields; ?> required
-                    placeholder="98XXXXXXXX"
-                    value="<?php echo htmlspecialchars(preg_replace('/[^0-9]/','',(string)($loggedMember['phone'] ?? ($_POST['mobile'] ?? '')))); ?>">
+                <input type="tel" name="mobile" class="form-control js-loan-personal" maxlength="15" required
+                    placeholder="98XXXXXXXX" value="<?php echo htmlspecialchars($_POST['mobile'] ?? ''); ?>">
                 <div class="invalid-feedback"><?php echo isEnglish() ? 'Valid 10-digit mobile required.' : '१० अंकको मोबाइल नम्बर अनिवार्य।'; ?></div>
             </div>
             <div class="col-md-4 js-hide-if-coop-yes">
                 <label class="form-label"><?php echo isEnglish() ? 'Email Address' : 'इमेल ठेगाना'; ?> <span class="text-danger">*</span></label>
-                <input type="email" name="email" class="form-control js-loan-personal"
-                    <?php echo $lockedMemberFields; ?> required
-                    placeholder="you@example.com"
-                    value="<?php echo htmlspecialchars($loggedMember['email'] ?? ($_POST['email'] ?? '')); ?>">
+                <input type="email" name="email" class="form-control js-loan-personal" required
+                    placeholder="you@example.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
                 <div class="invalid-feedback"><?php echo isEnglish() ? 'Valid email address required.' : 'सही इमेल ठेगाना अनिवार्य।'; ?></div>
             </div>
             <div class="col-md-4 js-hide-if-coop-yes">
                 <label class="form-label"><?php echo isEnglish() ? 'Citizenship No.' : 'नागरिकता नम्बर'; ?></label>
-                <input type="text" name="citizenship_no" class="form-control js-loan-personal"
-                    <?php echo $lockedMemberFields; ?>
+                <input type="text" name="citizenship_no" class="form-control"
                     value="<?php echo htmlspecialchars($_POST['citizenship_no'] ?? ''); ?>"
                     placeholder="XX-XX-XXXXX">
             </div>
             <div class="col-12 js-hide-if-coop-yes">
                 <label class="form-label"><?php echo isEnglish() ? 'Permanent Address' : 'स्थायी ठेगाना'; ?></label>
                 <textarea name="address" class="form-control js-loan-personal" rows="2"
-                    <?php echo $lockedMemberFields; ?>
                     placeholder="<?php echo isEnglish() ? 'District / VDC / Ward' : 'जिल्ला / गाउँपालिका / वडा'; ?>"><?php echo htmlspecialchars($_POST['address'] ?? ''); ?></textarea>
             </div>
         </div>
     </div>
-
-    <?php if (!$loggedMember): ?>
+    <?php endif; /* !$loggedMember */ ?>
     <script>
     (function(){
         function syncLoanMemberUi(){

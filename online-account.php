@@ -257,10 +257,13 @@ try {
 
                     <form method="POST" enctype="multipart/form-data" class="account-form needs-validation" id="accountOpenForm" novalidate>
                         <?php echo csrfField(); ?>
-                        <?php if ($loggedMember): ?>
-                        <div class="alert alert-success py-2 small mb-3">
-                            <i class="fas fa-user-check me-1"></i><?php echo isEnglish() ? 'Logged in — personal details from profile / KYC where available.' : 'लगइन — व्यक्तिगत विवरण प्रोफाइल / KYC बाट।'; ?>
-                        </div>
+                        <?php if ($loggedMember):
+                            $kycForDisplay = isset($kycMerge) ? $kycMerge : null;
+                            if (!$kycForDisplay) {
+                                try { $kycForDisplay = loadKycRowForLoggedMemberPublic(getDB(), $loggedMember); } catch(Throwable $e) {}
+                            }
+                            require ROOT_PATH . 'includes/member-prefill-block.php';
+                        ?>
                         <?php else: ?>
                         <div class="border rounded-3 p-3 mb-3 bg-light">
                             <label class="form-label fw-semibold d-block mb-2"><?php echo isEnglish() ? 'Are you already a KYC-registered member?' : 'पहिले नै KYC दर्ता भएको सदस्य?'; ?></label>
@@ -300,6 +303,7 @@ try {
                         </div>
 
                         <!-- Personal Info -->
+                        <?php if (!$loggedMember): ?>
                         <div class="form-section">
                             <h5><i class="fas fa-user"></i> <?php echo isEnglish() ? 'Personal Information' : 'व्यक्तिगत जानकारी'; ?></h5>
                             <div class="row">
@@ -311,17 +315,17 @@ try {
                                 </div>
                                 <div class="col-md-6 mb-3 js-acc-name-wrap">
                                     <label class="form-label"><?php echo isEnglish() ? 'Full Name (Nepali)' : 'पूरा नाम (नेपाली)'; ?> <span class="text-danger">*</span></label>
-                                    <input type="text" name="full_name" class="form-control js-acc-pers" required value="<?php echo htmlspecialchars($_POST['full_name'] ?? '', ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                    <input type="text" name="full_name" class="form-control js-acc-pers" required value="<?php echo htmlspecialchars($_POST['full_name'] ?? '', ENT_QUOTES); ?>">
                                 </div>
-                                <div class="col-md-6 mb-3 js-acc-kyc-hide">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Full Name (English)' : 'पूरा नाम (अंग्रेजी)'; ?></label>
-                                    <input type="text" name="full_name_en" class="form-control" value="<?php echo htmlspecialchars($_POST['full_name_en'] ?? '', ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                    <input type="text" name="full_name_en" class="form-control" value="<?php echo htmlspecialchars($_POST['full_name_en'] ?? '', ENT_QUOTES); ?>">
                                 </div>
-                                <div class="col-md-4 mb-3 js-acc-kyc-hide">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Date of Birth (BS)' : 'जन्म मिति (बि.सं.)'; ?></label>
-                                    <input type="text" name="dob_bs" class="form-control nepali-datepicker" placeholder="YYYY-MM-DD" autocomplete="off" value="<?php echo htmlspecialchars($_POST['dob_bs'] ?? '', ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                    <input type="text" name="dob_bs" class="form-control nepali-datepicker" placeholder="YYYY-MM-DD" autocomplete="off" value="<?php echo htmlspecialchars($_POST['dob_bs'] ?? '', ENT_QUOTES); ?>">
                                 </div>
-                                <div class="col-md-4 mb-3 js-acc-kyc-hide">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Gender' : 'लिङ्ग'; ?></label>
                                     <select name="gender" class="form-select">
                                         <option value="male"><?php echo isEnglish() ? 'Male' : 'पुरुष'; ?></option>
@@ -329,7 +333,7 @@ try {
                                         <option value="other"><?php echo isEnglish() ? 'Other' : 'अन्य'; ?></option>
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3 js-acc-kyc-hide">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Marital Status' : 'वैवाहिक स्थिति'; ?></label>
                                     <select name="marital_status" class="form-select">
                                         <option value="single"><?php echo isEnglish() ? 'Single' : 'अविवाहित'; ?></option>
@@ -338,32 +342,23 @@ try {
                                 </div>
                                 <div class="col-md-6 mb-3 js-hide-if-acc-coop-yes">
                                     <label class="form-label"><?php echo isEnglish() ? 'Mobile Number' : 'मोबाइल नम्बर'; ?> <span class="text-danger">*</span></label>
-                                    <!-- 10-digit Nepal mobile number required -->
-                                    <input type="tel" name="mobile" class="form-control js-acc-contact" required
-                                           maxlength="10" pattern="[0-9]{10}"
-                                           placeholder="98XXXXXXXX"
-                                           value="<?php echo htmlspecialchars($_POST['mobile'] ?? ($loggedMember['phone'] ?? ''), ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                    <input type="tel" name="mobile" class="form-control js-acc-contact" required maxlength="10" pattern="[0-9]{10}" placeholder="98XXXXXXXX" value="<?php echo htmlspecialchars($_POST['mobile'] ?? '', ENT_QUOTES); ?>">
                                 </div>
                                 <div class="col-md-6 mb-3 js-hide-if-acc-coop-yes">
-                                    <label class="form-label">
-                                        <?php echo isEnglish() ? 'Email' : 'इमेल'; ?>
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="email" name="email" class="form-control js-acc-contact" required
-                                           placeholder="akashpame@gmail.com"
-                                           value="<?php echo htmlspecialchars($_POST['email'] ?? ($loggedMember['email'] ?? ''), ENT_QUOTES); ?>" <?php echo $lockedMemberFields; ?>>
+                                    <label class="form-label"><?php echo isEnglish() ? 'Email' : 'इमेल'; ?> <span class="text-danger">*</span></label>
+                                    <input type="email" name="email" class="form-control js-acc-contact" required placeholder="akashpame@gmail.com" value="<?php echo htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES); ?>">
                                 </div>
-                                <div class="col-md-6 mb-3 js-acc-kyc-hide">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Permanent Address' : 'स्थायी ठेगाना'; ?></label>
-                                    <textarea name="permanent_address" class="form-control" rows="2" <?php echo $lockedMemberFields; ?>><?php echo htmlspecialchars($_POST['permanent_address'] ?? '', ENT_QUOTES); ?></textarea>
+                                    <textarea name="permanent_address" class="form-control" rows="2"><?php echo htmlspecialchars($_POST['permanent_address'] ?? '', ENT_QUOTES); ?></textarea>
                                 </div>
-                                <div class="col-md-6 mb-3 js-acc-kyc-hide">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label"><?php echo isEnglish() ? 'Temporary Address' : 'अस्थायी ठेगाना'; ?></label>
-                                    <textarea name="temporary_address" class="form-control" rows="2" <?php echo $lockedMemberFields; ?>><?php echo htmlspecialchars($_POST['temporary_address'] ?? '', ENT_QUOTES); ?></textarea>
+                                    <textarea name="temporary_address" class="form-control" rows="2"><?php echo htmlspecialchars($_POST['temporary_address'] ?? '', ENT_QUOTES); ?></textarea>
                                 </div>
                             </div>
                         </div>
-                        <?php if (!$loggedMember): ?>
+                        <?php endif; ?>
                         <script>
                         (function(){
                           function syncAccCoop(){

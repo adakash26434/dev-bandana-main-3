@@ -308,7 +308,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </p>
                         </div>
 
-                        <?php if (!$loggedMember): ?>
+                        <?php if ($loggedMember):
+                            $kycForDisplay = null;
+                            try { $kycForDisplay = loadKycRowForLoggedMemberPublic(getDB(), $loggedMember); } catch(Throwable $e) {}
+                            require ROOT_PATH . 'includes/member-prefill-block.php';
+                        else: ?>
                         <div class="form-section border rounded-3 p-3 mb-3 bg-light">
                             <label class="form-label fw-semibold d-block mb-2"><?php echo isEnglish() ? 'Cooperative member?' : 'सहकारी सदस्य?'; ?></label>
                             <div class="d-flex flex-wrap gap-3">
@@ -318,7 +322,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <?php endif; ?>
 
-                        <!-- Personal Info -->
+                        <!-- Personal Info — guest only -->
+                        <?php if (!$loggedMember): ?>
                         <div class="form-section" id="personalInfoSection">
                             <h5><i class="fas fa-user"></i> <?php echo isEnglish() ? 'Personal Information' : 'व्यक्तिगत जानकारी'; ?></h5>
                             <div class="row">
@@ -332,13 +337,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" id="phoneLabel"><?php echo isEnglish() ? 'Phone' : 'फोन'; ?> <span class="text-danger required-star">*</span></label>
-                                    <!-- required attribute JS toggle ले control गर्छ — anonymous box tick गरेपछि remove हुन्छ -->
                                     <input type="tel" name="phone" id="phoneField" class="form-control"
                                            required maxlength="10" pattern="[0-9]{10}"
                                            placeholder="98XXXXXXXX">
                                 </div>
                                 <div class="col-md-6 mb-3 js-hide-if-grv-coop-yes">
-                                    <!-- Email — required for non-anonymous; JS toggle required attribute -->
                                     <label class="form-label" id="emailLabel">
                                         <?php echo isEnglish() ? 'Email' : 'इमेल'; ?>
                                         <span class="text-danger required-star" id="emailStar">*</span>
@@ -348,6 +351,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                         </div>
+                        <?php endif; /* !$loggedMember */ ?>
 
                         <!-- Grievance Details -->
                         <div class="form-section">

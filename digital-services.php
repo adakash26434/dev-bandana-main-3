@@ -349,11 +349,13 @@ require_once 'includes/header.php';
                 <!-- Request Form -->
                 <form method="POST" enctype="multipart/form-data" id="digitalServiceForm" class="needs-validation" novalidate>
                     <?php echo csrfField(); ?>
-                    <?php if ($loggedMember): ?>
-                    <div class="alert alert-success py-2 small mb-3">
-                        <i class="fas fa-user-check me-1"></i><?php echo isEnglish() ? 'Logged in — your name, member no., phone and email are taken from your profile / KYC.' : 'लगइन हुनुहुन्छ — नाम, सदस्य नं., मोबाइल र इमेल प्रोफाइल / KYC बाट लिइन्छ।'; ?>
-                    </div>
-                    <?php else: ?>
+                    <?php if ($loggedMember):
+                        $kycForDisplay = isset($kycMerge) ? $kycMerge : null;
+                        if (!$kycForDisplay) {
+                            try { $kycForDisplay = loadKycRowForLoggedMemberPublic(getDB(), $loggedMember); } catch(Throwable $e) {}
+                        }
+                        require ROOT_PATH . 'includes/member-prefill-block.php';
+                    else: ?>
                     <div class="border rounded-3 p-3 mb-3 ds-soft-bg">
                         <label class="form-label fw-semibold d-block mb-2"><?php echo isEnglish() ? 'Are you a cooperative member?' : 'तपाईं सहकारी सदस्य हुनुहुन्छ?'; ?></label>
                         <div class="d-flex flex-wrap gap-3">
@@ -363,54 +365,49 @@ require_once 'includes/header.php';
                     </div>
                     <?php endif; ?>
 
-                    <!-- Section: व्यक्तिगत जानकारी -->
+                    <!-- Section: व्यक्तिगत जानकारी — guest only -->
+                    <?php if (!$loggedMember): ?>
                     <div class="form-card-title mb-3">
                         <i class="fas fa-user"></i>
                         <?php echo isEnglish() ? 'Personal Information' : 'व्यक्तिगत जानकारी'; ?>
                     </div>
                     <div class="row g-3 mb-4">
-                        <!-- पूरा नाम -->
                         <div class="col-md-6 js-ds-name-wrap">
                             <label class="form-label"><?php echo isEnglish() ? 'Full Name' : 'पूरा नाम'; ?> <span class="req">*</span></label>
                             <input type="text" name="requester_name" class="form-control js-ds-personal" required
                                    placeholder="<?php echo isEnglish() ? 'Your full name' : 'तपाईंको पूरा नाम'; ?>"
-                                   value="<?php echo e($_POST['requester_name'] ?? ($loggedMember['name'] ?? '')); ?>" <?php echo $lockedMemberFields; ?>>
+                                   value="<?php echo e($_POST['requester_name'] ?? ''); ?>">
                         </div>
-                        <!-- सदस्य नं. -->
                         <div class="col-md-6">
                             <label class="form-label">
                                 <?php echo isEnglish() ? 'Member No.' : 'सदस्य नं.'; ?>
                                 <span class="ds-req-mark js-ds-mid-req ds-mid-req">*</span>
-                                <small class="ds-muted js-ds-mid-opt">(<?php echo isEnglish() ? 'optional' : 'ऐच्छिक'; ?>)</small>
+                                <small class="ds-muted js-ds-mid-opt">(<?php echo isEnglish() ? 'optional' : 'ऌच्छिक'; ?>)</small>
                             </label>
                             <input type="text" name="member_id" class="form-control js-ds-mid"
                                    placeholder="<?php echo isEnglish() ? 'e.g. 12345' : 'जस्तै: १२३४५'; ?>"
-                                   value="<?php echo e($_POST['member_id'] ?? ($loggedMember['sadasyata_number'] ?? '')); ?>" <?php echo $lockedMemberFields; ?>>
+                                   value="<?php echo e($_POST['member_id'] ?? ''); ?>">
                         </div>
-                        <!-- मोबाइल नम्बर -->
                         <div class="col-md-6 js-hide-if-ds-coop-yes">
                             <label class="form-label"><?php echo isEnglish() ? 'Mobile Number' : 'मोबाइल नम्बर'; ?> <span class="req">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
                                 <input type="tel" name="phone" class="form-control js-ds-personal" required
                                        placeholder="9827157000" pattern="[0-9]{10}" maxlength="10"
-                                       value="<?php echo e($_POST['phone'] ?? ($loggedMember['phone'] ?? '')); ?>" <?php echo $lockedMemberFields; ?>>
+                                       value="<?php echo e($_POST['phone'] ?? ''); ?>">
                             </div>
-                            <small class="ds-muted"><?php echo isEnglish() ? '10-digit mobile number' : '१० अंकको मोबाइल नम्बर'; ?></small>
                         </div>
-                        <!-- इमेल -->
                         <div class="col-md-6 js-hide-if-ds-coop-yes">
                             <label class="form-label"><?php echo isEnglish() ? 'Email Address' : 'इमेल ठेगाना'; ?> <span class="req">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                 <input type="email" name="email" class="form-control js-ds-personal" required
                                        placeholder="akashpame@gmail.com"
-                                       value="<?php echo e($_POST['email'] ?? ($loggedMember['email'] ?? '')); ?>" <?php echo $lockedMemberFields; ?>>
+                                       value="<?php echo e($_POST['email'] ?? ''); ?>">
                             </div>
-                            <small class="ds-muted"><?php echo isEnglish() ? 'Required for status notifications' : 'Status सूचनाको लागि अनिवार्य'; ?></small>
                         </div>
                     </div>
-                    <?php if (!$loggedMember): ?>
+                    <?php endif; /* !$loggedMember */?>
                     <script>
                     (function(){
                       function syncDsCoop(){
