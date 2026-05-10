@@ -239,6 +239,7 @@ if ($result && !empty($result['ok'])) {
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=9">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/eye-candy-verify-v7.css?v=11">
 <?php @require_once __DIR__ . '/assets/css/_color-vars.php'; ?>
+<link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/global-unify-v2.css?v=1">
 <style>
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 body {

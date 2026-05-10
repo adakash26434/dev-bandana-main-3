@@ -166,6 +166,7 @@ try {
 <title><?php echo htmlspecialchars($pageTitle); ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <?php if (function_exists('memberHeadAssets')) memberHeadAssets(); ?>
+<link rel="stylesheet" href="<?php echo $_siteUrl; ?>assets/css/global-unify-v2.css?v=1">
 <link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/member.css?v=9.9">
 <link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/member-portal-v2.css?v=1">
 <link rel="stylesheet" href="<?php echo $_siteUrl; ?>member/assets/eye-candy-v7.css?v=7">

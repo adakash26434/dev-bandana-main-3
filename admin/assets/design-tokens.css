@@ -5,11 +5,12 @@
    ============================================================ */
 
 :root {
-  /* Brand */
-  --brand-primary: #0d5c2e;
-  --brand-primary-hover: #0a4a25;
-  --brand-primary-glow: #1a8754;
-  --brand-accent: #f4b400;
+  /* Brand — bridged to global dynamic vars from _color-vars.php + design-tokens.css
+     Admin Settings बाट primary_color बदल्दा यिनले automatically follow गर्छन् */
+  --brand-primary:      var(--primary-color,      #0d5c2e);
+  --brand-primary-hover:var(--primary-dark,        #0a4a25);
+  --brand-primary-glow: var(--primary-light,       #1a8754);
+  --brand-accent:       var(--accent-color,        #f4b400);
   --brand-gradient: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-glow));
 
   /* Surfaces */
@@ -63,7 +64,7 @@
   --shadow-focus: 0 0 0 3px rgba(26, 135, 84, 0.18);
 
   /* Typography */
-  --font-sans: "Mukta", "Noto Sans Devanagari", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-primary, "Mukta", "Noto Sans Devanagari", -apple-system, "Segoe UI", Roboto, sans-serif);
   --fs-xs: 12px;
   --fs-sm: 13px;
   --fs-base: 14px;

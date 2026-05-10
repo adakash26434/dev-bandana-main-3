@@ -34,10 +34,10 @@ $_apSiteName = function_exists('getSetting') ? getSetting('site_name', 'Admin Pa
 <meta name="theme-color" content="var(--primary-dark)">
 <title><?= htmlspecialchars($page_title) ?> · आकाश डिजिटल सहकारी</title>
 <link rel="stylesheet" href="<?= $base ?>/assets/design-tokens.css?v=10.0">
+<?php if (function_exists('getSetting')) require ROOT_PATH . 'assets/css/_color-vars.php'; ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- UI Uniformity Fix — Global consistency across all interfaces -->
-<link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/ui-uniformity-fix.css?v=1">
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<?= SITE_URL ?>assets/css/global-unify-v2.css?v=1">
 </head>
 <body class="admin-shell">
 
