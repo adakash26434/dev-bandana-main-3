@@ -126,6 +126,11 @@ body {
     box-shadow: var(--adm-shadow-xs) !important;
     transition: box-shadow .2s ease !important;
 }
+
+.ds-section {
+    padding: 18px 22px !important;
+    margin-bottom: 18px !important;
+}
 .card:hover {
     box-shadow: var(--adm-shadow-sm) !important;
 }
