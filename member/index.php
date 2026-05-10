@@ -126,10 +126,10 @@ $greeting = $hour < 12 ? $_t('शुभ बिहान', 'Good Morning') : ($ho
 
 /* सबै Quick Apply → /member/ भित्र (कल्याण = native welfare.php, बाँकी = apply-frame) */
 $quickActions = [
-    ['href' => $siteUrl.'member/apply-frame.php?p=appointment', 'icon' => 'fa-calendar-check',     'color' => 'var(--primary-color)', 'label' => $_t('भेटघाट', 'Appointment')],
+    ['href' => $siteUrl.'member/appointment.php',               'icon' => 'fa-calendar-check',     'color' => 'var(--primary-color)', 'label' => $_t('भेटघाट', 'Appointment')],
     ['href' => $siteUrl.'member/kyc.php',                        'icon' => 'fa-id-card',             'color' => 'var(--secondary-color)', 'label' => $_t('KYC दर्ता', 'KYC Registration')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=loan',        'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark)', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
-    ['href' => $siteUrl.'member/apply-frame.php?p=account',     'icon' => 'fa-university',          'color' => 'var(--primary-color)', 'label' => $_t('खाता खोल्ने', 'Open Account')],
+    ['href' => $siteUrl.'member/loan-apply.php',               'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark)', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
+    ['href' => $siteUrl.'member/account-apply.php',            'icon' => 'fa-university',          'color' => 'var(--primary-color)', 'label' => $_t('खाता खोल्ने', 'Open Account')],
     ['href' => $siteUrl.'member/apply-frame.php?p=digital',     'icon' => 'fa-laptop',              'color' => 'var(--secondary-color)', 'label' => $_t('डिजिटल सेवा', 'Digital Service')],
     ['href' => $siteUrl.'member/apply-frame.php?p=grievance',   'icon' => 'fa-comment-exclamation', 'color' => 'var(--secondary-color)', 'label' => $_t('गुनासो', 'Grievance')],
     ['href' => $siteUrl.'member/welfare.php',                   'icon' => 'fa-heart',               'color' => 'var(--secondary-color)', 'label' => $_t('कल्याण', 'Welfare')],
@@ -276,8 +276,8 @@ require __DIR__ . '/includes/chrome.php';
                 $digitalServices = array_merge($digitalServices, [
                     ['icon'=>'fa-mobile-screen-button','color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>$_t('मोबाइल बैंकिङ','Mobile Banking'),  'href'=>$siteUrl.'member/apply-frame.php?p=digital', 'desc'=>$_t('कुनै पनि समय बैंकिङ','Anytime banking')],
                     ['icon'=>'fa-qrcode',              'color'=>'var(--secondary-dark)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>$_t('QR भुक्तानी','QR Payment'),         'href'=>$siteUrl.'member/apply-frame.php?p=digital', 'desc'=>$_t('छिटो भुक्तानी','Quick payment')],
-                    ['icon'=>'fa-file-invoice-dollar', 'color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>$_t('अनलाइन ऋण','Online Loan'),           'href'=>$siteUrl.'member/apply-frame.php?p=loan',    'desc'=>$_t('घरबाटै ऋण आवेदन','Apply loan from home')],
-                    ['icon'=>'fa-piggy-bank',          'color'=>'var(--secondary-dark)','bg'=>'color-mix(in srgb, var(--secondary-color) 10%, white)','label'=>$_t('अनलाइन बचत','Online Bachat'),      'href'=>$siteUrl.'member/apply-frame.php?p=account', 'desc'=>$_t('बचत खाता Online','Online savings account')],
+                    ['icon'=>'fa-file-invoice-dollar', 'color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>$_t('अनलाइन ऋण','Online Loan'),           'href'=>$siteUrl.'member/loan-apply.php',            'desc'=>$_t('घरबाटै ऋण आवेदन','Apply loan from home')],
+                    ['icon'=>'fa-piggy-bank',          'color'=>'var(--secondary-dark)','bg'=>'color-mix(in srgb, var(--secondary-color) 10%, white)','label'=>$_t('अनलाइन बचत','Online Bachat'),      'href'=>$siteUrl.'member/account-apply.php',         'desc'=>$_t('बचत खाता Online','Online savings account')],
                     ['icon'=>'fa-headset',             'color'=>'var(--secondary-color)','bg'=>'color-mix(in srgb, var(--secondary-color) 12%, white)','label'=>$_t('सेवा सहायता','24/7 Support'),     'href'=>$siteUrl.'member/service-request.php',       'desc'=>$_t('सहायता अनुरोध','Request support')],
                     ['icon'=>'fa-id-card',             'color'=>'var(--primary-color)','bg'=>'color-mix(in srgb, var(--primary-color) 12%, white)','label'=>'Digital ID Card',   'href'=>$siteUrl.'member/id-card.php',
                      'desc'=>$mem['id_card_generated'] ? $_t('ID Card हेर्नुहोस्','View ID card') : $_t('Admin Generate गर्दैछन्','Pending admin generation')],

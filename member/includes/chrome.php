@@ -109,10 +109,10 @@ $_active = $_self === 'index.php' || $_self === ''  ? 'dashboard'
         : ($_self === 'scan.php'                    ? 'scan'
         : ($_self === 'attend.php'                  ? 'attend'
         : ($_self === 'service-request.php'         ? 'service'
-        : ($_applyFrameP === 'loan'                 ? 'apply-loan'
-        : ($_applyFrameP === 'account'              ? 'apply-account'
+        : ($_self === 'appointment.php'             ? 'apply-appointment'
+        : ($_self === 'loan-apply.php'              ? 'apply-loan'
+        : ($_self === 'account-apply.php'           ? 'apply-account'
         : ($_applyFrameP === 'grievance'            ? 'apply-grievance'
-        : ($_applyFrameP === 'appointment'          ? 'apply-appointment'
         : ($_applyFrameP === 'digital'              ? 'apply-digital' : ''))))))))))))));
 
 /* Notifications for bell */
@@ -313,9 +313,9 @@ try {
         <a href="<?php echo $_siteUrl; ?>member/scan.php" class="mem-nav-item <?php echo $_active==='scan'?'active':''; ?>"><i class="fas fa-qrcode"></i><?php echo $_t('QR स्क्यान', 'QR Scan'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/attend.php" class="mem-nav-item <?php echo $_active==='attend'?'active':''; ?>"><i class="fas fa-calendar-check"></i><?php echo $_t('उपस्थिति', 'Attendance'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/service-request.php" class="mem-nav-item <?php echo $_active==='service'?'active':''; ?>"><i class="fas fa-concierge-bell"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=appointment" class="mem-nav-item <?php echo $_active==='apply-appointment'?'active':''; ?>"><i class="fas fa-calendar-check"></i><?php echo $_t('भेटघाट', 'Appointment'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=loan" class="mem-nav-item <?php echo $_active==='apply-loan'?'active':''; ?>"><i class="fas fa-hand-holding-dollar"></i><?php echo $_t('ऋण आवेदन', 'Loan Apply'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=account" class="mem-nav-item <?php echo $_active==='apply-account'?'active':''; ?>"><i class="fas fa-landmark"></i><?php echo $_t('खाता खोल्ने', 'Open Account'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/appointment.php" class="mem-nav-item <?php echo $_active==='apply-appointment'?'active':''; ?>"><i class="fas fa-calendar-check"></i><?php echo $_t('भेटघाट', 'Appointment'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/loan-apply.php" class="mem-nav-item <?php echo $_active==='apply-loan'?'active':''; ?>"><i class="fas fa-hand-holding-dollar"></i><?php echo $_t('ऋण आवेदन', 'Loan Apply'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/account-apply.php" class="mem-nav-item <?php echo $_active==='apply-account'?'active':''; ?>"><i class="fas fa-landmark"></i><?php echo $_t('खाता खोल्ने', 'Open Account'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=digital" class="mem-nav-item <?php echo $_active==='apply-digital'?'active':''; ?>"><i class="fas fa-laptop"></i><?php echo $_t('डिजिटल सेवा', 'Digital Service'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=grievance" class="mem-nav-item <?php echo $_active==='apply-grievance'?'active':''; ?>"><i class="fas fa-comment-exclamation"></i><?php echo $_t('गुनासो', 'Grievance'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/certificate.php" class="mem-nav-item <?php echo $_active==='certificate'?'active':''; ?>"><i class="fas fa-certificate"></i><?php echo $_t('प्रमाणपत्र', 'Certificates'); ?></a>
