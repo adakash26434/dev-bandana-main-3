@@ -435,54 +435,44 @@ function getNepaliMonthName($monthKey) {
 }
 
 // Format date in Nepali style (for display)
-// Note: This is a simplified approximation. For accurate BS date conversion,
-// use a proper Nepali date library like NepaliCalendar
+// Uses accurate BS conversion via nepali_ad_to_bs_string() when available.
 function formatNepaliDate($date, $showTime = false) {
     if (empty($date)) return '';
 
     $timestamp = strtotime($date);
     if ($timestamp === false) return $date;
 
-    $year = date('Y', $timestamp);
-    $month = date('n', $timestamp);
-    $day = date('j', $timestamp);
+    $adYmd = date('Y-m-d', $timestamp);
 
-    // Correct BS year conversion based on month
-    // Nepali New Year (Baisakh 1) falls around April 13-14
-    // January 1 to ~April 13: BS year = AD year + 56
-    // ~April 14 onwards: BS year = AD year + 57
-    if ($month < 4 || ($month == 4 && $day < 14)) {
-        $nepaliYear = $year + 56;
-    } else {
-        $nepaliYear = $year + 57;
-    }
-
-    // Approximate Nepali month based on Gregorian date
-    // Each Nepali month starts around mid of Gregorian month
-    $nepaliMonthMap = [
-        1 => ['month' => 'पुष', 'switch_day' => 14, 'next' => 'माघ'],      // Jan: Poush -> Magh ~14th
-        2 => ['month' => 'माघ', 'switch_day' => 12, 'next' => 'फागुन'],    // Feb: Magh -> Falgun ~12th
-        3 => ['month' => 'फागुन', 'switch_day' => 14, 'next' => 'चैत्र'],  // Mar: Falgun -> Chaitra ~14th
-        4 => ['month' => 'चैत्र', 'switch_day' => 13, 'next' => 'बैशाख'],  // Apr: Chaitra -> Baisakh ~13th
-        5 => ['month' => 'बैशाख', 'switch_day' => 14, 'next' => 'जेठ'],    // May: Baisakh -> Jestha ~14th
-        6 => ['month' => 'जेठ', 'switch_day' => 15, 'next' => 'असार'],     // Jun: Jestha -> Ashadh ~15th
-        7 => ['month' => 'असार', 'switch_day' => 16, 'next' => 'श्रावण'],  // Jul: Ashadh -> Shrawan ~16th
-        8 => ['month' => 'श्रावण', 'switch_day' => 17, 'next' => 'भदौ'],   // Aug: Shrawan -> Bhadra ~17th
-        9 => ['month' => 'भदौ', 'switch_day' => 17, 'next' => 'असोज'],     // Sep: Bhadra -> Ashwin ~17th
-        10 => ['month' => 'असोज', 'switch_day' => 17, 'next' => 'कात्तिक'], // Oct: Ashwin -> Kartik ~17th
-        11 => ['month' => 'कात्तिक', 'switch_day' => 16, 'next' => 'मंसिर'], // Nov: Kartik -> Mangsir ~16th
-        12 => ['month' => 'मंसिर', 'switch_day' => 15, 'next' => 'पुष']     // Dec: Mangsir -> Poush ~15th
+    static $_bsMonthNames = [
+        1 => 'बैशाख', 2 => 'जेठ',    3 => 'असार',
+        4 => 'श्रावण', 5 => 'भदौ',   6 => 'असोज',
+        7 => 'कात्तिक', 8 => 'मंसिर', 9 => 'पुष',
+        10 => 'माघ',  11 => 'फागुन', 12 => 'चैत्र',
     ];
 
-    $monthData = $nepaliMonthMap[$month];
-    $nepaliMonthName = ($day < $monthData['switch_day']) ? $monthData['month'] : $monthData['next'];
+    if (function_exists('nepali_ad_to_bs_string')) {
+        $bsYmd = nepali_ad_to_bs_string($adYmd);
+        if ($bsYmd) {
+            [$bsY, $bsM, $bsD] = array_map('intval', explode('-', $bsYmd));
+            $formatted = toNepaliNumeral($bsY) . ' ' . ($_bsMonthNames[$bsM] ?? $bsM) . ' ' . toNepaliNumeral($bsD);
+            if ($showTime) {
+                $formatted .= ' ' . toNepaliNumeral(date('H:i', $timestamp));
+            }
+            return $formatted;
+        }
+    }
 
+    // Fallback: simple approximation (only used if converter not loaded)
+    $year  = (int) date('Y', $timestamp);
+    $month = (int) date('n', $timestamp);
+    $day   = (int) date('j', $timestamp);
+    $nepaliYear = ($month < 4 || ($month == 4 && $day < 14)) ? $year + 56 : $year + 57;
+    $nepaliMonthName = $_bsMonthNames[min(12, max(1, (($month + 8) % 12) + 1))] ?? 'बैशाख';
     $formatted = toNepaliNumeral($nepaliYear) . ' ' . $nepaliMonthName . ' ' . toNepaliNumeral($day);
-
     if ($showTime) {
         $formatted .= ' ' . toNepaliNumeral(date('H:i', $timestamp));
     }
-
     return $formatted;
 }
 
