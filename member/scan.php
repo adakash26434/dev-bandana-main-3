@@ -145,8 +145,8 @@ require __DIR__ . '/includes/chrome.php';
 
 <main class="mp-main">
 <div class="mp-container mp-container-narrow scan-wrap">
-  <h1 style="font-size:1.2rem;font-weight:800;color:var(--primary-color,#1a8754);margin:0 0 10px;">
-    <i class="fas fa-qrcode" style="margin-right:8px;"></i><?php echo $_t('कार्यक्रम QR स्क्यान', 'Program QR Scan'); ?>
+  <h1 class="mem-page-title">
+    <i class="fas fa-qrcode"></i><?php echo $_t('कार्यक्रम QR स्क्यान', 'Program QR Scan'); ?>
   </h1>
 
   <div class="scan-hero">
@@ -154,14 +154,13 @@ require __DIR__ . '/includes/chrome.php';
     <strong><?php echo $_t('Check-in / OK', 'Check-in / OK'); ?></strong> <?php echo $_t('थिच्नुहोस् — उपस्थिति Admin र तपाईंको', '— attendance goes to admin and your'); ?> <strong><?php echo $_t('उपस्थिति इतिहास', 'attendance history'); ?></strong><?php echo $_t('मा जान्छ। (Pre-registration मात्र उपस्थिति होइन।)', '. (Pre-registration alone is not attendance.)'); ?>
   </div>
 
-  <div id="scan-reader">
-    <div id="scan-loading" style="display:none;"><i class="fas fa-spinner"></i><?php echo $_t('क्यामेरा खुल्दैछ…', 'Opening camera…'); ?></div>
-  </div>
+  <div id="scan-loading" style="display:none;text-align:center;padding:20px;color:var(--text-muted,#6b7280);font-size:.88rem;"><i class="fas fa-spinner" style="animation:spin 1s linear infinite;display:block;font-size:1.8rem;margin-bottom:8px;"></i><?php echo $_t('क्यामेरा खुल्दैछ…', 'Opening camera…'); ?></div>
+  <div id="scan-reader"></div>
   <div id="scan-err" class="scan-err" role="alert"></div>
   <div id="scan-success" class="scan-success"></div>
 
   <div class="scan-actions">
-    <button type="button" class="scan-btn-start" id="scanStart" style="display:flex;font-size:1.05rem;padding:16px 20px;"><i class="fas fa-camera"></i><?php echo $_t('क्यामेरा सुरु गर्नुहोस् — ट्याप गर्नुहोस्', 'Tap to Start Camera'); ?></button>
+    <button type="button" class="mem-submit-btn" id="scanStart" style="font-size:1rem;"><i class="fas fa-camera"></i><?php echo $_t('क्यामेरा सुरु गर्नुहोस् — ट्याप गर्नुहोस्', 'Tap to Start Camera'); ?></button>
     <button type="button" class="scan-btn-stop" id="scanStop" style="display:none;"><i class="fas fa-stop"></i><?php echo $_t('रोक्नुहोस्', 'Stop'); ?></button>
   </div>
 
@@ -284,6 +283,7 @@ require __DIR__ . '/includes/chrome.php';
     btnStart.disabled = true;
     btnStart.style.display = 'none';
     if (loadEl) loadEl.style.display = 'block';
+    readerEl.innerHTML = '';
     html5Qr = new Html5Qrcode('scan-reader');
     var cfg = { fps: 12, qrbox: qrboxSize(), aspectRatio: 1.0 };
     html5Qr.start(
