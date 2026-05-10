@@ -1113,7 +1113,8 @@ if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
     header('X-XSS-Protection: 1; mode=block');
     header('Referrer-Policy: strict-origin-when-cross-origin');
-    /* KYC / verify जस्ता सुविधाको लागि same-origin mic+camera */
+    /* KYC / QR scan / verify — camera must be allowed on same-origin
+       Both old (allowlist) and new (structured) syntax sent for max compatibility */
     header('Permissions-Policy: geolocation=(), microphone=(self), camera=(self), payment=(), usb=()');
     $_httpsOn = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off' && (string)$_SERVER['HTTPS'] !== '0')
         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
@@ -1124,7 +1125,8 @@ if (!headers_sent()) {
     /* CSP report-only — बिस्तारै enforce गर्न लग मोनिटर गर्न */
     header(
         "Content-Security-Policy-Report-Only: default-src 'self'; "
-        . "img-src 'self' data: https:; "
+        . "img-src 'self' data: blob: https:; "
+        . "media-src 'self' blob:; "
         . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
         . "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "

@@ -21,6 +21,9 @@ $pageTitle = $_t('कार्यक्रम QR स्क्यान', 'Progra
 $base      = rtrim(SITE_URL, '/') . '/';
 
 $extraHead = <<<'HTML'
+<!-- iOS Safari camera permission hint -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
 .scan-wrap { margin: 0 auto; }
 .scan-hero {
@@ -173,48 +176,52 @@ require __DIR__ . '/includes/chrome.php';
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function(){
-  var base      = <?= json_encode($base, JSON_UNESCAPED_SLASHES) ?>;
-  var readerEl  = document.getElementById('scan-reader');
-  var errEl     = document.getElementById('scan-err');
-  var successEl = document.getElementById('scan-success');
-  var loadEl    = document.getElementById('scan-loading');
-  var btnStart  = document.getElementById('scanStart');
-  var btnStop   = document.getElementById('scanStop');
-  var html5Qr   = null;
-  var busy      = false;
+  'use strict';
+  var base       = <?= json_encode($base, JSON_UNESCAPED_SLASHES) ?>;
+  var readerEl   = document.getElementById('scan-reader');
+  var errEl      = document.getElementById('scan-err');
+  var successEl  = document.getElementById('scan-success');
+  var loadEl     = document.getElementById('scan-loading');
+  var btnStart   = document.getElementById('scanStart');
+  var btnStop    = document.getElementById('scanStop');
+  var html5Qr    = null;
+  var busy       = false;
   var camRunning = false;
 
-  var msgInvalid = <?= json_encode($_t('यो QR मान्य छैन। Admin ले बनाएको कार्यक्रम QR प्रयोग गर्नुहोस्।', 'This QR is not valid. Use admin-generated program QR.')) ?>;
-  var msgLib     = <?= json_encode($_t('स्क्यान लाइब्रेरी लोड हुन सकेन। Internet जाँच गरी पुनः प्रयास गर्नुहोस्।', 'Scanner library failed to load. Check internet and retry.')) ?>;
-  var msgCam     = <?= json_encode($_t('क्यामेरा खोल्न सकिएन।', 'Unable to open camera.')) ?>;
-  var msgPerm    = <?= json_encode($_t('क्यामेरा अनुमति अस्वीकार भयो। Browser Settings मा गई Camera अनुमति दिनुहोस् र पुनः प्रयास गर्नुहोस्।', 'Camera permission denied. Go to Browser Settings, allow Camera, then retry.')) ?>;
-  var msgHttps   = <?= json_encode($_t('क्यामेरा HTTPS मा मात्र काम गर्छ। Secure connection प्रयोग गर्नुहोस्।', 'Camera only works over HTTPS. Use a secure connection.')) ?>;
-  var msgRetry   = <?= json_encode($_t('पुनः प्रयास', 'Retry')) ?>;
-  var msgScanning = <?= json_encode($_t('QR खोज्दैछ… कार्यक्रम QR सामु राख्नुहोस्।', 'Scanning… Hold program QR in front of camera.')) ?>;
-  var msgFound   = <?= json_encode($_t('QR फेला पर्यो! जाँदैछ…', 'QR found! Redirecting…')) ?>;
+  /* ── Translated strings ── */
+  var msgInvalid  = <?= json_encode($_t('यो QR मान्य छैन। Admin ले बनाएको कार्यक्रम QR प्रयोग गर्नुहोस्।', 'This QR is not valid. Use admin-generated program QR.')) ?>;
+  var msgLib      = <?= json_encode($_t('स्क्यान लाइब्रेरी लोड हुन सकेन। Internet जाँच गरी पुनः प्रयास गर्नुहोस्।', 'Scanner library failed to load. Check internet and retry.')) ?>;
+  var msgCam      = <?= json_encode($_t('क्यामेरा खोल्न सकिएन।', 'Unable to open camera.')) ?>;
+  var msgPerm     = <?= json_encode($_t('क्यामेरा अनुमति अस्वीकार भयो।\nBrowser Settings → Site Settings → Camera → Allow गर्नुहोस् र पुनः प्रयास गर्नुहोस्।', 'Camera permission denied.\nGo to Browser Settings → Site Settings → Camera → Allow, then retry.')) ?>;
+  var msgHttps    = <?= json_encode($_t('क्यामेरा HTTPS मा मात्र काम गर्छ। Secure connection प्रयोग गर्नुहोस्।', 'Camera only works over HTTPS. Use a secure connection.')) ?>;
+  var msgRetry    = <?= json_encode($_t('पुनः प्रयास', 'Retry')) ?>;
+  var msgFound    = <?= json_encode($_t('QR फेला पर्यो! जाँदैछ…', 'QR found! Redirecting…')) ?>;
+  var msgIosPerm  = <?= json_encode($_t('iPhone/iPad: Safari → Settings (⚙) → Camera → Allow गर्नुहोस् र फेरि ट्याप गर्नुहोस्।', 'iPhone/iPad: Go to Safari → Settings (⚙) → Camera → Allow, then tap again.')) ?>;
 
-  function showErr(msg) {
-    errEl.innerHTML = msg +
-      '<br><button class="scan-err-retry" onclick="retryCamera()">' + msgRetry + '</button>';
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isAndroid = /android/i.test(navigator.userAgent);
+
+  function showErr(msg, extraHtml) {
+    errEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i>' +
+      msg.replace(/\n/g, '<br>') +
+      (extraHtml ? '<br>' + extraHtml : '') +
+      '<br><button class="scan-err-retry" style="margin-top:10px;" onclick="retryCamera()">' +
+      '<i class="fas fa-rotate-right" style="margin-right:5px;"></i>' + msgRetry + '</button>';
     errEl.style.display = 'block';
     successEl.style.display = 'none';
     if (loadEl) loadEl.style.display = 'none';
     readerEl.classList.remove('scanning');
+    btnStart.disabled = false;
+    btnStart.style.display = 'flex';
+    btnStop.style.display = 'none';
   }
-  function hideErr() {
-    errEl.style.display = 'none';
-    errEl.innerHTML = '';
-  }
-  function showSuccess(msg) {
-    successEl.textContent = msg;
-    successEl.style.display = 'block';
-  }
+  function hideErr() { errEl.style.display = 'none'; errEl.innerHTML = ''; }
+  function showSuccess(msg) { successEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px;"></i>' + msg; successEl.style.display = 'block'; }
 
-  /* Responsive qrbox — 70% of the reader element width, min 200, max 300 */
   function qrboxSize() {
     var w = Math.min(readerEl.clientWidth || 280, 400);
     var s = Math.round(w * 0.72);
-    return { width: Math.max(180, Math.min(s, 300)), height: Math.max(180, Math.min(s, 300)) };
+    return { width: Math.max(180, Math.min(s, 280)), height: Math.max(180, Math.min(s, 280)) };
   }
 
   function extractToken(text) {
@@ -227,7 +234,6 @@ require __DIR__ . '/includes/chrome.php';
         var clean = String(q).replace(/[^a-zA-Z0-9_-]/g, '');
         return /^[a-zA-Z0-9_-]{8,80}$/.test(clean) ? clean : '';
       }
-      return '';
     } catch (e) {}
     if (/^[a-zA-Z0-9_-]{8,80}$/.test(t)) return t;
     var parts = t.split(':');
@@ -243,14 +249,9 @@ require __DIR__ . '/includes/chrome.php';
     busy = true;
     hideErr();
     var token = extractToken(decodedText);
-    if (!token) {
-      showErr(msgInvalid);
-      busy = false;
-      return;
-    }
+    if (!token) { showErr(msgInvalid); busy = false; return; }
     showSuccess(msgFound);
     readerEl.classList.remove('scanning');
-    /* Stop camera then redirect */
     stopCamera(function() {
       window.location.href = base + 'member/attend.php?qr_token=' + encodeURIComponent(token) + '&auto=1';
     });
@@ -258,40 +259,74 @@ require __DIR__ . '/includes/chrome.php';
 
   function stopCamera(cb) {
     if (!html5Qr) { camRunning = false; if (cb) cb(); return; }
-    html5Qr.stop().then(function() {
-      try { if (typeof html5Qr.clear === 'function') html5Qr.clear(); } catch(e) {}
-      html5Qr = null; camRunning = false;
-      btnStop.style.display = 'none';
-      btnStart.style.display = 'flex';
+    var q = html5Qr; html5Qr = null; camRunning = false;
+    q.stop().then(function() {
+      try { if (typeof q.clear === 'function') q.clear(); } catch(e) {}
+      btnStop.style.display = 'none'; btnStart.style.display = 'flex';
       if (cb) cb();
     }).catch(function() {
-      html5Qr = null; camRunning = false;
-      btnStop.style.display = 'none';
-      btnStart.style.display = 'flex';
+      btnStop.style.display = 'none'; btnStart.style.display = 'flex';
       if (cb) cb();
+    });
+  }
+
+  /* ── Camera start with 3-step fallback ──
+     Step 1: { facingMode: { exact: 'environment' } }  — rear camera explicit
+     Step 2: { facingMode: 'environment' }             — rear camera preferred
+     Step 3: true                                      — any camera (front ok)
+  */
+  function tryStart(constraints, cfg, fallbacks) {
+    var q = new Html5Qrcode('scan-reader', { verbose: false });
+    return q.start(constraints, cfg, onScanSuccess, function(){}).then(function() {
+      html5Qr = q; return true;
+    }).catch(function(e) {
+      try { if (typeof q.clear === 'function') q.clear(); } catch(ex) {}
+      if (fallbacks && fallbacks.length) {
+        readerEl.innerHTML = '';
+        return tryStart(fallbacks[0], cfg, fallbacks.slice(1));
+      }
+      throw e;
     });
   }
 
   function startCamera() {
     if (camRunning) return;
     hideErr();
+
     if (typeof Html5Qrcode === 'undefined') { showErr(msgLib); return; }
-    /* HTTPS check */
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+
+    /* HTTPS guard — skip for localhost */
+    var host = location.hostname;
+    if (location.protocol !== 'https:' && host !== 'localhost' && host !== '127.0.0.1') {
       showErr(msgHttps); return;
     }
+
+    /* getUserMedia support check */
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      var extra = isIOS ? '<br><small>' + msgIosPerm + '</small>' : '';
+      showErr(msgCam + ' (getUserMedia not supported)' + extra); return;
+    }
+
     btnStart.disabled = true;
     btnStart.style.display = 'none';
+    btnStop.style.display = 'none';
     if (loadEl) loadEl.style.display = 'block';
     readerEl.innerHTML = '';
-    html5Qr = new Html5Qrcode('scan-reader');
-    var cfg = { fps: 12, qrbox: qrboxSize(), aspectRatio: 1.0 };
-    html5Qr.start(
-      { facingMode: { ideal: 'environment' } },
-      cfg,
-      onScanSuccess,
-      function() {} /* frame error — ignore */
-    ).then(function() {
+
+    var cfg = { fps: 10, qrbox: qrboxSize(), aspectRatio: 1.0,
+                disableFlip: false, experimentalFeatures: { useBarCodeDetectorIfSupported: true } };
+
+    /* iOS Safari: { exact: 'environment' } often throws OverconstrainedError — go straight to fallback */
+    var constraints, fallbacks;
+    if (isIOS) {
+      constraints = { facingMode: 'environment' };
+      fallbacks   = [true];
+    } else {
+      constraints = { facingMode: { exact: 'environment' } };
+      fallbacks   = [{ facingMode: { ideal: 'environment' } }, { facingMode: 'environment' }, true];
+    }
+
+    tryStart(constraints, cfg, fallbacks).then(function() {
       camRunning = true;
       busy = false;
       btnStart.disabled = false;
@@ -300,33 +335,29 @@ require __DIR__ . '/includes/chrome.php';
       readerEl.classList.add('scanning');
     }).catch(function(e) {
       html5Qr = null;
-      btnStart.disabled = false;
-      btnStart.style.display = 'flex';
+      camRunning = false;
       if (loadEl) loadEl.style.display = 'none';
-      var msg = (e && e.message ? e.message : '');
-      if (/denied|not allowed|permission/i.test(msg)) {
-        showErr(msgPerm);
-      } else if (/https/i.test(msg)) {
+      var msg = (e && e.message ? String(e.message) : String(e || ''));
+      var extra = '';
+      if (/denied|not allowed|permission|NotAllowed/i.test(msg)) {
+        showErr(msgPerm, isIOS ? '<small>' + msgIosPerm + '</small>' : '');
+      } else if (/https|secure/i.test(msg)) {
         showErr(msgHttps);
+      } else if (/overconstrained|NotReadableError|TrackStart/i.test(msg)) {
+        /* camera busy (another app holding it) */
+        showErr(msgCam + '<br><small><?= addslashes($_t('अर्को App ले क्यामेरा प्रयोग गरिरहेको हुन सक्छ। ती App बन्द गरी फेरि प्रयास गर्नुहोस्।', 'Another app may be using the camera. Close other apps and retry.')) ?></small>');
       } else {
-        showErr(msgCam + (msg ? ' — ' + msg : ''));
+        extra = isIOS ? '<br><small>' + msgIosPerm + '</small>' : (isAndroid ? '<br><small><?= addslashes($_t('Chrome Settings → Site Settings → Camera → Allow गर्नुहोस्।', 'Chrome Settings → Site Settings → Camera → Allow.')) ?></small>' : '');
+        showErr(msgCam + (msg ? '<br><small>' + msg + '</small>' : '') + extra);
       }
     });
   }
 
-  window.retryCamera = function() {
-    hideErr();
-    busy = false;
-    stopCamera(function() { startCamera(); });
-  };
+  window.retryCamera = function() { hideErr(); busy = false; stopCamera(function(){ startCamera(); }); };
 
   btnStart.addEventListener('click', startCamera);
   btnStop.addEventListener('click', function() { stopCamera(); });
-
-  /* Stop camera when user leaves page (back button / tab switch) */
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) stopCamera();
-  });
+  document.addEventListener('visibilitychange', function() { if (document.hidden) stopCamera(); });
   window.addEventListener('pagehide', function() { stopCamera(); });
 })();
 </script>
