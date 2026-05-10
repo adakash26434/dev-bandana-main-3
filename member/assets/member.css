@@ -1371,6 +1371,21 @@
 }
 
 /* ── Responsive ── */
+@media (min-width: 900px) and (max-width: 1100px) {
+    /* Tablet: nav items wrap into 2 rows, tighter padding */
+    .mem-nav {
+        flex-wrap: wrap;
+        gap: 2px 1px;
+        padding: 4px 6px;
+    }
+    .mem-nav-item {
+        padding: 5px 9px;
+        font-size: 0.65rem;
+        min-width: 46px;
+    }
+    .mem-nav-item i { font-size: 0.85rem; }
+}
+
 @media (max-width: 899px) {
     /* Desktop top nav — hidden on mobile; bottom nav takes over */
     .mem-nav { display: none !important; }
