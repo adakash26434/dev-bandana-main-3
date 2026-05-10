@@ -196,7 +196,7 @@ body {
 }
 
 .table-hover tbody tr:hover td {
-    background: #f0fdf4 !important;
+    background: color-mix(in srgb, var(--primary-color,#1a5f2a) 6%, white) !important;
 }
 
 .table tbody tr:last-child td {
@@ -222,7 +222,7 @@ body {
 .btn-primary:hover {
     background: var(--primary-dark) !important;
     border-color: var(--primary-dark) !important;
-    box-shadow: 0 3px 8px rgba(26,95,42,.25) !important;
+    box-shadow: 0 3px 8px rgba(var(--primary-rgb,26,95,42),.25) !important;
     transform: translateY(-1px) !important;
 }
 
@@ -269,7 +269,7 @@ body {
 .form-control:focus,
 .form-select:focus {
     border-color: var(--primary-color) !important;
-    box-shadow: 0 0 0 3px rgba(26,95,42,.12) !important;
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb,26,95,42),.12) !important;
     outline: none !important;
 }
 
@@ -363,7 +363,7 @@ body {
 }
 .nav-tabs .nav-link:hover {
     color: var(--primary-color) !important;
-    border-bottom-color: rgba(26,95,42,.3) !important;
+    border-bottom-color: rgba(var(--primary-rgb,26,95,42),.3) !important;
     background: transparent !important;
 }
 .nav-tabs .nav-link.active {
@@ -393,14 +393,14 @@ body {
    14. HELP TIP BOX — Non-developer guidance
    ═══════════════════════════════════════════════════ */
 .admin-help-tip {
-    background: #f0fdf4;
-    border: 1px solid #86efac;
+    background: color-mix(in srgb, var(--primary-color,#1a5f2a) 8%, white);
+    border: 1px solid color-mix(in srgb, var(--primary-color,#1a5f2a) 30%, white);
     border-left: 4px solid var(--primary-color);
     border-radius: var(--adm-radius-sm);
     padding: 12px 16px;
     margin-bottom: 18px;
     font-size: .88rem;
-    color: #14532d;
+    color: var(--primary-dark,#0a4a25);
     display: flex;
     gap: 10px;
     align-items: flex-start;
@@ -409,7 +409,7 @@ body {
     flex-shrink: 0;
     width: 22px;
     height: 22px;
-    background: var(--primary-color);
+    background: var(--primary-color,#1a5f2a);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -608,16 +608,16 @@ hr { border-color: var(--adm-border) !important; opacity: 1 !important; }
 
 .nav-tabs .nav-link:hover,
 .admin-nav-tabs .nav-link:hover {
-    background: #f3f7f4 !important;
-    border-color: #bfcac2 !important;
-    color: #14532d !important;
+    background: color-mix(in srgb, var(--primary-color,#1a5f2a) 8%, white) !important;
+    border-color: color-mix(in srgb, var(--primary-color,#1a5f2a) 35%, white) !important;
+    color: var(--primary-dark, #0a4a25) !important;
 }
 
 .nav-tabs .nav-link.active,
 .admin-nav-tabs .nav-link.active {
-    background: #eaf6ef !important;
-    border-color: #7ab88f !important;
-    color: #14532d !important;
+    background: color-mix(in srgb, var(--primary-color,#1a5f2a) 14%, white) !important;
+    border-color: color-mix(in srgb, var(--primary-color,#1a5f2a) 55%, white) !important;
+    color: var(--primary-dark, var(--primary-color, #0a4a25)) !important;
     box-shadow: none !important;
 }
 
@@ -646,8 +646,8 @@ textarea.form-control {
 .form-control:focus,
 .form-select:focus,
 textarea.form-control:focus {
-    border-color: #2f8f55 !important;
-    box-shadow: 0 0 0 2px rgba(47, 143, 85, 0.12) !important;
+    border-color: var(--primary-color, #2f8f55) !important;
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb,26,95,42), 0.12) !important;
 }
 
 .row.g-2 > [class*="col-"],
@@ -670,14 +670,14 @@ textarea.form-control:focus {
 
 .btn-primary,
 .btn-success {
-    background: #1f7a46 !important;
-    border-color: #1f7a46 !important;
+    background: var(--primary-color, #1f7a46) !important;
+    border-color: var(--primary-color, #1f7a46) !important;
 }
 
 .btn-primary:hover,
 .btn-success:hover {
-    background: #176238 !important;
-    border-color: #176238 !important;
+    background: var(--primary-dark, #176238) !important;
+    border-color: var(--primary-dark, #176238) !important;
 }
 
 .btn-outline-danger {
@@ -706,7 +706,7 @@ textarea.form-control:focus {
 }
 
 .admin-page-header i:not(.btn i):not(.badge i) {
-    color: #1f7a46 !important;
+    color: var(--primary-color, #1f7a46) !important;
 }
 
 .admin-page-header-icon {

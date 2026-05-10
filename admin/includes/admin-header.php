@@ -260,11 +260,11 @@ set_exception_handler(function (\Throwable $ex) {
     <link rel="stylesheet" href="../assets/css/admin-tokens.css?v=3">
     <?php @require_once __DIR__ . '/../../assets/css/_color-vars.php'; ?>
     <!-- Global Unify v2 — consistent color/font/form across all panels -->
-    <link rel="stylesheet" href="../assets/css/global-unify-v2.css?v=1">
+    <link rel="stylesheet" href="../assets/css/global-unify-v2.css?v=2">
 
     <!-- Admin CSS -->
     <link rel="stylesheet" href="assets/admin.css?v=9.7">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=6.4">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=6.5">
     <link rel="stylesheet" href="../assets/css/v9-mobile-fix.css?v=9.7">
     <link rel="stylesheet" href="../assets/css/site-banner-logo.css?v=1">
 
