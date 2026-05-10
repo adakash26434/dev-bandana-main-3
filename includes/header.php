@@ -528,9 +528,12 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
             }
         }
     </style>
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/public-modern.css?v=1">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/public-modern.css?v=2">
     <!-- Global Unify v2 — consistent color/font/form/button across all panels -->
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/global-unify-v2.css?v=1">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/global-unify-v2.css?v=2">
+    <!-- UI Uniformity + Mobile Audit — final layer patches -->
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/ui-uniformity-fix.css?v=2">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/v10.6-mobile-audit.css?v=1">
     <meta name="csrf-token" content="<?php echo generateCSRFToken(); ?>">
     <?php if (!empty($__embed_frame)): ?>
     <style id="public-embed-frame-css">

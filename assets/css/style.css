@@ -2741,8 +2741,8 @@ img {
     display: inline-block;
     padding: 14px 20px;
     border-radius: 12px;
-    background: #f0fff4;
-    border: 2px dashed #28a745;
+    background: color-mix(in srgb, var(--primary-color,#28a745) 8%, white);
+    border: 2px dashed var(--primary-light, #28a745);
     margin-bottom: 12px;
 }
 .form-tracking-id {
