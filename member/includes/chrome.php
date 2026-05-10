@@ -99,22 +99,31 @@ $_langBadge = $_isEn ? 'EN' : 'ने';
 /* Auto-detect active nav from filename */
 $_self  = basename($_SERVER['PHP_SELF'] ?? '');
 $_applyFrameP = $_self === 'apply-frame.php' ? ($_GET['p'] ?? '') : '';
-$_active = $_self === 'index.php' || $_self === ''  ? 'dashboard'
-        : ($_self === 'notifications.php'           ? 'notifications'
-        : ($_self === 'id-card.php'                 ? 'idcard'
-        : ($_self === 'tracker.php'                 ? 'tracker'
-        : ($_self === 'profile.php'                 ? 'profile'
-        : ($_self === 'welfare.php'                 ? 'welfare'
-        : ($_self === 'certificate.php'             ? 'certificate'
-        : ($_self === 'scan.php'                    ? 'scan'
-        : ($_self === 'attend.php'                  ? 'attend'
-        : ($_self === 'service-request.php'         ? 'service'
-        : ($_self === 'appointment.php'             ? 'apply-appointment'
-        : ($_self === 'loan-apply.php'              ? 'apply-loan'
-        : ($_self === 'account-apply.php'           ? 'apply-account'
-        : ($_self === 'grievance.php'               ? 'apply-grievance'
-        : ($_self === 'digital-service.php'         ? 'apply-digital'
-        : ($_applyFrameP === 'digital'              ? 'apply-digital' : ''))))))))))))))));
+$_activeMap = [
+    'index.php'          => 'dashboard',
+    ''                   => 'dashboard',
+    'notifications.php'  => 'notifications',
+    'id-card.php'        => 'idcard',
+    'tracker.php'        => 'tracker',
+    'profile.php'        => 'profile',
+    'welfare.php'        => 'welfare',
+    'certificate.php'    => 'certificate',
+    'scan.php'           => 'scan',
+    'attend.php'         => 'attend',
+    'service-request.php'=> 'service',
+    'appointment.php'    => 'apply-appointment',
+    'loan-apply.php'     => 'apply-loan',
+    'account-apply.php'  => 'apply-account',
+    'grievance.php'      => 'apply-grievance',
+    'digital-service.php'=> 'apply-digital',
+];
+if (isset($_activeMap[$_self])) {
+    $_active = $_activeMap[$_self];
+} elseif ($_applyFrameP === 'digital') {
+    $_active = 'apply-digital';
+} else {
+    $_active = '';
+}
 
 /* Notifications for bell */
 $_unread = function_exists('getMemberUnreadCount') ? getMemberUnreadCount($_memId) : 0;
