@@ -155,13 +155,13 @@ require __DIR__ . '/includes/chrome.php';
   </div>
 
   <div id="scan-reader">
-    <div id="scan-loading"><i class="fas fa-spinner"></i><?php echo $_t('क्यामेरा खुल्दैछ…', 'Opening camera…'); ?></div>
+    <div id="scan-loading" style="display:none;"><i class="fas fa-spinner"></i><?php echo $_t('क्यामेरा खुल्दैछ…', 'Opening camera…'); ?></div>
   </div>
   <div id="scan-err" class="scan-err" role="alert"></div>
   <div id="scan-success" class="scan-success"></div>
 
   <div class="scan-actions">
-    <button type="button" class="scan-btn-start" id="scanStart" style="display:flex;"><i class="fas fa-camera"></i><?php echo $_t('क्यामेरा सुरु', 'Start Camera'); ?></button>
+    <button type="button" class="scan-btn-start" id="scanStart" style="display:flex;font-size:1.05rem;padding:16px 20px;"><i class="fas fa-camera"></i><?php echo $_t('क्यामेरा सुरु गर्नुहोस् — ट्याप गर्नुहोस्', 'Tap to Start Camera'); ?></button>
     <button type="button" class="scan-btn-stop" id="scanStop" style="display:none;"><i class="fas fa-stop"></i><?php echo $_t('रोक्नुहोस्', 'Stop'); ?></button>
   </div>
 
@@ -322,25 +322,6 @@ require __DIR__ . '/includes/chrome.php';
 
   btnStart.addEventListener('click', startCamera);
   btnStop.addEventListener('click', function() { stopCamera(); });
-
-  /* Auto-start camera when page is visible (mobile tap from bottom nav) */
-  function tryAutoStart() {
-    if (!document.hidden && typeof Html5Qrcode !== 'undefined') {
-      startCamera();
-    }
-  }
-  /* Wait for library to load then auto-start */
-  if (typeof Html5Qrcode !== 'undefined') {
-    tryAutoStart();
-  } else {
-    /* Library loads async — poll briefly */
-    var _poll = 0;
-    var _t = setInterval(function() {
-      _poll++;
-      if (typeof Html5Qrcode !== 'undefined') { clearInterval(_t); tryAutoStart(); }
-      else if (_poll > 30) { clearInterval(_t); } /* give up after 3s */
-    }, 100);
-  }
 
   /* Stop camera when user leaves page (back button / tab switch) */
   document.addEventListener('visibilitychange', function() {
