@@ -13,18 +13,7 @@
 
 /* Base font size reset - ensure consistency */
 html {
-    font-size: 14px !important;
-}
-
-/* Standard font sizes for all interfaces */
-:root {
-    --font-xs: 0.75rem;    /* 12px */
-    --font-sm: 0.875rem;   /* 14px */
-    --font-base: 1rem;     /* 16px */
-    --font-lg: 1.125rem;   /* 18px */
-    --font-xl: 1.25rem;    /* 20px */
-    --font-2xl: 1.5rem;    /* 24px */
-    --font-3xl: 1.875rem;  /* 30px */
+    font-size: var(--font-base, 14px);
 }
 
 /* Body text - consistent across all panels */
@@ -60,7 +49,7 @@ h3, .section-header h2, .section-header h3 {
 
 /* Small headings */
 h4, h5, h6 {
-    font-size: var(--font-base) !important;
+    font-size: var(--font-md) !important;
     font-weight: 600 !important;
 }
 
@@ -70,7 +59,7 @@ h4, h5, h6 {
 
 /* Sidebar navigation */
 .sidebar-nav a {
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
     font-weight: 500 !important;
 }
 
@@ -81,14 +70,14 @@ h4, h5, h6 {
 
 /* Card headers */
 .card-header {
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
     font-weight: 600 !important;
     color: var(--text-primary, #1a2e1f) !important;
 }
 
 /* Tables */
 .table {
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
 }
 
 .table th {
@@ -98,18 +87,18 @@ h4, h5, h6 {
 
 /* Forms */
 .form-label {
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
     font-weight: 500 !important;
     color: var(--text-primary, #1a2e1f) !important;
 }
 
 .form-control, .form-select {
-    font-size: var(--font-base) !important;
+    font-size: var(--font-md) !important;
 }
 
 /* Buttons */
 .btn {
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
     font-weight: 500 !important;
 }
 
@@ -138,7 +127,7 @@ h4, h5, h6 {
 
 /* Member topbar */
 .mem-topbar-brand .mem-brand-name {
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
     font-weight: 700 !important;
 }
 
@@ -254,7 +243,7 @@ footer a:hover,
 /* Secondary text colors */
 .text-muted, .form-text, .empty-state p {
     color: var(--text-muted, #6b7280) !important;
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -285,7 +274,7 @@ footer a:hover,
 
 @media (max-width: 768px) {
     html {
-        font-size: 13px !important;
+        font-size: var(--font-xs) !important;
     }
     
     h1, .page-title, .dash-title-main {
@@ -299,7 +288,7 @@ footer a:hover,
 
 @media (max-width: 576px) {
     html {
-        font-size: 12px !important;
+        font-size: calc(var(--font-xs) - 1px) !important;
     }
     
     h1, .page-title, .dash-title-main {
@@ -339,7 +328,7 @@ footer a:hover,
 }
 
 .ds-tab {
-    font-size: var(--font-sm) !important;
+    font-size: var(--font-md) !important;
     font-weight: 600 !important;
     color: var(--text-muted, #6b7280) !important;
     padding: 0.75rem 1rem !important;
