@@ -1268,6 +1268,141 @@ textarea.form-control:focus {
 .dash-val-review { color: #1e40af; }
 .dash-val-approved { color: #166534; }
 
+.wf-summary-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0 0 18px;
+}
+
+.wf-stat-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 74px;
+    padding: 14px 16px;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+    text-decoration: none;
+    color: #0f172a;
+}
+
+.wf-stat-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .10);
+    text-decoration: none;
+}
+
+.wf-stat-chip .val {
+    font-size: 1.8rem;
+    line-height: 1;
+    font-weight: 800;
+}
+
+.wf-stat-chip .lbl {
+    font-size: .9rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+.wf-stat-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 46px;
+    border-radius: 14px;
+    font-size: 1.05rem;
+}
+
+.wf-stat-icon.pending {
+    background: #fff7ed;
+    color: #d97706;
+}
+
+.wf-stat-icon.review {
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+.wf-stat-icon.approved {
+    background: #ecfdf5;
+    color: #166534;
+}
+
+.wf-type-row {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 14px;
+    background: #fff;
+}
+
+.wf-type-icon {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: var(--primary-color, #198754);
+}
+
+.wf-type-name {
+    min-width: 0;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.wf-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: .28rem .62rem;
+    font-size: .76rem;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.wf-badge.pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.wf-badge.review {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.wf-badge.approved {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+@media (max-width: 768px) {
+    .wf-summary-bar {
+        grid-template-columns: 1fr;
+    }
+
+    .wf-type-row {
+        grid-template-columns: 42px minmax(0, 1fr);
+    }
+
+    .wf-type-row > .d-flex {
+        grid-column: 1 / -1;
+    }
+}
+
 .dash-empty-note {
     color: #9ca3af;
     font-size: .85rem;

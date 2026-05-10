@@ -473,9 +473,9 @@ try {
       <a href="welfare-claims.php" class="btn btn-sm dash-btn-outline-primary"><i class="fas fa-arrow-up-right-from-square"></i> <?php echo $__t('सबै दाबी', 'All Claims'); ?></a>
     </div>
     <div class="wf-summary-bar">
-      <a href="welfare-claims.php?status=pending" class="wf-stat-chip"><div class="val dash-val-pending"><?= $welfarePending ?></div><div class="lbl"><?php echo $__t('पेन्डिङ', 'Pending'); ?></div></a>
-      <a href="welfare-claims.php?status=under_review" class="wf-stat-chip"><div class="val dash-val-review"><?= $welfareReview ?></div><div class="lbl"><?php echo $__t('समीक्षाधीन', 'Under Review'); ?></div></a>
-      <a href="welfare-claims.php?status=approved" class="wf-stat-chip"><div class="val dash-val-approved"><?= $welfareApproved ?></div><div class="lbl"><?php echo $__t('स्वीकृत', 'Approved'); ?></div></a>
+      <a href="welfare-claims.php?status=pending" class="wf-stat-chip"><span class="wf-stat-icon pending"><i class="fas fa-clock"></i></span><span><div class="val dash-val-pending"><?= $welfarePending ?></div><div class="lbl"><?php echo $__t('पेन्डिङ', 'Pending'); ?></div></span></a>
+      <a href="welfare-claims.php?status=under_review" class="wf-stat-chip"><span class="wf-stat-icon review"><i class="fas fa-magnifying-glass"></i></span><span><div class="val dash-val-review"><?= $welfareReview ?></div><div class="lbl"><?php echo $__t('समीक्षाधीन', 'Under Review'); ?></div></span></a>
+      <a href="welfare-claims.php?status=approved" class="wf-stat-chip"><span class="wf-stat-icon approved"><i class="fas fa-circle-check"></i></span><span><div class="val dash-val-approved"><?= $welfareApproved ?></div><div class="lbl"><?php echo $__t('स्वीकृत', 'Approved'); ?></div></span></a>
     </div>
     <?php if (empty($welfareByType)): ?>
       <div class="text-center py-3 dash-empty-note"><?php echo $__t('कुनै दाबी छैन।', 'No claims found.'); ?></div>
