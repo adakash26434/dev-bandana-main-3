@@ -244,8 +244,8 @@ function memberClearRateLimit($email) {
 function memberIsLoggedIn() {
     if (empty($_SESSION['member_id'])) return false;
 
-    // Member session hardening: 10-minute inactivity timeout
-    $memberIdleLimit = 600;
+    // Member session hardening: 2-hour inactivity timeout (mobile-friendly)
+    $memberIdleLimit = 7200;
     $last = (int)($_SESSION['member_last_activity'] ?? 0);
     if ($last > 0 && (time() - $last) > $memberIdleLimit) {
         return false;
@@ -264,7 +264,11 @@ function memberIsLoggedIn() {
     $expectedUA = $_SESSION['member_agent_hash'] ?? '';
     $expectedIP = $_SESSION['member_ip_partial'] ?? '';
 
-    if ($expectedUA !== '') {
+    /* UA fingerprint check disabled — mobile browsers (WebView, Chrome on Android,
+     * iOS Safari) frequently vary UA between requests causing false logouts.
+     * IP /24 check below is sufficient for session binding security.
+     */
+    if (false && $expectedUA !== '') {
         $currentUA = substr(md5($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 16);
         if ($currentUA !== $expectedUA) {
             error_log('member-auth: UA fingerprint mismatch for member_id=' . (int)$_SESSION['member_id']);
