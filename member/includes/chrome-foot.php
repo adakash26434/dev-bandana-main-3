@@ -13,6 +13,12 @@ $_footT = static function (string $np, string $en) use ($_footIsEn): string {
 };
 ?>
 
+<?php
+$_footLangQuery = $_GET ?? [];
+$_footLangQuery['lang'] = $_footIsEn ? 'np' : 'en';
+$_footLangToggleUrl = strtok($_SERVER['REQUEST_URI'] ?? '', '?') . '?' . http_build_query($_footLangQuery);
+$_footLangBadge = $_footIsEn ? 'नेपाली' : 'EN';
+?>
 <!-- Mobile bottom navigation (hidden on desktop ≥900px) -->
 <nav class="mp-bottom-nav">
   <a href="<?php echo SITE_URL; ?>member/"><i class="fas fa-house"></i><span><?php echo $_footT('गृह', 'Home'); ?></span></a>
@@ -20,6 +26,7 @@ $_footT = static function (string $np, string $en) use ($_footIsEn): string {
   <a href="<?php echo SITE_URL; ?>member/scan.php" class="mp-nav-scan" aria-label="<?php echo $_footT('QR स्क्यान', 'Scan QR'); ?>"><i class="fas fa-qrcode"></i><span><?php echo $_footT('स्क्यान', 'Scan'); ?></span></a>
   <a href="<?php echo SITE_URL; ?>member/id-card.php"><i class="fas fa-id-card"></i><span><?php echo $_footT('आईडी', 'ID Card'); ?></span></a>
   <a href="<?php echo SITE_URL; ?>member/profile.php"><i class="fas fa-user-circle"></i><span><?php echo $_footT('प्रोफाइल', 'Profile'); ?></span></a>
+  <a href="<?php echo htmlspecialchars($_footLangToggleUrl, ENT_QUOTES); ?>" class="mp-nav-lang" title="<?php echo $_footT('भाषा', 'Language'); ?>"><i class="fas fa-language"></i><span><?php echo htmlspecialchars($_footLangBadge); ?></span></a>
 </nav>
 
 <style>
@@ -70,6 +77,13 @@ $_footT = static function (string $np, string $en) use ($_footIsEn): string {
 }
 body { padding-bottom: 80px; }
 @media (min-width: 900px) { .mp-bottom-nav { display: none; } body { padding-bottom: 0; } }
+
+/* Language toggle item — subtle distinction */
+.mp-nav-lang {
+    border-left: 1px solid color-mix(in srgb, var(--primary-color) 20%, #e5e7eb);
+    opacity: 0.85;
+}
+.mp-nav-lang i { color: var(--primary-color); }
 
 /* Mobile optimizations */
 @media (max-width: 480px) {

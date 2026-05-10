@@ -205,7 +205,7 @@ try {
 
 <!-- ══ Unified Topbar ══ -->
 <div class="mem-topbar">
-    <a href="<?php echo $_siteUrl; ?>" class="mem-topbar-brand <?php echo !empty($_logoPath) ? 'has-logo' : 'no-logo'; ?>">
+    <a href="<?php echo $_siteUrl; ?>member/" class="mem-topbar-brand <?php echo !empty($_logoPath) ? 'has-logo' : 'no-logo'; ?>">
         <?php if ($_logoPath): ?>
         <img src="<?php echo $_siteUrl . htmlspecialchars($_logoPath); ?>" alt="Logo">
         <?php else: ?>
