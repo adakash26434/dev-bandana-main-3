@@ -135,7 +135,7 @@ $quickActions = [
     ['href' => $siteUrl.'member/loan-apply.php',               'icon' => 'fa-hand-holding-usd',    'color' => 'var(--secondary-dark)', 'label' => $_t('ऋण आवेदन', 'Loan Apply')],
     ['href' => $siteUrl.'member/account-apply.php',            'icon' => 'fa-university',          'color' => 'var(--primary-color)', 'label' => $_t('खाता खोल्ने', 'Open Account')],
     ['href' => $siteUrl.'member/digital-service.php',          'icon' => 'fa-laptop',              'color' => 'var(--secondary-color)', 'label' => $_t('डिजिटल सेवा', 'Digital Service')],
-    ['href' => $siteUrl.'member/grievance.php',                 'icon' => 'fa-comment-exclamation', 'color' => 'var(--secondary-color)', 'label' => $_t('गुनासो', 'Grievance')],
+    ['href' => $siteUrl.'member/grievance.php',                 'icon' => 'fa-comment-dots', 'color' => 'var(--secondary-color)', 'label' => $_t('गुनासो', 'Grievance')],
     ['href' => $siteUrl.'member/welfare.php',                   'icon' => 'fa-heart',               'color' => 'var(--secondary-color)', 'label' => $_t('कल्याण', 'Welfare')],
     ['href' => $siteUrl.'member/service-request.php',           'icon' => 'fa-concierge-bell',      'color' => 'var(--primary-color)', 'label' => $_t('सेवा अनुरोध', 'Service Req.')],
     ['href' => $siteUrl.'member/apply-frame.php?p=career',      'icon' => 'fa-briefcase',           'color' => 'var(--primary-dark)', 'label' => $_t('जागिर', 'Career')],
