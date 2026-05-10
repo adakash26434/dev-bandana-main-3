@@ -130,6 +130,11 @@ $siteName  = getSetting('site_name', 'सहकारी');
 $pageTitle = $_t('सेवा अनुरोध', 'Service Request') . ' — ' . $siteName;
 $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">';
 
+/* Active tab */
+$srActiveTab = 'new';
+if ($successMsg) $srActiveTab = 'history';
+if (isset($_GET['tab']) && in_array($_GET['tab'], ['new','history'], true)) $srActiveTab = $_GET['tab'];
+
 $statusColors = [
     'pending' => 'sr-status--pending',
     'confirmed' => 'sr-status--confirmed',
@@ -159,116 +164,149 @@ HTML;
 <main class="mp-main">
 <div class="mp-container">
 
-  <h1 class="mem-page-title">
-    <i class="fas fa-concierge-bell"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?>
-  </h1>
-
-  <?php if ($successMsg): ?>
-  <div class="mem-alert mem-alert-success">
-    <i class="fas fa-circle-check"></i>
-    <div><?= $successMsg ?><br><a href="tracker.php" style="color:inherit;font-weight:700;"><?php echo $_t('Tracker मा हेर्नुहोस्', 'Open in Tracker'); ?> →</a></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+    <h1 class="mem-page-title" style="margin:0">
+      <i class="fas fa-concierge-bell"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?>
+    </h1>
+    <a href="tracker.php" style="font-size:.8rem;color:var(--primary-color);text-decoration:none;font-weight:600;border:1px solid color-mix(in srgb,var(--primary-color) 30%,#e5e7eb);padding:5px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;">
+      <i class="fas fa-magnifying-glass-chart"></i> <?php echo $_t('Tracker', 'Tracker'); ?>
+    </a>
   </div>
-  <?php endif; ?>
+
   <?php if ($errorMsg): ?>
-  <div class="mem-alert mem-alert-error">
+  <div class="mem-alert mem-alert-error" style="margin-bottom:14px;">
     <i class="fas fa-circle-xmark"></i><div><?= htmlspecialchars($errorMsg) ?></div>
   </div>
   <?php endif; ?>
 
-  <div class="mem-autofill-banner">
-    <i class="fas fa-wand-magic-sparkles"></i>
-    <div><?php echo $_t('तपाईंको नाम, फोन, email — <strong>KYC/profile बाट auto-fill</strong> भएको छ। सेवा प्रकार र सन्देश मात्र भर्नुहोस्।', 'Your name, phone and email are <strong>auto-filled from KYC/profile</strong>. Only select service type and message.'); ?></div>
+  <!-- ── Tabs ── -->
+  <div class="wf-tabs">
+    <button class="wf-tab <?= $srActiveTab==='new'?'active':'' ?>" onclick="srShowTab(this,'sr-pane-new')" id="srTabNew">
+      <i class="fas fa-plus-circle wf-icon-gap-sm"></i><?php echo $_t('नयाँ अनुरोध', 'New Request'); ?>
+    </button>
+    <button class="wf-tab <?= $srActiveTab==='history'?'active':'' ?>" onclick="srShowTab(this,'sr-pane-history')" id="srTabHistory">
+      <i class="fas fa-clock-rotate-left wf-icon-gap-sm"></i><?php echo $_t('मेरा अनुरोधहरू', 'My Requests'); ?> (<?= count($recentReqs) ?>)
+    </button>
   </div>
 
-  <form method="POST">
-    <?= $csrfField ?>
-    <input type="hidden" name="action" value="submit">
-
-    <!-- Auto-filled member info -->
-    <div class="mem-prefill-block">
-      <div class="mem-prefill-block-head"><i class="fas fa-user-check"></i><?php echo $_t('तपाईंको जानकारी (KYC बाट)', 'Your Info (from KYC)'); ?></div>
-      <div class="mem-prefill-grid">
-        <div class="mem-prefill-item"><span class="mem-prefill-label"><?php echo $_t('नाम', 'Name'); ?></span><span class="mem-prefill-value"><?= htmlspecialchars($memName ?: '—') ?></span></div>
-        <div class="mem-prefill-item"><span class="mem-prefill-label"><?php echo $_t('सदस्यता नम्बर', 'Member No.'); ?></span><span class="mem-prefill-value mem-tracking-id"><?= htmlspecialchars($memSadasyata ?: '—') ?></span></div>
-        <div class="mem-prefill-item"><span class="mem-prefill-label"><?php echo $_t('फोन', 'Phone'); ?></span><span class="mem-prefill-value"><?= htmlspecialchars($rPhone ?: '—') ?></span></div>
-        <div class="mem-prefill-item"><span class="mem-prefill-label">Email</span><span class="mem-prefill-value"><?= htmlspecialchars($rEmail ?: '—') ?></span></div>
-      </div>
+  <!-- ── Tab: New Request ── -->
+  <div class="wf-pane <?= $srActiveTab==='new'?'active':'' ?>" id="sr-pane-new">
+    <div class="mem-autofill-banner">
+      <i class="fas fa-wand-magic-sparkles"></i>
+      <div><?php echo $_t('तपाईंको नाम, फोन, email — <strong>KYC/profile बाट auto-fill</strong> भएको छ। सेवा प्रकार र सन्देश मात्र भर्नुहोस्।', 'Your name, phone and email are <strong>auto-filled from KYC/profile</strong>. Only select service type and message.'); ?></div>
     </div>
 
-    <!-- Service type -->
-    <div class="mem-form-group">
-      <label class="mem-form-label"><?php echo $_t('सेवा प्रकार छान्नुहोस्', 'Select Service Type'); ?> <span class="mem-form-required">*</span></label>
-      <select name="service_type" class="mem-form-control" required>
-        <option value="">— <?php echo $_t('सेवा छान्नुहोस्', 'Select service'); ?> —</option>
-        <?php foreach ($serviceTypes as $key => $svc): ?>
-        <option value="<?= $key ?>"><?= $svc['label'] ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
+    <form method="POST">
+      <?= $csrfField ?>
+      <input type="hidden" name="action" value="submit">
 
-    <div class="mem-form-row mem-form-row-2">
-      <div class="mem-form-group">
-        <label class="mem-form-label"><i class="fas fa-calendar" style="color:var(--primary-color);margin-right:4px"></i><?php echo $_t('मनपर्ने मिति (Optional)', 'Preferred Date (Optional)'); ?></label>
-        <input type="date" name="preferred_date" class="mem-form-control" min="<?= date('Y-m-d') ?>">
+      <div class="mem-prefill-block">
+        <div class="mem-prefill-block-head"><i class="fas fa-user-check"></i><?php echo $_t('तपाईंको जानकारी (KYC बाट)', 'Your Info (from KYC)'); ?></div>
+        <div class="mem-prefill-grid">
+          <div class="mem-prefill-item"><span class="mem-prefill-label"><?php echo $_t('नाम', 'Name'); ?></span><span class="mem-prefill-value"><?= htmlspecialchars($memName ?: '—') ?></span></div>
+          <div class="mem-prefill-item"><span class="mem-prefill-label"><?php echo $_t('सदस्यता नम्बर', 'Member No.'); ?></span><span class="mem-prefill-value mem-tracking-id"><?= htmlspecialchars($memSadasyata ?: '—') ?></span></div>
+          <div class="mem-prefill-item"><span class="mem-prefill-label"><?php echo $_t('फोन', 'Phone'); ?></span><span class="mem-prefill-value"><?= htmlspecialchars($rPhone ?: '—') ?></span></div>
+          <div class="mem-prefill-item"><span class="mem-prefill-label">Email</span><span class="mem-prefill-value"><?= htmlspecialchars($rEmail ?: '—') ?></span></div>
+        </div>
       </div>
+
       <div class="mem-form-group">
-        <label class="mem-form-label"><i class="fas fa-clock" style="color:var(--primary-color);margin-right:4px"></i><?php echo $_t('मनपर्ने समय', 'Preferred Time'); ?></label>
-        <?php $preferredTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $preferredTimeOptions = function_exists('getOfficeTimeOptions') ? getOfficeTimeOptions(30) : []; ?>
-        <select name="preferred_time" class="mem-form-control">
-          <option value="">— <?php echo $_t('समय छान्नुहोस्', 'Select time'); ?> —</option>
-          <?php foreach ($preferredTimeOptions as $optVal => $optLabel): ?>
-          <option value="<?php echo htmlspecialchars($optVal, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $preferredTimeValue === $optVal ? 'selected' : ''; ?>>
-            <?php echo htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8'); ?>
-          </option>
+        <label class="mem-form-label"><?php echo $_t('सेवा प्रकार छान्नुहोस्', 'Select Service Type'); ?> <span class="mem-form-required">*</span></label>
+        <select name="service_type" class="mem-form-control" required>
+          <option value="">— <?php echo $_t('सेवा छान्नुहोस्', 'Select service'); ?> —</option>
+          <?php foreach ($serviceTypes as $key => $svc): ?>
+          <option value="<?= $key ?>"><?= $svc['label'] ?></option>
           <?php endforeach; ?>
-          <?php if ($preferredTimeValue !== '' && !isset($preferredTimeOptions[$preferredTimeValue])): ?>
-          <option value="<?php echo htmlspecialchars($preferredTimeValue, ENT_QUOTES, 'UTF-8'); ?>" selected>
-            <?php echo htmlspecialchars($preferredTimeValue, ENT_QUOTES, 'UTF-8'); ?>
-          </option>
-          <?php endif; ?>
         </select>
       </div>
+
+      <div class="mem-form-row mem-form-row-2">
+        <div class="mem-form-group">
+          <label class="mem-form-label"><i class="fas fa-calendar" style="color:var(--primary-color);margin-right:4px"></i><?php echo $_t('मनपर्ने मिति (Optional)', 'Preferred Date (Optional)'); ?></label>
+          <input type="date" name="preferred_date" class="mem-form-control" min="<?= date('Y-m-d') ?>">
+        </div>
+        <div class="mem-form-group">
+          <label class="mem-form-label"><i class="fas fa-clock" style="color:var(--primary-color);margin-right:4px"></i><?php echo $_t('मनपर्ने समय', 'Preferred Time'); ?></label>
+          <?php $preferredTimeValue = trim((string)($_POST['preferred_time'] ?? '')); $preferredTimeOptions = function_exists('getOfficeTimeOptions') ? getOfficeTimeOptions(30) : []; ?>
+          <select name="preferred_time" class="mem-form-control">
+            <option value="">— <?php echo $_t('समय छान्नुहोस्', 'Select time'); ?> —</option>
+            <?php foreach ($preferredTimeOptions as $optVal => $optLabel): ?>
+            <option value="<?php echo htmlspecialchars($optVal, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $preferredTimeValue === $optVal ? 'selected' : ''; ?>>
+              <?php echo htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+            <?php endforeach; ?>
+            <?php if ($preferredTimeValue !== '' && !isset($preferredTimeOptions[$preferredTimeValue])): ?>
+            <option value="<?php echo htmlspecialchars($preferredTimeValue, ENT_QUOTES, 'UTF-8'); ?>" selected>
+              <?php echo htmlspecialchars($preferredTimeValue, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+            <?php endif; ?>
+          </select>
+        </div>
+      </div>
+
+      <div class="mem-form-group">
+        <label class="mem-form-label"><i class="fas fa-building" style="color:var(--primary-color);margin-right:4px"></i><?php echo $_t('शाखा', 'Branch'); ?></label>
+        <input type="text" name="branch" class="mem-form-control" value="<?= htmlspecialchars($rBranch) ?>" placeholder="<?php echo $_t('जस्तै: प्रधान कार्यालय', 'e.g., Head Office'); ?>">
+      </div>
+
+      <div class="mem-form-group">
+        <label class="mem-form-label"><?php echo $_t('विस्तृत सन्देश', 'Detailed Message'); ?> <span class="mem-form-required">*</span></label>
+        <textarea name="message" class="mem-form-control" rows="4" required placeholder="<?php echo $_t('तपाईंको अनुरोधको पूरा विवरण लेख्नुहोस्...', 'Write full details of your request...'); ?>"></textarea>
+      </div>
+
+      <button type="submit" class="mem-submit-btn">
+        <i class="fas fa-paper-plane"></i> <?php echo $_t('अनुरोध पठाउनुहोस्', 'Submit Request'); ?>
+      </button>
+    </form>
+  </div><!-- /sr-pane-new -->
+
+  <!-- ── Tab: History ── -->
+  <div class="wf-pane <?= $srActiveTab==='history'?'active':'' ?>" id="sr-pane-history">
+    <?php if ($successMsg): ?>
+    <div class="mem-alert mem-alert-success" style="margin-bottom:16px;">
+      <i class="fas fa-circle-check"></i>
+      <div><?= $successMsg ?></div>
     </div>
+    <?php endif; ?>
 
-    <div class="mem-form-group">
-      <label class="mem-form-label"><i class="fas fa-building" style="color:var(--primary-color);margin-right:4px"></i><?php echo $_t('शाखा', 'Branch'); ?></label>
-      <input type="text" name="branch" class="mem-form-control" value="<?= htmlspecialchars($rBranch) ?>" placeholder="<?php echo $_t('जस्तै: प्रधान कार्यालय', 'e.g., Head Office'); ?>">
+    <?php if (empty($recentReqs)): ?>
+    <div style="padding:40px 0;text-align:center;">
+      <i class="fas fa-inbox" style="font-size:2rem;color:var(--text-muted,#9ca3af);display:block;margin-bottom:10px;"></i>
+      <div style="font-weight:600;color:var(--text-primary,#1a2e1f);margin-bottom:4px;"><?php echo $_t('कुनै अनुरोध छैन', 'No requests found'); ?></div>
+      <div style="font-size:.82rem;color:var(--text-muted,#6b7280);"><?php echo $_t('"नयाँ अनुरोध" tab बाट सेवा लिनुहोस्।', 'Use "New Request" tab to submit.'); ?></div>
     </div>
-
-    <div class="mem-form-group">
-      <label class="mem-form-label"><?php echo $_t('विस्तृत सन्देश', 'Detailed Message'); ?> <span class="mem-form-required">*</span></label>
-      <textarea name="message" class="mem-form-control" rows="4" required placeholder="<?php echo $_t('तपाईंको अनुरोधको पूरा विवरण लेख्नुहोस्...', 'Write full details of your request...'); ?>"></textarea>
-    </div>
-
-    <button type="submit" class="mem-submit-btn">
-      <i class="fas fa-paper-plane"></i> <?php echo $_t('अनुरोध पठाउनुहोस्', 'Submit Request'); ?>
-    </button>
-  </form>
-
-  <!-- Recent requests -->
-  <?php if (!empty($recentReqs)): ?>
-  <div style="margin-top:24px;">
-    <div class="mem-section-title"><i class="fas fa-history"></i><?php echo $_t('हालसालैका अनुरोधहरू', 'Recent Requests'); ?></div>
+    <?php else: ?>
     <?php foreach ($recentReqs as $rq):
         $stClass = $statusColors[$rq['status']] ?? '';
+        $stLabels = ['pending'=>$_t('पर्खिँदै','Pending'),'confirmed'=>$_t('पुष्टि','Confirmed'),'completed'=>$_t('सम्पन्न','Completed'),'cancelled'=>$_t('रद्द','Cancelled'),'processing'=>$_t('प्रक्रिया','Processing')];
+        $stLabel  = $stLabels[$rq['status']] ?? htmlspecialchars($rq['status']);
     ?>
     <div class="recent-card">
       <div>
-        <div style="font-size:.85rem;font-weight:600;color:var(--text-primary,#1a2e1f)"><?= htmlspecialchars(mb_substr($rq['purpose'],0,50)) ?></div>
-        <div class="mem-text-xs mem-text-muted" style="margin-top:2px"><?= date('Y-m-d', strtotime($rq['created_at'])) ?></div>
+        <div style="font-size:.87rem;font-weight:600;color:var(--text-primary,#1a2e1f)"><?= htmlspecialchars(mb_substr($rq['purpose'] ?? $rq['tracking_id'],0,60)) ?></div>
+        <div style="font-size:.75rem;color:var(--text-muted,#6b7280);margin-top:3px"><?= date('Y-m-d', strtotime($rq['created_at'])) ?></div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span class="mem-tracking-id"><?= htmlspecialchars($rq['tracking_id']) ?></span>
-        <span class="sr-status <?= htmlspecialchars($stClass) ?>" style="font-size:.75rem;font-weight:700"><?= htmlspecialchars($rq['status']) ?></span>
+        <span class="sr-status <?= htmlspecialchars($stClass) ?>" style="font-size:.75rem;font-weight:700;"><?= $stLabel ?></span>
       </div>
     </div>
     <?php endforeach; ?>
-    <a href="tracker.php?filter=appointment" style="font-size:.82rem;color:var(--primary-color);text-decoration:none;font-weight:600;">
-      <?php echo $_t('सबै Tracker मा हेर्नुहोस्', 'View all in Tracker'); ?> →
+    <a href="tracker.php?filter=appointment" style="font-size:.82rem;color:var(--primary-color);text-decoration:none;font-weight:600;display:inline-block;margin-top:8px;">
+      <i class="fas fa-magnifying-glass-chart" style="margin-right:4px;"></i><?php echo $_t('सबै Tracker मा हेर्नुहोस्', 'View all in Tracker'); ?> →
     </a>
-  </div>
-  <?php endif; ?>
+    <?php endif; ?>
+  </div><!-- /sr-pane-history -->
 
 </div>
 </main>
+<script>
+function srShowTab(btn, paneId) {
+    document.querySelectorAll('.wf-tab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.wf-pane').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    var pane = document.getElementById(paneId);
+    if (pane) pane.classList.add('active');
+}
+</script>
 <?php require __DIR__ . '/includes/chrome-foot.php'; ?>
