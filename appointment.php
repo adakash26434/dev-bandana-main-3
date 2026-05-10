@@ -10,6 +10,8 @@ $error          = '';
 $apptTrackingId = '';
 $loggedMember   = getLoggedInMemberProfile();
 $lockedMemberFields = $loggedMember ? 'readonly' : '';
+$isEmbed = !empty($_GET['embed']);
+$trackerUrl = $isEmbed ? (SITE_URL . 'member/tracker.php') : 'application-tracker.php';
 
 /* =============================================
    फारम submit भएमा process गर्नुहोस्
@@ -137,12 +139,12 @@ require_once 'includes/header.php';
                         <div class="form-tracking-id" id="apptTrkId"><?php echo e($apptTrackingId); ?></div>
                         <button type="button" onclick="copyTrk('apptTrkId',this)" class="btn btn-sm btn-outline-success py-0 px-2" title="Copy" style="font-size:11px;line-height:1.8;"><i class="fas fa-copy"></i></button>
                     </div>
-                    <div class="form-tracking-help"><a href="application-tracker.php" class="text-success text-decoration-none fw-semibold">यहाँ बाट</a> Application Tracker मा स्थिति हेर्नुहोस्।</div>
+                    <div class="form-tracking-help"><a href="<?php echo e($trackerUrl); ?>" class="text-success text-decoration-none fw-semibold"><?php echo isEnglish() ? 'Click here' : 'यहाँ बाट'; ?></a> <?php echo isEnglish() ? 'to check status in Tracker.' : 'Tracker मा स्थिति हेर्नुहोस्।'; ?></div>
                 </div>
                 <?php endif; ?>
                 <div class="d-flex justify-content-center flex-wrap gap-2">
-                <a href="appointment.php" class="btn btn-success px-4"><i class="fas fa-plus me-1"></i><?php echo isEnglish() ? 'New Request' : 'नयाँ अनुरोध'; ?></a>
-                <a href="application-tracker.php" class="btn btn-outline-primary px-4"><i class="fas fa-search me-1"></i><?php echo isEnglish() ? 'Track Status' : 'स्थिति ट्र्याक'; ?></a>
+                <a href="appointment.php<?php echo $isEmbed ? '?embed=1' : ''; ?>" class="btn btn-success px-4"><i class="fas fa-plus me-1"></i><?php echo isEnglish() ? 'New Request' : 'नयाँ अनुरोध'; ?></a>
+                <a href="<?php echo e($trackerUrl); ?>" class="btn btn-outline-primary px-4"><i class="fas fa-search me-1"></i><?php echo isEnglish() ? 'Track Status' : 'स्थिति ट्र्याक'; ?></a>
                 <a href="<?php echo SITE_URL; ?>" class="btn btn-outline-secondary px-4"><i class="fas fa-home me-1"></i><?php echo isEnglish() ? 'Home' : 'गृहपृष्ठ'; ?></a>
                 </div>
             </div>
@@ -188,7 +190,7 @@ require_once 'includes/header.php';
                         <div class="appt-step-help">
                             <i class="fas fa-search me-1"></i>
                             <?php echo isEnglish() ? 'After booking, use your Tracking ID on the ' : 'बुक गरेपछि '; ?>
-                            <a href="application-tracker.php" class="appt-step-link">
+                            <a href="<?php echo e($trackerUrl); ?>" class="appt-step-link">
                                 <?php echo isEnglish() ? 'Application Tracker' : 'Application Tracker'; ?>
                             </a>
                             <?php echo isEnglish() ? ' page to check status.' : ' मा Tracking ID बाट स्थिति हेर्नुहोस्।'; ?>

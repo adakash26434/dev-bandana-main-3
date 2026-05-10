@@ -12,6 +12,8 @@ $error      = '';
 $trackingId = '';
 $loggedMember = getLoggedInMemberProfile();
 $lockedMemberFields = $loggedMember ? 'readonly' : '';
+$isEmbed = !empty($_GET['embed']);
+$trackerUrl = $isEmbed ? (SITE_URL . 'member/tracker.php') : 'application-tracker.php';
 
 /* सेवा प्रकारहरू — icon, Nepali र English नाम */
 $serviceTypes = [
@@ -213,13 +215,13 @@ require_once 'includes/header.php';
                         <div class="form-tracking-id" id="dsTrkId"><?php echo e($trackingId); ?></div>
                         <button type="button" onclick="copyTrk('dsTrkId',this)" class="btn btn-sm btn-outline-success py-0 px-2 ds-track-copy" title="Copy"><i class="fas fa-copy"></i></button>
                     </div>
-                    <div class="form-tracking-help"><a href="application-tracker.php" class="ds-track-help-link">यहाँ बाट</a> Application Tracker मा स्थिति हेर्नुहोस्।</div>
+                    <div class="form-tracking-help"><a href="<?php echo e($trackerUrl); ?>" class="ds-track-help-link"><?php echo isEnglish() ? 'Click here' : 'यहाँ बाट'; ?></a> <?php echo isEnglish() ? 'to check status in Tracker.' : 'Tracker मा स्थिति हेर्नुहोस्।'; ?></div>
                 </div>
                 <div class="mt-3">
-                    <a href="application-tracker.php" class="btn ds-btn-success px-4 me-2">
+                    <a href="<?php echo e($trackerUrl); ?>" class="btn ds-btn-success px-4 me-2">
                         <i class="fas fa-search me-1"></i><?php echo isEnglish() ? 'Track My Request' : 'अनुरोध ट्र्याक'; ?>
                     </a>
-                    <a href="digital-services.php" class="btn btn-outline-secondary px-4">
+                    <a href="digital-services.php<?php echo $isEmbed ? '?embed=1' : ''; ?>" class="btn btn-outline-secondary px-4">
                         <i class="fas fa-plus me-1"></i><?php echo isEnglish() ? 'New Request' : 'नयाँ अनुरोध'; ?>
                     </a>
                 </div>
@@ -246,7 +248,7 @@ require_once 'includes/header.php';
                     <?php echo isEnglish() ? 'Request a Service' : 'सेवा अनुरोध गर्नुहोस्'; ?>
                 </a>
                 <?php if ($success): ?>
-                <a href="application-tracker.php" class="btn btn-outline-success btn-lg px-4 ms-2">
+                <a href="<?php echo e($trackerUrl); ?>" class="btn btn-outline-success btn-lg px-4 ms-2">
                     <i class="fas fa-search me-2"></i>
                     <?php echo isEnglish() ? 'Track My Request' : 'अनुरोध ट्र्याक गर्नुहोस्'; ?>
                 </a>
