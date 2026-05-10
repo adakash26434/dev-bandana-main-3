@@ -277,8 +277,8 @@ try {
         </div>
         <?php endif; ?>
         <span class="mem-topbar-name"><?php echo htmlspecialchars($_memName); ?></span>
-        <a href="<?php echo $_siteUrl; ?>member/logout.php" class="mem-topbar-btn">
-            <i class="fas fa-sign-out-alt"></i> <?php echo $_t('लगआउट', 'Logout'); ?>
+        <a href="<?php echo $_siteUrl; ?>member/logout.php" class="mem-topbar-btn mem-topbar-logout">
+            <i class="fas fa-sign-out-alt"></i><span class="mem-logout-text"> <?php echo $_t('लगआउट', 'Logout'); ?></span>
         </a>
     </div>
 </div>
@@ -307,5 +307,5 @@ try {
         <a href="<?php echo $_siteUrl; ?>member/service-request.php" class="mem-nav-item <?php echo $_active==='service'?'active':''; ?>"><i class="fas fa-concierge-bell"></i><?php echo $_t('सेवा अनुरोध', 'Service Request'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/certificate.php" class="mem-nav-item <?php echo $_active==='certificate'?'active':''; ?>"><i class="fas fa-certificate"></i><?php echo $_t('प्रमाणपत्र', 'Certificates'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/profile.php" class="mem-nav-item <?php echo $_active==='profile'?'active':''; ?>"><i class="fas fa-user-circle"></i><?php echo $_t('प्रोफाइल', 'Profile'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>" class="mem-nav-item"><i class="fas fa-globe"></i><?php echo $_t('मुख्य साइट', 'Main Site'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>" class="mem-nav-item" target="_blank" rel="noopener"><i class="fas fa-globe"></i><?php echo $_t('मुख्य साइट', 'Main Site'); ?></a>
     </nav>

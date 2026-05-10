@@ -1391,14 +1391,48 @@
     .mem-nav { display: none !important; }
 }
 
+/* ── Mobile topbar improvements ── */
+@media (max-width: 768px) {
+    .mem-topbar { padding: 6px 12px; min-height: 48px; }
+    .mem-topbar-right { gap: 8px; }
+    /* Logout: icon only on mobile — saves ~60px */
+    .mem-logout-text { display: none; }
+    .mem-topbar-logout { padding: 5px 8px; min-width: 32px; justify-content: center; }
+    /* Lang badge — always show, compact */
+    .mem-lang-code { font-size: 0.65rem; }
+    /* Name hidden below 768 */
+    .mem-topbar-name { display: none; }
+    /* Logo image max-width tighter on mobile */
+    .mem-topbar-brand img { max-height: 38px; max-width: min(160px, 42vw); padding: 3px 6px; }
+}
+
 @media (max-width: 576px) {
-    .mem-container { padding: 14px 10px 60px; }
+    .mem-container { padding: 14px 10px 80px; }
     .mem-id-card { padding: 18px 16px; }
     .mem-id-name { font-size: 1rem; }
     .mem-stats { grid-template-columns: repeat(2, 1fr); }
     .mem-actions { grid-template-columns: repeat(3, 1fr); }
     .mem-oauth-row { grid-template-columns: 1fr; }
-    .mem-topbar-name { display: none; }
+    /* Topbar further compact on very small screens */
+    .mem-topbar { padding: 5px 10px; }
+    .mem-topbar-right { gap: 6px; }
+    .mem-bell-btn { font-size: 0.95rem; padding: 3px; }
+    .mem-topbar-avatar { width: 28px; height: 28px; }
+    .mem-topbar-avatar-stack { width: 28px; height: 28px; }
+}
+
+/* ── Member portal form readability (readonly auto-filled fields) ── */
+.form-control[readonly],
+.wf-readonly {
+    background: color-mix(in srgb, var(--primary-color, #1a8754) 6%, #f9fafb) !important;
+    color: var(--text-muted, #6b7280) !important;
+    border-style: dashed !important;
+    cursor: default;
+}
+/* Info bar for auto-fill notice */
+.sr-info-bar, .wf-info-box {
+    font-size: .83rem;
+    line-height: 1.55;
 }
 
 /* ── EMI Calculator ── */
