@@ -94,8 +94,8 @@ $extraHead = <<<HTML
   box-shadow:0 8px 32px rgba(var(--primary-rgb),.12);
   position:relative; overflow:hidden;
 }
-.cert-top-band { background:var(--primary-color); color:var(--text-on-primary); padding:14px 24px; display:flex; align-items:center; gap:16px; }
-.cert-logo { width:52px; height:52px; border-radius:10px; background:white; padding:4px; object-fit:contain; }
+.cert-top-band { background:var(--primary-color); color:var(--text-on-primary); padding:12px 24px; display:flex; align-items:center; gap:18px; }
+.cert-logo { height:auto; width:auto; max-height:52px; max-width:200px; border-radius:10px; background:rgba(255,255,255,0.12); padding:6px 10px; object-fit:contain; }
 .cert-logo-placeholder { width:52px;height:52px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem; }
 .cert-site-name { font-size:1.1rem; font-weight:800; line-height:1.2; }
 .cert-site-sub  { font-size:.78rem; opacity:.85; margin-top:2px; }
