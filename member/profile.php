@@ -93,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_kyc_docs'])) {
         $error = 'KYC रेकर्ड भेटिएन।';
     } else {
         $candidates = [];
-        foreach (['photo', 'signature', 'left_thumb', 'right_thumb'] as $f) {
-            if ($f !== 'photo' && empty($kycDocCols[$f])) {
+        foreach (['photo', 'citizenship_front', 'citizenship_back', 'signature', 'left_thumb', 'right_thumb'] as $f) {
+            if (!in_array($f, ['photo', 'citizenship_front', 'citizenship_back'], true) && empty($kycDocCols[$f])) {
                 continue;
             }
             if (!kycDocNeedsUpload($kycRow[$f] ?? null)) {
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_kyc_docs'])) {
             $set = [];
             $vals = [];
             foreach ($candidates as $f) {
-                $jpegOnly = ($f !== 'signature');
+                $jpegOnly = !in_array($f, ['signature'], true);
                 $path = captureOrUpload($f, 'kyc', $jpegOnly);
                 if ($path === '') {
                     continue;
@@ -207,8 +207,8 @@ $pageTitle = $_t('मेरो प्रोफाइल', 'My Profile') . ' — 
 
 $profileKycCapture = false;
 if ($kycRow) {
-    foreach (['photo', 'signature', 'left_thumb', 'right_thumb'] as $fk) {
-        if ($fk !== 'photo' && empty($kycDocCols[$fk])) {
+    foreach (['photo', 'citizenship_front', 'citizenship_back', 'signature', 'left_thumb', 'right_thumb'] as $fk) {
+        if (!in_array($fk, ['photo', 'citizenship_front', 'citizenship_back'], true) && empty($kycDocCols[$fk])) {
             continue;
         }
         if (kycDocNeedsUpload($kycRow[$fk] ?? null)) {
@@ -593,7 +593,7 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
                         </div>
 
                         <?php if (!empty($missing)): ?>
-                        <form method="POST" novalidate class="needs-validation" enctype="multipart/form-data" class="kyc-form mem-kyc-cap-form" style="margin-top:8px;">
+                        <form method="POST" novalidate enctype="multipart/form-data" class="kyc-form mem-kyc-cap-form needs-validation" style="margin-top:8px;">
                             <?php echo csrfField(); ?>
                             <input type="hidden" name="do_kyc_docs" value="1">
                             <?php if ($kycLocked): ?>
@@ -604,10 +604,30 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
                             <div class="small text-muted mb-2">KYM single-source कायम राख्दै, हराइरहेको कागजात यहींबाट अपडेट गर्न सक्नुहुन्छ।</div>
                             <?php if (kycDocNeedsUpload($kycRow['photo'] ?? null)): ?>
                             <div class="mem-field">
-                                <label>फोटो</label>
+                                <label>फोटो <span style="color:#dc2626;">*</span></label>
                                 <div class="kyc-cap-field" data-kyc-cap="passport">
-                                    <span class="kyc-cap-label">पासपोर्ट साइज फोटो</span>
+                                    <span class="kyc-cap-label">पासपोर्ट साइज फोटो — दुवै आँखा र दुवै कान स्पष्ट हुनुपर्छ</span>
                                     <input type="hidden" name="photo">
+                                </div>
+                                <div style="font-size:.75rem;color:#b45309;margin-top:4px;"><i class="fas fa-triangle-exclamation"></i> आँखा र कान स्पष्ट नदेखिएमा Admin ले Reject गर्नेछन्।</div>
+                            </div>
+                            <?php endif; ?>
+                            <?php if (kycDocNeedsUpload($kycRow['citizenship_front'] ?? null)): ?>
+                            <div class="mem-field">
+                                <label>नागरिकता अगाडि <span style="color:#dc2626;">*</span></label>
+                                <div class="kyc-cap-field" data-kyc-cap="citizen_front">
+                                    <span class="kyc-cap-label">नागरिकता अगाडिको फोटो — असली नागरिकता पत्र मात्र</span>
+                                    <input type="hidden" name="citizenship_front">
+                                </div>
+                                <div style="font-size:.75rem;color:#b45309;margin-top:4px;"><i class="fas fa-triangle-exclamation"></i> राष्ट्रिय परिचयपत्र वा अन्य कागजात हाल्न नहोस्।</div>
+                            </div>
+                            <?php endif; ?>
+                            <?php if (kycDocNeedsUpload($kycRow['citizenship_back'] ?? null)): ?>
+                            <div class="mem-field">
+                                <label>नागरिकता पछाडि <span style="color:#dc2626;">*</span></label>
+                                <div class="kyc-cap-field" data-kyc-cap="citizen_back">
+                                    <span class="kyc-cap-label">नागरिकता पछाडिको फोटो — असली नागरिकता पत्र मात्र</span>
+                                    <input type="hidden" name="citizenship_back">
                                 </div>
                             </div>
                             <?php endif; ?>
@@ -698,7 +718,12 @@ $kymDobDisplay = (trim((string)($kymDobKr['dob_bs'] ?? '')) !== '')
 
     btnProfile.addEventListener('click', function () { showTab('profile'); });
     btnSecurity.addEventListener('click', function () { showTab('security'); });
-    btnKyc.addEventListener('click', function () { showTab('kyc'); });
+    btnKyc.addEventListener('click', function () {
+        showTab('kyc');
+        if (window.KYCCapture && window.KYCCapture.initAllKYCCapture) {
+            setTimeout(window.KYCCapture.initAllKYCCapture, 50);
+        }
+    });
     var initial = (window.location.hash || '').toLowerCase().replace('#', '');
     if (initial !== 'profile' && initial !== 'security' && initial !== 'kyc') initial = 'profile';
     showTab(initial);

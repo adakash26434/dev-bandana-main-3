@@ -660,11 +660,13 @@ window._kycCaptureInited = true;
       let label = 'राम्रो — यो फोटो प्रयोग गर्न सकिन्छ';
       let cls = 'good';
       if (score < 50) {
-        label = 'गुणस्तर कम — फोटो फेरि खिच्नुहोस्';
+        label = 'गुणस्तर कम (' + score + '/100) — फेरि खिच्नुहोस्';
         cls = 'bad';
       } else if (score < 70) {
-        label = 'ठिकै — सम्भव भएसम्म अझ स्पष्ट फोटो राख्नुहोस्';
+        label = 'ठिकै (' + score + '/100) — अझ स्पष्ट फोटो राख्नुहोस्';
         cls = 'ok';
+      } else {
+        label = 'राम्रो (' + score + '/100) — दुवै आँखा र कान स्पष्ट भए confirm गर्नुहोस्';
       }
 
       const extra = field.preview.querySelector('.kyc-cap-extra');
@@ -721,9 +723,19 @@ window._kycCaptureInited = true;
 
       if (!textLikely) {
         field.hidden.value = '';
-        setTimeout(() => {
-          alert((label || 'कागजात') + ' अस्पष्ट/गलत देखियो (कागजातको टेक्स्ट/किनारा भेटिएन)। कृपया असली नागरिकताको फोटो फेरि लिनुहोस्।');
-        }, 50);
+        const fieldName = field.hidden ? (field.hidden.name || '') : '';
+        let warnMsg = '';
+        if (fieldName === 'citizenship_front' || fieldName === 'citizenship_back') {
+          warnMsg = '⚠️ यो फोटो नागरिकता जस्तो देखिएन।\n\n'
+            + '✅ सही: असली नेपाली नागरिकता पत्रको फोटो\n'
+            + '❌ गलत: राष्ट्रिय परिचयपत्र, Voter ID, अन्य कार्ड, वा अनुहारको फोटो\n\n'
+            + 'कृपया असली नागरिकता पत्रको स्पष्ट फोटो फेरि लिनुहोस्।';
+        } else if (fieldName === 'national_id_card') {
+          warnMsg = '⚠️ यो फोटो राष्ट्रिय परिचयपत्र जस्तो देखिएन।\n\nकृपया असली NID/Smart Card को स्पष्ट फोटो लिनुहोस्।';
+        } else {
+          warnMsg = (label || 'कागजात') + ' अस्पष्ट/गलत देखियो।\nकागजातको टेक्स्ट/किनारा स्पष्ट नभएमा Admin ले Reject गर्नेछन्।\nकृपया फेरि स्पष्ट फोटो लिनुहोस्।';
+        }
+        setTimeout(() => { alert(warnMsg); }, 50);
       }
     };
     img.src = dataUrl;

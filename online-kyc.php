@@ -410,6 +410,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         : 'पासपोर्ट फोटो guideline पुष्टि गर्नुहोस् (दुवै आँखा र दुवै कान स्पष्ट देखिनुपर्छ)।';
                 }
 
+                // Server-side: if JS quality score sent and is critically low, flag for admin review
+                if (!$error && $photo_quality_score > 0 && $photo_quality_score < 30) {
+                    $error = isEnglish()
+                        ? 'Photo quality is too low (score: ' . $photo_quality_score . '/100). Please retake with better lighting and a clear face.'
+                        : 'फोटो गुणस्तर धेरै कम छ (Score: ' . $photo_quality_score . '/100)। राम्रो उज्यालोमा स्पष्ट अनुहार देखिने फोटो फेरि खिच्नुहोस्।';
+                }
+
                 if (!$error) {
                     $kycTrackingId = $existingKyc['tracking_id'] ?? ('KYC-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid('', true)), 0, 6)));
                     $want_id_card  = isset($_POST['want_id_card']) ? 1 : 0;

@@ -113,7 +113,8 @@ $_active = $_self === 'index.php' || $_self === ''  ? 'dashboard'
         : ($_self === 'loan-apply.php'              ? 'apply-loan'
         : ($_self === 'account-apply.php'           ? 'apply-account'
         : ($_self === 'grievance.php'               ? 'apply-grievance'
-        : ($_applyFrameP === 'digital'              ? 'apply-digital' : ''))))))))))))));
+        : ($_self === 'digital-service.php'         ? 'apply-digital'
+        : ($_applyFrameP === 'digital'              ? 'apply-digital' : ''))))))))))))))));
 
 /* Notifications for bell */
 $_unread = function_exists('getMemberUnreadCount') ? getMemberUnreadCount($_memId) : 0;
@@ -316,7 +317,7 @@ try {
         <a href="<?php echo $_siteUrl; ?>member/appointment.php" class="mem-nav-item <?php echo $_active==='apply-appointment'?'active':''; ?>"><i class="fas fa-calendar-check"></i><?php echo $_t('भेटघाट', 'Appointment'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/loan-apply.php" class="mem-nav-item <?php echo $_active==='apply-loan'?'active':''; ?>"><i class="fas fa-hand-holding-dollar"></i><?php echo $_t('ऋण आवेदन', 'Loan Apply'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/account-apply.php" class="mem-nav-item <?php echo $_active==='apply-account'?'active':''; ?>"><i class="fas fa-landmark"></i><?php echo $_t('खाता खोल्ने', 'Open Account'); ?></a>
-        <a href="<?php echo $_siteUrl; ?>member/apply-frame.php?p=digital" class="mem-nav-item <?php echo $_active==='apply-digital'?'active':''; ?>"><i class="fas fa-laptop"></i><?php echo $_t('डिजिटल सेवा', 'Digital Service'); ?></a>
+        <a href="<?php echo $_siteUrl; ?>member/digital-service.php" class="mem-nav-item <?php echo $_active==='apply-digital'?'active':''; ?>"><i class="fas fa-laptop"></i><?php echo $_t('डिजिटल सेवा', 'Digital Service'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/grievance.php" class="mem-nav-item <?php echo $_active==='apply-grievance'?'active':''; ?>"><i class="fas fa-comment-exclamation"></i><?php echo $_t('गुनासो', 'Grievance'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/certificate.php" class="mem-nav-item <?php echo $_active==='certificate'?'active':''; ?>"><i class="fas fa-certificate"></i><?php echo $_t('प्रमाणपत्र', 'Certificates'); ?></a>
         <a href="<?php echo $_siteUrl; ?>member/profile.php" class="mem-nav-item <?php echo $_active==='profile'?'active':''; ?>"><i class="fas fa-user-circle"></i><?php echo $_t('प्रोफाइल', 'Profile'); ?></a>
