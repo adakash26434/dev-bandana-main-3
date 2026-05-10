@@ -8576,7 +8576,7 @@ input[readonly].nepali-datepicker:hover,
 
 .ip-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 0;
     border-bottom: 1px solid #f0f0f0;
 }
@@ -8640,10 +8640,13 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .ip-stat-value {
-    font-size: 1.02rem;
+    font-size: 0.96rem;
     font-weight: 800;
     color: #1a1a1a;
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ip-stat-label {

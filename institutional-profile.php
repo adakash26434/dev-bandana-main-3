@@ -281,7 +281,7 @@ function ipShortAmt(float $v): string {
 /* Stats Grid */
 .ip-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 0;
     border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f0f0f0);
 }
@@ -313,10 +313,13 @@ function ipShortAmt(float $v): string {
 .ip-stat-purple .ip-stat-icon   { background:color-mix(in srgb, var(--primary-dark) 12%, white); color:var(--primary-dark); }
 
 .ip-stat-value {
-    font-size: 1.02rem;
+    font-size: 0.96rem;
     font-weight: 800;
     color: var(--text-color,#1a1a1a);
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .ip-stat-label {
     font-size: 0.75rem;
