@@ -56,9 +56,11 @@ $errorMsg   = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submit_claim') {
     if (!verifyCSRFToken()) {
-        $errorMsg = $_t('सुरक्षा जाँच असफल। पुनः प्रयास गर्नुहोस्।', 'Security check failed. Please try again.');
+        header('Location: welfare.php?err=csrf');
+        exit;
     } elseif (!checkRateLimit('welfare_portal_' . $memberId, 5, 3600)) {
-        $errorMsg = $_t('धेरै अनुरोधहरू भए। १ घण्टापछि पुनः प्रयास गर्नुहोस्।', 'Too many requests. Please try again after 1 hour.');
+        header('Location: welfare.php?err=ratelimit');
+        exit;
     } else {
         $claimType  = trim($_POST['claim_type'] ?? '');
         $desc       = trim(substr($_POST['description'] ?? '', 0, 4000));
@@ -78,7 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
 
         $validTypes = ['maternity','death','insurance','medical','accident','other'];
         if (!in_array($claimType, $validTypes, true)) {
-            $errorMsg = $_t('दाबी प्रकार छान्नुहोस्।', 'Please select claim type.');
+            header('Location: welfare.php?err=no_type');
+            exit;
         } else {
             try {
                 $submit = submitWelfareClaimUnified($db, [
@@ -105,14 +108,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
                     'insurer_name' => $insurerNm ?: null,
                 ], $_FILES);
                 $trackingId = $submit['tracking_id'];
-                $successMsg = isEnglish()
-                    ? "Claim submitted successfully! Tracking ID: <strong>$trackingId</strong> — You will be notified after admin review."
-                    : "दाबी सफलतापूर्वक दर्ता भयो! Tracking ID: <strong>$trackingId</strong> — Admin ले समीक्षा गरेपछि सूचित गरिनेछ।";
+                /* PRG: redirect so browser refresh doesn't re-submit */
+                header('Location: welfare.php?submitted=1&tid=' . urlencode($trackingId));
+                exit;
             } catch (Throwable $e) {
-                $errorMsg = $_t('दाबी दर्ता गर्न समस्या भयो। पुनः प्रयास गर्नुहोस्।', 'Failed to submit claim. Please try again.');
                 error_log('[welfare portal] ' . $e->getMessage());
+                header('Location: welfare.php?err=submit_failed');
+                exit;
             }
         }
+    }
+    /* Unhandled POST (wrong action etc.) — redirect to prevent re-submit */
+    if (empty($successMsg) && empty($errorMsg)) {
+        header('Location: welfare.php');
+        exit;
     }
 }
 
@@ -130,6 +139,22 @@ try {
 
 $siteName  = getSetting('site_name', 'सहकारी');
 $pageTitle = ($_t('कल्याण दाबी', 'Welfare Claims')) . ' — ' . $siteName;
+
+/* ── Resolve PRG flash messages from GET params ── */
+if (!empty($_GET['submitted']) && !empty($_GET['tid'])) {
+    $tid = htmlspecialchars($_GET['tid']);
+    $successMsg = isEnglish()
+        ? "Claim submitted successfully! Tracking ID: <strong>$tid</strong> — You will be notified after admin review."
+        : "दाबी सफलतापूर्वक दर्ता भयो! Tracking ID: <strong>$tid</strong> — Admin ले समीक्षा गरेपछि सूचित गरिनेछ।";
+}
+if (!empty($_GET['err'])) {
+    $errKey = $_GET['err'];
+    if ($errKey === 'csrf')         $errorMsg = $_t('सुरक्षा जाँच असफल। पुनः प्रयास गर्नुहोस्।', 'Security check failed. Please try again.');
+    elseif ($errKey === 'ratelimit') $errorMsg = $_t('धेरै अनुरोधहरू भए। १ घण्टापछि पुनः प्रयास गर्नुहोस्।', 'Too many requests. Please try again after 1 hour.');
+    elseif ($errKey === 'no_type')   $errorMsg = $_t('दाबी प्रकार छान्नुहोस्।', 'Please select claim type.');
+    else                             $errorMsg = $_t('दाबी दर्ता गर्न समस्या भयो। पुनः प्रयास गर्नुहोस्।', 'Failed to submit claim. Please try again.');
+}
+
 $activeTab = empty($myClaims) ? 'new' : ((!empty($_GET['new']) || !empty($successMsg)) ? 'new' : 'history');
 $csrfField = '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCSRFToken()) . '">';
 
