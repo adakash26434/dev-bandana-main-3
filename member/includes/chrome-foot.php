@@ -22,11 +22,10 @@ $_footLangBadge = $_footIsEn ? 'नेपाली' : 'EN';
 <!-- Mobile bottom navigation (hidden on desktop ≥900px) -->
 <nav class="mp-bottom-nav">
   <a href="<?php echo SITE_URL; ?>member/"><i class="fas fa-house"></i><span><?php echo $_footT('गृह', 'Home'); ?></span></a>
-  <a href="<?php echo SITE_URL; ?>member/programs.php"><i class="fas fa-calendar-alt"></i><span><?php echo $_footT('कार्यक्रम', 'Programs'); ?></span></a>
+  <a href="<?php echo SITE_URL; ?>member/attend.php"><i class="fas fa-calendar-check"></i><span><?php echo $_footT('उपस्थिति', 'Attend'); ?></span></a>
   <a href="<?php echo SITE_URL; ?>member/scan.php" class="mp-nav-scan" aria-label="<?php echo $_footT('QR स्क्यान', 'Scan QR'); ?>"><i class="fas fa-qrcode"></i><span><?php echo $_footT('स्क्यान', 'Scan'); ?></span></a>
   <a href="<?php echo SITE_URL; ?>member/id-card.php"><i class="fas fa-id-card"></i><span><?php echo $_footT('आईडी', 'ID Card'); ?></span></a>
   <a href="<?php echo SITE_URL; ?>member/profile.php"><i class="fas fa-user-circle"></i><span><?php echo $_footT('प्रोफाइल', 'Profile'); ?></span></a>
-  <a href="<?php echo htmlspecialchars($_footLangToggleUrl, ENT_QUOTES); ?>" class="mp-nav-lang" title="<?php echo $_footT('भाषा', 'Language'); ?>"><i class="fas fa-language"></i><span><?php echo htmlspecialchars($_footLangBadge); ?></span></a>
 </nav>
 
 <style>
