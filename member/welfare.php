@@ -371,35 +371,41 @@ HTML;
 
   <!-- Tab: New Claim Form -->
   <div class="wf-pane <?= $activeTab==='new'?'active':'' ?>" id="pane-new">
-    <div class="wf-info-box">
-      <i class="fas fa-circle-info icon"></i>
-      <div><?php echo $_t('तपाईंको नाम, फोन र ठेगाना profile बाट auto-fill भएको छ। केवल दाबीको विवरण भर्नुहोस्।', 'Your name, phone, and address are auto-filled from profile. Please fill only claim details.'); ?></div>
+    <div class="mem-autofill-banner">
+      <i class="fas fa-wand-magic-sparkles"></i>
+      <div><?php echo $_t('तपाईंको नाम, फोन र ठेगाना <strong>KYC बाट auto-fill</strong> भएको छ — तल देखिन्छ। केवल दाबीको विवरण भर्नुहोस्।', 'Your name, phone and address are <strong>auto-filled from KYC</strong> — shown below. Fill only claim details.'); ?></div>
     </div>
 
     <form method="POST" enctype="multipart/form-data">
       <?= $csrfField ?>
       <input type="hidden" name="action" value="submit_claim">
 
-      <!-- Pre-filled member info (readonly) -->
-      <div class="wf-member-box">
-        <div class="wf-member-title"><?php echo $_t('सदस्य जानकारी (Auto-filled)', 'Member Information (Auto-filled)'); ?></div>
-        <div class="form-row cols2">
-          <div class="form-group wf-mb-8">
-            <label><?php echo $_t('नाम', 'Name'); ?></label>
-            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($memName) ?>" readonly>
+      <!-- Pre-filled member info — display only, no input fields -->
+      <div class="mem-prefill-block">
+        <div class="mem-prefill-block-head"><i class="fas fa-user-check"></i><?php echo $_t('सदस्य जानकारी (KYC बाट)', 'Member Info (from KYC)'); ?></div>
+        <div class="mem-prefill-grid">
+          <div class="mem-prefill-item">
+            <span class="mem-prefill-label"><?php echo $_t('नाम', 'Name'); ?></span>
+            <span class="mem-prefill-value"><?= htmlspecialchars($memName ?: '—') ?></span>
           </div>
-          <div class="form-group wf-mb-8">
-            <label><?php echo $_t('सदस्यता नम्बर', 'Membership Number'); ?></label>
-            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($memSadasyata) ?>" readonly>
+          <div class="mem-prefill-item">
+            <span class="mem-prefill-label"><?php echo $_t('सदस्यता नम्बर', 'Member No.'); ?></span>
+            <span class="mem-prefill-value mem-tracking-id"><?= htmlspecialchars($memSadasyata ?: '—') ?></span>
           </div>
-          <div class="form-group wf-mb-8">
-            <label><?php echo $_t('फोन', 'Phone'); ?></label>
-            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($resolvedPhone) ?>" readonly>
+          <div class="mem-prefill-item">
+            <span class="mem-prefill-label"><?php echo $_t('फोन', 'Phone'); ?></span>
+            <span class="mem-prefill-value"><?= htmlspecialchars($resolvedPhone ?: '—') ?></span>
           </div>
-          <div class="form-group wf-mb-0">
-            <label>Email</label>
-            <input type="text" class="form-control wf-readonly" value="<?= htmlspecialchars($resolvedEmail) ?>" readonly>
+          <div class="mem-prefill-item">
+            <span class="mem-prefill-label">Email</span>
+            <span class="mem-prefill-value"><?= htmlspecialchars($resolvedEmail ?: '—') ?></span>
           </div>
+          <?php if ($resolvedAddress): ?>
+          <div class="mem-prefill-item">
+            <span class="mem-prefill-label"><?php echo $_t('ठेगाना', 'Address'); ?></span>
+            <span class="mem-prefill-value"><?= htmlspecialchars($resolvedAddress) ?></span>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
 
