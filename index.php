@@ -101,14 +101,17 @@ ensurePublicTables();
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start;
+    text-align: left;
     padding: 2rem;
 }
 
 .hero-text-wrapper {
     max-width: 600px;
     animation: heroTextSlide 1s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 @keyframes heroTextSlide {
@@ -398,18 +401,18 @@ $L = getLangStrings();
                                 <div class="hero-text-wrapper">
                                     <h1 class="hero-title-modern"><?php echo e($slider['title']); ?></h1>
                                     <p class="hero-subtitle-modern"><?php echo e($slider['subtitle']); ?></p>
+                                    <?php if ($slider['button_text']): ?>
+                                    <div class="hero-actions-modern">
+                                        <a href="<?php echo e($slider['button_url']); ?>" class="btn hero-btn-modern">
+                                            <span class="btn-content">
+                                                <?php echo e($slider['button_text']); ?>
+                                                <i class="fas fa-arrow-right btn-icon"></i>
+                                            </span>
+                                            <span class="btn-shine"></span>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
-                                <?php if ($slider['button_text']): ?>
-                                <div class="hero-actions-modern">
-                                    <a href="<?php echo e($slider['button_url']); ?>" class="btn hero-btn-modern">
-                                        <span class="btn-content">
-                                            <?php echo e($slider['button_text']); ?>
-                                            <i class="fas fa-arrow-right btn-icon"></i>
-                                        </span>
-                                        <span class="btn-shine"></span>
-                                    </a>
-                                </div>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -424,14 +427,14 @@ $L = getLangStrings();
                                 <div class="hero-text-wrapper">
                                     <h1 class="hero-title-modern"><?php echo $heroTitle; ?></h1>
                                     <p class="hero-subtitle-modern"><?php echo $heroSubtitle; ?></p>
-                                </div>
-                                <div class="hero-actions-modern">
-                                    <a href="about.php" class="btn hero-btn-modern">
-                                        <span class="btn-content">
-                                            <?php echo isEnglish() ? 'Learn More' : 'थप जान्नुहोस्'; ?> <i class="fas fa-arrow-right btn-icon"></i>
-                                        </span>
-                                        <span class="btn-shine"></span>
-                                    </a>
+                                    <div class="hero-actions-modern">
+                                        <a href="about.php" class="btn hero-btn-modern">
+                                            <span class="btn-content">
+                                                <?php echo isEnglish() ? 'Learn More' : 'थप जान्नुहोस्'; ?> <i class="fas fa-arrow-right btn-icon"></i>
+                                            </span>
+                                            <span class="btn-shine"></span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
