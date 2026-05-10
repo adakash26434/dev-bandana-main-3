@@ -416,16 +416,23 @@ $L = getLangStrings();
                 </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="carousel-item active">
-                    <div class="slider-bg default-slider">
-                        <div class="slider-overlay"></div>
+                <div class="carousel-item hero-slide-modern active">
+                    <div class="slider-bg hero-bg-modern default-slider" style="background-image: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
+                        <div class="slider-overlay hero-overlay-modern"></div>
                         <div class="container">
-                            <div class="slider-content">
-                                <h1><?php echo $heroTitle; ?></h1>
-                                <p><?php echo $heroSubtitle; ?></p>
-                                <a href="about.php" class="btn home-btn-primary btn-lg">
-                                    थप जान्नुहोस् <i class="fas fa-arrow-right"></i>
-                                </a>
+                            <div class="slider-content hero-content-modern">
+                                <div class="hero-text-wrapper">
+                                    <h1 class="hero-title-modern"><?php echo $heroTitle; ?></h1>
+                                    <p class="hero-subtitle-modern"><?php echo $heroSubtitle; ?></p>
+                                </div>
+                                <div class="hero-actions-modern">
+                                    <a href="about.php" class="btn hero-btn-modern">
+                                        <span class="btn-content">
+                                            <?php echo isEnglish() ? 'Learn More' : 'थप जान्नुहोस्'; ?> <i class="fas fa-arrow-right btn-icon"></i>
+                                        </span>
+                                        <span class="btn-shine"></span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
