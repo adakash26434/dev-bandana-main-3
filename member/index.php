@@ -81,10 +81,14 @@ if ($raQ !== '') {
 $recentApps = array_slice($recentFiltered, 0, 5);
 
 /* Notifications */
-$unread  = getMemberUnreadCount($memberId);
-$notifSt = $db->prepare("SELECT * FROM member_notifications WHERE member_id=? ORDER BY created_at DESC LIMIT 5");
-$notifSt->execute([$memberId]);
-$notifs  = $notifSt->fetchAll(PDO::FETCH_ASSOC);
+$unread = 0;
+$notifs = [];
+try {
+    $unread  = getMemberUnreadCount($memberId);
+    $notifSt = $db->prepare("SELECT * FROM member_notifications WHERE member_id=? ORDER BY created_at DESC LIMIT 5");
+    $notifSt->execute([$memberId]);
+    $notifs  = $notifSt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+} catch (Throwable $e) { $unread = 0; $notifs = []; }
 
 /* ── Partner service history ── */
 $partnerHistory = [];
