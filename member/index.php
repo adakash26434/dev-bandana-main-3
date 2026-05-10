@@ -203,7 +203,12 @@ require __DIR__ . '/includes/chrome.php';
     <!-- Greeting -->
     <div class="mem-greeting midx-greeting">
         <h2 class="midx-greeting-title"><?php echo $greeting; ?>, <?php echo htmlspecialchars($memName); ?>! 👋</h2>
-        <p class="midx-greeting-date"><?php echo $_t('आजको मिति', 'Today'); ?>: <?php echo formatNepaliDate(date('Y-m-d')); ?></p>
+        <p class="midx-greeting-date"><?php
+            /* Use Kathmandu timezone explicitly for accurate BS today */
+            $tz = new DateTimeZone('Asia/Kathmandu');
+            $todayAd = (new DateTimeImmutable('now', $tz))->format('Y-m-d');
+            echo $_t('आजको मिति', 'Today') . ': ' . formatNepaliDate($todayAd);
+        ?></p>
     </div>
 
     <!-- Stat cards -->
