@@ -165,9 +165,9 @@ $extraHead = <<<HTML
 .wf-tlabel.done   { color:var(--primary-color); font-weight:600; }
 .wf-tlabel.active { color:var(--secondary-color); font-weight:700; }
 .form-group { margin-bottom:14px; }
-.form-group label { display:block; font-size:.82rem; font-weight:600; color:var(--text-color); margin-bottom:5px; }
+.form-group label { display:block; font-size:.88rem; font-weight:600; color:var(--text-color); margin-bottom:5px; line-height:1.5; }
 .form-control { width:100%; padding:10px 14px; min-height:44px; border:1.5px solid color-mix(in srgb, var(--primary-color) 20%, var(--gray-300)); border-radius:10px;
-               font-family:inherit; font-size:.9rem; background:var(--gray-50); transition:border-color .2s; line-height:1.4; }
+               font-family:inherit; font-size:.95rem; background:var(--gray-50); transition:border-color .2s; line-height:1.5; }
 .form-control:focus { outline:none; border-color:var(--primary-color); background:white; box-shadow:0 0 0 3px rgba(var(--primary-rgb),.12); }
 .form-row { display:grid; gap:12px; }
 .form-row.cols2 { grid-template-columns:1fr 1fr; }
@@ -182,7 +182,7 @@ $extraHead = <<<HTML
 .doc-upload { border:2px dashed color-mix(in srgb, var(--primary-color) 18%, var(--gray-200)); border-radius:10px; padding:16px; text-align:center; cursor:pointer; transition:border .2s; }
 .doc-upload:hover { border-color:var(--primary-color); }
 .wf-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
-.wf-title { font-size:1.25rem; font-weight:700; color:var(--primary-color); margin:0; }
+.wf-title { font-size:1.45rem; font-weight:700; color:var(--primary-color); margin:0; line-height:1.4; }
 .wf-title-icon, .wf-link-icon, .wf-tab-icon { margin-right:8px; }
 .wf-link-row { display:flex; gap:8px; }
 .wf-link { font-size:.8rem; color:var(--primary-color); text-decoration:none; }
@@ -506,16 +506,18 @@ function showTab(btn, tab) {
     if (el) el.classList.add('active');
 }
 function showTypeFields(type) {
-    document.querySelectorAll('.type-fields').forEach(f => f.classList.remove('show'));
-    var map = {
-        'death'     : 'tf-death',
-        'maternity' : 'tf-maternity',
-        'medical'   : 'tf-medical',
-        'accident'  : 'tf-medical',
-        'insurance' : 'tf-insurance',
-        'other'     : 'tf-other'
-    };
-    if (map[type]) document.getElementById(map[type]).classList.add('show');
+    setTimeout(function() {
+        document.querySelectorAll('.type-fields').forEach(f => f.classList.remove('show'));
+        var map = {
+            'death'     : 'tf-death',
+            'maternity' : 'tf-maternity',
+            'medical'   : 'tf-medical',
+            'accident'  : 'tf-medical',
+            'insurance' : 'tf-insurance',
+            'other'     : 'tf-other'
+        };
+        if (map[type]) document.getElementById(map[type]).classList.add('show');
+    }, 0);
 }
 function showFiles(input) {
     var list = document.getElementById('fileList');

@@ -117,7 +117,7 @@ $extraHead = <<<HTML
 .cert-watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-30deg); font-size:5rem; font-weight:900; color:rgba(var(--primary-rgb),.04); pointer-events:none; white-space:nowrap; z-index:0; }
 .cert-ribbon { position:absolute; top:16px; right:-20px; background:var(--secondary-color); color:var(--text-on-secondary); font-size:.65rem; font-weight:700; padding:4px 28px; transform:rotate(35deg); letter-spacing:.08em; }
 .cert-actions { display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px; }
-.cert-page-title { font-size:1.15rem;font-weight:700;color:var(--primary-color);margin:0; }
+.cert-page-title { font-size:1.45rem;font-weight:700;color:var(--primary-color);margin:0;line-height:1.4; }
 .cert-btn-row { display:flex;gap:10px;flex-wrap:wrap; }
 .cert-btn { padding:9px 20px;border-radius:8px;font-family:inherit;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:6px;text-decoration:none; }
 .cert-btn.primary { background:var(--primary-color);color:var(--text-on-primary);border:none;cursor:pointer; }
