@@ -158,21 +158,26 @@ require __DIR__ . '/includes/chrome.php';
   function extractToken(text) {
     var t = (text || '').trim();
     if (!t) return '';
+    // 1. Try as URL — extract qr_token/token query param
     try {
-      // Check if it's a URL with qr_token parameter
-      var u = new URL(t, window.location.origin);
+      var u = new URL(t);
       var q = u.searchParams.get('qr_token') || u.searchParams.get('token');
-      if (q) return String(q).replace(/[^a-zA-Z0-9_-]/g, '');
+      if (q) {
+        var clean = String(q).replace(/[^a-zA-Z0-9_-]/g, '');
+        return /^[a-zA-Z0-9_-]{8,80}$/.test(clean) ? clean : '';
+      }
+      // It's a URL but has no token param — invalid QR
+      return '';
     } catch (e) {}
-    // Fallback to colon-separated format
+    // 2. Plain token string (not a URL)
     if (/^[a-zA-Z0-9_-]{8,80}$/.test(t)) return t;
-    // Try colon format
-    try {
-        var parts = t.split(':');
-        return parts.length >= 2 ? parts[1].trim() : '';
-    } catch (e) {
-        return '';
+    // 3. Colon-separated "PROG:TOKEN" format
+    var parts = t.split(':');
+    if (parts.length === 2) {
+      var tok = parts[1].trim().replace(/[^a-zA-Z0-9_-]/g, '');
+      return /^[a-zA-Z0-9_-]{8,80}$/.test(tok) ? tok : '';
     }
+    return '';
   }
 
   function validateAndAutoAttend(decodedText) {
