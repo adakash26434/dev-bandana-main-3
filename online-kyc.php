@@ -756,7 +756,7 @@ try {
 <!-- v10.4: KYC capture assets (camera/crop/signature/fingerprint) -->
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/kyc-capture.css?v=10.6">
 <?php printNepalAddressJs(); ?>
-<script defer src="<?php echo SITE_URL; ?>assets/js/kyc-capture.js?v=10.7"></script>
+<script defer src="<?php echo SITE_URL; ?>assets/js/kyc-capture.js?v=10.8"></script>
 
 <!-- KYC Form Section -->
 <section class="kyc-form-section section-padding">
@@ -1558,21 +1558,23 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial deferred safety refresh
     setTimeout(forceCaptureRefresh, 320);
 
-    // Step बदल्दा signature canvas width/pen ठीक रहोस्
+    // Step बदल्दा capture fields re-init + signature canvas ठीक
     ['kymNextBtn', 'kymPrevBtn'].forEach(function (id) {
         var b = document.getElementById(id);
         if (!b) return;
         b.addEventListener('click', function () {
             setTimeout(function () {
+                forceCaptureRefresh();
                 try { window.dispatchEvent(new Event('resize')); } catch (e) {}
-            }, 120);
+            }, 180);
         });
     });
 
-    // Document accordion खुल्दा पनि redraw sizing
+    // Document accordion खुल्दा पनि capture re-init + redraw
     document.querySelectorAll('.kyc-doc-item > summary').forEach(function (s) {
         s.addEventListener('click', function () {
             setTimeout(function () {
+                forceCaptureRefresh();
                 try { window.dispatchEvent(new Event('resize')); } catch (e) {}
             }, 140);
         });
