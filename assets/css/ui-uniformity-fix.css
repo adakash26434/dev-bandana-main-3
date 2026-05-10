@@ -57,6 +57,21 @@ h4, h5, h6 {
     line-height: 1.6 !important;
 }
 
+/* ── Hero / slider display headings — restore large size after global h1 reset ── */
+.hero-title-modern,
+.slider-content h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.4 !important;
+    margin-bottom: 0.75rem !important;
+}
+@media (max-width: 768px) {
+    .hero-title-modern, .slider-content h1 { font-size: 2rem !important; }
+}
+@media (max-width: 480px) {
+    .hero-title-modern, .slider-content h1 { font-size: 1.8rem !important; }
+}
+
 /* ═══════════════════════════════════════════════════
    3. ADMIN INTERFACE SPECIFIC FIXES
    ═══════════════════════════════════════════════════ */
