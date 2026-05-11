@@ -18,10 +18,6 @@ try {
     $savingRates = $loanRates = [];
 }
 ?>
-<style>
-.ir-cta-btn{background:var(--surface-color);border:1px solid color-mix(in srgb,var(--primary-color) 18%,white);color:var(--primary-dark);}
-.ir-cta-btn:hover{background:color-mix(in srgb,var(--primary-color) 10%,white);border-color:color-mix(in srgb,var(--primary-color) 24%,white);color:var(--primary-dark);}
-</style>
 
 <!-- Page Banner -->
 <section class="page-banner">
