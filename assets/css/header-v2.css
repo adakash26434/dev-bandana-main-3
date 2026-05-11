@@ -8,11 +8,12 @@
 .pfl-top-bar {
     background: var(--header-color, var(--topbar-bg, var(--secondary-color)));
     color: #fff;
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif;
     font-size: 12.5px;
     line-height: 1;
-    border-bottom: 1px solid rgba(0,0,0,0.15);
+    border-bottom: 1px solid rgba(0,0,0,0.12);
     position: relative;
-    z-index: 1200; /* keep login dropdown above banner/logo on mobile */
+    z-index: 1200;
     overflow: visible;
 }
 .pfl-top-bar .container {
@@ -20,7 +21,7 @@
     align-items: stretch;
     justify-content: space-between;
     gap: 0;
-    min-height: 34px;
+    min-height: 36px;
 }
 
 /* Quick utility links — left */
@@ -42,12 +43,13 @@
     gap: 5px;
     color: rgba(255,255,255,0.92);
     text-decoration: none;
-    padding: 8px 12px;
+    padding: 8px 13px;
     font-size: 12px;
     font-weight: 500;
-    transition: background .2s, color .2s;
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif;
+    transition: background .18s, color .18s;
     white-space: nowrap;
-    border-right: 1px solid rgba(255,255,255,0.15);
+    border-right: 1px solid rgba(255,255,255,0.12);
 }
 .pfl-quick-links > li > a:hover {
     background: rgba(0,0,0,0.2);
@@ -129,15 +131,19 @@
 .pfl-login-drop-wrap { position: relative; }
 .pfl-login-toggle {
     background: rgba(255,255,255,.18) !important;
-    border: 1px solid rgba(255,255,255,.35) !important;
+    border: 1px solid rgba(255,255,255,.32) !important;
     font-weight: 600 !important;
-    padding: 4px 12px !important;
-    border-radius: 4px !important;
+    padding: 5px 13px !important;
+    border-radius: 6px !important;
     cursor: pointer;
     display: flex !important;
     align-items: center;
+    min-height: 30px;
     gap: 6px;
     white-space: nowrap;
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif;
+    font-size: 12.5px;
+    transition: background .18s, border-color .18s !important;
 }
 .pfl-login-toggle:hover { background: rgba(255,255,255,.32) !important; }
 .pfl-login-caret {
@@ -180,14 +186,15 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 10px;
+    padding: 7px 12px;
     color: #2c3e50;
     text-decoration: none;
     transition: background .15s;
     background: none !important;
     border: none !important;
     font-weight: 400 !important;
-    min-height: 0;
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif;
+    min-height: 42px;
 }
 .pfl-login-menu li a:hover { background: #f4faf5 !important; }
 
@@ -270,11 +277,12 @@
     background: #fff;
     display: flex;
     align-items: center;
-    overflow: visible;               /* must be visible for dropdown menus */
-    min-height: 88px;
+    overflow: visible;
+    min-height: 84px;
     position: relative;
-    z-index: 1100;                   /* below top-bar dropdown, above page content */
+    z-index: 1100;
     isolation: isolate;
+    border-bottom: 1px solid rgba(0,0,0,.04);
 }
 
 /*
@@ -507,19 +515,23 @@
    Deep green text + gold/green hover with gradient pill
 ════════════════════════════════════════════════════ */
 body.header-v2 .pfl-nav-area .nav-menu > li > a {
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif;
     color: #0b3b1a;
     font-weight: 700;
     font-size: 13px;
-    padding: 7px 10px;
-    border-radius: 6px;
+    padding: 8px 11px;
+    border-radius: 7px;
     position: relative;
-    transition: background .22s, color .22s, box-shadow .22s;
+    transition: background .22s, color .22s, box-shadow .2s;
     white-space: nowrap;
-    letter-spacing: 0.005em;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
     background: transparent;
     border: none;
     box-shadow: none;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* Colored underline bar on each item */
@@ -575,9 +587,13 @@ body.header-v2 .pfl-nav-area .nav-menu .dropdown {
     min-width: 210px;
 }
 body.header-v2 .pfl-nav-area .nav-menu .dropdown li a {
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif;
     color: #1a3a25;
     font-size: 13px;
     font-weight: 500;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    min-height: 38px;
     transition: background .15s, color .15s, padding-left .15s;
     border-bottom: 1px solid rgba(0,0,0,0.04);
 }
@@ -600,11 +616,20 @@ body.header-v2 .pfl-nav-area .nav-menu .dropdown li a i {
     margin-left: auto;
     padding: 8px 12px;
     background: none;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    color: #333;
+    border: 1.5px solid rgba(var(--primary-rgb,26,95,42), .22);
+    border-radius: 8px;
+    color: var(--primary-dark, #144a21);
     font-size: 18px;
     cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    transition: background .18s, border-color .18s;
+}
+.pfl-mobile-toggle:hover {
+    background: rgba(var(--primary-rgb,26,95,42), .06);
+    border-color: var(--primary-color);
 }
 
 /* ═══════════════════════════════════════════
@@ -614,14 +639,15 @@ body.header-v2 .pfl-nav-area .nav-menu .dropdown li a i {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 1px 8px rgba(0,0,0,.08);
+    transition: box-shadow .25s ease;
 }
 .pfl-main-header { position: relative !important; }
 .pfl-top-bar     { position: relative !important; }
 
-/* Scroll shadow */
+/* Scroll shadow — more prominent when scrolled */
 .pfl-header-wrapper.scrolled {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,.15), 0 1px 4px rgba(0,0,0,.06);
 }
 
 /* ═══════════════════════════════════════════
@@ -881,6 +907,7 @@ body.dark-mode.header-v2 .pfl-nav-area .nav-menu > li.active > a {
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
