@@ -234,6 +234,7 @@ require_once 'includes/header.php';
 }
 </style>
 
+<?php
 // Get about page content
 try {
     $db = getDB();

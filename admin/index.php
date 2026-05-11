@@ -402,7 +402,7 @@ $showLicenseRenewalOnLogin = $showLicenseRenewalOnLogin && !$forceShowLogin;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/design-tokens.css?v=9.7">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/auth-portals-unified.css?v=8">
-    <link rel="stylesheet" href="assets/admin-modern.css?v=4.9">
+    <link rel="stylesheet" href="assets/admin-modern.css?v=6.5">
     <?php if (file_exists(__DIR__ . '/../assets/css/_color-vars.php')) require __DIR__ . '/../assets/css/_color-vars.php'; ?>
     <style>
         *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
