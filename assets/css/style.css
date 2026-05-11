@@ -2667,56 +2667,25 @@ img {
 }
 
 /* ==============================================
-   PAGE BANNER
+   PAGE BANNER — breadcrumb helpers
+   (full .page-banner definition further below — "Page Banner Enhanced")
    ============================================== */
-.page-banner {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    padding: 28px 0;
-    text-align: center;
-    color: var(--white);
+.page-banner .breadcrumb {
+    justify-content: center;
+    margin: 0;
+    font-size: 0.9rem;
 }
-
-.page-banner h1 {
-    font-size: 1.85rem;
-    margin-bottom: 10px;
-}
-
-/* ─────────────────────────────────────────
-   v10.7 Typography Consistency (Public)
-   सार्वजनिक pages मा title/subtitle को आकार एकरूप राख्ने
-   ───────────────────────────────────────── */
 .page-banner h1 {
     font-size: 1.75rem;
     font-weight: 700;
     line-height: 1.6;
 }
-.page-banner .breadcrumb {
-    font-size: 0.9rem;
-}
+.page-banner .breadcrumb-item a { color: rgba(255,255,255,0.8); }
+.page-banner .breadcrumb-item.active { color: var(--white); }
+.page-banner .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.6); }
 @media (max-width: 768px) {
-    .page-banner h1 {
-        font-size: 1.42rem;
-    }
-    .page-banner .breadcrumb {
-        font-size: 0.82rem;
-    }
-}
-
-.page-banner .breadcrumb {
-    justify-content: center;
-    margin: 0;
-}
-
-.page-banner .breadcrumb-item a {
-    color: rgba(255,255,255,0.8);
-}
-
-.page-banner .breadcrumb-item.active {
-    color: var(--white);
-}
-
-.page-banner .breadcrumb-item + .breadcrumb-item::before {
-    color: rgba(255,255,255,0.6);
+    .page-banner h1 { font-size: 1.42rem; }
+    .page-banner .breadcrumb { font-size: 0.82rem; }
 }
 
 /* ==============================================
@@ -11351,7 +11320,7 @@ input[readonly].nepali-datepicker:hover,
 
 /* Page Banner Enhanced */
 .page-banner {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0d3015 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     padding: 28px 0 32px;
     position: relative;
     overflow: hidden;

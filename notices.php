@@ -23,13 +23,6 @@ try {
     $singleNotice = null;
 }
 ?>
-<style>
-.nts-btn-primary{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
-.nts-btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
-.nts-empty-icon{color:var(--text-muted);}
-.nts-muted{color:var(--text-muted)!important;}
-</style>
-
 <!-- Page Banner -->
 <section class="page-banner">
     <div class="container">
