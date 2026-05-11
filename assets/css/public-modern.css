@@ -1,180 +1,625 @@
 /**
- * public-modern.css — Public Site Modern Polish v1.0
+ * public-modern.css — Unified Design System v2.0
  * ====================================================
- * style.css माथि load हुन्छ — override layer मात्र।
- * ─── Guide ─────────────────────────────────────────
- *  रंग:  assets/css/design-tokens.css मा बदल्नुहोस्
- *  Font: includes/header.php मा Google Font link बदल्नुहोस्
+ * Global polish: fonts, spacing, colors, forms, cards,
+ * icons, section headers, footer — sabai uniform.
+ * Logic touch gardaina — CSS override layer matra.
  * ────────────────────────────────────────────────────
  */
 
-/* ═══════════════════════════════════════════
-   GLOBAL SMOOTH — Transitions & scrolling
-   ═══════════════════════════════════════════ */
-html { scroll-behavior: smooth; }
+/* ═══════════════════════════════════════════════════
+   1. BASE — Smooth, box-sizing, font rendering
+   ═══════════════════════════════════════════════════ */
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
 *, *::before, *::after { box-sizing: border-box; }
 
-/* ═══════════════════════════════════════════
-   CARDS — Cleaner, modern
-   ═══════════════════════════════════════════ */
+body {
+    font-family: 'Mukta', 'Noto Sans Devanagari', 'Segoe UI', sans-serif !important;
+    font-size: 1rem !important;
+    line-height: 1.75 !important;
+    color: #1f2937 !important;
+    background: #f8faf9 !important;
+    -webkit-font-smoothing: antialiased !important;
+    text-rendering: optimizeLegibility !important;
+}
+
+/* Heading scale — uniform */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    color: #111827 !important;
+    letter-spacing: -0.01em !important;
+}
+h1 { font-size: clamp(1.6rem, 4vw, 2.25rem) !important; }
+h2 { font-size: clamp(1.35rem, 3vw, 1.8rem) !important; }
+h3 { font-size: clamp(1.1rem, 2.5vw, 1.4rem) !important; }
+h4 { font-size: clamp(1rem, 2vw, 1.15rem) !important; }
+h5 { font-size: 1rem !important; }
+h6 { font-size: .9rem !important; }
+
+p { line-height: 1.8 !important; color: #374151 !important; }
+a { color: var(--primary-color, #1a5f2a); transition: color .18s; }
+a:hover { color: var(--primary-dark, #144a21); }
+
+/* ═══════════════════════════════════════════════════
+   2. SCROLLBAR — Subtle brand-colored
+   ═══════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f1; }
+::-webkit-scrollbar-thumb {
+    background: rgba(var(--primary-rgb,26,95,42), .35);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--primary-rgb,26,95,42), .6);
+}
+
+/* ═══════════════════════════════════════════════════
+   3. SECTION HEADERS — Uniform across all pages
+   ═══════════════════════════════════════════════════ */
+.section-header,
+.section-header-unified {
+    margin-bottom: 2.25rem !important;
+    text-align: center !important;
+}
+.section-header h2,
+.section-header h3,
+.section-header-unified h2 {
+    font-weight: 800 !important;
+    color: #111827 !important;
+    margin-bottom: .4rem !important;
+}
+.section-header p,
+.section-header-unified p {
+    color: #6b7280 !important;
+    font-size: .97rem !important;
+    max-width: 560px !important;
+    margin: 0 auto !important;
+}
+
+/* Section badge pill */
+.section-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    background: rgba(var(--primary-rgb,26,95,42), .09) !important;
+    color: var(--primary-color, #1a5f2a) !important;
+    font-size: .78rem !important;
+    font-weight: 700 !important;
+    letter-spacing: .04em !important;
+    text-transform: uppercase !important;
+    padding: 4px 12px !important;
+    border-radius: 999px !important;
+    margin-bottom: .6rem !important;
+}
+.section-badge-wrap { margin-bottom: .35rem !important; }
+
+/* Section divider line */
+.section-divider {
+    width: 48px !important;
+    height: 3px !important;
+    background: var(--primary-color, #1a5f2a) !important;
+    border-radius: 2px !important;
+    margin: .65rem auto 1rem !important;
+}
+
+/* Section padding uniform */
+.section-padding,
+.section-py {
+    padding-top: 72px !important;
+    padding-bottom: 72px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   4. CARDS — Clean, consistent shadow & hover
+   ═══════════════════════════════════════════════════ */
 .card {
     border-radius: 14px !important;
-    border: 1px solid #eaecef !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 1px 6px rgba(0,0,0,.05) !important;
     transition: transform .22s ease, box-shadow .22s ease !important;
     overflow: hidden !important;
+    background: #fff !important;
 }
 .card:hover {
     transform: translateY(-3px) !important;
-    box-shadow: 0 8px 24px rgba(var(--primary-rgb,26,95,42),.12) !important;
+    box-shadow: 0 8px 28px rgba(var(--primary-rgb,26,95,42),.11) !important;
+    border-color: rgba(var(--primary-rgb,26,95,42),.2) !important;
 }
 .card-title {
-    font-size: 1.05rem !important;
+    font-size: 1rem !important;
     font-weight: 700 !important;
     line-height: 1.4 !important;
+    color: #111827 !important;
 }
-
-/* ═══════════════════════════════════════════
-   NAVBAR — Clean, sticky, modern
-   ═══════════════════════════════════════════ */
-.navbar {
-    transition: box-shadow .2s ease !important;
-}
-.navbar-scrolled,
-.navbar.shadow-sm {
-    box-shadow: 0 2px 12px rgba(0,0,0,.10) !important;
-}
-.navbar-nav .nav-link {
+.card-header {
+    background: #f9fafb !important;
+    border-bottom: 1px solid #e5e7eb !important;
     font-weight: 600 !important;
-    font-size: .9rem !important;
-    letter-spacing: .01em !important;
-    transition: color .18s !important;
+    padding: .85rem 1.25rem !important;
+}
+.card-body { padding: 1.4rem !important; }
+.card-footer {
+    background: #f9fafb !important;
+    border-top: 1px solid #f0f0f0 !important;
 }
 
-/* ═══════════════════════════════════════════
-   BUTTONS — Modern rounded flat
-   ═══════════════════════════════════════════ */
+/* Service cards */
+.service-card,
+.service-card-modern {
+    border-radius: 14px !important;
+    transition: transform .22s, box-shadow .22s !important;
+}
+.service-card:hover,
+.service-card-modern:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 30px rgba(var(--primary-rgb,26,95,42),.14) !important;
+}
+
+/* Form cards */
+.form-card {
+    border-radius: 14px !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06) !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 1.75rem !important;
+}
+.form-card-title {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: var(--primary-dark, #144a21) !important;
+    border-bottom: 2px solid #f0f8f2 !important;
+    padding-bottom: .65rem !important;
+    margin-bottom: 1.25rem !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   5. BUTTONS — Professional, consistent
+   ═══════════════════════════════════════════════════ */
 .btn {
-    border-radius: 8px !important;
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif !important;
     font-weight: 600 !important;
+    border-radius: 9px !important;
+    letter-spacing: .01em !important;
     transition: all .2s ease !important;
 }
+.btn-lg { padding: .65rem 1.75rem !important; font-size: 1rem !important; }
+.btn-sm { padding: .28rem .8rem !important; font-size: .82rem !important; }
+
 .btn-primary {
     background: var(--primary-color, #1a5f2a) !important;
     border-color: var(--primary-color, #1a5f2a) !important;
+    color: var(--text-on-primary, #fff) !important;
 }
-.btn-primary:hover {
+.btn-primary:hover, .btn-primary:focus {
     background: var(--primary-dark, #144a21) !important;
     border-color: var(--primary-dark, #144a21) !important;
-    box-shadow: 0 4px 12px rgba(var(--primary-rgb,26,95,42),.28) !important;
+    color: var(--text-on-primary, #fff) !important;
+    box-shadow: 0 4px 14px rgba(var(--primary-rgb,26,95,42),.28) !important;
     transform: translateY(-1px) !important;
 }
 .btn-outline-primary {
     color: var(--primary-color, #1a5f2a) !important;
     border-color: var(--primary-color, #1a5f2a) !important;
+    background: transparent !important;
 }
 .btn-outline-primary:hover {
     background: var(--primary-color, #1a5f2a) !important;
     color: #fff !important;
+    box-shadow: 0 4px 14px rgba(var(--primary-rgb,26,95,42),.22) !important;
 }
 
-/* ═══════════════════════════════════════════
-   FORM CONTROLS — Clean modern inputs
-   ═══════════════════════════════════════════ */
+/* Home page specific btn overrides */
+.home-btn-primary {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-on-primary, #fff) !important;
+}
+.home-btn-primary:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: var(--text-on-primary, #fff) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* View-all buttons */
+.view-all-btn {
+    border-radius: 10px !important;
+    padding: .6rem 1.6rem !important;
+    font-weight: 600 !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   6. FORMS — Clean, accessible, consistent
+   ═══════════════════════════════════════════════════ */
+.form-label {
+    font-weight: 600 !important;
+    font-size: .88rem !important;
+    color: #374151 !important;
+    margin-bottom: .35rem !important;
+    letter-spacing: .01em !important;
+}
 .form-control,
 .form-select {
-    border-radius: 10px !important;
+    font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif !important;
+    font-size: .96rem !important;
     border: 1.5px solid #d1d5db !important;
+    border-radius: 10px !important;
     padding: 10px 14px !important;
-    font-size: .95rem !important;
-    transition: border-color .18s, box-shadow .18s !important;
     min-height: 44px !important;
-    line-height: 1.4 !important;
+    color: #1f2937 !important;
+    background: #fff !important;
+    transition: border-color .18s, box-shadow .18s !important;
+    line-height: 1.5 !important;
 }
-.form-control:focus,
-.form-select:focus {
+.form-control:focus, .form-select:focus {
     border-color: var(--primary-color, #1a5f2a) !important;
     box-shadow: 0 0 0 3px rgba(var(--primary-rgb,26,95,42),.12) !important;
     outline: none !important;
+    background: #fff !important;
 }
-.form-label {
-    font-weight: 600 !important;
-    color: #374151 !important;
-    margin-bottom: 5px !important;
-    font-size: .9rem !important;
+.form-control::placeholder { color: #9ca3af !important; font-size: .9rem !important; }
+textarea.form-control { min-height: 110px !important; resize: vertical !important; }
+
+.input-group-text {
+    background: #f5f7fa !important;
+    border: 1.5px solid #d1d5db !important;
+    color: #6b7280 !important;
+    font-size: .88rem !important;
+    border-radius: 10px 0 0 10px !important;
+    min-height: 44px !important;
 }
 
-/* ═══════════════════════════════════════════
-   SECTION TITLES — Consistent hierarchy
-   ═══════════════════════════════════════════ */
-.section-title,
-.section-heading {
-    font-weight: 800 !important;
-    letter-spacing: -.01em !important;
-    line-height: 1.6 !important;
+/* Required asterisk */
+.req, .text-danger.req { color: #dc3545 !important; font-size: .72em !important; }
+
+/* Form section heading */
+.form-section-title {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: var(--primary-dark, #144a21) !important;
+    border-left: 3px solid var(--primary-color) !important;
+    padding-left: .75rem !important;
+    margin-bottom: 1rem !important;
+    margin-top: 1.5rem !important;
 }
 
-/* ═══════════════════════════════════════════
-   TABLES — Clean public tables
-   ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   7. TABLES — Clean professional
+   ═══════════════════════════════════════════════════ */
 .table {
-    font-size: .92rem !important;
+    font-size: .91rem !important;
+    color: #374151 !important;
 }
 .table thead th {
-    background: color-mix(in srgb, var(--primary-color,#1a5f2a) 7%, white) !important;
+    background: rgba(var(--primary-rgb,26,95,42),.06) !important;
+    color: #1a2e1f !important;
     font-weight: 700 !important;
-    color: var(--primary-dark, #374151) !important;
-    border-bottom-width: 2px !important;
-    border-color: var(--border-color, #e5e7eb) !important;
+    font-size: .8rem !important;
+    letter-spacing: .04em !important;
+    text-transform: uppercase !important;
+    border-bottom: 2px solid rgba(var(--primary-rgb,26,95,42),.15) !important;
+    padding: .7rem .9rem !important;
+    white-space: nowrap !important;
 }
-.table tbody tr:hover td {
-    background: color-mix(in srgb, var(--primary-color,#1a5f2a) 5%, white) !important;
+.table td {
+    padding: .65rem .9rem !important;
+    vertical-align: middle !important;
+    border-color: #f3f4f6 !important;
 }
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background: rgba(var(--primary-rgb,26,95,42),.025) !important;
+}
+.table-hover > tbody > tr:hover > * {
+    background: rgba(var(--primary-rgb,26,95,42),.055) !important;
+}
+.table-responsive { border-radius: 12px !important; overflow: hidden !important; }
 
-/* ═══════════════════════════════════════════
-   ALERTS & NOTICE BADGES
-   ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   8. ALERTS & BADGES — Soft pill style
+   ═══════════════════════════════════════════════════ */
 .alert {
     border-radius: 10px !important;
     border-left-width: 4px !important;
+    font-size: .92rem !important;
+    padding: .85rem 1.1rem !important;
+}
+.alert i { margin-right: 6px !important; }
+
+.badge {
+    font-family: 'Mukta', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: .73em !important;
+    border-radius: 6px !important;
+    padding: .28em .65em !important;
+    letter-spacing: .02em !important;
 }
 
-/* ═══════════════════════════════════════════
-   FOOTER — Clean modern footer
-   ═══════════════════════════════════════════ */
-footer a:hover {
-    opacity: .85 !important;
-    text-decoration: underline !important;
+/* New/latest badge on cards */
+.new-badge, .new-badge-modern {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 5px !important;
+    letter-spacing: .03em !important;
+}
+.latest-badge {
+    background: rgba(var(--primary-rgb,26,95,42),.12) !important;
+    color: var(--primary-color) !important;
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 5px !important;
+    margin-left: 6px !important;
+    vertical-align: middle !important;
 }
 
-/* ═══════════════════════════════════════════
-   SCROLLBAR — Subtle
-   ═══════════════════════════════════════════ */
-::-webkit-scrollbar { width: 7px; height: 7px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+/* ═══════════════════════════════════════════════════
+   9. ICONS — Consistent size & alignment
+   ═══════════════════════════════════════════════════ */
+/* Section icon circles */
+.service-icon,
+.service-icon-modern {
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 14px !important;
+    background: rgba(var(--primary-rgb,26,95,42),.09) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 1rem !important;
+    transition: background .2s, color .2s !important;
+}
+.service-icon i,
+.service-icon-modern i {
+    font-size: 1.5rem !important;
+    color: var(--primary-color) !important;
+    transition: color .2s !important;
+}
+.service-card:hover .service-icon,
+.service-card-modern:hover .service-icon-modern {
+    background: var(--primary-color) !important;
+}
+.service-card:hover .service-icon i,
+.service-card-modern:hover .service-icon-modern i {
+    color: #fff !important;
+}
 
-/* ═══════════════════════════════════════════
-   FOCUS VISIBLE — Accessibility modern
-   ═══════════════════════════════════════════ */
+/* Tools widget icons */
+.tools-mini-link {
+    border-radius: 10px !important;
+    transition: background .18s, transform .18s !important;
+}
+.tools-mini-link:hover {
+    transform: translateY(-2px) !important;
+}
+.tools-mini-link i {
+    font-size: 1.15rem !important;
+    color: var(--primary-color) !important;
+    transition: color .18s !important;
+}
+
+/* Footer contact icons */
+.footer-contact li i {
+    color: rgba(255,255,255,.75) !important;
+    width: 18px !important;
+    text-align: center !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+    margin-top: 3px !important;
+}
+
+/* Inline text icons */
+.btn i, a i {
+    vertical-align: -1px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   10. PAGE BANNER — Clean, consistent across pages
+   ═══════════════════════════════════════════════════ */
+.page-banner {
+    padding: 26px 0 30px !important;
+}
+.page-banner h1 {
+    font-size: clamp(1.15rem, 3vw, 1.6rem) !important;
+    font-weight: 800 !important;
+    letter-spacing: -.01em !important;
+}
+.page-banner p {
+    color: rgba(255,255,255,.82) !important;
+    font-size: .95rem !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   11. INTEREST RATES TABLE — Special styling
+   ═══════════════════════════════════════════════════ */
+.interest-rate-value {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: var(--primary-color) !important;
+    font-variant-numeric: tabular-nums !important;
+}
+.rate-row:hover { background: rgba(var(--primary-rgb,26,95,42),.04) !important; }
+
+/* ═══════════════════════════════════════════════════
+   12. NOTICES / NEWS — Card list style
+   ═══════════════════════════════════════════════════ */
+.notice-item, .news-item {
+    border-left: 3px solid transparent !important;
+    transition: border-color .18s, background .18s !important;
+    border-radius: 0 8px 8px 0 !important;
+}
+.notice-item:hover, .news-item:hover {
+    border-left-color: var(--primary-color) !important;
+    background: rgba(var(--primary-rgb,26,95,42),.04) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   13. FOOTER — Professional, clean
+   ═══════════════════════════════════════════════════ */
+.main-footer {
+    font-size: .91rem !important;
+    line-height: 1.75 !important;
+}
+.footer-top {
+    padding: 52px 0 36px !important;
+}
+.footer-widget h4 {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    letter-spacing: .02em !important;
+    margin-bottom: 1.1rem !important;
+    text-transform: uppercase !important;
+}
+.footer-links { list-style: none !important; padding: 0 !important; margin: 0 !important; }
+.footer-links li { margin-bottom: .45rem !important; }
+.footer-links a {
+    font-size: .9rem !important;
+    opacity: .82 !important;
+    transition: opacity .15s, padding-left .15s !important;
+    text-decoration: none !important;
+}
+.footer-links a:hover {
+    opacity: 1 !important;
+    padding-left: 4px !important;
+}
+.footer-contact { list-style: none !important; padding: 0 !important; }
+.footer-contact li {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+    margin-bottom: .6rem !important;
+    font-size: .9rem !important;
+    opacity: .88 !important;
+    line-height: 1.5 !important;
+}
+.footer-social {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 1rem !important;
+}
+.footer-social a {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255,255,255,.14) !important;
+    transition: background .18s, transform .18s !important;
+    text-decoration: none !important;
+}
+.footer-social a:hover {
+    background: rgba(255,255,255,.28) !important;
+    transform: translateY(-2px) !important;
+}
+.footer-bottom {
+    padding: 14px 0 !important;
+    font-size: .8rem !important;
+}
+.footer-bottom .container {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    justify-content: space-between !important;
+}
+.footer-policy-links {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    font-size: .78rem !important;
+}
+.footer-policy-links a {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    opacity: .75 !important;
+    text-decoration: none !important;
+    transition: opacity .15s !important;
+}
+.footer-policy-links a:hover { opacity: 1 !important; }
+.visitor-counter {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    font-size: .78rem !important;
+    opacity: .72 !important;
+}
+.visitor-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+.developer {
+    font-size: .78rem !important;
+    opacity: .72 !important;
+    margin: 0 !important;
+}
+.developer a { opacity: 1 !important; text-decoration: underline !important; }
+
+/* ═══════════════════════════════════════════════════
+   14. FLOATING ELEMENTS — WhatsApp, Useful Links
+   ═══════════════════════════════════════════════════ */
+.whatsapp-float {
+    right: 18px !important;
+    bottom: 80px !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   15. EMPTY STATE — Uniform across all pages
+   ═══════════════════════════════════════════════════ */
+.empty-state {
+    text-align: center !important;
+    padding: 3.5rem 1.5rem !important;
+    color: #9ca3af !important;
+}
+.empty-state i {
+    font-size: 2.75rem !important;
+    opacity: .3 !important;
+    display: block !important;
+    margin-bottom: .85rem !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   16. ACCESSIBILITY — Focus visible
+   ═══════════════════════════════════════════════════ */
 *:focus:not(:focus-visible) { outline: none; }
 *:focus-visible {
     outline: 2px solid var(--primary-color, #1a5f2a);
     outline-offset: 3px;
+    border-radius: 4px;
 }
 
-/* ═══════════════════════════════════════════
-   MOBILE — Better touch targets
-   ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   17. MOBILE — Touch-friendly, readable
+   ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
     .btn { min-height: 44px; padding: 10px 18px !important; }
-    .form-control, .form-select { font-size: 16px !important; } /* prevent iOS zoom */
+    .form-control, .form-select { font-size: 16px !important; }
+    .section-padding, .section-py { padding-top: 48px !important; padding-bottom: 48px !important; }
+    .card-body { padding: 1.1rem !important; }
+    .form-card { padding: 1.1rem !important; }
+    .footer-top { padding: 36px 0 24px !important; }
+    .footer-bottom .container {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+    h1 { font-size: 1.45rem !important; }
+    h2 { font-size: 1.25rem !important; }
 }
 
-/* ═══════════════════════════════════════════
-   PAGE BANNER — Cleaner style
-   ═══════════════════════════════════════════ */
-.page-banner h1 {
-    font-size: clamp(1.2rem, 3vw, 1.6rem) !important;
+@media (max-width: 480px) {
+    .section-badge { font-size: .72rem !important; }
+    .footer-policy-links { gap: 4px !important; font-size: .74rem !important; }
 }

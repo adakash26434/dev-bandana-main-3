@@ -528,7 +528,7 @@ $__hrefLangEn = $__seoCanon . $__hrefLangSep . 'lang=en';
             }
         }
     </style>
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/public-modern.css?v=2">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/public-modern.css?v=3">
     <!-- Global Unify v2 — consistent color/font/form/button across all panels -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/global-unify-v2.css?v=2">
     <!-- UI Uniformity + Mobile Audit — final layer patches -->
