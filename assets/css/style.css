@@ -16,15 +16,12 @@
     --primary-green10: #e8f5e9;  /* very light green background */
     --primary-green20: #c8e6c9;  /* light green border/bg */
 
-    /* ── Secondary / Accent ── */
-    --secondary-color: #ffc107;  /* yellow/gold — award, highlight */
-    --accent-color:    #17a2b8;  /* teal — info badges */
-    --coop-blue:       #3498db;  /* link blue */
+    /* ── Secondary (header/topbar — admin-overridable) ── */
+    --secondary-color: #ffc107;  /* yellow/gold fallback — _color-vars.php override गर्छ */
 
-    /* ── Dark backgrounds (Hero, Dark sections) ── */
-    --dark-navy:  #16213e;       /* hero section dark */
-    --mid-navy:   #2a3a52;       /* mid-dark section */
-    --dark-deep:  #1a1a2e;       /* deepest dark */
+    /* ── Dark mode backgrounds ── */
+    --dark-bg:        #1a2535;   /* dark mode card/section bg */
+    --dark-bg-deep:   #111825;   /* dark mode page bg */
 
     /* ── Text ── */
     --text-color:  #333333;      /* main body text */
@@ -47,7 +44,6 @@
     --success: #28a745;
     --danger:  #dc3545;
     --warning: #ffc107;
-    --info:    #17a2b8;
 
     /* ── Spacing (consistent spacing) ── */
     --section-py: 60px;          /* section top/bottom padding */
@@ -187,9 +183,9 @@
 }
 
 .scroll-btn.up {
-    background: linear-gradient(145deg, var(--primary-color), #34c759);
+    background: linear-gradient(145deg, var(--primary-color), var(--primary-light));
     color: #fff;
-    animation: pulse-scroll 2.5s ease-in-out infinite; /* subtle pulse */
+    animation: pulse-scroll 2.5s ease-in-out infinite;
 }
 
 /* UP button: subtle pulse animation */
@@ -214,7 +210,7 @@
 }
 
 .scroll-btn.up:hover {
-    background: linear-gradient(145deg, #155222, var(--primary-color));
+    background: linear-gradient(145deg, var(--primary-dark), var(--primary-color));
     box-shadow: 0 8px 28px rgba(26, 95, 42, 0.4);
 }
 
@@ -1567,7 +1563,7 @@ img {
     top: 15px;
     right: 15px;
     padding: 5px 12px;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    background: var(--secondary-color);
     color: var(--white);
     font-size: 11px;
     font-weight: 600;
@@ -1706,8 +1702,8 @@ img {
     color: var(--primary-light);
 }
 .rate-card.loan h5 i {
-    background: linear-gradient(135deg, rgba(23, 162, 184, 0.15), rgba(23, 162, 184, 0.25));
-    color: var(--accent-color);
+    background: rgba(var(--primary-rgb, 26,95,42), 0.12);
+    color: var(--primary-color);
 }
 
 .rate-card .table {
@@ -1770,7 +1766,7 @@ img {
 }
 
 .rates-header.loan {
-    background: var(--accent-color);
+    background: var(--secondary-color);
 }
 
 .rates-header i {
@@ -1804,8 +1800,8 @@ img {
 }
 
 .rate-badge.loan {
-    background: rgba(23, 162, 184, 0.1);
-    color: var(--accent-color);
+    background: rgba(var(--primary-rgb, 26,95,42), 0.08);
+    color: var(--primary-color);
 }
 
 .rates-note {
@@ -2203,7 +2199,7 @@ img {
    MOBILE APP SECTION
    ============================================== */
 .mobile-app-section {
-    background: linear-gradient(135deg, var(--dark-deep) 0%, var(--dark-navy) 100%);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
     padding: 80px 0;
     color: var(--white);
     position: relative;
@@ -2407,7 +2403,7 @@ img {
 .section-divider {
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    background: var(--primary-color);
     margin: 15px auto;
     border-radius: 2px;
 }
@@ -2417,7 +2413,7 @@ img {
     display: block;
     width: 12px;
     height: 12px;
-    background: var(--accent-color);
+    background: var(--primary-color);
     border-radius: 50%;
     margin: -4px auto 0;
 }
@@ -2455,7 +2451,7 @@ img {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    background: var(--secondary-color);
     color: var(--white);
     font-size: 10px;
     font-weight: 700;
@@ -2464,7 +2460,7 @@ img {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     animation: pulse-badge 2s infinite;
-    box-shadow: 0 3px 10px rgba(238, 90, 36, 0.4);
+    box-shadow: 0 3px 10px rgba(var(--primary-rgb,26,95,42), 0.25);
 }
 
 @keyframes pulse-badge {
@@ -5973,31 +5969,31 @@ textarea.form-control {
 
 /* Report Card Type Variations */
 .report-card.monthly .report-icon {
-    background: linear-gradient(135deg, var(--coop-blue), #2980b9);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
 }
 
 .report-card.quarterly .report-icon {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
 }
 
 .report-card.progress .report-icon {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
 }
 
 .report-card.annual .report-icon {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
 }
 
 .report-card.financial .report-icon {
-    background: linear-gradient(135deg, #00b894, #00cec9);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
 }
 
 .report-card.audit .report-icon {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
 }
 
 .report-card.agm .report-icon {
-    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
 }
 
 /* Purple button for AGM */
@@ -6283,7 +6279,7 @@ textarea.form-control {
   margin-right: 8px;
   }
 
-> .logo-text {
+.logo-text {
   display: flex;
   flex-direction: column;
   max-width: 160px;
@@ -7750,7 +7746,7 @@ body.chatbot-open {
 }
 
 .message-card.ceo-card {
-    border-top: 4px solid var(--accent-color);
+    border-top: 4px solid var(--primary-color);
 }
 
 .message-header {
@@ -8708,7 +8704,7 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .bar-warning {
-    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
 }
 
 .bar-danger {
@@ -9885,15 +9881,15 @@ input[readonly].nepali-datepicker:hover,
 }
 
 .report-quick-link.monthly:hover {
-    background: var(--coop-blue);
+    background: var(--primary-color);
     color: var(--white);
-    border-color: var(--coop-blue);
+    border-color: var(--primary-color);
 }
 
 .report-quick-link.annual:hover {
-    background: #27ae60;
+    background: var(--primary-color);
     color: var(--white);
-    border-color: #27ae60;
+    border-color: var(--primary-color);
 }
 
 @media (max-width: 767px) {
@@ -9991,7 +9987,7 @@ input[readonly].nepali-datepicker:hover,
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--coop-blue), #2980b9);
+    background: var(--primary-color);
     color: var(--white);
     border: none;
     cursor: pointer;
@@ -10035,7 +10031,7 @@ input[readonly].nepali-datepicker:hover,
     justify-content: space-between;
     align-items: center;
     padding: 15px 18px;
-    background: linear-gradient(135deg, var(--coop-blue), #2980b9);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
     color: var(--white);
 }
 
@@ -10100,7 +10096,7 @@ input[readonly].nepali-datepicker:hover,
     background: var(--light-bg);
     border-radius: 8px;
     font-size: 14px;
-    color: var(--coop-blue);
+    color: var(--primary-color);
     margin-right: 12px;
     flex-shrink: 0;
 }
@@ -12896,7 +12892,7 @@ input[readonly].nepali-datepicker:hover,
 
 /* उप-मेनु संख्या चिन्ह — header-v2.css सँग मेल (टप बारको बिज्ञापन ब्याज जस्तै) */
 .main-nav .dropdown li > a .pfl-badge.pfl-badge--submenu {
-    background: var(--accent-color, #f39c12);
+    background: var(--primary-color);
     color: #fff;
     font-size: 9px;
     padding: 1px 6px;
@@ -13235,8 +13231,8 @@ body.dark-mode .dark-mode-toggle {
     align-items: center;
     justify-content: center;
     padding: 2px 7px;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white;
+    background: var(--secondary-color);
+    color: var(--white);
     font-size: 0.6rem;
     font-weight: 700;
     border-radius: 4px;
@@ -13266,14 +13262,14 @@ body.dark-mode .dark-mode-toggle {
     top: 15px;
     right: 15px;
     padding: 5px 12px;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white;
+    background: var(--secondary-color);
+    color: var(--white);
     font-size: 0.7rem;
     font-weight: 700;
     border-radius: 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb,26,95,42), 0.2);
     animation: newBadgePulse 2s ease-in-out infinite;
     z-index: 10;
 }
@@ -13309,15 +13305,15 @@ body.dark-mode .dark-mode-toggle {
    DARK MODE BASIC STYLES
    ============================================== */
 body.dark-mode {
-    --bg-color: var(--dark-deep);
+    --bg-color: var(--dark-bg-deep);
     --text-color: var(--border-color);
-    --card-bg: var(--dark-navy);
+    --card-bg: var(--dark-bg);
     background-color: var(--bg-color);
     color: var(--text-color);
 }
 
 body.dark-mode .main-header {
-    background: var(--dark-navy);
+    background: var(--dark-bg);
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
@@ -13332,30 +13328,30 @@ body.dark-mode .nav-menu > li.active > a {
 }
 
 body.dark-mode .top-bar {
-    background: linear-gradient(135deg, #0f0f1a 0%, var(--dark-navy) 100%);
+    background: linear-gradient(135deg, var(--dark-bg-deep) 0%, var(--dark-bg) 100%);
 }
 
 body.dark-mode .card,
 body.dark-mode .service-card,
 body.dark-mode .rate-card-enhanced {
-    background: var(--dark-navy);
-    border-color: #2a2a4a;
+    background: var(--dark-bg);
+    border-color: rgba(255,255,255,.08);
 }
 
 body.dark-mode .main-footer {
-    background: linear-gradient(180deg, #0f0f1a 0%, var(--dark-navy) 100%);
+    background: linear-gradient(180deg, var(--dark-bg-deep) 0%, var(--dark-bg) 100%);
 }
 
 body.dark-mode .section-padding {
-    background-color: var(--dark-deep);
+    background-color: var(--dark-bg-deep);
 }
 
 body.dark-mode .bg-light {
-    background-color: var(--dark-navy) !important;
+    background-color: var(--dark-bg) !important;
 }
 
 body.dark-mode .notice-ticker {
-    background: var(--dark-navy);
+    background: var(--dark-bg);
 }
 
 /* Dark Mode — Form inputs, tables, modals */
@@ -13404,8 +13400,8 @@ body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
 
 body.dark-mode .dropdown-menu,
 body.dark-mode .nav-menu .dropdown {
-    background: var(--dark-navy);
-    border-color: #2a2a4a;
+    background: var(--dark-bg);
+    border-color: rgba(255,255,255,.08);
 }
 
 body.dark-mode .nav-menu .dropdown li a {
@@ -13420,7 +13416,7 @@ body.dark-mode .nav-menu .dropdown li a:hover {
 body.dark-mode .modal-content,
 body.dark-mode .chatbot-box,
 body.dark-mode .useful-links-popup-box {
-    background: var(--dark-navy);
+    background: var(--dark-bg);
     color: var(--border-color);
 }
 
@@ -13431,7 +13427,7 @@ body.dark-mode .chatbot-header {
 }
 
 body.dark-mode .chatbot-body {
-    background: var(--dark-deep);
+    background: var(--dark-bg-deep);
 }
 
 body.dark-mode .faq-question {
@@ -13462,8 +13458,8 @@ body.dark-mode .tool-card,
 body.dark-mode .form-card,
 body.dark-mode .result-box,
 body.dark-mode .success-card {
-    background: var(--dark-navy);
-    border-color: #2a2a4a;
+    background: var(--dark-bg);
+    border-color: rgba(255,255,255,.08);
     color: var(--border-color);
 }
 
@@ -14337,19 +14333,19 @@ body.dark-mode .notice-ticker .ticker-label {
 body.dark-mode .section-padding,
 body.dark-mode .bg-light,
 body.dark-mode section.bg-light {
-    background-color: var(--dark-deep) !important;
+    background-color: var(--dark-bg-deep) !important;
 }
 
 /* Cards in dark mode — better contrast */
 body.dark-mode .card,
 body.dark-mode .service-card {
-    background: #1e2d40 !important;
-    border-color: var(--mid-navy) !important;
+    background: var(--dark-bg) !important;
+    border-color: rgba(255,255,255,.08) !important;
     color: #e0e0e8;
 }
 body.dark-mode .card .card-header {
-    background: #16243a !important;
-    border-bottom-color: var(--mid-navy) !important;
+    background: var(--dark-bg-deep) !important;
+    border-bottom-color: rgba(255,255,255,.08) !important;
     color: #e0e0e8;
 }
 body.dark-mode .card .card-title,
@@ -14360,7 +14356,7 @@ body.dark-mode .card h4 {
 
 /* Badges — dark mode मा readable */
 body.dark-mode .badge.bg-light {
-    background: var(--mid-navy) !important;
+    background: var(--dark-bg) !important;
     color: #c8d8e8 !important;
 }
 
@@ -14416,8 +14412,8 @@ body.dark-mode .alert-danger {
 /* Rate cards / stat boxes */
 body.dark-mode .rate-card-enhanced,
 body.dark-mode .stat-card-public {
-    background: #1e2d40 !important;
-    border-color: var(--mid-navy) !important;
+    background: var(--dark-bg) !important;
+    border-color: rgba(255,255,255,.08) !important;
 }
 
 /* Form labels in dark mode */
@@ -14436,9 +14432,9 @@ body.dark-mode .form-select:focus {
 /* Nepali datepicker in dark mode */
 body.dark-mode .nepali-datepicker-popup,
 body.dark-mode .ndp-calendar {
-    background: #1e2d40 !important;
+    background: var(--dark-bg) !important;
     color: var(--border-color) !important;
-    border-color: var(--mid-navy) !important;
+    border-color: rgba(255,255,255,.08) !important;
 }
 
 /* EMI calculator dark mode */
@@ -14448,13 +14444,13 @@ body.dark-mode .schedule-table th {
     color: var(--border-color) !important;
 }
 body.dark-mode .schedule-table td {
-    border-color: var(--mid-navy) !important;
+    border-color: rgba(255,255,255,.08) !important;
     color: #c8d8e8 !important;
 }
 
 /* Mobile menu in dark mode */
 body.dark-mode .mobile-nav {
-    background: var(--dark-navy) !important;
+    background: var(--dark-bg) !important;
 }
 body.dark-mode .mobile-nav-link {
     color: var(--border-color) !important;
