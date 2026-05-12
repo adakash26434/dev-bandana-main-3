@@ -165,40 +165,5 @@ require_once 'includes/header.php';
     </div>
 </section>
 
-<style>
-.page-content-box {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.08);
-}
-
-.page-featured-image img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-}
-
-/* विषयवस्तु: universal.css → .coop-prose (page-body सँगै) */
-
-.page-tags .badge {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    border: 1px solid #e0e0e0;
-}
-
-.error-box {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 60px 40px;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.08);
-}
-
-@media (max-width: 767px) {
-    .page-content-box {
-        padding: 25px;
-    }
-}
-</style>
 
 <?php require_once 'includes/footer.php'; ?>

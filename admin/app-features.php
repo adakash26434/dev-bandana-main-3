@@ -67,32 +67,6 @@ $flash = getFlash();
 
 <?php if (!empty($flash)) { echo adminAlert($flash['type'] === 'success' ? 'success' : 'danger', $flash['message']); } ?>
 
-<style>
-.appfeat-flat-top{border-top-left-radius:0!important;border-top-right-radius:0!important;}
-.appfeat-icon-wrap{width:44px;height:44px;background:linear-gradient(135deg,color-mix(in srgb, var(--primary-color) 12%, white),color-mix(in srgb, var(--primary-light) 16%, white));border-radius:10px;display:flex;align-items:center;justify-content:center;}
-.appfeat-inline-form{display:inline;}
-.appfeat-toggle-badge{cursor:pointer;}
-.appfeat-form-header{background:linear-gradient(135deg,var(--primary-color),var(--primary-light));color:var(--text-on-primary);}
-.appfeat-stat-pill{background:color-mix(in srgb,var(--primary-color) 14%, white);color:var(--primary-dark);border:1px solid color-mix(in srgb,var(--primary-color) 24%, white);}
-.appfeat-count-badge{background:var(--primary-color)!important;color:var(--text-on-primary)!important;}
-.appfeat-icon{color:var(--primary-color);}
-.appfeat-order-badge{background:color-mix(in srgb,var(--primary-color) 10%, white);color:var(--primary-dark);border:1px solid color-mix(in srgb,var(--primary-color) 20%, white);}
-.appfeat-label{color:var(--primary-dark);}
-.appfeat-icon-prev{background:var(--primary-color);color:var(--text-on-primary);}
-.appfeat-submit{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
-.appfeat-submit:hover,.appfeat-submit:focus{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
-.appfeat-muted{color:var(--text-muted)!important;}
-.appfeat-toggle-on{background:color-mix(in srgb,var(--secondary-color) 16%,white);color:var(--secondary-dark);}
-.appfeat-toggle-off{background:color-mix(in srgb,var(--text-muted) 12%,white);color:var(--text-light);}
-.appfeat-status-on{background:color-mix(in srgb,var(--primary-color) 16%,white);color:var(--primary-dark);}
-.appfeat-status-off{background:color-mix(in srgb,var(--text-muted) 14%,white);color:var(--text-light);}
-.appfeat-btn-edit{background:var(--primary-color);border-color:var(--primary-color);color:var(--text-on-primary);}
-.appfeat-btn-edit:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:var(--text-on-primary);}
-.appfeat-btn-delete{background:var(--secondary-color);border-color:var(--secondary-color);color:var(--text-on-secondary);}
-.appfeat-btn-delete:hover{background:var(--secondary-dark);border-color:var(--secondary-dark);color:var(--text-on-secondary);}
-.appfeat-cancel-btn{background:color-mix(in srgb,var(--primary-color) 8%,white);color:var(--primary-dark);border:1px solid color-mix(in srgb,var(--primary-color) 18%,white);}
-.appfeat-required{color:var(--secondary-color);}
-</style>
 
 <ul class="nav nav-tabs admin-nav-tabs mb-0">
     <li class="nav-item">

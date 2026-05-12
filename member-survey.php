@@ -224,26 +224,6 @@ require_once 'includes/header.php';
 <!-- =============================================
      Feedback / Survey Modal — Bootstrap 5
      ============================================= -->
-<style>
-/* Popup हटाएर inline card style */
-#surveyModal {
-    display: block;
-    position: static;
-    background: transparent;
-}
-#surveyModal .modal-dialog {
-    max-width: 860px;
-    margin: 0 auto 2rem;
-}
-#surveyModal .modal-content {
-    border: 0;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-}
-#surveyModal .btn-close {
-    display: none;
-}
-</style>
 <div class="modal fade show" id="surveyModal" tabindex="-1" aria-labelledby="surveyModalLabel" aria-hidden="false">
     <div class="modal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content">

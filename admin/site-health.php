@@ -673,46 +673,6 @@ function htmlEsc(s) {
           </div>
       </div><!-- /.card form field preview -->
 
-      <style>
-      /* ── Form Field Preview styles ── */
-      #fp-canvas { min-height: 280px; }
-      .fp-section-label {
-          font-size: .72rem;
-          font-weight: 700;
-          letter-spacing: .06em;
-          text-transform: uppercase;
-          color: var(--primary-color, #1a5f2a);
-          border-left: 3px solid var(--primary-color, #1a5f2a);
-          padding: 2px 0 2px 10px;
-          margin-bottom: 1rem;
-      }
-      /* Simulated focus for the "Focus" state demo cell */
-      .fp-simfocus {
-          border-color: var(--primary-color, #1a5f2a) !important;
-          box-shadow: 0 0 0 3px rgba(26,95,42,.15) !important;
-      }
-      /* Dark mode canvas */
-      #fp-canvas.fp-dark {
-          background: #1e293b;
-          border-radius: 0 0 .375rem .375rem;
-      }
-      #fp-canvas.fp-dark .form-control,
-      #fp-canvas.fp-dark .form-select,
-      #fp-canvas.fp-dark .input-group-text {
-          background: #0f172a;
-          border-color: #334155;
-          color: #e2e8f0;
-      }
-      #fp-canvas.fp-dark .form-control::placeholder { color: #64748b; }
-      #fp-canvas.fp-dark .form-label,
-      #fp-canvas.fp-dark .form-check-label,
-      #fp-canvas.fp-dark .fp-section-label,
-      #fp-canvas.fp-dark .form-text { color: #94a3b8 !important; }
-      #fp-canvas.fp-dark .fp-section-label { border-left-color: #4ade80; color: #4ade80 !important; }
-      #fp-canvas.fp-dark .form-check-input { background-color: #0f172a; border-color: #475569; }
-      #fp-canvas.fp-dark .btn-outline-secondary { color: #94a3b8; border-color: #475569; }
-      #fp-canvas.fp-dark label.form-label { color: #94a3b8 !important; }
-      </style>
 
       <script>
       (function() {

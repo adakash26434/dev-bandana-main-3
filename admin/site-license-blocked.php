@@ -107,153 +107,28 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
     <title>म्याद सकियो — Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --coop-900: #14532d;
-            --coop-700: #15803d;
-            --ink: #0f172a;
-            --muted: #64748b;
-            --line: #e2e8f0;
-            --amber-bg: #fffbeb;
-            --amber-br: #fcd34d;
-        }
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Devanagari", "Mukta", sans-serif;
-            background: linear-gradient(165deg, #ecfdf5 0%, #f0fdf4 28%, #f8fafc 72%);
-            color: var(--ink);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: clamp(16px, 4vw, 32px);
-        }
-        .shell { width: 100%; max-width: 540px; }
-        .card-main {
-            border-radius: 20px;
-            border: 1px solid var(--line);
-            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, .06), 0 20px 50px -12px rgba(22, 101, 52, .12);
-            overflow: hidden;
-            background: #fff;
-        }
-        .card-head {
-            background: linear-gradient(135deg, var(--coop-900) 0%, var(--coop-700) 100%);
-            color: #fff;
-            padding: 1.35rem 1.5rem 1.25rem;
-            text-align: center;
-        }
-        .card-head h1 {
-            margin: 0;
-            font-size: clamp(1.1rem, 3.2vw, 1.3rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            line-height: 1.35;
-        }
-        .card-head .sub {
-            margin: 0.65rem 0 0;
-            opacity: 0.92;
-            font-size: 0.9rem;
-            line-height: 1.55;
-        }
-        .ico-wrap {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 14px;
-            border-radius: 50%;
-            background: var(--amber-bg);
-            border: 1px solid var(--amber-br);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(217, 119, 6, .15);
-        }
-        .ico-wrap i { font-size: 1.85rem; color: #d97706; }
-        .card-body-inner { padding: 1.4rem 1.5rem 1.5rem; }
-        .pill-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; }
-        .pill {
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            background: #fef3c7;
-            color: #92400e;
-            border: 1px solid #fcd34d;
-        }
-        .dates-box {
-            background: #f8fafc;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 1rem 1.1rem;
-            margin-bottom: 1.15rem;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-        .dates-box .lbl { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 0.2rem; }
-        .vendor-note {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 14px;
-            padding: 0.9rem 1rem;
-            margin-bottom: 1rem;
-            text-align: left;
-            font-size: 0.82rem;
-            line-height: 1.55;
-            color: #1e3a5f;
-        }
-        .pay-box {
-            background: #f8fafc;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 1rem 1.1rem;
-            margin-bottom: 1rem;
-            text-align: left;
-            font-size: 0.85rem;
-        }
-        .pay-box code { color: #be185d; font-weight: 600; }
-        .amt-locked {
-            background: #f3f4f6;
-            border: 2px dashed #9ca3af;
-            border-radius: 10px;
-            padding: 0.65rem 0.85rem;
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-        .steps {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 14px;
-            padding: 1rem 1.1rem;
-            margin-bottom: 1.25rem;
-            text-align: left;
-        }
-        .steps ol { margin: 0; padding-left: 1.2rem; font-size: 0.88rem; line-height: 1.65; color: #334155; }
-        .btn-logout {
-            border-radius: 12px;
-            font-weight: 600;
-            padding: 0.5rem 1.25rem;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/admin-modern.css">
 </head>
 <body>
-<div class="shell">
-    <div class="card-main">
-        <div class="card-head">
-            <div class="ico-wrap"><i class="fas fa-calendar-xmark" aria-hidden="true"></i></div>
+<div class="slb-shell">
+    <div class="slb-card-main">
+        <div class="slb-card-head">
+            <div class="slb-ico-wrap"><i class="fas fa-calendar-xmark" aria-hidden="true"></i></div>
             <h1>साइट सेवा म्याद सकियो</h1>
             <p class="sub"><strong><?php echo $siteH; ?></strong> — साधारण Admin को प्यानल अस्थायी बन्द छ। तल नवीकरण वा भुक्तानी सूचना गर्नुहोस्।</p>
         </div>
-        <div class="card-body-inner text-center">
-            <div class="pill-row">
-                <span class="pill"><i class="fas fa-circle-exclamation me-1"></i>म्याद सकियो · Expired</span>
+        <div class="slb-card-body text-center">
+            <div class="slb-pill-row">
+                <span class="slb-pill"><i class="fas fa-circle-exclamation me-1"></i>म्याद सकियो · Expired</span>
             </div>
 
-            <div class="vendor-note">
+            <div class="slb-vendor-note">
                 <strong>सूचना:</strong> SSL certificates तथा domain active शुल्क कृपया तुरुन्तै अनलाइनमार्फत भुक्तानी गर्नुहोला, अन्यथा domain स्वतः suspend हुन सक्नेछ।
                 अन्य cloud, maintenance, support तथा license सम्बन्धी लागतको विस्तृत जानकारी तथा भुक्तानी प्रक्रियाका लागि कृपया सम्बन्धित vendor सँग सम्पर्क गर्नुहुन अनुरोध गरिन्छ।
             </div>
 
             <?php if ($untilBs !== ''): ?>
-            <div class="dates-box">
+            <div class="slb-dates-box">
                 <div class="lbl">अन्तिम वैध दिन / Last valid day</div>
                 <div><strong>बि.सं.</strong> <?php echo $untilBsNpH; ?> <span class="text-muted">(<code><?php echo $untilBsH; ?></code>)</span></div>
                 <?php if ($untilAd !== ''): ?>
@@ -284,12 +159,12 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
                 <div class="mt-2 text-muted">पुष्टि/सक्रिय अपडेट नआउँदासम्म प्रतीक्षा गर्नुहोस्। दोहोरो भुक्तानी नगर्नुहोस्।</div>
             </div>
             <?php elseif ($showPayForm): ?>
-            <div class="pay-box">
+            <div class="slb-pay-box">
                 <div class="fw-bold mb-2 text-success"><i class="fas fa-mobile-screen-button me-1"></i>Pay Now — आफ्नो wallet बाट पठाउनुहोस्</div>
                 <p class="small text-secondary mb-2">तलका नम्बर <strong>विक्रेता खाता</strong> हुन्। आफ्नो Khalti वा eSewa बाट Send/Transfer गर्नुहोस्।</p>
                 <?php if ($blockedPayAmount !== ''): ?>
                 <p class="mb-1 small"><strong>रकम (नवीकरण सेटिङ — बदल्न मिल्दैन):</strong></p>
-                <div class="amt-locked mb-2 text-start"><?php echo htmlspecialchars($blockedPayAmount, ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="slb-amt-locked mb-2 text-start"><?php echo htmlspecialchars($blockedPayAmount, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php else: ?>
                 <p class="small text-warning mb-2">रकम अझै सेट भएको छैन। व्यवस्थापक वा विक्रेता सम्पर्क गर्नुहोस्।</p>
                 <?php endif; ?>
@@ -329,7 +204,7 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
             </form>
             <?php endif; ?>
 
-            <div class="steps">
+            <div class="slb-steps">
                 <div class="fw-semibold text-success mb-2 small"><i class="fas fa-list-check me-1"></i>संक्षेप</div>
                 <ol class="mb-0">
                     <li>यो पृष्ठ कार्यालय/साधारण Admin का लागि हो — माथि Pay Now + सूचना उपलब्ध छ।</li>
@@ -337,7 +212,7 @@ $showPayForm = ($blockedPendingRow === null && !$blockedRenewalSent);
                 </ol>
             </div>
 
-            <a href="logout.php" class="btn btn-outline-secondary btn-logout">
+            <a href="logout.php" class="btn btn-outline-secondary slb-btn-logout">
                 <i class="fas fa-right-from-bracket me-2"></i>लगआउट
             </a>
         </div>

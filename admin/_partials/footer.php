@@ -8,15 +8,4 @@
   <a href="/admin/logout.php" class="admin-nav-item"><i class="fas fa-right-from-bracket"></i><span>लगआउट</span></a>
 </nav>
 
-<style>
-  .admin-bottom-nav .admin-nav-item {
-    display:flex;flex-direction:column;align-items:center;gap:2px;
-    color:var(--text-muted);text-decoration:none;font-size:11px;font-weight:600;
-    padding:4px 8px;border-radius:var(--radius-sm);transition:color .15s;
-  }
-  .admin-bottom-nav .admin-nav-item:hover { color:var(--brand-primary); }
-  .admin-bottom-nav .admin-nav-item i { font-size:18px; }
-  body.admin-shell { padding-bottom: 70px; }
-  @media (min-width: 900px) { .admin-bottom-nav { display:none; } body.admin-shell { padding-bottom:0; } }
-</style>
 </body></html>
